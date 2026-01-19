@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Resources Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .top-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .top-link-btn {
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid #667eea;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+
+        .top-link-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        }
+
+        .section-header h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin: 0;
+            border: none;
+            padding: 0;
+            flex: 1;
+        }
+
+        .toggle-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .section-content {
+            padding: 30px;
+            display: none;
+            animation: slideDown 0.4s ease;
+        }
+
+        .section-content.open {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin: 20px 0 15px 0;
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .resource-item {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .resource-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .resource-label {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .link-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resource-link {
+            color: #333;
+            text-decoration: none;
+            flex: 1;
+            word-break: break-word;
+            font-size: 0.95rem;
+        }
+
+        .resource-link:hover {
+            color: #667eea;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .conference-box {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .conference-box h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .conference-detail {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prompt-box {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .prompt-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .prompt-text {
+            color: #333;
+            line-height: 1.8;
+            font-family: 'Courier New', monospace;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .student-section {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .student-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #ffd700;
+            color: #333;
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .link-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .copy-btn {
+                width: 100%;
+            }
+            
+            .top-links {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            
+            .toggle-btn {
+                width: 100%;
+            }
+        }
+
+        .copied-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .copied-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="copied-notification" id="notification">✓ Copied to clipboard!</div>
+    
+    <div class="container">
+        <!-- TOP LINKS -->
+        <div class="top-links">
+            <a href="https://codepen.io/-K-the-builder/full/QwEpbxo" target="_blank" class="top-link-btn">
+                <span>🎨</span> CodePen Demo
+            </a>
+            <a href="https://app.milanote.com/1VH5CZ14P2bp3t?p=XzAhcmdwp2f" target="_blank" class="top-link-btn">
+                <span>📋</span> Milanote Board
+            </a>
+        </div>
+  <a href="https://lmarena.ai/ru" target="_blank" class="top-link-btn">
+                <span>📋</span> LMN
+            </a>
+        </div>
+        <div class="header">
+            <h1>📚 English Learning Resources Hub</h1>
+            <p>Your comprehensive collection of teaching materials, links, and prompts</p>
+        </div>
+<!-- STARLIGHT TEST BOOKLETS -->
+<div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+        <h2>⭐ Starlight – Test Booklets</h2>
+        <button class="toggle-btn">Expand</button>
+    </div>
+
+    <div class="section-content">
+        <div class="resource-grid">
+
+            <div class="resource-item">
+                <span class="resource-label">4 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://go.11klasov.net/3980-starlight-4-zvezdnyy-angliyskiy-4-klass-test-booklet-kontrolnye-zadaniya-baranova-km-duli-d-i-dr.html">
+                    Starlight 4 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">5 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://go.11klasov.net/4004-starlight-5-zvezdnyy-angliyskiy-5-klass-kontrolnye-zadaniya-baranova-km-i-dr.html">
+                    Starlight 5 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">6 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://drive.google.com/file/d/1Qg6ZKgQHtim58HsA6u9aUkNqgcbR7QTB/view?usp=sharing">
+                    Starlight 6 – Test Booklet (PDF)
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">7 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://go.11klasov.net/3991-starlight-7-zvezdnyy-angliyskiy-7-klass-kontrolnye-zadaniya-baranova-km-i-dr.html">
+                    Starlight 7 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">8 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://drive.google.com/file/d/1Aur8Rg17F3MJKxe-NSFodf7rv00l1Jsq/view?usp=sharing">
+                    Starlight 8 – Test Booklet (PDF)
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">9 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://drive.google.com/file/d/1BHaFrdOBwt9bNgFIoHh4gytHbkGQvP2h/view?usp=sharing">
+                    Starlight 9 – Test Booklet (PDF)
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- SPOTLIGHT TEST BOOKLETS -->
+<div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+        <h2>💡 Spotlight – Test Booklets</h2>
+        <button class="toggle-btn">Expand</button>
+    </div>
+
+    <div class="section-content">
+        <div class="resource-grid">
+
+            <div class="resource-item">
+                <span class="resource-label">4 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://kniga-figa.ru/spotlight-4-anglijskij-yazyk-4-klass-anglijskij-v-fokuse-kontrolnye-zadaniya-bykova-n-i-duli-dzh/">
+                    Spotlight 4 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">5 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://kniga-figa.ru/spotlight-5-anglijskij-v-fokuse-5-klass-kontrolnye-zadaniya-vaulina/">
+                    Spotlight 5 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">6 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://kniga-figa.ru/spotlight-6-anglijskij-v-fokuse-6-klass-kontrolnye-zadaniya-vaulina/">
+                    Spotlight 6 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">7 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://kniga-figa.ru/spotlight-7-anglijskij-v-fokuse-7-klass-kontrolnye-zadaniya-vaulina/">
+                    Spotlight 7 – Test Booklet
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">8 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://drive.google.com/file/d/1ctgeJKDpc68xhyzOTB7A2Q8nFIO4jMJQ/view?usp=sharing">
+                    Spotlight 8 – Test Booklet (PDF)
+                </a>
+            </div>
+
+            <div class="resource-item">
+                <span class="resource-label">9 класс</span>
+                <a class="resource-link" target="_blank"
+                   href="https://drive.google.com/file/d/1_zA6VHSr-8_spPJ80hj-CAaWN5tLUF7U/view?usp=sharing">
+                    Spotlight 9 – Test Booklet (PDF)
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+        <!-- STARLIGHT SECTION -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>⭐ Starlight Resources</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <h3>Starlight 4</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">p 1</span>
+                        <div class="link-wrapper">
+                            <a href="https://psv4.userapi.com/s/v1/d/idhC_L3qjE5orEf-CUunsej7nVjXmVHgHPNfj7MvHiYPuEvXbXvgg8DDJOjYc1xJBaYHpcSiFE9LSVorhV4aGy4L7kBtBNvi9tiTZSazjGTS6MMSb4LfpQ/Starlight_4_Student_s_Book_part_1.pdf" target="_blank" class="resource-link">Starlight_4_Student_s_Book_part_1.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://psv4.userapi.com/s/v1/d/idhC_L3qjE5orEf-CUunsej7nVjXmVHgHPNfj7MvHiYPuEvXbXvgg8DDJOjYc1xJBaYHpcSiFE9LSVorhV4aGy4L7kBtBNvi9tiTZSazjGTS6MMSb4LfpQ/Starlight_4_Student_s_Book_part_1.pdf')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">p 2</span>
+                        <div class="link-wrapper">
+                            <a href="https://drive.google.com/file/d/1PIy583kDUB8vZvhkFCvutw7PKkMvm-PE/preview" target="_blank" class="resource-link">Baranova_Duli_Starlight_4_kl_2ch_2012 -ilovepdf-compressed.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://drive.google.com/file/d/1PIy583kDUB8vZvhkFCvutw7PKkMvm-PE/preview')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">wb 1</span>
+                        <div class="link-wrapper">
+                            <a href="https://drive.google.com/file/d/1zG6Lwf2XHHw6iISpgnYEMBkZECuDT_Ou/view" target="_blank" class="resource-link">Starlight-4.-Rab.-tetrad-v-2ch.-CH.1_Baranova-Duli-i-dr_2019-80s.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://drive.google.com/file/d/1zG6Lwf2XHHw6iISpgnYEMBkZECuDT_Ou/view')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">wb 2</span>
+                        <div class="link-wrapper">
+                            <a href="https://drive.google.com/file/d/107om0e88zRG2PJMy1Eb9SdO84VC9MA23/view" target="_blank" class="resource-link">WB part2.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://drive.google.com/file/d/107om0e88zRG2PJMy1Eb9SdO84VC9MA23/view')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">ex</span>
+                        <div class="link-wrapper">
+                            <a href="https://drive.google.com/file/d/1SZnSAfpNoX_ND4lI8F04NS_IQ85pdWHU/view" target="_blank" class="resource-link">starlight_4_sbornik_uprazhnenii.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://drive.google.com/file/d/1SZnSAfpNoX_ND4lI8F04NS_IQ85pdWHU/view')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">grammar</span>
+                        <div class="link-wrapper">
+                            <a href="https://drive.google.com/file/d/1WuYe8MRbySfb8gE-x9skcxc6G5RdaE5U/view" target="_blank" class="resource-link">Starlight_4_Sbornik_gram_upr_Ryazantseva_2019.pdf</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://drive.google.com/file/d/1WuYe8MRbySfb8gE-x9skcxc6G5RdaE5U/view')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Starlight 2-6</h3>
+                <div class="resource-item">
+                    <div class="link-wrapper">
+                        <a href="https://sites.google.com/view/lobankovapi/%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F-%D0%BA%D0%BE%D0%BF%D0%B8%D0%BB%D0%BA%D0%B0/%D0%B4%D0%BE/2-%D0%BA%D0%BB%D0%B0%D1%81%D1%81?authuser=0" target="_blank" class="resource-link">Страничка учителя - 2 класс</a>
+                        <button class="copy-btn" onclick="copyToClipboard('https://sites.google.com/view/lobankovapi/%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F-%D0%BA%D0%BE%D0%BF%D0%B8%D0%BB%D0%BA%D0%B0/%D0%B4%D0%BE/2-%D0%BA%D0%BB%D0%B0%D1%81%D1%81?authuser=0')">Copy</button>
+                    </div>
+                </div>
+
+                <h3>Starlight 6-9</h3>
+                <div class="resource-grid">
+                    <!-- Starlight 6 -->
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/6-klass/angliyskiy-yazyk-6-klass-starlight-6-zvezdnyy-angliyskiy-6-klass-baranova-k-m-duli-d-kopylova-v-v?ysclid=mhuxg7piml672276723" target="_blank" class="resource-link">Английский язык. 6 класс. Starlight 6</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/6-klass/angliyskiy-yazyk-6-klass-starlight-6-zvezdnyy-angliyskiy-6-klass-baranova-k-m-duli-d-kopylova-v-v?ysclid=mhuxg7piml672276723')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/6-klass/starlight-6-zvezdnyy-angliyskiy-6-klass-rabochaya-tetrad-baranova-k-m-duli-d?ysclid=mhuxgvfghi697680392" target="_blank" class="resource-link">Starlight 6 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/6-klass/starlight-6-zvezdnyy-angliyskiy-6-klass-rabochaya-tetrad-baranova-k-m-duli-d?ysclid=mhuxgvfghi697680392')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Starlight 7 -->
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/7-klass/angliyskiy-yazyk-7-klass-starlight-7-uchebnik-baranova-duli-kopylova?ysclid=mhuxh8odvq808823824" target="_blank" class="resource-link">Английский язык 7 класс Starlight 7</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/7-klass/angliyskiy-yazyk-7-klass-starlight-7-uchebnik-baranova-duli-kopylova?ysclid=mhuxh8odvq808823824')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/7-klass/starlight-7-angliyskiy-yazyk-7-klass-rabochaya-tetrad-baranova-k-m-duli-d?ysclid=mhuxhg96e9631349590" target="_blank" class="resource-link">Starlight 7 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/7-klass/starlight-7-angliyskiy-yazyk-7-klass-rabochaya-tetrad-baranova-k-m-duli-d?ysclid=mhuxhg96e9631349590')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Starlight 8 -->
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/8-klass/starlight-8-zvezdnyy-angliyskiy-8-klass-uchebnik-baranova-duli-kopylova?ysclid=mhuxhuu1py846799288" target="_blank" class="resource-link">Starlight 8 (Звездный английский 8 класс)</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/8-klass/starlight-8-zvezdnyy-angliyskiy-8-klass-uchebnik-baranova-duli-kopylova?ysclid=mhuxhuu1py846799288')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/8-klass/starlight-8-rabochaya-tetrad-angliyskiy-yazyk-8-klass-baranova-duli?ysclid=mhuxi0ebtk976313614" target="_blank" class="resource-link">Starlight 8 рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/8-klass/starlight-8-rabochaya-tetrad-angliyskiy-yazyk-8-klass-baranova-duli?ysclid=mhuxi0ebtk976313614')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Starlight 9 -->
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/9-klass/angliyskiy-yazyk-9-klass-starlight-9-zvezdnyy-angliyskiy-baranova-k-m-duli-d?ysclid=mhuxi8ca0466837593" target="_blank" class="resource-link">Английский язык. 9 класс. Starlight 9</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/9-klass/angliyskiy-yazyk-9-klass-starlight-9-zvezdnyy-angliyskiy-baranova-k-m-duli-d?ysclid=mhuxi8ca0466837593')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/9-klass/starlight-9-zvezdnyy-angliyskiy-9-klass-rabochaya-tetrad-baranova-duli?ysclid=mhuxigg9cw592403959" target="_blank" class="resource-link">Starlight 9 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/9-klass/starlight-9-zvezdnyy-angliyskiy-9-klass-rabochaya-tetrad-baranova-duli?ysclid=mhuxigg9cw592403959')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPOTLIGHT SECTION -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🔦 Spotlight Resources</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <!-- Spotlight 5 -->
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/5-klass/angliyskiy-yazyk-5-klass-spotlight-5-angliyskiy-v-fokuse-uchebnik-vaulina-yu-e-duli-dzh?ysclid=mhuxjurbqp347829134" target="_blank" class="resource-link">Spotlight 5. Английский в фокусе. Учебник</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/5-klass/angliyskiy-yazyk-5-klass-spotlight-5-angliyskiy-v-fokuse-uchebnik-vaulina-yu-e-duli-dzh?ysclid=mhuxjurbqp347829134')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/5-klass/spotlight-5-workbook-angliyskiy-v-fokuse-5-klass-angliyskiy-yazyk-rabochaya-tetrad-vaulina?ysclid=mhuxk52ri6866747979" target="_blank" class="resource-link">Spotlight 5 workbook</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/5-klass/spotlight-5-workbook-angliyskiy-v-fokuse-5-klass-angliyskiy-yazyk-rabochaya-tetrad-vaulina?ysclid=mhuxk52ri6866747979')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Spotlight 6 -->
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/6-klass/angliyskiy-yazyk-6-klass-spotlight-6-angliyskiy-v-fokuse-6-klass-vaulina-yu-e-duli-d-podolyako-o-e?ysclid=mhuxkhbio1193269565" target="_blank" class="resource-link">Spotlight 6 (Английский в фокусе. 6 класс)</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/6-klass/angliyskiy-yazyk-6-klass-spotlight-6-angliyskiy-v-fokuse-6-klass-vaulina-yu-e-duli-d-podolyako-o-e?ysclid=mhuxkhbio1193269565')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/6-klass/spotlight-6-angliyskiy-v-fokuse-6-klass-rabochaya-tetrad-vaulina-yu-e-duli-dzh" target="_blank" class="resource-link">Spotlight 6 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/6-klass/spotlight-6-angliyskiy-v-fokuse-6-klass-rabochaya-tetrad-vaulina-yu-e-duli-dzh')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Spotlight 7 -->
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/7-klass/angliyskiy-yazyk-spotlight-7-angliyskiy-v-fokuse-7-klass-vaulina-duli?ysclid=mhuxlo5chg271904103" target="_blank" class="resource-link">Spotlight 7 (Английский в фокусе 7 класс)</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/7-klass/angliyskiy-yazyk-spotlight-7-angliyskiy-v-fokuse-7-klass-vaulina-duli?ysclid=mhuxlo5chg271904103')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/7-klass/spotlight-7-angliyskiy-yazyk-7-klass-rabochaya-tetrad-vaulina-yu-e-duli-dzh" target="_blank" class="resource-link">Spotlight 7 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/7-klass/spotlight-7-angliyskiy-yazyk-7-klass-rabochaya-tetrad-vaulina-yu-e-duli-dzh')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Spotlight 8 -->
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/8-klass/spotlight-8-angliyskiy-v-fokuse-8-klass-uchebnik-vaulina-duli" target="_blank" class="resource-link">Spotlight 8 (Английский в фокусе 8 класс)</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/8-klass/spotlight-8-angliyskiy-v-fokuse-8-klass-uchebnik-vaulina-duli')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/8-klass/spotlight-8-rabochaya-tetrad-vaulina-duli" target="_blank" class="resource-link">Spotlight 8 рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/8-klass/spotlight-8-rabochaya-tetrad-vaulina-duli')">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Spotlight 9 -->
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс SB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/uchebniki/9-klass/angliyskiy-yazyk-9-klass-spotlight-angliyskiy-v-fokuse-vaulina-yu-e-duli-dzh" target="_blank" class="resource-link">Spotlight. (Английский в фокусе) 9 класс</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/uchebniki/9-klass/angliyskiy-yazyk-9-klass-spotlight-angliyskiy-v-fokuse-vaulina-yu-e-duli-dzh')">Copy</button>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс WB</span>
+                        <div class="link-wrapper">
+                            <a href="https://uchebniki-school.ru/rabochie-tetradi/9-klass/spotlight-9-angliyskiy-v-fokuse-9-klass-rabochaya-tetrad-vaulina-duli" target="_blank" class="resource-link">Spotlight 9 Рабочая тетрадь</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://uchebniki-school.ru/rabochie-tetradi/9-klass/spotlight-9-angliyskiy-v-fokuse-9-klass-rabochaya-tetrad-vaulina-duli')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONFERENCES -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🎥 Conference Links</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <div class="conference-box">
+                    <h4>Zoom Conference 1</h4>
+                    <div class="conference-detail">
+                        <span>ID: 791 8227 1796 | Password: 123456</span>
+                        <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1')">Copy Link</button>
+                    </div>
+                </div>
+
+                <div class="conference-box">
+                    <h4>Zoom Conference 2</h4>
+                    <div class="conference-detail">
+                        <span>ID: 826 5841 5026 | Password: 5C3E71</span>
+                        <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1')">Copy Link</button>
+                    </div>
+                </div>
+
+                <div class="conference-box">
+                    <h4>Zoom Conference 3</h4>
+                    <div class="conference-detail">
+                        <span>ID: 864 5559 1163 | Password: 8NBLmv</span>
+                        <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/86455591163?pwd=5OYaA3tztc1ONhqKhjLOr5SK0EGuGI.1')">Copy Link</button>
+                    </div>
+                </div>
+
+                <div class="conference-box">
+                    <h4>Zoom Conference 4</h4>
+                    <div class="conference-detail">
+                        <span>ID: 879 9080 5738 | Password: 700700</span>
+                        <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/87990805738?pwd=0T597Pn7QyC5F4CVl7tyYZnEHo99eZ.1')">Copy Link</button>
+                    </div>
+                </div>
+
+                <div class="resource-grid" style="margin-top: 20px;">
+                    <div class="resource-item">
+                        <span class="resource-label">MS Teams</span>
+                        <div class="link-wrapper">
+                            <a href="https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt" target="_blank" class="resource-link">Join Teams Meeting</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Yandex (Adults)</span>
+                        <div class="link-wrapper">
+                            <a href="https://telemost.yandex.ru/j/96276160430845" target="_blank" class="resource-link">Telemost Adults</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://telemost.yandex.ru/j/96276160430845')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Yandex (Kids)</span>
+                        <div class="link-wrapper">
+                            <a href="https://telemost.yandex.ru/j/32323878732068" target="_blank" class="resource-link">Telemost Kids</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://telemost.yandex.ru/j/32323878732068')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">FrogCall</span>
+                        <div class="link-wrapper">
+                            <a href="https://frogcall.app/frog-soothing-lake-qnx" target="_blank" class="resource-link">Frog Room</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://frogcall.app/frog-soothing-lake-qnx')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STUDENT SECTIONS -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>👥 Student Resources</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <!-- LIZA -->
+                <div class="student-section">
+                    <h3>📖 Liza - Pre-B1 Level</h3>
+                    <span class="tag">Comics</span>
+                    <span class="tag">PET Prep</span>
+                    <span class="tag">Think Level 2</span>
+                    
+                    <div class="resource-grid" style="margin-top: 15px;">
+                        <div class="resource-item">
+                            <span class="resource-label">W.I.T.C.H. Comic</span>
+                            <div class="link-wrapper">
+                                <a href="https://batcave.biz/reader/30891/216864" target="_blank" class="resource-link">Read Online</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://batcave.biz/reader/30891/216864')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">PET Practice</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.flipbuilder.com/sdtta/epxn/" target="_blank" class="resource-link">Practice Tests</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.flipbuilder.com/sdtta/epxn/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">PET Speaking</span>
+                            <div class="link-wrapper">
+                                <a href="https://app.engxam.com/pet/speaking/1/" target="_blank" class="resource-link">Speaking Practice</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://app.engxam.com/pet/speaking/1/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Think 2 SB</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.flipbuilder.com/sdtta/fxjv/" target="_blank" class="resource-link">Student's Book</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.flipbuilder.com/sdtta/fxjv/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Think 2 WB</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.flipbuilder.com/sdtta/mdho/" target="_blank" class="resource-link">Workbook</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.flipbuilder.com/sdtta/mdho/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Film: Journey 2</span>
+                            <div class="link-wrapper">
+                                <a href="https://ridomovies.tv/movies/journey-2-the-mysterious-island-watch-online-2012-rd2" target="_blank" class="resource-link">Watch Movie</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://ridomovies.tv/movies/journey-2-the-mysterious-island-watch-online-2012-rd2')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EGOR -->
+                <div class="student-section" style="background: linear-gradient(135deg, #ffeaa7, #fdcb6e);">
+                    <h3>🎮 Egor - A1 Level</h3>
+                    <span class="tag">FNAF Comics</span>
+                    <span class="tag">Spotlight 5</span>
+                    <span class="tag">Interactive Games</span>
+                    
+                    <div class="resource-grid" style="margin-top: 15px;">
+                        <div class="resource-item">
+                            <span class="resource-label">FNAF Comic</span>
+                            <div class="link-wrapper">
+                                <a href="https://readcomiconline.li/Comic/Five-Nights-at-Freddy-s-The-Fourth-Closet/TPB?id=228539&s=s2#17" target="_blank" class="resource-link">Read Fourth Closet</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://readcomiconline.li/Comic/Five-Nights-at-Freddy-s-The-Fourth-Closet/TPB?id=228539&s=s2#17')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Comic Board</span>
+                            <div class="link-wrapper">
+                                <a href="https://www.tldraw.com/r/YnaZZU0eOoKgbwCEldQcZ?d=v0.-34.1280.653.zUyUyvq_8r1JZaQIfFFB7" target="_blank" class="resource-link">Interactive Board</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://www.tldraw.com/r/YnaZZU0eOoKgbwCEldQcZ?d=v0.-34.1280.653.zUyUyvq_8r1JZaQIfFFB7')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">School Board</span>
+                            <div class="link-wrapper">
+                                <a href="https://app.moyadoska.com/board/d1c5b0b5-d2a4-463f-8ef3-9feb0d9eea92" target="_blank" class="resource-link">Moya Doska</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://app.moyadoska.com/board/d1c5b0b5-d2a4-463f-8ef3-9feb0d9eea92')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Spotlight 5 SB</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.fliphtml5.com/eezrn/qguu/#p=53" target="_blank" class="resource-link">Student's Book</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.fliphtml5.com/eezrn/qguu/#p=53')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Holst Board</span>
+                            <div class="link-wrapper">
+                                <a href="https://app.holst.so/invite/975bb258-eb46-4672-a955-a10817c5bed8" target="_blank" class="resource-link">Egor's Holst</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://app.holst.so/invite/975bb258-eb46-4672-a955-a10817c5bed8')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SONYA -->
+                <div class="student-section" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
+                    <h3>🎵 Sonya - A1 Level</h3>
+                    <span class="tag">Songs</span>
+                    <span class="tag">Listening</span>
+                    <span class="tag">Interactive</span>
+                    
+                    <div class="resource-grid" style="margin-top: 15px;">
+                        <div class="resource-item">
+                            <span class="resource-label">Listening Practice</span>
+                            <div class="link-wrapper">
+                                <a href="https://www.english-room.com/listening-english-exams/" target="_blank" class="resource-link">English Room</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://www.english-room.com/listening-english-exams/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Starters Listening</span>
+                            <div class="link-wrapper">
+                                <a href="https://www.esleschool.com/en_gb/birthday-party-starters-listening/" target="_blank" class="resource-link">Birthday Party Activity</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://www.esleschool.com/en_gb/birthday-party-starters-listening/')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SOPHIA -->
+                <div class="student-section" style="background: linear-gradient(135deg, #fd79a8, #e17055);">
+                    <h3>🎓 Sophia - B1+ Level</h3>
+                    <span class="tag">Think 3</span>
+                    <span class="tag">Advanced Topics</span>
+                    <span class="tag">Legal English</span>
+                    
+                    <div class="resource-grid" style="margin-top: 15px;">
+                        <div class="resource-item">
+                            <span class="resource-label">Legal English</span>
+                            <div class="link-wrapper">
+                                <a href="https://moodle2.units.it/pluginfile.php/324776/mod_resource/content/1/Legal%20English%20R.%20Haigh%20British%20and%20American%20English.pdf" target="_blank" class="resource-link">British vs American</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://moodle2.units.it/pluginfile.php/324776/mod_resource/content/1/Legal%20English%20R.%20Haigh%20British%20and%20American%20English.pdf')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Think 3 SB</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.flipbuilder.com/sdtta/ewjo/" target="_blank" class="resource-link">Student's Book</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.flipbuilder.com/sdtta/ewjo/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Think 3 WB</span>
+                            <div class="link-wrapper">
+                                <a href="https://online.flipbuilder.com/sdtta/stuc/" target="_blank" class="resource-link">Workbook</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://online.flipbuilder.com/sdtta/stuc/')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Interstellar Film</span>
+                            <div class="link-wrapper">
+                                <a href="https://inoriginal.net/films/210-interstellar-2014.html" target="_blank" class="resource-link">Watch with Subtitles</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://inoriginal.net/films/210-interstellar-2014.html')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Film Script</span>
+                            <div class="link-wrapper">
+                                <a href="https://subslikescript.com/movie/Interstellar-816692" target="_blank" class="resource-link">Interstellar Script</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://subslikescript.com/movie/Interstellar-816692')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">BBC News Review</span>
+                            <div class="link-wrapper">
+                                <a href="https://www.bbc.co.uk/learningenglish/english/course/newsreview/unit-1" target="_blank" class="resource-link">BBC Learning</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://www.bbc.co.uk/learningenglish/english/course/newsreview/unit-1')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OUTCOMES -->
+                <div class="student-section" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+                    <h3>📘 Outcomes Pre-Intermediate</h3>
+                    
+                    <div class="resource-grid" style="margin-top: 15px;">
+                        <div class="resource-item">
+                            <span class="resource-label">Student's Book</span>
+                            <div class="link-wrapper">
+                                <a href="https://archive.org/details/outcomes-2ed-pre-intermediate-students-book-www.frenglish.ru/page/66/mode/2up?view=theater" target="_blank" class="resource-link">Archive.org</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://archive.org/details/outcomes-2ed-pre-intermediate-students-book-www.frenglish.ru/page/66/mode/2up?view=theater')">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="resource-item">
+                            <span class="resource-label">Workbook</span>
+                            <div class="link-wrapper">
+                                <a href="https://kami.app/EcS-nSQ-AzU-aPB" target="_blank" class="resource-link">Kami App</a>
+                                <button class="copy-btn" onclick="copyToClipboard('https://kami.app/EcS-nSQ-AzU-aPB')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GRAMMAR & BOARDS -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>📝 Grammar & Interactive Boards</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">Wordwall 1</span>
+                        <div class="link-wrapper">
+                            <a href="https://wordwall.net/teacher/628253/myteachingstuff" target="_blank" class="resource-link">My Teaching Stuff</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://wordwall.net/teacher/628253/myteachingstuff')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Wordwall 2</span>
+                        <div class="link-wrapper">
+                            <a href="https://wordwall.net/teacher/19324810/chillskillteam" target="_blank" class="resource-link">Chill Skill Team</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://wordwall.net/teacher/19324810/chillskillteam')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">HOLST</span>
+                        <div class="link-wrapper">
+                            <a href="https://app.holst.so/share/b/6417f98b-098a-44f3-ad61-59e86741dfbe" target="_blank" class="resource-link">Main Holst</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://app.holst.so/share/b/6417f98b-098a-44f3-ad61-59e86741dfbe')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">E.HOLST</span>
+                        <div class="link-wrapper">
+                            <a href="https://app.holst.so/share/b/8140ec86-1189-4da4-8bd2-2aff4012e959" target="_blank" class="resource-link">Extended Board</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://app.holst.so/share/b/8140ec86-1189-4da4-8bd2-2aff4012e959')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">GRAMMAR</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.engblocks.com/grammar/exercises/" target="_blank" class="resource-link">Free English Grammar Exercises Online</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.engblocks.com/grammar/exercises/')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">BAMBOOZLE</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.baamboozle.com/games" target="_blank" class="resource-link">Games Directory</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.baamboozle.com/games')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">EDUCAPLAY</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.educaplay.com/learning-resources/" target="_blank" class="resource-link">Free Educational games directory</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.educaplay.com/learning-resources/')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Yandex Board</span>
+                        <div class="link-wrapper">
+                            <a href="https://boards.yandex.ru/whiteboard/?hash=4f0527aa47cc3b133daf46add43e86fb" target="_blank" class="resource-link">Whiteboard</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://boards.yandex.ru/whiteboard/?hash=4f0527aa47cc3b133daf46add43e86fb')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Taskade</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.taskade.com/d/y3GsmFditMBHnQ5D?share=view&view=QXu1GaPtoqxrGjj3&as=list" target="_blank" class="resource-link">Project Manager</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.taskade.com/d/y3GsmFditMBHnQ5D?share=view&view=QXu1GaPtoqxrGjj3&as=list')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- AI PROMPTS -->
+<div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+        <h2>🤖 AI Teaching Prompts</h2>
+        <button class="toggle-btn">Expand</button>
+    </div>
+    <div class="section-content">
+        
+        <div class="prompt-box">
+            <h4>📝 A1 Worksheet</h4>
+            <div class="prompt-text">
+Ты — преподаватель английского языка, создающий рабочие листы для уровня A1–A2.
+Я дам тебе список новых слов и фраз (иногда с эмоджи). Ты должен придумать точно такие же упражнения, как в примере ниже, но с новыми словами.
+
+Обязательные правила:
+— НИКОГДА не указывай правильные ответы рядом с заданиями.
+— Всегда перемешивай варианты ответов во всех заданиях, т.е. MIX THEM UP (особенно в Match, Phrase Match и Odd one out).
+— Структура и нумерация упражнений должна быть точно как в образце.
+— Используй эмоджи для слов/фраз, если я их не дал.
+— Не повторяй инструкции — сразу давай готовый рабочий лист.
+
+Текущие изменения в структуре (всегда используй именно так):
+
+EXERCISE 2 называется теперь «Word Beginnings Match» — нужно соединить начало слова с правильным окончанием (вместо синонимов).
+EXERCISE 2.1 оставь как «ANTONYM MATCH», но обязательно пиши в заголовке или инструкции: «Find antonyms (A1 level)».
+EXERCISE 7 теперь называется «Complete the Words» — ученик дописывает пропущенные буквы в словах (вместо таблицы).
+
+Пример структуры (всегда делай точно так же, только с новыми словами):
+
+LEAD-IN. Read Words and Emojis
+Read the words and look at the emojis. Say each word aloud.
+[список слов/фраз с эмоджи]
+
+EXERCISE 1. Match the Word and the Correct Emoji
+Match each word or phrase to the correct emoji.
+[список слов]
+Emojis:
+[перемешанные буквы a–i]
+
+EXERCISE 2. Word Beginnings Match
+Match the beginning of the word with the correct ending.
+[левая колонка: начала слов]
+[правая колонка: перемешанные окончания]
+
+EXERCISE 2.1. ANTONYM MATCH – Find antonyms (A1 level)
+Match the word with its opposite.
+[слова]
+Words to match:
+[перемешанные антонимы a–h]
+
+EXERCISE 3. PHRASE MATCH
+Match the beginning of each phrase with its ending.
+[левая колонка]
+Endings:
+[перемешанные окончания a–f]
+
+EXERCISE 4. Odd Word Out
+Which word does not belong? Circle it and explain why.
+[5 строчек по 3–4 слова, варианты перемешаны]
+
+EXERCISE 5. Put the Words in the Correct Order
+Make correct sentences.
+[перемешанные слова в скобках] — _________
+
+EXERCISE 6. Complete Using the Correct Word
+Choose from the box and fill in the blanks:
+[список слов в рамке]
+[предложения с пропусками]
+
+EXERCISE 7. Complete the Words
+Write the missing letters.
+p _ _ s _ n t
+l _ c k _
+и т.д.
+
+Теперь, когда я даю новые слова — делай рабочий лист по этой обновлённой структуре.
+_______________________________________________
+После этого ты сразу (без дополнительных вопросов) оформляешь готовый материал в красивую HTML-страницу со следующими обязательными элементами:
+
+6 кнопок вверху для смены темы: Comic, Underwater, Flourish, Five Nights at Freddy's, Cosmic, Sunrise (меняют только фон и цвета через CSS-классы, без JavaScript).
+Шрифт Raleway, крупный текст ~29px.
+Комиксные яркие заголовки.
+Каждое упражнение в отдельном белом/полупрозрачном блоке с тенью.
+Два столбца для списков, таблицы для всех Match и Phrase Match.
+Только чистый HTML + встроенный CSS, без JS и лишнего текста.
+Разные шрифты для каждого стиля и разные интересные, но простые анимации для каждого стиля.
+НЕ ИСПОЛЬЗУЙ БЕЛЫЙ ШРИФТ (ТОЛЬКО ТЁМНО-СИНИЙ, ТЁМНО-ЗЕЛЁНЫЙ, ЧЁРНЫЙ, ТЁМНО-КОРИЧНЕВЫЙ) и используй простые интересные, но ЧИТАЕМЫЕ ШРИФТЫ.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>📝 A1 Worksheet English</h4>
+            <div class="prompt-text">
+You are an English teacher creating worksheets for A0–A1 level students.
+I will give you a list of new words and phrases (sometimes with emojis). You must create exactly the same exercises as in the example below, but with the new words.
+
+Mandatory rules:
+— NEVER show correct answers next to the tasks.
+— ALWAYS shuffle answer options in ALL exercises, i.e., MIX THEM UP (especially in Match, Phrase Match, and Odd One Out).
+— The structure and numbering of exercises must be exactly like the example.
+— Use emojis for words/phrases if I haven't provided them.
+— Do not repeat instructions — immediately provide the finished worksheet.
+
+Current structure changes (always use exactly like this):
+
+EXERCISE 2 is now called "Word Beginnings Match" — students connect the beginning of a word with the correct ending (instead of synonyms).
+EXERCISE 2.1 stays as "ANTONYM MATCH," but always write in the title or instruction: "Find antonyms (A1 level)."
+EXERCISE 7 is now called "Complete the Words" — students write the missing letters in words (instead of a table).
+
+Example structure (always do exactly like this, just with new words):
+
+LEAD-IN. Read Words and Emojis
+Read the words and look at the emojis. Say each word aloud.
+[list of words/phrases with emojis]
+
+EXERCISE 1. Match the Word and the Correct Emoji
+Match each word or phrase to the correct emoji.
+[list of words]
+Emojis:
+[shuffled letters a–i]
+
+EXERCISE 2. Word Beginnings Match
+Match the beginning of the word with the correct ending.
+[left column: word beginnings]
+[right column: shuffled endings]
+
+EXERCISE 2.1. ANTONYM MATCH – Find antonyms (A1 level)
+Match the word with its opposite.
+[words]
+Words to match:
+[shuffled antonyms a–h]
+
+EXERCISE 3. PHRASE MATCH
+Match the beginning of each phrase with its ending.
+[left column]
+Endings:
+[shuffled endings a–f]
+
+EXERCISE 4. Odd Word Out
+Which word does not belong? Circle it and explain why.
+[5 rows of 3–4 words each, options shuffled]
+
+EXERCISE 5. Put the Words in the Correct Order
+Make correct sentences.
+[scrambled words in brackets] — _________
+
+EXERCISE 6. Complete Using the Correct Word
+Choose from the box and fill in the blanks:
+[list of words in a box]
+[sentences with gaps]
+
+EXERCISE 7. Complete the Words
+Write the missing letters.
+p _ _ s _ n t
+l _ c k _
+etc.
+
+Now, when I give new words — create a worksheet using this updated structure.
+_______________________________________
+After that, immediately (without additional questions) format the finished material into a beautiful HTML page with the following mandatory elements:
+
+6 buttons at the top for theme switching: Comic, Underwater, Flourish, Five Nights at Freddy's, Cosmic, Sunrise (change only background and colors via CSS classes, without JavaScript).
+Raleway font, large text ~29px.
+Bright comic-style headers.
+Each exercise in a separate white/semi-transparent block with shadow.
+Two columns for lists, tables for all Match and Phrase Match exercises.
+Only clean HTML + inline CSS, no JS and no extra text.
+Different fonts for every style and different interesting but simple animations for every style.
+DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN) and use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎬 B1+ SOPHIA</h4>
+            <div class="prompt-text">
+Please create 7 B2 level "fill-in-the-gap" sentences based on the text I provide.
+
+Step 1: List the 7 target words in RANDOMIZED order before the gap-fill exercise.
+
+Step 2: Create gap-fill sentences using those 7 words. Do NOT show answers next to the gaps.
+
+Step 3: Create a vocabulary matching task using the same 7 words, with shuffled definitions presented in two columns:
+• Column 1: Numbered words (1–7)
+• Column 2: Lettered definitions (A–G) — SHUFFLED, not in matching order
+
+Step 4: Present both exercises using colorful HTML styling to make it visually appealing.
+
+Important rules:
+— Do NOT forget to shuffle the variants in all exercises.
+— Provide answers afterwards HIDDEN in HTML using a small clickable "." sign or hidden details tag.
+— Use attractive fonts (Raleway or similar), colorful headers, and exercise blocks with shadows.
+— Make it print-friendly and classroom-ready.
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN).
+— Use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎯 True/False FILM LIZA</h4>
+            <div class="prompt-text">
+Based on the text I provide, please create the following exercises:
+
+EXERCISE 1: TRUE OR FALSE (7 statements)
+Create 7 true-or-false statements based on the text.
+Format them as flippable cards (front = statement, back = True/False).
+Make them visually engaging in Quizizz style.
+
+EXERCISE 2: MATCHING HALVES (5 pairs)
+Create 5 sentence halves based on the text.
+• Display the first halves in Column 1, labeled 1–5.
+• Display the second halves in Column 2, labeled A–E — SHUFFLED, not in matching order.
+• Include gap-fill inside the second halves, with a word bank listed above.
+
+Important formatting rules:
+— DO NOT SHOW THE ANSWERS next to the exercises.
+— HIDE all answers in a small button in the top-right corner (or use HTML details/summary tag).
+— Use colorful HTML styling similar to Quizizz — bright colors, rounded cards, playful fonts.
+— Make it interactive-looking and classroom-ready.
+— Use readable dark fonts only (dark blue, dark green, black, or dark brown).
+— DO NOT USE WHITE FONT.
+— Use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎵 Song-Based SOPHI A1</h4>
+            <div class="prompt-text">
+You're an AI assistant helping an English teacher create interactive learning materials for A0–A1 students based on a song.
+
+I will give you the lyrics of a song. Follow these steps:
+
+STEP 1: SONG HTML PAGE WITH MP3 PLAYER
+• Create a simple HTML page that displays the full lyrics.
+• Embed a basic MP3 player using HTML5 audio tag (leave src empty or with placeholder).
+• Style the page for readability with a nice background.
+_________________________
+STEP 2: GAP-FILL LYRICS EXERCISE
+• Show the lyrics with gaps as I've written (missing words-do not show words).
+• Do NOT show answers next to the gaps.
+___________________________
+STEP 3: VOCABULARY EXERCISES (based on new words from the song)
+NEW WORDS:_____________________________
+Create these exercises using the structure below:
+
+LEAD-IN: Read Words and Emojis — list new words with emojis.
+
+EXERCISE 1: Match the Word and the Correct Emoji — words + shuffled emojis (a–h).
+
+EXERCISE 2: Word Beginnings Match — match word beginnings with shuffled endings.
+
+EXERCISE 2.1: ANTONYM MATCH – Find antonyms (A1 level) — words + shuffled antonyms.
+
+EXERCISE 3: PHRASE MATCH — match phrase beginnings with shuffled endings.
+
+EXERCISE 4: Odd Word Out — 5 rows of 3–4 words, circle the word that doesn't belong. Options shuffled.
+
+EXERCISE 5: Put the Words in the Correct Order — scrambled sentences.
+
+EXERCISE 6: Complete Using the Correct Word — gap-fill with word box.
+
+EXERCISE 7: Complete the Words — write missing letters.
+
+Formatting rules:
+— ALWAYS shuffle answer options in every exercise.
+— NEVER show correct answers next to tasks.
+— Use colorful HTML with Raleway font, ~29px text, comic-style headers.
+— Each exercise in a separate block with shadow.
+— Two columns for lists, tables for matching exercises.
+— Only clean HTML + inline CSS, no JavaScript.
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN).
+— Use simple interesting but READABLE FONTS.
+— Different fonts for every theme style.
+— Different interesting but simple animations for every theme style.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎮 SOPHI Mission-Style Exercises</h4>
+            <div class="prompt-text">
+You are creating gamified English exercises for A1-level students in a Call of Duty-inspired style.
+
+Based on the vocabulary/text I provide, generate exercises formatted as MISSIONS with these elements:
+
+MISSION BRIEFING: Introduction to the lesson topic (dramatic, action-style language).
+
+MISSION 1: INTEL GATHERING (Vocabulary Match)
+• Match words to definitions or images.
+• Present as "gathering intel" before the mission.
+• Shuffle all answer options.
+
+MISSION 2: CODE BREAKER (Word Beginnings Match)
+• Match word beginnings to endings.
+• Style as "decoding enemy messages."
+• Shuffle all endings.
+
+MISSION 3: ENEMY DETECTION (Odd One Out)
+• Find the word that doesn't belong in each group.
+• Present as "identifying the enemy spy."
+• 5 rows of 3–4 words, all options shuffled.
+
+MISSION 4: TACTICAL SENTENCES (Put Words in Order)
+• Unscramble sentences.
+• Style as "reconstructing intercepted communications."
+
+MISSION 5: SUPPLY DROP (Gap-Fill)
+• Complete sentences with words from the supply box.
+• Present as "filling your ammo/supply crate."
+
+MISSION 6: FINAL ASSAULT (Complete the Words)
+• Write missing letters in words.
+• Present as "the final push to victory."
+
+DEBRIEF: Space for teacher notes or review.
+
+Formatting requirements:
+— Use dark military colors (army green, black, dark brown) with accent colors (orange, red).
+— Include placeholder spaces for custom images (mission badges, character icons).
+— Use bold, military-style fonts (Orbitron, Black Ops One, or similar).
+— Each mission in a separate block with tactical styling.
+— Include "RANK UP" or "XP EARNED" sections for gamification.
+— Shuffle all answer options in every exercise.
+— Hide answers in a collapsible "CLASSIFIED" section.
+— Clean HTML + CSS only, no JavaScript.
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN).
+— Use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>📖 Comic Lesson Generator (Pre-B1)</h4>
+            <div class="prompt-text">
+Создай HTML-страницу для занятий по комиксу/картинке, которую я тебе пришлю.
+
+Уровень: Pre-B1
+Язык упражнений: ALL IN ENGLISH
+
+Включи следующие упражнения:
+
+1. READ NEW WORDS
+Список новых слов с определениями и примерами предложений (всё на английском).
+
+2. COMPLETE THE SENTENCES (Gap-Fill)
+Предложения с пропусками. Слова для заполнения даны в рамке сверху (перемешаны).
+
+3. TRUE OR FALSE
+Предложения по содержанию комикса. Ученик определяет — True или False.
+
+4. MATCHING HALVES
+Соедини начало предложения с правильным окончанием.
+Левая колонка: 1–5 (начала)
+Правая колонка: A–E (окончания, ПЕРЕМЕШАНЫ)
+
+5. FILL IN THE GAPS
+Ещё одно упражнение с пропусками, используя новые слова.
+
+6. ANSWER ABCD QUESTIONS
+Вопросы с вариантами ответов (A, B, C, D) по содержанию комикса и новым словам.
+
+7. GRAMMAR EXERCISES
+Упражнения на грамматику (_________________) с использованием новых слов.
+
+Требования к оформлению:
+— Яркий мультяшный фон, подходящий для подростков.
+— Фиолетовые крупные заголовки (~29px).
+— Шрифт Raleway.
+— Каждое упражнение в отдельном блоке с тенью.
+— Два столбца для списков.
+— Таблицы для Matching упражнений.
+— ПЕРЕМЕШИВАЙ все варианты ответов.
+— НЕ показывай правильные ответы рядом с заданиями.
+— Спрячь ответы в скрытом блоке (details/summary или кнопка).
+— Только чистый HTML + CSS, без JavaScript.
+— НЕ ИСПОЛЬЗУЙ БЕЛЫЙ ШРИФТ (ТОЛЬКО ТЁМНО-СИНИЙ, ТЁМНО-ЗЕЛЁНЫЙ, ЧЁРНЫЙ, ТЁМНО-КОРИЧНЕВЫЙ).
+— Используй простые интересные, но ЧИТАЕМЫЕ ШРИФТЫ.
+— Разные шрифты для каждого стиля.
+— Разные интересные, но простые анимации для каждого стиля.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🔄 Multiple Choice Translation Exercise (RU↔EN)</h4>
+            <div class="prompt-text">
+Create a multiple choice translation exercise for A1-level students.
+
+I will give you a list of English phrases/sentences. You will create questions like this:
+
+FORMAT FOR ENGLISH → RUSSIAN (Questions 1-3):
+"She can work out" — как перевести?
+A) Она может плавать
+B) Он может тренироваться
+C) Она может бегать
+D) Она может тренироваться ✓ (hide correct answer)
+
+FORMAT FOR RUSSIAN → ENGLISH (Questions 4-6):
+"Мы вышли из дома" — how to translate?
+A) We left the house ✓ (hide correct answer)
+B) We lived in the house
+C) We loved the house
+D) We lost the house
+
+Rules:
+— Questions 1-3: English to Russian translation
+— Questions 4-6: Russian to English translation
+— Each question has 4 options (A, B, C, D)
+— Mix up similar-sounding or similar-meaning options to make it challenging
+— DO NOT show correct answers next to questions
+— Hide all answers in a separate "ANSWER KEY" section at the bottom (collapsible)
+
+Formatting:
+— Use colorful HTML with clear, readable fonts
+— Each question in a numbered block
+— Options clearly labeled A, B, C, D
+— Use different background colors for EN→RU and RU→EN sections
+— Make it print-friendly for classroom use
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN)
+— Use simple interesting but READABLE FONTS
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎨 Multi-Theme SOPHI</h4>
+            <div class="prompt-text">
+Ты — веб-дизайнер, создающий красивые рабочие листы для уроков английского.
+
+Создай HTML-страницу с готовыми упражнениями, которые я тебе дам.
+
+ОБЯЗАТЕЛЬНЫЕ ЭЛЕМЕНТЫ ДИЗАЙНА:
+
+1. ПЕРЕКЛЮЧАТЕЛЬ ТЕМ (6 кнопок вверху страницы):
+• Comic — жёлтый фон в горошек, шрифт Bangers, pop-art анимация
+• Underwater — голубой градиент, шрифт Bubblegum Sans, плавающая анимация
+• Flourish — розовый цветочный фон, шрифт Dancing Script, fade-in анимация
+• Five Nights at Freddy's — тёмный клетчатый фон, шрифт Creepster, glitch анимация
+• Cosmic — фиолетовый космический градиент, шрифт Orbitron, glow анимация
+• Sunrise — персиковый градиент, шрифт Abril Fatface, rise-up анимация
+
+2. ОБЩИЕ ТРЕБОВАНИЯ К СТИЛЮ:
+• Шрифт по умолчанию: Raleway
+• Размер текста: ~29px
+• Комиксные яркие заголовки
+• Каждое упражнение в отдельном белом/полупрозрачном блоке с тенью
+• Два столбца для списков (не четыре!)
+• Таблицы для всех Match и Phrase Match заданий
+
+3. ВАЖНЫЕ ПРАВИЛА:
+• Только чистый HTML + встроенный CSS
+• БЕЗ JavaScript (переключение тем через CSS radio buttons)
+• НЕ ИСПОЛЬЗОВАТЬ БЕЛЫЙ ШРИФТ
+• Только тёмные читаемые цвета: тёмно-синий, тёмно-зелёный, чёрный, тёмно-коричневый
+• Разные интересные, но простые анимации для каждой темы
+• Разные читаемые шрифты для каждой темы
+
+4. СТРУКТУРА СТРАНИЦЫ:
+• Панель с кнопками тем (sticky сверху)
+• Контейнер с упражнениями
+• Каждое упражнение в отдельном блоке
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🖼️ Image-Based Vocabulary Lesson (A1-A2)</h4>
+            <div class="prompt-text">
+I will send you an image. Based on what you see in the image, create a complete vocabulary lesson for A1-A2 level students. 
+
+Include the following exercises:
+
+1. NEW VOCABULARY LIST
+• List 8-10 words related to the image with emojis.
+• Include simple definitions in English.
+• Add example sentences for each word.
+
+2. MATCH THE WORD AND THE CORRECT EMOJI
+• Words on the left (numbered 1-8).
+• Emojis on the right (lettered a-h, SHUFFLED).
+
+3. WORD BEGINNINGS MATCH
+• Match the beginning of each word with the correct ending.
+• Left column: word beginnings.
+• Right column: endings (SHUFFLED).
+
+4. ANTONYM MATCH – Find antonyms (A1 level)
+• Match words with their opposites.
+• Shuffle all answer options.
+
+5. DESCRIBE THE IMAGE
+• Write 5 sentences about what you see in the image.
+• Use the new vocabulary.
+
+6. TRUE OR FALSE
+• Create 5 statements about the image.
+• Students decide if each statement is True or False.
+
+7. COMPLETE THE SENTENCES
+• Gap-fill exercise using the new vocabulary.
+• Word bank provided above (SHUFFLED).
+
+8. COMPLETE THE WORDS
+• Write the missing letters in each word.
+
+Formatting requirements:
+— SHUFFLE all answer options in every matching exercise.
+— DO NOT show correct answers next to tasks.
+— Hide answers in a collapsible section at the bottom.
+— Use colorful HTML with Raleway font, ~29px text.
+— Bright comic-style headers.
+— Each exercise in a separate block with shadow.
+— Two columns for lists.
+— Tables for matching exercises.
+— Only clean HTML + inline CSS, no JavaScript.
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN).
+— Use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>📺 Video Exercises (B1)</h4>
+            <div class="prompt-text">
+Based on the video transcript/film dialogue I provide, create comprehensive exercises for B1 level students.
+
+Include the following:
+
+1. KEY VOCABULARY (8-10 words)
+• List important words from the text with definitions.
+• Include example sentences.
+• Add emojis for visual support.
+
+2. VOCABULARY MATCHING
+• Column 1: Words (numbered 1-8)
+• Column 2: Definitions (lettered A-H, SHUFFLED)
+
+3. GAP-FILL EXERCISE (7 sentences)
+• Create sentences using the key vocabulary.
+• Word bank provided above (SHUFFLED order).
+• Blanks for students to fill in.
+
+4. TRUE OR FALSE (7 statements)
+• Statements based on the content of the video/film.
+• Students mark True or False.
+
+5. MATCHING HALVES (5 pairs)
+• Column 1: Sentence beginnings (1-5)
+• Column 2: Sentence endings (A-E, SHUFFLED)
+
+6. MULTIPLE CHOICE QUESTIONS (5 questions)
+• Questions about the content.
+• 4 options each (A, B, C, D).
+• Only one correct answer.
+
+7. DISCUSSION QUESTIONS
+• 3-4 open-ended questions for speaking practice.
+
+Formatting requirements:
+— SHUFFLE all answer options in every exercise.
+— DO NOT show correct answers next to tasks.
+— Hide all answers in a collapsible "ANSWER KEY" section.
+— Use colorful HTML styling.
+— Raleway font, large text (~29px).
+— Bright, engaging headers.
+— Each exercise in a separate block with shadow.
+— Two columns for lists.
+— Tables for matching exercises.
+— Only clean HTML + inline CSS, no JavaScript.
+— DO NOT USE WHITE FONT (ONLY DARK BLUE, DARK GREEN, BLACK, DARK BROWN).
+— Use simple interesting but READABLE FONTS.
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+
+        <div class="prompt-box">
+            <h4>🎲 Grammar SOPHIA </h4>
+            <div class="prompt-text">
+Could you create 7 true-or-false statements and 5 matching sentence halves based on the text I provide? Make it as cards that I can flip for true-false and matching halves with (gap-fill inside the second halves with list of the words abone) Please format the output in colorful HTML in the style of quizizz. For the matching halves exercise, display the first halves in one column labeled 1–5 and the shuffled second halves in a separate column labeled A–E. DO NOT SHOW THE ANSWERS HIDE THEM IN A SMALL BUTTON ABOVE ON THE RIGHT the text:
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+ <div class="prompt-box">
+            <h4>🎲 FILM KSY </h4>
+            <div class="prompt-text">
+Analyze the following text and perform the following tasks: Vocabulary Selection: Identify 5-7 phrases from the text that are suitable for an A2-level Russian learner (simple, common, and useful for beginners in christmas theme). Provide a list of these words in both English and Russian. Exercise 1: Matching Words with Translations Create a matching exercise where the selected words (in English) are paired with their Russian translations. The translations should be listed in a random order, and the task is to match each English word with its correct Russian equivalent. Exercise 2: Matching Sentences with Translations Write 5-7 simple sentences in English using the selected words. These sentences should be A1-level (short, clear, and grammatically simple). Provide Russian translations for these sentences, but mix up the order. The task is to match each English sentence with its correct Russian translation. Exercise 3: Reading and Matching Phrases from the Original Text Extract short phrases or sentences from the original text that include the selected words. Provide Russian translations for these phrases/sentences, but mix up the order. The task is to match each original phrase/sentence with its correct Russian translation. Format the exercises clearly so they are easy to understand and complete. Use tables or numbered lists for matching tasks. and all variants should be mixed up. All in a beautiful html
+            </div>
+            <button class="copy-btn" onclick="copyPrompt(this)" style="margin-top: 10px;">Copy Prompt</button>
+        </div>
+    </div>
+</div>
+
+        <!-- ADDITIONAL TOOLS -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🛠️ Additional Teaching Tools</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">Conker AI</span>
+                        <div class="link-wrapper">
+                            <a href="https://app.conker.ai/create" target="_blank" class="resource-link">Quiz Creator</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://app.conker.ai/create')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Heuristica Quiz</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.heuristi.ca/tools/free-ai-quiz-generator" target="_blank" class="resource-link">AI Quiz Generator</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.heuristi.ca/tools/free-ai-quiz-generator')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Lesson Planner</span>
+                        <div class="link-wrapper">
+                            <a href="https://lesson-plan-generator.vercel.app/" target="_blank" class="resource-link">Auto Generator</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://lesson-plan-generator.vercel.app/')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">NotebookLM</span>
+                        <div class="link-wrapper">
+                            <a href="https://notebooklm.google.com/notebook/dcf8bafe-a021-444b-ad36-4578411eb651" target="_blank" class="resource-link">Google Notebook</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://notebooklm.google.com/notebook/dcf8bafe-a021-444b-ad36-4578411eb651')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">FCE Vocabulary</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.tea4er.com/sites/default/files/lesson/37/2023-08/Check_Your_English_Vocabulary_For_FCE.pdf" target="_blank" class="resource-link">FCE Workbook PDF</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.tea4er.com/sites/default/files/lesson/37/2023-08/Check_Your_English_Vocabulary_For_FCE.pdf')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Upstream Tests</span>
+                        <div class="link-wrapper">
+                            <a href="https://www.tea4er.com/sites/default/files/lesson/37/2023-08/Upstream.%20Test%20booklet.%20Virginia%20Evans.pdf" target="_blank" class="resource-link">Test Booklet PDF</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://www.tea4er.com/sites/default/files/lesson/37/2023-08/Upstream.%20Test%20booklet.%20Virginia%20Evans.pdf')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">Olympics English</span>
+                        <div class="link-wrapper">
+                            <a href="https://karinagerman.ru/images/olympic/topnotchenglish_olimpiady_po_angliyskomu_yazyku_dlya_8-11_2.pdf?ysclid=mj8mk6lnx2446043771" target="_blank" class="resource-link">Grades 8-11 PDF</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://karinagerman.ru/images/olympic/topnotchenglish_olimpiady_po_angliyskomu_yazyku_dlya_8-11_2.pdf?ysclid=mj8mk6lnx2446043771')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXTRA LINKS SECTION -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🔗 Extra Links</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">OUTCOMES</span>
+                        <div class="link-wrapper">
+                            <a href="https://1drv.ms/f/c/50b12e644e700366/EpNe9zCUiBdJs7DAVmmT-HEBLkT1oQ75_WKUCiWfhh1DQg?e=qJZCGT" target="_blank" class="resource-link">Outcomes Resources</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://1drv.ms/f/c/50b12e644e700366/EpNe9zCUiBdJs7DAVmmT-HEBLkT1oQ75_WKUCiWfhh1DQg?e=qJZCGT')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">ENGLISH FILE</span>
+                        <div class="link-wrapper">
+                            <a href="https://1drv.ms/f/c/50b12e644e700366/Em-DrWzwaEFLi-HHxeTmTEAB4IR9Irpf3q1F34frZIdl3g?e=jrcbGP" target="_blank" class="resource-link">English File Resources</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://1drv.ms/f/c/50b12e644e700366/Em-DrWzwaEFLi-HHxeTmTEAB4IR9Irpf3q1F34frZIdl3g?e=jrcbGP')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">TEAMS</span>
+                        <div class="link-wrapper">
+                            <a href="https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt" target="_blank" class="resource-link">MS Teams Meeting</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">HEADWAY</span>
+                        <div class="link-wrapper">
+                            <a href="https://1drv.ms/f/c/50b12e644e700366/Ek5sgOph4UhMrL4Y1wwsQQIBkIxqC9kuz08uYdEzbe2i9w?e=ixub10" target="_blank" class="resource-link">Headway Resources</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://1drv.ms/f/c/50b12e644e700366/Ek5sgOph4UhMrL4Y1wwsQQIBkIxqC9kuz08uYdEzbe2i9w?e=ixub10')">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-item">
+                        <span class="resource-label">EGOR</span>
+                        <div class="link-wrapper">
+                            <a href="https://1drv.ms/f/c/50b12e644e700366/IgCKa52nABpHRLcn33KRK6oUAedwreaRjlN-KiAHFbNbt1c?e=59sQUg" target="_blank" class="resource-link">Egor's Resources</a>
+                            <button class="copy-btn" onclick="copyToClipboard('https://1drv.ms/f/c/50b12e644e700366/IgCKa52nABpHRLcn33KRK6oUAedwreaRjlN-KiAHFbNbt1c?e=59sQUg')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                showNotification();
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function copyPrompt(button) {
+            const promptText = button.previousElementSibling.textContent;
+            navigator.clipboard.writeText(promptText).then(function() {
+                showNotification();
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.add('show');
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+
+        // Collapsible sections functionality
+        function toggleSection(header) {
+            const section = header.parentElement;
+            const content = section.querySelector('.section-content');
+            const button = header.querySelector('.toggle-btn');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                button.textContent = 'Expand';
+            } else {
+                content.style.display = 'block';
+                button.textContent = 'Collapse';
+            }
+        }
+
+        // Initialize all sections as collapsed on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const allSections = document.querySelectorAll('.section-content');
+            allSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            const allButtons = document.querySelectorAll('.toggle-btn');
+            allButtons.forEach(button => {
+                button.textContent = 'Expand';
+            });
+        });
+    </script>
+</body>
+</html>
