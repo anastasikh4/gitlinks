@@ -3,43 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Learning Resources Hub</title>
+    <title>English Learning Hub</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
             --primary: #2c3e50;
             --secondary: #3498db;
             --accent: #e74c3c;
-            --text: #2c3e50;
-            --bg-light: #ecf0f1;
-            --border: #bdc3c7;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
         }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text);
-            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f7fa;
         }
-
-        /* ============================================
-           HEADER & NAVIGATION
-           ============================================ */
         header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 20px 0;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
         .header-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -47,188 +34,196 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
-
         .logo {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: bold;
         }
-
         nav {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
-
         nav a {
             color: white;
-            text-decoration: none;
+            text-decoration: underline;
+            text-decoration-style: dotted;
             padding: 8px 12px;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: background 0.3s;
-            font-size: 14px;
+            cursor: pointer;
         }
-
         nav a:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255,255,255,0.2);
+            text-decoration: underline;
         }
-
-        /* ============================================
-           MAIN CONTENT WRAPPER
-           ============================================ */
+        nav a::after {
+            content: ' 🔗';
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        nav a:hover::after {
+            opacity: 0.7;
+        }
         main {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 20px;
         }
-
-        /* ============================================
-           SECTIONS & STYLING
-           ============================================ */
         section {
-            margin-bottom: 50px;
-            padding: 30px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid var(--secondary);
-        }
-
-        section h2 {
-            font-size: 28px;
-            color: var(--primary);
+            border-radius: 10px;
+            padding: 20px;
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-
-        section h3 {
-            font-size: 18px;
-            color: var(--secondary);
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: var(--dark);
             margin-top: 20px;
-            margin-bottom: 15px;
         }
-
-        /* ============================================
-           LINKS & BUTTONS
-           ============================================ */
+        #top-links {
+            border-left: 4px solid var(--accent);
+        }
         .link-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
-
         .link-item {
+            background: var(--light);
             padding: 15px;
-            background: var(--bg-light);
-            border-radius: 6px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
+            border-radius: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-
         .link-item:hover {
-            background: var(--secondary);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
-
         .link-item a {
+            color: var(--secondary);
             text-decoration: none;
-            color: inherit;
-            font-weight: 500;
+            font-weight: 600;
             display: block;
         }
-
         .link-item small {
+            color: #7f8c8d;
             display: block;
-            margin-top: 8px;
-            opacity: 0.7;
-            font-size: 12px;
+            margin-top: 5px;
         }
-
-        /* ============================================
-           THEME BUTTONS
-           ============================================ */
-        .theme-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .theme-btn {
-            padding: 10px 15px;
-            border: 2px solid var(--border);
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .theme-btn:hover,
-        .theme-btn.active {
-            background: var(--secondary);
-            color: white;
-            border-color: var(--secondary);
-        }
-
-        /* ============================================
-           COPY BUTTON
-           ============================================ */
         .copy-btn {
-            padding: 8px 12px;
-            background: var(--accent);
+            background: var(--secondary);
             color: white;
             border: none;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 5px;
             cursor: pointer;
             font-size: 12px;
             transition: background 0.3s;
-            margin-left: 10px;
         }
-
         .copy-btn:hover {
-            background: #c0392b;
-        }
-
-        /* ============================================
-           FOOTER
-           ============================================ */
-        footer {
             background: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 60px;
         }
-
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
-        @media (max-width: 768px) {
-            nav {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            section {
-                padding: 20px;
-            }
-
-            .link-grid {
-                grid-template-columns: 1fr;
-            }
+        /* Collapsible Sections */
+        .section {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .section-header:hover {
+            background: linear-gradient(135deg, #1a252f, var(--secondary));
+        }
+        .section-header h2 {
+            color: white;
+            border: none;
+            margin: 0;
+            padding: 0;
+            font-size: 1.3rem;
+        }
+        .toggle-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            padding: 0 20px;
+        }
+        .section-content.active {
+            max-height: 1000px;
+            padding: 20px;
+        }
+        /* Resource Grid */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .resource-item {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .resource-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .resource-label {
+            background: var(--secondary);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .resource-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            flex: 1;
+        }
+        .resource-link:hover {
+            color: var(--secondary);
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <!-- ================================================
-         HEADER & NAVIGATION
-         ================================================ -->
     <header>
         <div class="header-container">
             <div class="logo">📚 English Learning Hub</div>
@@ -243,7 +238,6 @@
             </nav>
         </div>
     </header>
-
     <!-- ================================================
          MAIN CONTENT
          ================================================ -->
@@ -266,12 +260,10 @@
                 </div>
             </div>
         </section>
-
         <!-- ========== CONFERENCE LINKS ========== -->
         <section id="conferences">
             <h2>🎥 Conference Links</h2>
             <p>Быстрый доступ к платформам для живых сессий:</p>
-
             <h3>Zoom Conferences</h3>
             <div class="link-grid">
                 <div class="link-item" style="padding: 20px;">
@@ -279,7 +271,6 @@
                     <div style="margin-top: 10px; font-size: 13px;">
                         <div>📌 ID: 791 8227 1796</div>
                         <div>🔐 Pass: 123456</div>
-                        <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1')" style="margin-top: 10px;">Copy Link</button>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
@@ -287,7 +278,6 @@
                     <div style="margin-top: 10px; font-size: 13px;">
                         <div>📌 ID: 826 5841 5026</div>
                         <div>🔐 Pass: 5C3E71</div>
-                        <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1')" style="margin-top: 10px;">Copy Link</button>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
@@ -295,7 +285,6 @@
                     <div style="margin-top: 10px; font-size: 13px;">
                         <div>📌 ID: 864 5559 1163</div>
                         <div>🔐 Pass: 8NBLmv</div>
-                        <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/86455591163?pwd=5OYaA3tztc1ONhqKhjLOr5SK0EGuGI.1')" style="margin-top: 10px;">Copy Link</button>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
@@ -303,328 +292,322 @@
                     <div style="margin-top: 10px; font-size: 13px;">
                         <div>📌 ID: 879 9080 5738</div>
                         <div>🔐 Pass: 700700</div>
-                        <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/87990805738?pwd=0T597Pn7QyC5F4CVl7tyYZnEHo99eZ.1')" style="margin-top: 10px;">Copy Link</button>
                     </div>
                 </div>
             </div>
-
             <h3>Other Platforms</h3>
             <div class="link-grid">
                 <div class="link-item">
                     <a href="https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt" target="_blank">Microsoft Teams</a>
-                    <button class="copy-btn" onclick="copyToClipboard('https://teams.live.com/meet/9363095173045?p=88UWjgBwCA7atMCbWt')" style="margin-top: 8px;">Copy Link</button>
                 </div>
                 <div class="link-item">
                     <a href="https://telemost.yandex.ru/j/96276160430845" target="_blank">🎓 Yandex (Adults)</a>
-                    <button class="copy-btn" onclick="copyToClipboard('https://telemost.yandex.ru/j/96276160430845')" style="margin-top: 8px;">Copy Link</button>
                 </div>
                 <div class="link-item">
                     <a href="https://telemost.yandex.ru/j/32323878732068" target="_blank">👶 Yandex (Kids)</a>
-                    <button class="copy-btn" onclick="copyToClipboard('https://telemost.yandex.ru/j/32323878732068')" style="margin-top: 8px;">Copy Link</button>
                 </div>
                 <div class="link-item">
                     <a href="https://frogcall.app/frog-soothing-lake-qnx" target="_blank">🐸 FrogCall</a>
-                    <button class="copy-btn" onclick="copyToClipboard('https://frogcall.app/frog-soothing-lake-qnx')" style="margin-top: 8px;">Copy Link</button>
                 </div>
             </div>
         </section>
-
         <!-- ========== STARLIGHT TEST BOOKLETS ========== -->
-        <section id="starlight">
-            <h2>📖 Starlight Test Booklets</h2>
-            <p>Комплексные материалы для тестирования по уровням:</p>
-
-            <h3>Классы 4-6</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Starlight 4 - Test Booklet</a>
-                    <small>Для 4 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Starlight 5 - Test Booklet</a>
-                    <small>Для 5 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Starlight 6 - Test Booklet</a>
-                    <small>Для 6 класса</small>
-                </div>
+        <section id="starlight" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>⭐ Starlight – Test Booklets</h2>
+                <button class="toggle-btn">Expand</button>
             </div>
-
-            <h3>Классы 7-9</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Starlight 7 - Test Booklet</a>
-                    <small>Для 7 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Starlight 8 - Test Booklet</a>
-                    <small>Для 8 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Starlight 9 - Test Booklet</a>
-                    <small>Для 9 класса</small>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========== SPOTLIGHT RESOURCES ========== -->
-        <section id="spotlight">
-            <h2>✨ Spotlight Resources</h2>
-            <p>Материалы для дополнительного обучения:</p>
-
-            <h3>Workbooks и Test Materials</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Spotlight 4 - Workbook</a>
-                    <small>Рабочая тетрадь для 4 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Spotlight 5 - Workbook</a>
-                    <small>Рабочая тетрадь для 5 класса</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Spotlight 6 - Workbook</a>
-                    <small>Рабочая тетрадь для 6 класса</small>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://go.11klasov.net/3980-starlight-4-zvezdnyy-angliyskiy-4-klass-test-booklet-kontrolnye-zadaniya-baranova-km-duli-d-i-dr.html">
+                            Starlight 4 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://go.11klasov.net/4004-starlight-5-zvezdnyy-angliyskiy-5-klass-kontrolnye-zadaniya-baranova-km-i-dr.html">
+                            Starlight 5 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://drive.google.com/file/d/1Qg6ZKgQHtim58HsA6u9aUkNqgcbR7QTB/view?usp=sharing">
+                            Starlight 6 – Test Booklet (PDF)
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://go.11klasov.net/3991-starlight-7-zvezdnyy-angliyskiy-7-klass-kontrolnye-zadaniya-baranova-km-i-dr.html">
+                            Starlight 7 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://drive.google.com/file/d/1Aur8Rg17F3MJKxe-NSFodf7rv00l1Jsq/view?usp=sharing">
+                            Starlight 8 – Test Booklet (PDF)
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://drive.google.com/file/d/1BHaFrdOBwt9bNgFIoHh4gytHbkGQvP2h/view?usp=sharing">
+                            Starlight 9 – Test Booklet (PDF)
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <!-- ========== STUDENT RESOURCES ========== -->
-        <section id="students">
-            <h2>👥 Ресурсы для Студентов</h2>
-            <p>Персонализированные материалы для разных учащихся:</p>
-
-            <h3>Liza</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Комиксы</a>
-                    <small>Интерактивные истории</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Упражнения</a>
-                    <small>Уровень: Beginner</small>
-                </div>
+        <!-- ========== SPOTLIGHT TEST BOOKLETS ========== -->
+        <section id="spotlight" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>💡 Spotlight – Test Booklets</h2>
+                <button class="toggle-btn">Expand</button>
             </div>
-
-            <h3>Egor</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Задачи</a>
-                    <small>Уровень: Intermediate</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Диалоги</a>
-                    <small>Практика разговорной речи</small>
-                </div>
-            </div>
-
-            <h3>Sonya & Sophia</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Advanced Tasks</a>
-                    <small>Продвинутый уровень</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Проекты</a>
-                    <small>Творческие работы</small>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========== GRAMMAR & INTERACTIVE GAMES ========== -->
-        <section id="grammar">
-            <h2>📚 Грамматика и Интерактивные Игры</h2>
-            <p>Упражнения для закрепления грамматических навыков:</p>
-
-            <h3>Интерактивные Платформы</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Wordwall</a>
-                    <small>Интерактивные игры и викторины</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Kahoot</a>
-                    <small>Совместные викторины</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Quizlet</a>
-                    <small>Карточки для изучения</small>
-                </div>
-            </div>
-
-            <h3>Типы Упражнений</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Matching Exercises</a>
-                    <small>Упражнения на сопоставление</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Gap Filling</a>
-                    <small>Заполнение пропусков</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Multiple Choice</a>
-                    <small>Выбор правильного ответа</small>
+            <div class="section-content">
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://kniga-figa.ru/spotlight-4-anglijskij-yazyk-4-klass-anglijskij-v-fokuse-kontrolnye-zadaniya-bykova-n-i-duli-dzh/">
+                            Spotlight 4 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://kniga-figa.ru/spotlight-5-anglijskij-v-fokuse-5-klass-kontrolnye-zadaniya-vaulina/">
+                            Spotlight 5 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://kniga-figa.ru/spotlight-6-anglijskij-v-fokuse-6-klass-kontrolnye-zadaniya-vaulina/">
+                            Spotlight 6 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://kniga-figa.ru/spotlight-7-anglijskij-v-fokuse-7-klass-kontrolnye-zadaniya-vaulina/">
+                            Spotlight 7 – Test Booklet
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://drive.google.com/file/d/1ctgeJKDpc68xhyzOTB7A2Q8nFIO4jMJQ/view?usp=sharing">
+                            Spotlight 8 – Test Booklet (PDF)
+                        </a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс</span>
+                        <a class="resource-link" target="_blank"
+                           href="https://drive.google.com/file/d/1_zA6VHSr-8_spPJ80hj-CAaWN5tLUF7U/view?usp=sharing">
+                            Spotlight 9 – Test Booklet (PDF)
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <!-- ========== AI PROMPTS & LESSON GENERATION ========== -->
-        <section id="ai-prompts">
-            <h2>🤖 AI Промпты для Генерации Уроков</h2>
-            <p>Используйте эти промпты для создания уникальных материалов:</p>
-
-            <h3>Основные Категории</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Генерация Рабочих Листов</a>
-                    <small>Промпты для создания упражнений</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Комиксы и Истории</a>
-                    <small>Творческие текстовые материалы</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Игры и Викторины</a>
-                    <small>Интерактивные задания</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Диалоги и Ролевые Игры</a>
-                    <small>Материалы для говорения</small>
-                </div>
+        <!-- ========== STARLIGHT RESOURCES ========== -->
+        <section id="starlight-resources" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>⭐ Starlight - Учебники и рабочие тетради</h2>
+                <button class="toggle-btn">Expand</button>
             </div>
+            <div class="section-content">
+                <!-- Starlight 4 -->
+                <h3>Starlight 4</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1wM1T04lKx0Rmkla-CRJ4SUQmOg6ENyh8/view">Student's Book Part 1</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1PIy583kDUB8vZvhkFCvutw7PKkMvm-PE/preview">Student's Book Part 2</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1zG6Lwf2XHHw6iISpgnYEMBkZECuDT_Ou/view">Workbook Part 1</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/107om0e88zRG2PJMy1Eb9SdO84VC9MA23/view">Workbook Part 2</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1SZnSAfpNoX_ND4lI8F04NS_IQ85pdWHU/view">Сборник</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">4 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1WuYe8MRbySfb8gE-x9skcxc6G5RdaE5U/view">Грамматический сборник</a>
+                    </div>
+                </div>
 
-            <h3>Продвинутые Промпты</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Gamified Exercises</a>
-                    <small>Геймифицированные упражнения</small>
+                <!-- Starlight 5 -->
+                <h3>Starlight 5</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/10A8f35F1YLCgF8IBaIKjyWaVmtOC7KBY/view">Student's Book</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1oaIRWffHPMjfsWT5TAkqGra95JiedUbK/view">Workbook</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1HxHke80os2Qak6jIYMdIYj9E8iB7mqvO/view">Grammar</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">5 класс GIA</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1fWz7pmEtwucbFp4pm7Bf4LWVUk1xUAhk/view">Готовимся к ГИА</a>
+                    </div>
                 </div>
-                <div class="link-item">
-                    <a href="#">Multithread Prompts</a>
-                    <small>Многоуровневые задания</small>
+
+                <!-- Starlight 6 -->
+                <h3>Starlight 6</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/107qaX7p1mENJ1ohB2Sj-n1JOD6oQceO_/view">Student's Book</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1ksMjcSHqTJ5iX-DWt5JtKEFPwo__Yf6l/view">Workbook</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/14WNNOIcSTeeY8BfEgyIMCMJSvh77Ycth/view">Grammar</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">6 класс GIA</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1BKVV8w0RsnR9fE73HmHJQZhfZ1qylvhf/view">Готовимся к ГИА</a>
+                    </div>
                 </div>
-                <div class="link-item">
-                    <a href="#">Video-Based Tasks</a>
-                    <small>Задания на основе видео</small>
+
+                <!-- Starlight 7 -->
+                <h3>Starlight 7</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1Uq2A9SJoJ3Dq5Xg5FD6U1hKOuWsBxdgO/view">Student's Book</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1nKoK_8NgEbTSoF5FVlEEc-TkDwfEPW4j/view">Workbook</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">7 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/18wPegeGYHhx6Yg7_4kIAqFmzZDpxfV4Z/view">Grammar</a>
+                    </div>
+                </div>
+
+                <!-- Starlight 8 -->
+                <h3>Starlight 8</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1ZlIIGSTkdpqs3XdMVm4xJuG9NwYy9QZ_/view">Student's Book</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1kN4In4OhuPvGbPykeAcgNG3jvwzYK_1b/view">Workbook</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">8 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1G09khBi51Y9FN4Fxrlnmqb-d1Va9j_qB/view">Grammar</a>
+                    </div>
+                </div>
+
+                <!-- Starlight 9 -->
+                <h3>Starlight 9</h3>
+                <div class="resource-grid">
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/11OaVovBF3EPF3BJij9j9mt9mJg8UV1HQ/view">Student's Book</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс WB</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1WjpNDiFprnZf6bGcYexK6yNZftzxy4rp/view">Workbook</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс</span>
+                        <a class="resource-link" target="_blank" href="https://uchebniki-school.ru/rabochie-tetradi/9-klass/starlight-9-zvezdnyy-angliyskiy-9-klass-rabochaya-tetrad-baranova-duli">Сборник (external)</a>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-label">9 класс Grammar</span>
+                        <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1TtVNolJfFzekHnLIg768QqgVgcVDMxOb/view">Grammar</a>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <!-- ========== ADDITIONAL TOOLS & RESOURCES ========== -->
-        <section id="tools">
-            <h2>🛠️ Дополнительные Инструменты</h2>
-            <p>Полезные ресурсы для планирования и преподавания:</p>
-
-            <h3>Планирование и Тестирование</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">Lesson Planner</a>
-                    <small>Планировщик уроков</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Quiz Generator</a>
-                    <small>Генератор викторин</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Assessment Tools</a>
-                    <small>Инструменты для оценки</small>
-                </div>
+        <!-- ========== STUDENTS ========== -->
+        <section id="students" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>👥 Студенты</h2>
+                <button class="toggle-btn">Expand</button>
             </div>
-
-            <h3>Внешние Ресурсы</h3>
-            <div class="link-grid">
-                <div class="link-item">
-                    <a href="#">BBC Learning English</a>
-                    <small>Материалы от BBC</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">TED-Ed</a>
-                    <small>Обучающие видео</small>
-                </div>
-                <div class="link-item">
-                    <a href="#">Grammarly</a>
-                    <small>Проверка грамматики</small>
-                </div>
+            <div class="section-content">
+                <p>Секция для студентов</p>
             </div>
         </section>
-
-        <!-- ========== THEME SWITCHER ========== -->
-        <section style="border-left-color: var(--accent);">
-            <h2>🎨 Переключение Тем</h2>
-            <p>Выберите понравившуюся тему для страницы:</p>
-            <div class="theme-buttons">
-                <button class="theme-btn active" onclick="switchTheme('default')">Default</button>
-                <button class="theme-btn" onclick="switchTheme('comic')">Comic</button>
-                <button class="theme-btn" onclick="switchTheme('underwater')">Underwater</button>
-                <button class="theme-btn" onclick="switchTheme('flourish')">Flourish</button>
-                <button class="theme-btn" onclick="switchTheme('dark')">Dark Mode</button>
+        <!-- ========== GRAMMAR ========== -->
+        <section id="grammar" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>📝 Грамматика</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <p>Секция для грамматики</p>
+            </div>
+        </section>
+        <!-- ========== AI PROMPTS ========== -->
+        <section id="ai-prompts" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🤖 AI Промпты</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <p>Секция для AI промптов</p>
+            </div>
+        </section>
+        <!-- ========== TOOLS ========== -->
+        <section id="tools" class="section">
+            <div class="section-header" onclick="toggleSection(this)">
+                <h2>🔧 Инструменты</h2>
+                <button class="toggle-btn">Expand</button>
+            </div>
+            <div class="section-content">
+                <p>Секция для инструментов</p>
             </div>
         </section>
     </main>
-
-    <!-- ================================================
-         FOOTER
-         ================================================ -->
-    <footer>
-        <p>&copy; 2024 English Learning Resources Hub | Все права защищены</p>
-    </footer>
-
-    <!-- ================================================
-         JAVASCRIPT
-         ================================================ -->
     <script>
-        // Theme switching function
-        function switchTheme(theme) {
-            const root = document.documentElement;
-            const buttons = document.querySelectorAll('.theme-btn');
-
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
-            switch(theme) {
-                case 'comic':
-                    root.style.setProperty('--primary', '#ff6b6b');
-                    root.style.setProperty('--secondary', '#ffd93d');
-                    break;
-                case 'underwater':
-                    root.style.setProperty('--primary', '#1e3a8a');
-                    root.style.setProperty('--secondary', '#0ea5e9');
-                    break;
-                case 'flourish':
-                    root.style.setProperty('--primary', '#6d28d9');
-                    root.style.setProperty('--secondary', '#ec4899');
-                    break;
-                case 'dark':
-                    document.body.style.background = '#1a1a1a';
-                    document.body.style.color = '#ffffff';
-                    root.style.setProperty('--text', '#ffffff');
-                    break;
-                default:
-                    root.style.setProperty('--primary', '#2c3e50');
-                    root.style.setProperty('--secondary', '#3498db');
-                    document.body.style.background = '#ffffff';
-                    document.body.style.color = '#2c3e50';
-            }
+        // Toggle collapsible sections
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const btn = header.querySelector('.toggle-btn');
+            content.classList.toggle('active');
+            btn.textContent = content.classList.contains('active') ? 'Collapse' : 'Expand';
         }
-
-        // Copy link function
+        // Copy to clipboard function
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            alert('Скопировано в буфер обмена!');
-        }
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('nav a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href');
-                const target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Ссылка скопирована!');
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
             });
-        });
+        }
     </script>
 </body>
 </html>
