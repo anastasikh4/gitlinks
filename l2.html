@@ -122,14 +122,29 @@
             background: var(--secondary);
             color: white;
             border: none;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             transition: background 0.3s;
         }
         .copy-btn:hover {
             background: var(--primary);
+        }
+        .copy-all-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-left: 10px;
+        }
+        .copy-all-btn:hover {
+            background: #c0392b;
         }
         /* Collapsible Sections */
         .section {
@@ -268,30 +283,90 @@
             <div class="link-grid">
                 <div class="link-item" style="padding: 20px;">
                     <strong>Zoom Conference 1</strong>
-                    <div style="margin-top: 10px; font-size: 13px;">
-                        <div>📌 ID: 791 8227 1796</div>
-                        <div>🔐 Pass: 123456</div>
+                    <div style="margin-top: 10px;">
+                        <a href="https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1" 
+                           target="_blank" 
+                           style="background: #2D8CFF; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 10px;">
+                            📲 Подключиться к конференции Zoom
+                        </a>
+                        <div style="font-size: 13px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                <span>📌 ID: 791 8227 1796</span>
+                                <button class="copy-btn" onclick="copyToClipboard('79182271796')">Copy</button>
+                                <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1')">Copy Link</button>
+                                <button class="copy-all-btn" onclick="copyAll('79182271796', '123456', 'https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1', 'Zoom Conference 1')">📋 Копировать всё</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>🔐 Pass: 123456</span>
+                                <button class="copy-btn" onclick="copyToClipboard('123456')">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
                     <strong>Zoom Conference 2</strong>
-                    <div style="margin-top: 10px; font-size: 13px;">
-                        <div>📌 ID: 826 5841 5026</div>
-                        <div>🔐 Pass: 5C3E71</div>
+                    <div style="margin-top: 10px;">
+                        <a href="https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1" 
+                           target="_blank" 
+                           style="background: #2D8CFF; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 10px;">
+                            📲 Подключиться к конференции Zoom
+                        </a>
+                        <div style="font-size: 13px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                <span>📌 ID: 826 5841 5026</span>
+                                <button class="copy-btn" onclick="copyToClipboard('82658415026')">Copy</button>
+                                <button class="copy-btn" onclick="copyToClipboard('https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1')">Copy Link</button>
+                                <button class="copy-all-btn" onclick="copyAll('82658415026', '5C3E71', 'https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1', 'Zoom Conference 2')">📋 Копировать всё</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>🔐 Pass: 5C3E71</span>
+                                <button class="copy-btn" onclick="copyToClipboard('5C3E71')">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
                     <strong>Zoom Conference 3</strong>
-                    <div style="margin-top: 10px; font-size: 13px;">
-                        <div>📌 ID: 864 5559 1163</div>
-                        <div>🔐 Pass: 8NBLmv</div>
+                    <div style="margin-top: 10px;">
+                        <a href="https://us05web.zoom.us/j/86455591163?pwd=5OYaA3tztc1ONhqKhjLOr5SK0EGuGI.1" 
+                           target="_blank" 
+                           style="background: #2D8CFF; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 10px;">
+                            📲 Подключиться к конференции Zoom
+                        </a>
+                        <div style="font-size: 13px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                <span>📌 ID: 864 5559 1163</span>
+                                <button class="copy-btn" onclick="copyToClipboard('86455591163')">Copy</button>
+                                <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/86455591163?pwd=5OYaA3tztc1ONhqKhjLOr5SK0EGuGI.1')">Copy Link</button>
+                                <button class="copy-all-btn" onclick="copyAll('86455591163', '8NBLmv', 'https://us05web.zoom.us/j/86455591163?pwd=5OYaA3tztc1ONhqKhjLOr5SK0EGuGI.1', 'Zoom Conference 3')">📋 Копировать всё</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>🔐 Pass: 8NBLmv</span>
+                                <button class="copy-btn" onclick="copyToClipboard('8NBLmv')">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="link-item" style="padding: 20px;">
                     <strong>Zoom Conference 4</strong>
-                    <div style="margin-top: 10px; font-size: 13px;">
-                        <div>📌 ID: 879 9080 5738</div>
-                        <div>🔐 Pass: 700700</div>
+                    <div style="margin-top: 10px;">
+                        <a href="https://us05web.zoom.us/j/87990805738?pwd=0T597Pn7QyC5F4CVl7tyYZnEHo99eZ.1" 
+                           target="_blank" 
+                           style="background: #2D8CFF; color: white; padding: 8px 16px; border-radius: 5px; text-decoration: none; display: inline-block; margin-bottom: 10px;">
+                            📲 Подключиться к конференции Zoom
+                        </a>
+                        <div style="font-size: 13px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                                <span>📌 ID: 879 9080 5738</span>
+                                <button class="copy-btn" onclick="copyToClipboard('87990805738')">Copy</button>
+                                <button class="copy-btn" onclick="copyToClipboard('https://us05web.zoom.us/j/87990805738?pwd=0T597Pn7QyC5F4CVl7tyYZnEHo99eZ.1')">Copy Link</button>
+                                <button class="copy-all-btn" onclick="copyAll('87990805738', '700700', 'https://us05web.zoom.us/j/87990805738?pwd=0T597Pn7QyC5F4CVl7tyYZnEHo99eZ.1', 'Zoom Conference 4')">📋 Копировать всё</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>🔐 Pass: 700700</span>
+                                <button class="copy-btn" onclick="copyToClipboard('700700')">Copy</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -452,7 +527,6 @@
                         <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1WuYe8MRbySfb8gE-x9skcxc6G5RdaE5U/view">Грамматический сборник</a>
                     </div>
                 </div>
-
                 <!-- Starlight 5 -->
                 <h3>Starlight 5</h3>
                 <div class="resource-grid">
@@ -473,7 +547,6 @@
                         <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1fWz7pmEtwucbFp4pm7Bf4LWVUk1xUAhk/view">Готовимся к ГИА</a>
                     </div>
                 </div>
-
                 <!-- Starlight 6 -->
                 <h3>Starlight 6</h3>
                 <div class="resource-grid">
@@ -494,7 +567,6 @@
                         <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1BKVV8w0RsnR9fE73HmHJQZhfZ1qylvhf/view">Готовимся к ГИА</a>
                     </div>
                 </div>
-
                 <!-- Starlight 7 -->
                 <h3>Starlight 7</h3>
                 <div class="resource-grid">
@@ -511,7 +583,6 @@
                         <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/18wPegeGYHhx6Yg7_4kIAqFmzZDpxfV4Z/view">Grammar</a>
                     </div>
                 </div>
-
                 <!-- Starlight 8 -->
                 <h3>Starlight 8</h3>
                 <div class="resource-grid">
@@ -528,7 +599,6 @@
                         <a class="resource-link" target="_blank" href="https://drive.google.com/file/d/1G09khBi51Y9FN4Fxrlnmqb-d1Va9j_qB/view">Grammar</a>
                     </div>
                 </div>
-
                 <!-- Starlight 9 -->
                 <h3>Starlight 9</h3>
                 <div class="resource-grid">
@@ -600,10 +670,21 @@
             content.classList.toggle('active');
             btn.textContent = content.classList.contains('active') ? 'Collapse' : 'Expand';
         }
+
         // Copy to clipboard function
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                alert('Ссылка скопирована!');
+                alert('Скопировано: ' + text);
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
+            });
+        }
+
+        // Copy all conference data
+        function copyAll(id, password, link, name) {
+            const text = `Подключиться к ${name}\nID: ${id}\nПароль: ${password}\nСсылка: ${link}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Скопированы все данные конференции!');
             }).catch(err => {
                 console.error('Ошибка копирования:', err);
             });
