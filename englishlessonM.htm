@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Яндекс Телемост — Подключение к уроку</title>
+    <style>
+        :root {
+            --yandex-blue: #3776f6;
+            --yandex-hover: #2159d1;
+            --bg-color: #1a1a1a;
+            --card-bg: #262626;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'YS Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 40px 60px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: var(--yandex-blue);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        p {
+            color: #999;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .join-btn {
+            background-color: var(--yandex-blue);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .join-btn:hover {
+            background-color: var(--yandex-hover);
+            transform: translateY(-2px);
+        }
+
+        .join-btn:active {
+            transform: translateY(0);
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">Y</div>
+    <h1>Урок английского</h1>
+    <p>Преподаватель приглашает вас в видеовстречу Телемоста.</p>
+    
+    <!-- Ваша ссылка подставлена в кнопку -->
+    <a href="https://telemost.yandex.ru/j/90112271761592" class="join-btn">Подключиться к уроку</a>
+    
+    <div class="footer-note">
+        Ссылка активна. Нажмите кнопку, чтобы войти.
+    </div>
+</div>
+
+</body>
+</html>
