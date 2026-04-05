@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>УРОК АНГЛИЙСКОГО</title>
+    <title>Урок английского</title>
     <style>
         body {
             margin: 0;
             background: #1a1a1a;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,64 +18,48 @@
             padding: 40px 30px;
             border-radius: 24px;
             text-align: center;
-            max-width: 450px;
-            width: 85%;
+            max-width: 550px;
+            width: 90%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .logo {
-            background: #3776f6;
-            width: 64px;
-            height: 64px;
+        .lesson-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 30px;
             border-radius: 16px;
-            margin: 0 auto 24px;
-            font-size: 36px;
-            font-weight: bold;
-            line-height: 64px;
-            color: white;
         }
-        h1 {
-            color: white;
-            font-size: 28px;
-            margin-bottom: 12px;
+        .button-image {
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            display: inline-block;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(55,118,246,0.3);
+            transform: scale(0.75);
         }
-        .description {
-            color: #aaa;
-            font-size: 18px;
-            margin-bottom: 32px;
+        .button-image:hover {
+            transform: scale(0.77);
+            opacity: 0.9;
         }
-        .button {
-            background: #3776f6;
-            color: white;
-            text-decoration: none;
-            padding: 18px;
-            border-radius: 14px;
-            display: block;
-            font-weight: bold;
-            font-size: 20px;
-            transition: background 0.2s;
-        }
-        .button:hover {
-            background: #2159d1;
+        .button-image:active {
+            transform: scale(0.73);
         }
         .footer {
             margin-top: 24px;
-            font-size: 14px;
+            font-size: 12px;
             color: #555;
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <div class="logo">🇷🇺</div>
-        <h1>УРОК АНГЛИЙСКОГО</h1>
-        <div class="description">
-            НАЖМИ НА СИНЮЮ КНОПКУ
-        </div>
-        <a class="button" href="https://telemost.yandex.ru/j/90112271761592" target="_blank">
-            🚀 ПЕРЕЙТИ К УРОКУ 🚀
+        <img class="lesson-image" src="https://github.com/anastasikh4/gitlinks/blob/main/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202026-04-05%20185545.png?raw=true" alt="Урок английского">
+
+        <a href="https://telemost.yandex.ru/j/90112271761592" target="_blank">
+            <img class="button-image" src="https://github.com/anastasikh4/gitlinks/blob/main/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202026-04-05%20185918.png?raw=true" alt="ПУСК">
         </a>
+
         <div class="footer">
-            ✅ ЯНДЕКС ТЕЛЕМОСТ • ССЫЛКА АКТИВНА
+            Яндекс Телемост • Ссылка активна
         </div>
     </div>
 </body>
