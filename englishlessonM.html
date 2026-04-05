@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Урок английского</title>
+    <title>YPOK AНГЛИЙСКОГO</title>
     <style>
         body {
             margin: 0;
             background: #1a1a1a;
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,30 +18,65 @@
             padding: 40px 30px;
             border-radius: 24px;
             text-align: center;
-            max-width: 400px;
+            max-width: 500px;
+            width: 85%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .title {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            color: #aaa;
+            font-size: 20px;
+            margin-bottom: 36px;
+            letter-spacing: 1px;
         }
         .button {
             background: #3776f6;
             color: white;
             text-decoration: none;
             padding: 18px 32px;
-            border-radius: 14px;
+            border-radius: 60px;
             display: inline-block;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 32px;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 5px 15px rgba(55,118,246,0.3);
+            letter-spacing: 4px;
         }
         .button:hover {
             background: #2159d1;
+            transform: scale(1.02);
         }
-        h1 { color: white; }
-        p { color: #999; }
+        .button:active {
+            transform: scale(0.98);
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #555;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>УРОК АНГЛИЙСКОГО</h1>
-        <p>НАЖМИ НА КНОПКУ</p>
-        <a class="button" href="https://telemost.yandex.ru/j/90112271761592">ПЕРЕЙТИ К УРОКУ</a>
+        <div class="title">
+            YPOK AНГЛИЙСKОГO
+        </div>
+        <div class="subtitle">
+            HАЖМИ НА СИНЮЮ КНОПКУ
+        </div>
+        <a class="button" href="https://telemost.yandex.ru/j/90112271761592" target="_blank">
+            ПУСK
+        </a>
+        <div class="footer">
+            ЯНДЕКС ТЕЛЕМОСТ • ССЫЛКА АКТИВНА
+        </div>
     </div>
 </body>
 </html>
