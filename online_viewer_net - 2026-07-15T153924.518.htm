@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree · Sims 4 Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg1: #f8d98f;
+            --bg2: #f4b35f;
+            --panel: rgba(255, 255, 255, 0.18);
+            --card: rgba(255, 255, 255, 0.86);
+            --text: #1f3b5c;
+            --line: rgba(255, 255, 255, 0.9);
+            --line-pink: #f58db7;
+            --plumbob: #4caf50;
+            --shadow: 0 18px 40px rgba(102, 55, 12, 0.18);
+            --photo-size: 110px;   /* new larger size */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 28px 18px;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.35) 0%, transparent 28%),
+                radial-gradient(circle at 80% 25%, rgba(255,255,255,0.18) 0%, transparent 22%),
+                linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background-image:
+                radial-gradient(circle at 12% 18%, rgba(255,255,255,0.9) 0 3px, transparent 4px),
+                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.9) 0 2px, transparent 3px),
+                radial-gradient(circle at 85% 16%, rgba(255,255,255,0.9) 0 4px, transparent 5px),
+                radial-gradient(circle at 88% 19%, rgba(255,255,255,0.9) 0 2px, transparent 3px);
+            opacity: 0.7;
+        }
+
+        .container {
+            width: min(1100px, 100%);
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 42px;
+            box-shadow: var(--shadow);
+            padding: 30px 24px 34px;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .plumbob {
+            width: 34px;
+            height: 34px;
+            background: var(--plumbob);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transform: rotate(180deg);
+            filter: drop-shadow(0 5px 10px rgba(76,175,80,0.35));
+        }
+
+        .plumbob.small {
+            width: 16px;
+            height: 16px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--text);
+            text-shadow: 0 2px 8px rgba(255,255,255,0.18);
+        }
+
+        .family-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 22px 42px;
+            width: 100%;
+        }
+
+        .row-group {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .connector {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 24px;
+            position: relative;
+        }
+
+        .connector-line {
+            width: min(420px, 60%);
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--line), var(--line-pink), var(--line), transparent);
+            border-radius: 999px;
+            position: relative;
+        }
+
+        .connector-line::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 10px;
+            height: 10px;
+            background: var(--line-pink);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 12px rgba(245,154,200,0.55);
+        }
+
+        .connector-split {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 120px;
+            align-items: flex-start;
+        }
+
+        .connector-vertical {
+            width: 3px;
+            height: 18px;
+            background: var(--line);
+            border-radius: 999px;
+            position: relative;
+        }
+
+        .connector-vertical::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -5px;
+            width: 8px;
+            height: 8px;
+            background: var(--line);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(255,255,255,0.35);
+        }
+
+        /* ---------- CARD WITH BIGGER PHOTO ---------- */
+        .sim-card {
+            position: relative;
+            background: rgba(255,255,255,0.78);
+            border: 2px solid rgba(255,255,255,0.9);
+            border-radius: 28px;
+            padding: 16px 16px 18px;   /* more padding for bigger circle */
+            min-width: 150px;           /* wider to fit 110px circle + text */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(80, 40, 10, 0.12);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+            overflow: visible;
+        }
+
+        .sim-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 18px 32px rgba(80, 40, 10, 0.16);
+            background: rgba(255,255,255,0.95);
+        }
+
+        .sim-card .photo {
+            width: var(--photo-size);      /* 110px */
+            height: var(--photo-size);     /* 110px */
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.95);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.7);
+            background: #f5f5f5;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        .sim-card .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .sim-card .name {
+            font-size: 1.05rem;        /* slightly larger to match bigger card */
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+
+        .sim-card .role {
+            margin-top: 5px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(31, 59, 92, 0.08);
+            backdrop-filter: blur(4px);
+        }
+
+        .sim-card.male .photo {
+            box-shadow: 0 10px 22px rgba(120, 180, 220, 0.18), inset 0 1px 2px rgba(255,255,255,0.7);
+        }
+
+        .sim-card.female .photo {
+            box-shadow: 0 10px 22px rgba(240, 160, 190, 0.18), inset 0 1px 2px rgba(255,255,255,0.7);
+        }
+
+        .sim-card.male,
+        .sim-card.female {
+            background: linear-gradient(180deg, rgba(255,255,255,0.66), rgba(255,255,255,0.42));
+        }
+
+        .sim-card.me {
+            background: linear-gradient(180deg, rgba(255, 236, 170, 0.92), rgba(255, 221, 120, 0.8));
+            border-color: rgba(255, 214, 85, 0.95);
+            box-shadow: 0 0 0 4px rgba(255, 224, 120, 0.24), 0 14px 28px rgba(120, 80, 10, 0.16);
+        }
+
+        .sim-card.me .photo {
+            border-color: rgba(255, 214, 85, 0.95);
+        }
+
+        .sim-card.me::after {
+            content: "";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: var(--plumbob);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            transform: rotate(180deg);
+            filter: drop-shadow(0 4px 8px rgba(76,175,80,0.35));
+        }
+
+        .sparkles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .sparkles span {
+            position: absolute;
+            color: rgba(255,255,255,0.95);
+            font-size: 1.2rem;
+            text-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+
+        .s1 { top: 18px; right: 26px; }
+        .s2 { top: 76px; left: 18px; }
+        .s3 { bottom: 28px; right: 38px; }
+        .s4 { bottom: 24px; left: 34px; }
+
+        .bottom-decor {
+            margin-top: 26px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            opacity: 0.8;
+        }
+
+        /* --- Responsive adjustments --- */
+        @media (max-width: 800px) {
+            :root {
+                --photo-size: 90px;   /* still bigger than original 78px, but scaled */
+            }
+            .container {
+                padding: 22px 16px 26px;
+                border-radius: 32px;
+            }
+
+            .row {
+                gap: 16px 24px;
+            }
+
+            .row-group {
+                gap: 12px;
+                padding: 8px 10px;
+            }
+
+            .sim-card {
+                min-width: 120px;
+                padding: 12px 12px 14px;
+                border-radius: 24px;
+            }
+
+            .sim-card .name {
+                font-size: 0.9rem;
+            }
+
+            .connector-line {
+                width: 78%;
+            }
+
+            .connector-split {
+                gap: 70px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            :root {
+                --photo-size: 72px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .header {
+                gap: 12px;
+            }
+
+            .plumbob {
+                width: 24px;
+                height: 24px;
+            }
+
+            .sim-card {
+                min-width: 96px;
+                padding: 8px 8px 10px;
+                border-radius: 20px;
+            }
+
+            .sim-card .name {
+                font-size: 0.72rem;
+            }
+
+            .sim-card .role {
+                font-size: 0.48rem;
+                padding: 2px 7px;
+            }
+
+            .connector-line {
+                width: 90%;
+            }
+
+            .connector-split {
+                gap: 34px;
+            }
+
+            .row-group {
+                border-radius: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="sparkles">
+        <span class="s1">✦</span>
+        <span class="s2">✧</span>
+        <span class="s3">✦</span>
+        <span class="s4">✧</span>
+    </div>
+
+    <div class="header">
+        <div class="plumbob"></div>
+        <h1>My Family Tree</h1>
+        <div class="plumbob"></div>
+    </div>
+
+    <div class="family-tree">
+        <div class="row">
+            <div class="row-group">
+                <div class="sim-card male">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(4).png?raw=true" alt="Grandpa">
+                    </div>
+                    <div class="name">GRANDPA</div>
+                    <div class="role">Grandfather</div>
+                </div>
+
+                <div class="sim-card female">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(5).png?raw=true" alt="Grandma">
+                    </div>
+                    <div class="name">GRANDMA</div>
+                    <div class="role">Grandmother</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connector">
+            <div class="connector-line"></div>
+        </div>
+
+        <div class="row">
+            <div class="row-group">
+                <div class="sim-card male">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(11).png?raw=true" alt="Dad">
+                    </div>
+                    <div class="name">DAD</div>
+                    <div class="role">husband</div>
+                </div>
+
+                <div class="sim-card female">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(12).png?raw=true" alt="Mom">
+                    </div>
+                    <div class="name">MOM</div>
+                    <div class="role">Wife</div>
+                </div>
+            </div>
+
+            <div class="row-group">
+                <div class="sim-card male">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(7).png?raw=true" alt="Uncle">
+                    </div>
+                    <div class="name">UNCLE</div>
+                    <div class="role">Mom's brother</div>
+                </div>
+
+                <div class="sim-card female">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(6).png?raw=true" alt="Aunt">
+                    </div>
+                    <div class="name">AUNT</div>
+                    <div class="role">Uncle's wife</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="connector">
+            <div class="connector-split">
+                <div class="connector-vertical"></div>
+                <div class="connector-vertical"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="row-group">
+                <div class="sim-card female">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(9).png?raw=true" alt="Sister">
+                    </div>
+                    <div class="name">SISTER</div>
+                    <div class="role">daughter</div>
+                </div>
+
+                <div class="sim-card male">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(8).png?raw=true" alt="Brother">
+                    </div>
+                    <div class="name">BROTHER</div>
+                    <div class="role">son</div>
+                </div>
+
+                <div class="sim-card me">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(10).png?raw=true" alt="Me">
+                    </div>
+                    <div class="name">ME</div>
+                    <div class="role">Daughter</div>
+                </div>
+            </div>
+
+            <div class="row-group">
+                <div class="sim-card female">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(3).png?raw=true" alt="Cousin">
+                    </div>
+                    <div class="name">COUSIN</div>
+                    <div class="role">Twin</div>
+                </div>
+
+                <div class="sim-card male">
+                    <div class="photo">
+                        <img src="https://github.com/anastasikh4/gitlinks/blob/main/abc011%20(2).png?raw=true" alt="Cousin">
+                    </div>
+                    <div class="name">COUSIN</div>
+                    <div class="role">Twin</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-decor">
+            <div class="plumbob small"></div>
+            <div class="plumbob small" style="background:#ffb74d;"></div>
+            <div class="plumbob small" style="background:#ef5350;"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
