@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula 1 · A1 Race Training</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --carbon-black: #15151e;
+            --tarmac-grey: #252532;
+            --neon-green: #00ff66;
+            --white: #ffffff;
+            --panel-bg: rgba(21, 21, 30, 0.95);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0b0b10;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(225,6,0,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(0,255,102,0.1) 0%, transparent 40%);
+            color: var(--white);
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mission-control {
+            max-width: 600px;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 3px solid var(--f1-red);
+            border-radius: 24px;
+            padding: 25px 20px;
+            box-shadow: 0 0 30px rgba(225, 6, 0, 0.2);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px dashed var(--f1-red);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 2.2rem;
+            color: var(--f1-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px var(--white);
+            margin-bottom: 5px;
+        }
+
+        .sub-badge {
+            font-family: 'Fredoka One', sans-serif;
+            background: var(--white);
+            color: var(--carbon-black);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        .progress-container {
+            margin: 20px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 12px;
+            background: #3d3d4e;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-green);
+            transition: width 0.4s ease;
+        }
+
+        #lap-counter {
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 1rem;
+            color: var(--neon-green);
+            white-space: nowrap;
+        }
+
+        .quest-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+        }
+
+        .quest-header {
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 1.3rem;
+            color: var(--neon-green);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .quest-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 2px solid #3d3d4e;
+        }
+
+        .quest-instruction {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #afafaf;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .quest-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-weight: 800;
+        }
+
+        .blank-token {
+            color: var(--f1-red);
+            border-bottom: 3px dashed var(--f1-red);
+            padding: 0 8px;
+        }
+
+        .grid-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .pit-btn {
+            background: var(--tarmac-grey);
+            border: 2px solid #3d3d4e;
+            border-bottom: 5px solid #1a1a24;
+            color: var(--white);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.1s linear;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pit-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .pit-btn.correct-glow {
+            background: #155724 !important;
+            border-color: var(--neon-green) !important;
+            border-bottom-color: #0c3617 !important;
+            color: var(--neon-green) !important;
+        }
+
+        .pit-btn.wrong-glow {
+            background: #721c24 !important;
+            border-color: var(--f1-red) !important;
+            border-bottom-color: #3f1014 !important;
+            color: #f8d7da !important;
+        }
+
+        .pit-btn.disabled-state {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .crash-shake {
+            animation: shakeAction 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAction {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .radio-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a252f;
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            border-top: 3px solid var(--f1-red);
+            z-index: 100;
+        }
+
+        .radio-content {
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #team-radio-msg {
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .next-lap-btn {
+            background: var(--f1-red);
+            border: none;
+            border-bottom: 4px solid #990400;
+            color: var(--white);
+            padding: 10px 20px;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .next-lap-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .podium-screen {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .podium-icon { font-size: 4.5rem; margin-bottom: 15px; }
+        .podium-title { font-family: 'Fredoka One', sans-serif; font-size: 2rem; color: var(--neon-green); margin-bottom: 10px; }
+        .podium-score { font-size: 1.5rem; font-weight: 800; margin-bottom: 25px; }
+
+        @media(max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .quest-text { font-size: 1.1rem; }
+            .pit-btn { font-size: 1rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mission-control">
+    <header>
+        <h1>Grand Prix Academy</h1>
+        <div class="sub-badge">A1 RACE TRAINING</div>
+        <div class="progress-container">
+            <div id="lap-counter">LAP 1 / 6</div>
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        </div>
+    </header>
+
+    <main id="workspace">
+        <!-- Interactive content streams injected here -->
+    </main>
+</div>
+
+<div class="radio-banner" id="radio-banner">
+    <div class="radio-content">
+        <span id="team-radio-msg">Radio Static...</span>
+        <button class="next-lap-btn" onclick="nextLap()">Next Lap &gt;&gt;</button>
+    </div>
+</div>
+
+<script>
+    const missionData = [
+        {
+            type: "Word",
+            header: "Lap 1: What is his name?",
+            hint: "His family name is Georgiozni.",
+            img: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=300&fit=crop",
+            q: "His ________ is Georgiozni.",
+            a: "surname",
+            options: ["surname", "weather", "inside", "drivers"]
+        },
+        {
+            type: "Grammar",
+            header: "Lap 2: Tomorrow",
+            hint: "The car will not stay outside.",
+            img: "https://images.unsplash.com/photo-1561484930-998b6a7b22e8?w=600&h=300&fit=crop",
+            q: "Tomorrow the car ________ stay inside.",
+            a: "won't",
+            options: ["won't", "didn't", "wasn't", "weren't"]
+        },
+        {
+            type: "Word",
+            header: "Lap 3: Where is the race?",
+            hint: "Cars drive on it.",
+            img: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=600&h=300&fit=crop",
+            q: "The car will drive on the ________.",
+            a: "track",
+            options: ["track", "inside", "monster", "company"]
+        },
+        {
+            type: "Grammar",
+            header: "Lap 4: Yesterday",
+            hint: "He had a special uniform.",
+            img: "https://images.unsplash.com/photo-1600712242805-5f78671b24da?w=600&h=300&fit=crop",
+            q: "Yesterday he ________ a uniform.",
+            a: "wore",
+            options: ["wore", "wear", "will wear", "wears"]
+        },
+        {
+            type: "Reading",
+            header: "Lap 5: Team",
+            hint: "They work together in a big place.",
+            img: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=600&h=300&fit=crop",
+            q: "They work in a big ________.",
+            a: "company",
+            options: ["company", "surname", "weather", "monster"]
+        },
+        {
+            type: "Reading",
+            header: "Lap 6: TV",
+            hint: "He will see the race on TV.",
+            img: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&h=300&fit=crop",
+            q: "Tomorrow he will ________ the race on TV.",
+            a: "watch",
+            options: ["watch", "wore", "was", "listened"]
+        }
+    ];
+
+    let currentLapIdx = 0;
+    let lapAnswered = false;
+    let checkpointScore = 0;
+
+    function startMission() {
+        currentLapIdx = 0;
+        checkpointScore = 0;
+        document.getElementById('radio-banner').style.display = 'none';
+        loadLapQuest();
+    }
+
+    function loadLapQuest() {
+        lapAnswered = false;
+        const currentQuest = missionData[currentLapIdx];
+        document.getElementById('radio-banner').style.display = 'none';
+        document.getElementById('lap-counter').innerText = 'LAP ' + (currentLapIdx + 1) + ' / ' + missionData.length;
+        document.getElementById('progress-fill').style.width = (currentLapIdx / missionData.length * 100) + '%';
+
+        const displayQuestion = currentQuest.q.replace("________", '<span class="blank-token">_______</span>');
+        const sortedOptions = [...currentQuest.options].sort(() => Math.random() - 0.5);
+
+        const workspaceNode = document.getElementById('workspace');
+        let html = '<div class="quest-card">';
+        html += '<div class="quest-header">🏁 ' + currentQuest.header + ' (' + currentQuest.type + ')</div>';
+        html += '<img src="' + currentQuest.img + '" class="quest-image" alt="Race Clue">';
+        html += '<div class="quest-instruction">' + currentQuest.hint + '</div>';
+        html += '<div class="quest-text">' + displayQuestion + '</div>';
+        html += '<div class="grid-options">';
+
+        sortedOptions.forEach(function(opt) {
+            html += '<button class="pit-btn" onclick="verifyPitChoice(this, \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
+        });
+
+        html += '</div></div>';
+        workspaceNode.innerHTML = html;
+    }
+
+    function verifyPitChoice(btnElement, chosenText) {
+        if (lapAnswered) return;
+        lapAnswered = true;
+        const correctAns = missionData[currentLapIdx].a;
+        const banner = document.getElementById('radio-banner');
+        const radioText = document.getElementById('team-radio-msg');
+        const mainBox = document.getElementById('workspace');
+
+        document.querySelectorAll('.pit-btn').forEach(function(btn) {
+            btn.classList.add('disabled-state');
+            if (btn.innerText.trim() === correctAns) {
+                btn.classList.add('correct-glow');
+            }
+        });
+
+        if (chosenText === correctAns) {
+            checkpointScore++;
+            btnElement.classList.add('correct-glow');
+            radioText.innerHTML = "🟢 TEAM RADIO: 'Box, box! Perfect!'";
+            banner.style.borderTopColor = "var(--neon-green)";
+        } else {
+            btnElement.classList.add('wrong-glow');
+            mainBox.classList.add('crash-shake');
+            if (navigator.vibrate) navigator.vibrate(150);
+            setTimeout(function() { mainBox.classList.remove('crash-shake'); }, 400);
+            radioText.innerHTML = "🔴 TEAM RADIO: 'Wrong! The answer was: " + correctAns.toUpperCase() + "'";
+            banner.style.borderTopColor = "var(--f1-red)";
+        }
+        banner.style.display = 'flex';
+        document.getElementById('progress-fill').style.width = ((currentLapIdx + 1) / missionData.length * 100) + '%';
+    }
+
+    function nextLap() {
+        currentLapIdx++;
+        if (currentLapIdx < missionData.length) {
+            loadLapQuest();
+        } else {
+            showPodiumFinish();
+        }
+    }
+
+    function showPodiumFinish() {
+        document.getElementById('radio-banner').style.display = 'none';
+        document.getElementById('lap-counter').innerText = "FINISH LINE";
+        let rankTitle = "Practice Squad";
+        let trophy = "⚙️";
+        if (checkpointScore === missionData.length) {
+            rankTitle = "Grand Prix Champion! 🏆";
+            trophy = "🥇";
+        } else if (checkpointScore >= 4) {
+            rankTitle = "Podium Finisher";
+            trophy = "🥈";
+        }
+        const workspaceNode = document.getElementById('workspace');
+        workspaceNode.innerHTML = '<div class="podium-screen">' +
+            '<div class="podium-icon">' + trophy + '</div>' +
+            '<div class="podium-title">' + rankTitle + '</div>' +
+            '<div class="podium-score">Mission Completed: ' + checkpointScore + ' / ' + missionData.length + ' Checkpoints</div>' +
+            '<button class="pit-btn" style="width:100%; text-align:center; background:var(--f1-red); border-color:var(--white);" onclick="startMission()">Restart Race</button>' +
+            '</div>';
+    }
+
+    window.addEventListener('DOMContentLoaded', startMission);
+</script>
+</body>
+</html>
