@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Grammar & Vocabulary Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-shadow: #46a302;
+            --duo-red: #ff4b4b;
+            --duo-red-shadow: #ea2b2b;
+            --duo-blue: #1cb0f6;
+            --duo-blue-shadow: #1899d6;
+            --duo-gray: #afafaf;
+            --duo-light-gray: #e5e5e5;
+            --duo-text: #3c3c3c;
+            --duo-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background-color: #f9fafb;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 12px;
+        }
+
+        .test-wrapper {
+            width: 100%;
+            max-width: 540px;
+            background: var(--duo-bg);
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.04);
+            border: 2px solid var(--duo-light-gray);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .progress-header {
+            padding: 20px 20px 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--duo-light-gray);
+        }
+
+        .quit-btn {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--duo-gray);
+            background: none;
+            border: none;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .progress-track {
+            background-color: var(--duo-light-gray);
+            height: 14px;
+            border-radius: 10px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--duo-green);
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #quest-step-lbl {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--duo-gray);
+            white-space: nowrap;
+        }
+
+        .workspace {
+            padding: 24px;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-tag {
+            font-size: 0.85rem;
+            color: var(--duo-blue);
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .instruction-prompt {
+            font-size: 1.3rem;
+            font-weight: 800;
+            line-height: 1.4;
+            margin-bottom: 24px;
+            color: #2b2b2b;
+        }
+
+        .sentence-panel {
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            background: #f7f9fa;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 2px solid var(--duo-light-gray);
+        }
+
+        .gap-marker {
+            color: var(--duo-blue);
+            border-bottom: 3px dashed var(--duo-blue);
+            padding: 0 10px;
+            font-weight: 900;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .tactile-btn {
+            background-color: var(--duo-bg);
+            border: 2px solid var(--duo-light-gray);
+            border-bottom: 5px solid #cccccc;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--duo-text);
+            cursor: pointer;
+            text-align: left;
+            transition: transform 0.05s ease, box-shadow 0.05s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tactile-btn:active:not(.disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 1px;
+        }
+
+        .tactile-btn.active-choice {
+            background-color: #ddf4ff;
+            border-color: #84d8ff;
+            color: #1899d6;
+            border-bottom-color: #55c2ff;
+        }
+
+        .tactile-btn.correct-choice {
+            background: #d7ffb8 !important;
+            border-color: #58cc02 !important;
+            border-bottom-color: #46a302 !important;
+            color: #256101 !important;
+        }
+
+        .tactile-btn.wrong-choice {
+            background: #ffd8d8 !important;
+            border-color: #ff4b4b !important;
+            border-bottom-color: #ea2b2b !important;
+            color: #961111 !important;
+        }
+
+        .tactile-btn.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .action-footer {
+            padding: 20px;
+            border-top: 2px solid var(--duo-light-gray);
+            background: var(--duo-bg);
+        }
+
+        .control-btn {
+            width: 100%;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            background-color: var(--duo-green);
+            color: #ffffff;
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+            transition: all 0.1s ease;
+        }
+
+        .control-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0 var(--duo-green-shadow);
+        }
+
+        .control-btn:disabled {
+            background-color: var(--duo-light-gray);
+            color: var(--duo-gray);
+            box-shadow: 0 4px 0 #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 16px 36px 16px;
+            display: flex;
+            justify-content: center;
+            transform: translateY(100%);
+            transition: transform 0.2s ease-out;
+            z-index: 100;
+        }
+
+        .feedback-sheet.active-sheet {
+            transform: translateY(0);
+        }
+
+        .sheet-interior {
+            width: 100%;
+            max-width: 540px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .sheet-message {
+            display: flex;
+            flex-direction: column;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .sheet-message span {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .feedback-sheet.success-sheet {
+            background-color: #d7ffb8;
+            border-top: 2px solid #a5ed6e;
+        }
+        .feedback-sheet.success-sheet .sheet-message { color: #46a302; }
+        .feedback-sheet.success-sheet .control-btn {
+            background-color: var(--duo-green);
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+        }
+
+        .feedback-sheet.error-sheet {
+            background-color: #ffd8d8;
+            border-top: 2px solid #ff9e9e;
+        }
+        .feedback-sheet.error-sheet .sheet-message { color: #ea2b2b; }
+        .feedback-sheet.error-sheet .control-btn {
+            background-color: var(--duo-red);
+            box-shadow: 0 4px 0 var(--duo-red-shadow);
+        }
+
+        .tremor {
+            animation: cardTremor 0.4s ease-in-out;
+        }
+
+        @keyframes cardTremor {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .podium-hub {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .podium-emblem { font-size: 4.5rem; margin-bottom: 15px; }
+        .podium-header { font-size: 1.8rem; font-weight: 900; color: var(--duo-blue); margin-bottom: 10px; }
+        .podium-score { font-size: 3.5rem; font-weight: 900; color: var(--duo-green); margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="test-wrapper">
+    <div class="progress-header" id="progress-header">
+        <button class="quit-btn" onclick="confirmRestart()">×</button>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div id="quest-step-lbl">1 / 20</div>
+    </div>
+
+    <div id="workspace-node" class="workspace"></div>
+
+    <div class="action-footer" id="action-footer">
+        <button class="control-btn" id="check-btn" disabled onclick="verifyCurrentAnswer()">Check Answer</button>
+    </div>
+</div>
+
+<div class="feedback-sheet" id="feedback-sheet">
+    <div class="sheet-interior">
+        <div class="sheet-message" id="sheet-message"></div>
+        <button class="control-btn" id="continue-btn" onclick="advanceQuizQueue()">Continue</button>
+    </div>
+</div>
+
+<script>
+    // Unified database mapped comprehensively using specified test contents
+    const quizDataset = [
+        // Section 1: Nationalities (8 items)
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Brazil – ________", target: "Brazilian", pool: ["Brazilian", "Brazilese", "Brazilish", "Braziliant"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Japan – ________", target: "Japanese", pool: ["Japanese", "Japanish", "Japanian", "Japanic"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Spain – ________", target: "Spanish", pool: ["Spanish", "Spaniard", "Spainish", "Spainese"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "The USA – ________", target: "American", pool: ["American", "USAnian", "United Statian", "Americish"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Italy – ________", target: "Italian", pool: ["Italian", "Italish", "Italianese", "Italic"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Britain – ________", target: "British", pool: ["British", "Britanian", "Briton", "Britished"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Poland – ________", target: "Polish", pool: ["Polish", "Polandish", "Polian", "Polisheese"] },
+        { mode: "Nationalities", hint: "Write the nationality.", stem: "Russia – ________", target: "Russian", pool: ["Russian", "Russish", "Russinese", "Republican"] },
+        // Section 2: Complete the sentences (12 items)
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Russia is a beautiful country with lots of seas, ________ and lakes.", target: "rivers", pool: ["rivers", "deserts", "north", "wavy"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "In Africa there are a lot of ________.", target: "deserts", pool: ["deserts", "rivers", "twins", "capital"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "What ________ is he? – He’s French.", target: "nationality", pool: ["nationality", "middle", "twins", "credit"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "My grandparents are in their ________ sixties.", target: "late", pool: ["late", "middle", "wavy", "slim"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Has Dan got a ________ licence?", target: "driving", pool: ["driving", "credit", "capital", "north"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Laura has two brothers. They are ________.", target: "twins", pool: ["twins", "middle", "late", "slim"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Helen is tall and ________ with short dark hair.", target: "slim", pool: ["slim", "wavy", "middle", "driving"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "London is the ________ of Britain.", target: "capital", pool: ["capital", "north", "deserts", "nationality"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Her mother is a ________-aged woman.", target: "middle", pool: ["middle", "late", "wavy", "driving"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Milan is in the ________ of Italy.", target: "north", pool: ["north", "capital", "deserts", "rivers"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Kate’s hair is long and ________.", target: "wavy", pool: ["wavy", "slim", "late", "twins"] },
+        { mode: "Vocabulary", hint: "Complete the sentence with the correct word.", stem: "Kim has got two ________ cards.", target: "credit", pool: ["credit", "driving", "nationality", "rivers"] }
+    ];
+
+    let quizQueue = [];
+    let activePointer = 0;
+    let currentlySelectedWord = null;
+    let standardScoreMetric = 0;
+
+    function initiateQuizSession() {
+        quizQueue = [...quizDataset].sort(() => Math.random() - 0.5);
+        activePointer = 0;
+        standardScoreMetric = 0;
+        document.getElementById('progress-header').style.display = 'flex';
+        document.getElementById('action-footer').style.display = 'block';
+        document.getElementById('feedback-sheet').classList.remove('active-sheet');
+        buildActiveTaskCard();
+    }
+
+    function buildActiveTaskCard() {
+        currentlySelectedWord = null;
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('feedback-sheet').classList.remove('active-sheet');
+        const activeTask = quizQueue[activePointer];
+
+        document.getElementById('quest-step-lbl').innerText = `${activePointer + 1} / ${quizQueue.length}`;
+        const ratioFill = (activePointer / quizQueue.length) * 100;
+        document.getElementById('progress-fill').style.width = `${ratioFill}%`;
+
+        const renderedStemText = activeTask.stem.replace("________", `<span class="gap-marker" id="embedded-gap-slot">______</span>`);
+        const randomizedOptions = [...activeTask.pool].sort(() => Math.random() - 0.5);
+
+        const targetWorkspaceNode = document.getElementById('workspace-node');
+        targetWorkspaceNode.innerHTML = `
+            <div class="section-tag">${activeTask.mode}</div>
+            <div class="instruction-prompt">${activeTask.hint}</div>
+            <div class="sentence-panel">${renderedStemText}</div>
+            <div class="options-container">
+                ${randomizedOptions.map(opt => `<button class="tactile-btn" onclick="captureOptionClick(this, '${opt.replace(/'/g, "\\'")}')">${opt}</button>`).join('')}
+            </div>
+        `;
+    }
+
+    function captureOptionClick(buttonNode, clickedTerm) {
+        document.querySelectorAll('.tactile-btn').forEach(btn => btn.classList.remove('active-choice'));
+        buttonNode.classList.add('active-choice');
+        currentlySelectedWord = clickedTerm;
+        document.getElementById('embedded-gap-slot').innerText = clickedTerm;
+        document.getElementById('check-btn').disabled = false;
+    }
+
+    function verifyCurrentAnswer() {
+        const activeTask = quizQueue[activePointer];
+        const confirmationFlag = (currentlySelectedWord === activeTask.target);
+        const sheetOverlayNode = document.getElementById('feedback-sheet');
+        const messageNode = document.getElementById('sheet-message');
+        const centralWorkspaceNode = document.getElementById('workspace-node');
+
+        document.querySelectorAll('.tactile-btn').forEach(btn => {
+            btn.classList.add('disabled');
+            if (btn.innerText.trim() === activeTask.target) {
+                btn.classList.add('correct-choice');
+            }
+        });
+
+        if (confirmationFlag) {
+            standardScoreMetric++;
+            messageNode.innerHTML = 'Excellent! You are correct.';
+            sheetOverlayNode.className = 'feedback-sheet active-sheet success-sheet';
+        } else {
+            centralWorkspaceNode.classList.add('tremor');
+            if (navigator.vibrate) navigator.vibrate(150);
+            setTimeout(() => centralWorkspaceNode.classList.remove('tremor'), 400);
+            document.querySelectorAll('.tactile-btn.active-choice').forEach(btn => btn.classList.add('wrong-choice'));
+            messageNode.innerHTML = `Correct answer: <span>${activeTask.target}</span>`;
+            sheetOverlayNode.className = 'feedback-sheet active-sheet error-sheet';
+            document.getElementById('embedded-gap-slot').innerText = activeTask.target;
+            document.getElementById('embedded-gap-slot').style.color = 'var(--duo-red)';
+            document.getElementById('embedded-gap-slot').style.borderColor = 'var(--duo-red)';
+        }
+    }
+
+    function advanceQuizQueue() {
+        activePointer++;
+        if (activePointer < quizQueue.length) {
+            buildActiveTaskCard();
+        } else {
+            renderFinalSummaryPanel();
+        }
+    }
+
+    function renderFinalSummaryPanel() {
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('feedback-sheet').classList.remove('active-sheet');
+        document.getElementById('progress-header').style.display = 'none';
+        document.getElementById('action-footer').style.display = 'none';
+
+        let ratingHeadline = "Keep Practicing!";
+        let badgeIcon = "🎯";
+        const performanceRatio = standardScoreMetric / quizQueue.length;
+        if (performanceRatio === 1) {
+            ratingHeadline = "Perfect Score! Master Rank";
+            badgeIcon = "🏆";
+        } else if (performanceRatio >= 0.8) {
+            ratingHeadline = "Brilliant Result!";
+            badgeIcon = "🌟";
+        } else if (performanceRatio >= 0.5) {
+            ratingHeadline = "Good Effort!";
+            badgeIcon = "👍";
+        }
+
+        const targetWorkspaceNode = document.getElementById('workspace-node');
+        targetWorkspaceNode.innerHTML = `
+            <div class="podium-hub">
+                <div class="podium-emblem">${badgeIcon}</div>
+                <div class="podium-header">${ratingHeadline}</div>
+                <div class="podium-score">${standardScoreMetric} / ${quizQueue.length}</div>
+                <button class="control-btn" style="background-color: var(--duo-blue); box-shadow: 0 4px 0 var(--duo-blue-shadow);" onclick="initiateQuizSession()">Try Again</button>
+            </div>
+        `;
+    }
+
+    function confirmRestart() {
+        if (confirm("Are you sure you want to abandon your current progress and restart?")) {
+            initiateQuizSession();
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', initiateQuizSession);
+</script>
+</body>
+</html>
