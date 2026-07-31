@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Doctor Q's Story · English Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-shadow: #46a302;
+            --duo-red: #ff4b4b;
+            --duo-red-shadow: #ea2b2b;
+            --duo-blue: #1cb0f6;
+            --duo-blue-shadow: #1899d6;
+            --duo-gray: #afafaf;
+            --duo-light-gray: #e5e5e5;
+            --duo-text: #3c3c3c;
+            --duo-bg: #ffffff;
+            --duo-card-bg: #f7f7f7;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', -apple-system, sans-serif;
+            user-select: none;
+        }
+        body {
+            background-color: var(--duo-bg);
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 16px;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        .exit-btn {
+            font-size: 28px;
+            color: var(--duo-gray);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .progress-track {
+            background-color: var(--duo-light-gray);
+            height: 16px;
+            border-radius: 16px;
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            background-color: var(--duo-green);
+            height: 100%;
+            width: 0%;
+            border-radius: 16px;
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .quiz-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: cardSlideIn 0.3s ease-out;
+        }
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .story-box {
+            background: #fef7e0;
+            border: 2px solid #f9e79f;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #2b2b2b;
+            font-weight: 600;
+        }
+        .prompt-label {
+            font-size: 0.95rem;
+            color: var(--duo-gray);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+        .sentence-box {
+            font-size: 1.35rem;
+            font-weight: 800;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            color: #2b2b2b;
+            background-color: var(--duo-card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px solid var(--duo-light-gray);
+            text-align: center;
+        }
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .option-card {
+            background-color: #ffffff;
+            border: 2px solid var(--duo-light-gray);
+            border-bottom: 5px solid var(--duo-light-gray);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--duo-text);
+            cursor: pointer;
+            text-align: center;
+            position: relative;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .option-card:active:not(.disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 1px;
+        }
+        .option-card.correct-glow {
+            background-color: #d7ffb8 !important;
+            border-color: #58cc02 !important;
+            border-bottom-color: #46a302 !important;
+            color: #2d6a0a !important;
+        }
+        .option-card.wrong-glow {
+            background-color: #ffd8d8 !important;
+            border-color: #ff4b4b !important;
+            border-bottom-color: #ea2b2b !important;
+            color: #b91c1c !important;
+        }
+        .option-card.disabled {
+            pointer-events: none;
+        }
+        .shake-effect {
+            animation: structuralShake 0.4s ease-in-out;
+        }
+        @keyframes structuralShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-12px); }
+            40%, 80% { transform: translateX(12px); }
+        }
+        .feedback-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 24px 16px 36px 16px;
+            display: flex;
+            justify-content: center;
+            transform: translateY(100%);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+        }
+        .feedback-sheet.revealed {
+            transform: translateY(0);
+        }
+        .feedback-content {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .feedback-message {
+            display: flex;
+            flex-direction: column;
+            font-weight: 900;
+            font-size: 1.3rem;
+        }
+        .feedback-sheet.correct-state {
+            background-color: #d7ffb8;
+            border-top: 2px solid #a5ed6e;
+        }
+        .feedback-sheet.correct-state .feedback-message { color: #46a302; }
+        .feedback-sheet.error-state {
+            background-color: #ffd8d8;
+            border-top: 2px solid #ff9e9e;
+        }
+        .feedback-sheet.error-state .feedback-message { color: #ea2b2b; }
+        .action-btn {
+            border: none;
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            color: #ffffff;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+        }
+        .feedback-sheet.correct-state .action-btn {
+            background-color: var(--duo-green);
+            box-shadow: 0 4px 0 var(--duo-green-shadow);
+        }
+        .feedback-sheet.error-state .action-btn {
+            background-color: var(--duo-red);
+            box-shadow: 0 4px 0 var(--duo-red-shadow);
+        }
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .summary-card {
+            text-align: center;
+            background: #ffffff;
+            padding: 40px 24px;
+            border-radius: 24px;
+            border: 2px solid var(--duo-light-gray);
+            box-shadow: 0 8px 0 var(--duo-light-gray);
+            animation: cardSlideIn 0.4s ease-out;
+        }
+        .summary-headline {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--duo-blue);
+            margin-bottom: 8px;
+        }
+        .badge-sub {
+            font-size: 1.1rem;
+            color: var(--duo-gray);
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .tally-score {
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--duo-green);
+            margin: 24px 0;
+            line-height: 1;
+        }
+        .summary-card .action-btn {
+            background-color: var(--duo-blue);
+            box-shadow: 0 4px 0 var(--duo-blue-shadow);
+            width: 100%;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="top-bar" id="top-bar">
+        <button class="exit-btn" onclick="triggerRestart()">×</button>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div id="quiz-card-anchor" class="quiz-card"></div>
+</div>
+
+<div class="feedback-sheet" id="feedback-overlay">
+    <div class="feedback-content">
+        <div class="feedback-message" id="feedback-message"></div>
+        <button class="action-btn" id="continue-btn" onclick="moveToNextStep()">Continue</button>
+    </div>
+</div>
+
+<script>
+    // Массив упражнений, основанных на тексте про доктора Кью
+    const quests = [
+        // Шаг 0: текст для чтения (без вопросов, просто показать)
+        {
+            type: "reading",
+            label: "Read about Doctor Q",
+            story: true
+        },
+        // Шаг 1-4: True/False вопросы
+        {
+            type: "tf",
+            question: "Doctor Q is a very good scientist.",
+            answer: "True",
+            options: ["True", "False"]
+        },
+        {
+            type: "tf",
+            question: "Pi doesn't like computer games.",
+            answer: "False",
+            options: ["True", "False"]
+        },
+        {
+            type: "tf",
+            question: "Rob is a brilliant chef.",
+            answer: "False",
+            options: ["True", "False"]
+        },
+        {
+            type: "tf",
+            question: "Millie likes helping Rob.",
+            answer: "True",
+            options: ["True", "False"]
+        },
+        // Шаг 5-6: Выбрать подходящее слово (эмоции)
+        {
+            type: "choose",
+            label: "How does Doctor Q feel about his new invention?",
+            question: "He is very … about it.",
+            answer: "excited",
+            options: ["excited", "worried", "scared", "angry"]
+        },
+        {
+            type: "choose",
+            label: "Rob and Millie are … robots.",
+            question: "They are very … and friendly.",
+            answer: "intelligent",
+            options: ["intelligent", "bad", "bored", "lazy"]
+        },
+        // Шаг 7-8: Matching (кто что делает)
+        {
+            type: "match",
+            label: "Who helps with cooking?",
+            question: "Rob is bad at cooking, so … helps him.",
+            answer: "Millie",
+            options: ["Millie", "Doctor Q", "Pi", "Rob"]
+        },
+        {
+            type: "match",
+            label: "Who loves video games?",
+            question: "… loves playing video games.",
+            answer: "Pi",
+            options: ["Pi", "Rob", "Millie", "Doctor Q"]
+        }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    const quizCard = document.getElementById('quiz-card-anchor');
+    const progressFill = document.getElementById('progress-fill');
+    const feedbackOverlay = document.getElementById('feedback-overlay');
+    const feedbackMessage = document.getElementById('feedback-message');
+    const continueBtn = document.getElementById('continue-btn');
+    const topBar = document.getElementById('top-bar');
+
+    function startQuiz() {
+        currentIndex = 0;
+        score = 0;
+        answered = false;
+        topBar.classList.remove('hidden');
+        feedbackOverlay.className = 'feedback-sheet';
+        displayQuest();
+    }
+
+    function displayQuest() {
+        answered = false;
+        feedbackOverlay.className = 'feedback-sheet';
+        const quest = quests[currentIndex];
+        const progressPercent = (currentIndex / quests.length) * 100;
+        progressFill.style.width = `${progressPercent}%`;
+
+        if (quest.story) {
+            // Экран с текстом
+            quizCard.innerHTML = `
+                <div class="prompt-label">📖 Reading</div>
+                <div class="story-box">
+                    This is Doctor Q. He's a brilliant scientist and inventor. He is very interested in art and loves painting. His best friend is Pi, a parrot. Pi loves playing video games. Rob and Millie are Doctor Q's assistants. They are intelligent, friendly robots. Rob is bad at cooking and Millie doesn't like cleaning, so they help each other.
+                </div>
+                <div class="options-list">
+                    <button class="option-card correct-glow" onclick="handleReadingContinue()">I've read the story ➔</button>
+                </div>
+            `;
+        } else {
+            let questionHTML = quest.question;
+            if (quest.type === "choose" || quest.type === "match") {
+                questionHTML = `<span class="prompt-label">${quest.label}</span> <div class="sentence-box">${quest.question}</div>`;
+            } else {
+                questionHTML = `<div class="sentence-box">${quest.question}</div>`;
+            }
+
+            const options = [...quest.options].sort(() => Math.random() - 0.5);
+            quizCard.innerHTML = `
+                ${quest.type !== "tf" ? `<div class="prompt-label">${quest.label}</div>` : ""}
+                ${questionHTML}
+                <div class="options-list">
+                    ${options.map(opt => `
+                        <button class="option-card" onclick="handleAnswer(this, '${opt.replace(/'/g, "\\'")}')">${opt}</button>
+                    `).join('')}
+                </div>
+            `;
+        }
+    }
+
+    function handleReadingContinue() {
+        // Переход к следующему вопросу после чтения
+        currentIndex++;
+        displayQuest();
+    }
+
+    function handleAnswer(button, selected) {
+        if (answered) return;
+        answered = true;
+        const quest = quests[currentIndex];
+        const isCorrect = (selected === quest.answer);
+        const rootCard = document.getElementById('quiz-card-anchor');
+
+        // Подсветить все кнопки
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.classList.add('disabled');
+            if (card.innerText.trim() === quest.answer) {
+                card.classList.add('correct-glow');
+            }
+        });
+
+        if (isCorrect) {
+            score++;
+            button.classList.add('correct-glow');
+            feedbackMessage.innerHTML = 'Excellent! ✅';
+            feedbackOverlay.className = 'feedback-sheet revealed correct-state';
+        } else {
+            button.classList.add('wrong-glow');
+            rootCard.classList.add('shake-effect');
+            if (navigator.vibrate) navigator.vibrate(150);
+            setTimeout(() => rootCard.classList.remove('shake-effect'), 400);
+            feedbackMessage.innerHTML = `Correct answer: <span>${quest.answer}</span>`;
+            feedbackOverlay.className = 'feedback-sheet revealed error-state';
+        }
+    }
+
+    function moveToNextStep() {
+        currentIndex++;
+        if (currentIndex < quests.length) {
+            displayQuest();
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        progressFill.style.width = '100%';
+        feedbackOverlay.className = 'feedback-sheet';
+        topBar.classList.add('hidden');
+        const total = quests.length - 1; // без экрана чтения
+        let headline = "Keep Practicing!";
+        if (score === total) headline = "Perfect! 🏆";
+        else if (score >= total * 0.7) headline = "Great job! 🌟";
+        else if (score >= total * 0.5) headline = "Good work! 👍";
+
+        quizCard.innerHTML = `
+            <div class="summary-card">
+                <div class="summary-headline">${headline}</div>
+                <div class="badge-sub">You answered all questions about Doctor Q!</div>
+                <div class="tally-score">${score}/${total}</div>
+                <button class="action-btn" onclick="startQuiz()">Read & Play Again</button>
+            </div>
+        `;
+    }
+
+    function triggerRestart() {
+        if (confirm("Start over?")) startQuiz();
+    }
+
+    window.addEventListener('DOMContentLoaded', startQuiz);
+    continueBtn.addEventListener('click', moveToNextStep);
+</script>
+</body>
+</html>
