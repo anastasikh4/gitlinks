@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>F1 Grand Prix Mission: Grid Academy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --carbon-black: #15151e;
+            --tarmac-grey: #252532;
+            --neon-green: #00ff66;
+            --white: #ffffff;
+            --panel-bg: rgba(21, 21, 30, 0.98);
+            --gold: #ffcc00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #0b0b10;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(225,6,0,0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(0,255,102,0.1) 0%, transparent 40%);
+            color: var(--white);
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .mission-control {
+            max-width: 550px;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 3px solid var(--f1-red);
+            border-radius: 24px;
+            padding: 25px 20px;
+            box-shadow: 0 0 35px rgba(225, 6, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px dashed var(--f1-red);
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 2.1rem;
+            color: var(--f1-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px var(--white);
+            margin-bottom: 8px;
+        }
+
+        .hud-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a24;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid #3d3d4e;
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 1rem;
+        }
+
+        .points-badge { color: var(--gold); font-weight: 700; }
+        .lap-badge { color: var(--neon-green); }
+
+        .progress-track {
+            background-color: #3d3d4e;
+            height: 10px;
+            border-radius: 10px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--neon-green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .quest-card {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .quest-title {
+            font-family: 'Fredoka One', sans-serif;
+            font-size: 1.25rem;
+            color: var(--neon-green);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quest-emoji-box {
+            width: 100%;
+            height: 170px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a24;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 2px solid #3d3d4e;
+            font-size: 90px;
+        }
+
+        .quest-sentence {
+            font-size: 1.3rem;
+            font-weight: 800;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .blank-line {
+            color: var(--f1-red);
+            border-bottom: 3px dashed var(--f1-red);
+            padding: 0 8px;
+            font-weight: 900;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .pit-btn {
+            background: var(--tarmac-grey);
+            border: 2px solid #3d3d4e;
+            border-bottom: 5px solid #1a1a24;
+            color: var(--white);
+            padding: 15px;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.1s linear;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .pit-btn:active:not(.disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 1px;
+        }
+
+        .pit-btn.correct-glow {
+            background: #155724 !important;
+            border-color: var(--neon-green) !important;
+            border-bottom-color: #0c3617 !important;
+            color: var(--neon-green) !important;
+        }
+
+        .pit-btn.wrong-glow {
+            background: #721c24 !important;
+            border-color: var(--f1-red) !important;
+            border-bottom-color: #3f1014 !important;
+            color: #f8d7da !important;
+        }
+
+        .pit-btn.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .crash-shake {
+            animation: shakeAction 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAction {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-12px); }
+            40%, 80% { transform: translateX(12px); }
+        }
+
+        .radio-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a252f;
+            padding: 22px;
+            display: none;
+            justify-content: center;
+            border-top: 3px solid var(--f1-red);
+            z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+        }
+
+        .radio-drawer.show-tray {
+            display: flex;
+        }
+
+        .radio-content {
+            max-width: 550px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #radio-transmission {
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+
+        .continue-mission-btn {
+            background: var(--f1-red);
+            border: none;
+            border-bottom: 4px solid #990400;
+            color: var(--white);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .continue-mission-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .podium-screen {
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        .podium-icon { font-size: 4.5rem; margin-bottom: 12px; }
+        .podium-title { font-family: 'Fredoka One', sans-serif; font-size: 1.9rem; color: var(--neon-green); margin-bottom: 10px; }
+        .podium-score { font-size: 1.4rem; font-weight: 800; margin-bottom: 25px; }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 1.7rem; }
+            .quest-sentence { font-size: 1.15rem; }
+            .pit-btn { font-size: 0.95rem; padding: 12px; }
+            .quest-emoji-box { height: 140px; font-size: 70px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mission-control">
+    <header>
+        <h1>Grand Prix Academy</h1>
+        <div class="hud-stats">
+            <div>🏁 SPEED HUD: <span class="lap-badge" id="lap-hud">LAP 1/6</span></div>
+            <div>🏆 REWARD: <span class="points-badge" id="points-hud">0 PTS</span></div>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </header>
+
+    <main id="quest-workspace">
+        <!-- Interactive game blocks generated here -->
+    </main>
+</div>
+
+<!-- Team Radio Drawer Slider Overlay -->
+<div class="radio-drawer" id="radio-drawer">
+    <div class="radio-content">
+        <span id="radio-transmission">Radio Static...</span>
+        <button class="continue-mission-btn" onclick="advanceLap()">Continue</button>
+    </div>
+</div>
+
+<script>
+    // 6 Contextual Quests with emoji visuals
+    const missionDatabase = [
+        {
+            type: "Grammar Quest",
+            header: "Lap 1: Live Telemetry Action",
+            emoji: "🎧",
+            q: "Look at the screen right now! He ________ to formula news now.",
+            a: "is listening",
+            options: ["is listening", "listens", "listening", "are listening"]
+        },
+        {
+            type: "Vocabulary Quest",
+            header: "Lap 2: Driver ID",
+            emoji: "🗺️",
+            q: "The champion driver on the left is fast! He is from ________.",
+            a: "China",
+            options: ["China", "Germany", "Italy", "Britain"]
+        },
+        {
+            type: "Grammar Quest",
+            header: "Lap 3: Driver Habits",
+            emoji: "⛑️",
+            q: "Safety check! A driver usually ________ a helmet on his head.",
+            a: "wears",
+            options: ["wears", "is wearing", "wear", "wearing"]
+        },
+        {
+            type: "Vocabulary Quest",
+            header: "Lap 4: Profile Inspection",
+            emoji: "💇‍♂️",
+            q: "Look at his profile picture. He doesn't have ________ hair.",
+            a: "dark",
+            options: ["dark", "straight", "wavy", "curly"]
+        },
+        {
+            type: "Reading Quest",
+            header: "Lap 5: Pit Wall Report",
+            emoji: "👥",
+            q: "The team is in the paddock. They are standing ________ in uniforms.",
+            a: "together",
+            options: ["together", "now", "always", "second"]
+        },
+        {
+            type: "Reading Quest",
+            header: "Lap 6: Podium Standings",
+            emoji: "🥈",
+            q: "Check the results log! A man with a dark beard was ________.",
+            a: "second",
+            options: ["second", "winner", "straight", "strange"]
+        }
+    ];
+
+    let activeLapIdx = 0;
+    let lapScored = false;
+    let runningPoints = 0;
+
+    function initMissionGame() {
+        activeLapIdx = 0;
+        runningPoints = 0;
+        document.getElementById('radio-drawer').classList.remove('show-tray');
+        document.getElementById('points-hud').textContent = '0 PTS';
+        loadCurrentLapQuest();
+    }
+
+    function loadCurrentLapQuest() {
+        lapScored = false;
+        const currentQuest = missionDatabase[activeLapIdx];
+        document.getElementById('radio-drawer').classList.remove('show-tray');
+        document.getElementById('lap-hud').textContent = 'LAP ' + (activeLapIdx + 1) + '/' + missionDatabase.length;
+
+        const trackPercentage = (activeLapIdx / missionDatabase.length) * 100;
+        document.getElementById('progress-fill').style.width = trackPercentage + '%';
+
+        // Replace blank placeholder with styled element
+        const configuredSentence = currentQuest.q.replace('________', '<span class="blank-line" id="active-blank">______</span>');
+
+        // Shuffle alternative buttons
+        const randomizedChoices = [...currentQuest.options].sort(() => Math.random() - 0.5);
+
+        const workspaceNode = document.getElementById('quest-workspace');
+        let html = '<div class="quest-card">';
+        html += '<div class="quest-title">⚡ ' + currentQuest.header + ' • ' + currentQuest.type + '</div>';
+        html += '<div class="quest-emoji-box">' + currentQuest.emoji + '</div>';
+        html += '<div class="quest-sentence">' + configuredSentence + '</div>';
+        html += '<div class="options-grid">';
+
+        randomizedChoices.forEach(function(option) {
+            html += '<button class="pit-btn" onclick="evaluateChoice(this, \'' + option.replace(/'/g, "\\'") + '\')">' + option + '</button>';
+        });
+
+        html += '</div></div>';
+        workspaceNode.innerHTML = html;
+    }
+
+    function evaluateChoice(selectedBtn, pickedValue) {
+        if (lapScored) return;
+        lapScored = true;
+        const currentQuest = missionDatabase[activeLapIdx];
+        const correctValue = currentQuest.a;
+        const drawer = document.getElementById('radio-drawer');
+        const radioText = document.getElementById('radio-transmission');
+        const mainPanel = document.querySelector('.mission-control');
+
+        // Lock all buttons and highlight correct one
+        const allBtns = document.querySelectorAll('.pit-btn');
+        allBtns.forEach(function(btn) {
+            btn.classList.add('disabled');
+            if (btn.textContent.trim() === correctValue) {
+                btn.classList.add('correct-glow');
+            }
+        });
+
+        const blankSpan = document.getElementById('active-blank');
+        if (pickedValue === correctValue) {
+            runningPoints += 50;
+            document.getElementById('points-hud').textContent = runningPoints + ' PTS';
+            selectedBtn.classList.add('correct-glow');
+            radioText.innerHTML = "🟢 TEAM RADIO: 'Box, box! Fast pit stop! Overtake complete, clean driving!' (+50 PTS)";
+            drawer.style.borderTopColor = "var(--neon-green)";
+            if (blankSpan) {
+                blankSpan.textContent = correctValue;
+                blankSpan.style.color = 'var(--neon-green)';
+                blankSpan.style.borderColor = 'var(--neon-green)';
+            }
+        } else {
+            selectedBtn.classList.add('wrong-glow');
+            mainPanel.classList.add('crash-shake');
+            if (navigator.vibrate) navigator.vibrate(150);
+            setTimeout(function() { mainPanel.classList.remove('crash-shake'); }, 400);
+            radioText.innerHTML = "🔴 TEAM RADIO: 'Copy that, technical error. Right variable was: " + correctValue.toUpperCase() + "'";
+            drawer.style.borderTopColor = "var(--f1-red)";
+            if (blankSpan) {
+                blankSpan.textContent = correctValue;
+                blankSpan.style.color = 'var(--f1-red)';
+                blankSpan.style.borderColor = 'var(--f1-red)';
+            }
+        }
+        drawer.classList.add('show-tray');
+        document.getElementById('progress-fill').style.width = ((activeLapIdx + 1) / missionDatabase.length * 100) + '%';
+    }
+
+    function advanceLap() {
+        activeLapIdx++;
+        if (activeLapIdx < missionDatabase.length) {
+            loadCurrentLapQuest();
+        } else {
+            displayPodiumFinish();
+        }
+    }
+
+    function displayPodiumFinish() {
+        document.getElementById('radio-drawer').classList.remove('show-tray');
+        document.getElementById('lap-hud').textContent = 'FINISH';
+        document.getElementById('progress-fill').style.width = '100%';
+
+        let podiumTitle = 'Paddock Runner';
+        let crownTrophy = '⚙️';
+        const perfectScore = missionDatabase.length * 50;
+        if (runningPoints === perfectScore) {
+            podiumTitle = 'World Grand Prix Champion! 🏆';
+            crownTrophy = '🥇';
+        } else if (runningPoints >= 200) {
+            podiumTitle = 'Podium Silver Medalist';
+            crownTrophy = '🥈';
+        }
+
+        const workspaceNode = document.getElementById('quest-workspace');
+        workspaceNode.innerHTML = '<div class="podium-screen">' +
+            '<div class="podium-icon">' + crownTrophy + '</div>' +
+            '<div class="podium-title">' + podiumTitle + '</div>' +
+            '<div class="podium-score">Final Reward Score: ' + runningPoints + ' / ' + perfectScore + ' Total points</div>' +
+            '<button class="pit-btn" style="width:100%; text-align:center; background:var(--f1-red); border-color:var(--white);" onclick="initMissionGame()">Restart Mission</button>' +
+            '</div>';
+    }
+
+    window.addEventListener('DOMContentLoaded', initMissionGame);
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Pro Strategy Center: Advanced Command Center</title>
+    <style>
+        :root {
+            --race-red: #e10600;
+            --bg-light: #f7f9fc;
+            --card-bg: #ffffff;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --accent-blue: #e6f0fa;
+            --success-green: #28a745;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-wrapper {
+            max-width: 950px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border-top: 8px solid var(--race-red);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--text-dark);
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        h1 span {
+            color: var(--race-red);
+        }
+
+        .dashboard-banner {
+            display: flex;
+            justify-content: space-between;
+            background: var(--accent-blue);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #1a436d;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .score-val {
+            color: var(--race-red);
+        }
+
+        .mission-section {
+            background: #fdfdfd;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .mission-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: #edf2f7;
+            color: var(--text-dark);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .grid-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .visual-thumb {
+            width: 180px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .sentence-builder {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .row-builder {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e0;
+        }
+
+        .row-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .sign-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .sign-plus { background: #e6fffa; color: #00865a; }
+        .sign-minus { background: #fff5f5; color: #e53e3e; }
+        .sign-q { background: #ebf8ff; color: #2b6cb0; }
+
+        select {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            background-color: #fff;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        select:focus {
+            border-color: var(--race-red);
+            outline: none;
+        }
+
+        .action-btn {
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            margin-top: 5px;
+        }
+
+        .action-btn:hover {
+            background: var(--race-red);
+        }
+
+        .status-box {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            display: none;
+            font-size: 0.95rem;
+        }
+
+        .status-ok { background: #f0fff4; color: #276749; border-left: 4px solid #38a169; }
+        .status-error { background: #fff5f5; color: #9b2c2c; border-left: 4px solid #e53e3e; }
+
+        @media (max-width: 600px) {
+            .game-wrapper {
+                padding: 15px;
+            }
+            .dashboard-banner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .grid-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .visual-thumb {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <header>
+            <h1>🏁 Race Strategy <span>Advanced Command Center</span></h1>
+            <p style="color: var(--text-muted); margin: 0;">Analyze details carefully. Every option matches the sentence type (+, -, ?), but only one is grammatically perfect!</p>
+        </header>
+
+        <div class="dashboard-banner">
+            <div>Sector Progress Score: <span id="total-score" class="score-val">0</span> / 90 XP</div>
+            <div>Current Rank: <span id="rank-text">Data Analyst</span></div>
+        </div>
+
+        <div style="margin-top: 25px;"></div>
+
+        <!-- SECTOR 1: PRESENT TENSE -->
+        <div class="mission-section" id="sector-1">
+            <div class="mission-header">
+                <div class="mission-title">🟢 Sector 1: Driver Profiles (Present Tense Challenge)</div>
+                <div class="badge">+30 XP</div>
+            </div>
+            
+            <div class="grid-container">
+                <img src="https://i.pinimg.com/originals/68/3b/5a/683b5a51c5ff755c5138e00c16e820ea.jpg" alt="Driver" class="visual-thumb">
+                
+                <div class="sentence-builder">
+                    <!-- Positive Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-plus">+</span> Select the correct positive statement:</div>
+                        <select id="s1-p">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="correct">He has dark curly hair and a moustache.</option>
+                            <option value="wrong1">He have dark curly hair and a moustache.</option>
+                            <option value="wrong2">He is dark curly hair and a moustache.</option>
+                        </select>
+                    </div>
+
+                    <!-- Negative Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-minus">-</span> Select the correct negative statement:</div>
+                        <select id="s1-n">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">He don't have straight hair.</option>
+                            <option value="correct">He doesn't have straight hair.</option>
+                            <option value="wrong2">He isn't have straight hair.</option>
+                        </select>
+                    </div>
+
+                    <!-- Question Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-q">?</span> Select the correct question form:</div>
+                        <select id="s1-q">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">Has he got a helmet on his head?</option>
+                            <option value="wrong2">Is he wear a helmet on his head?</option>
+                            <option value="correct">Does he wear a helmet on his head?</option>
+                        </select>
+                    </div>
+
+                    <button class="action-btn" onclick="validateSector(1, ['s1-p', 's1-n', 's1-q'])">Lock Strategy 1</button>
+                    <div class="status-box" id="status-1"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTOR 2: PRESENT CONTINUOUS -->
+        <div class="mission-section" id="sector-2">
+            <div class="mission-header">
+                <div class="mission-title">🟡 Sector 2: Live Action Track (Present Continuous Challenge)</div>
+                <div class="badge">+30 XP</div>
+            </div>
+            
+            <div class="grid-container">
+                <img src="https://autosport.com.ru/files/news/2025/05/04/9a647bec43284951044e723130aab001.jpg" alt="Racing Car" class="visual-thumb">
+                
+                <div class="sentence-builder">
+                    <!-- Positive Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-plus">+</span> Select the correct positive statement:</div>
+                        <select id="s2-p">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">They sitting on a strange car now.</option>
+                            <option value="correct">They are sitting on a strange car now.</option>
+                            <option value="wrong2">They is sitting on a strange car now.</option>
+                        </select>
+                    </div>
+
+                    <!-- Negative Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-minus">-</span> Select the correct negative statement:</div>
+                        <select id="s2-n">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="correct">The car isn't driving, it's in the garage.</option>
+                            <option value="wrong1">The car doesn't driving, it's in the garage.</option>
+                            <option value="wrong2">The car not driving, it's in the garage.</option>
+                        </select>
+                    </div>
+
+                    <!-- Question Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-q">?</span> Select the correct question form:</div>
+                        <select id="s2-q">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">Are they listen to formula news now?</option>
+                            <option value="wrong2">Do they listening to formula news now?</option>
+                            <option value="correct">Are they listening to formula news now?</option>
+                        </select>
+                    </div>
+
+                    <button class="action-btn" onclick="validateSector(2, ['s2-p', 's2-n', 's2-q'])">Lock Strategy 2</button>
+                    <div class="status-box" id="status-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTOR 3: PAST SIMPLE -->
+        <div class="mission-section" id="sector-3">
+            <div class="mission-header">
+                <div class="mission-title">🔴 Sector 3: Historical Podium (Past Simple Challenge)</div>
+                <div class="badge">+30 XP</div>
+            </div>
+            
+            <div class="grid-container">
+                <img src="https://i.dailymail.co.uk/1s/2023/07/31/12/73797381-0-image-m-27_1690801972131.jpg" alt="Podium" class="visual-thumb">
+                
+                <div class="sentence-builder">
+                    <!-- Positive Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-plus">+</span> Select the correct positive statement:</div>
+                        <select id="s3-p">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">A man with a dark beard were second.</option>
+                            <option value="correct">A man with a dark beard was second.</option>
+                            <option value="wrong2">A man with a dark beard did be second.</option>
+                        </select>
+                    </div>
+
+                    <!-- Negative Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-minus">-</span> Select the correct negative statement:</div>
+                        <select id="s3-n">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="wrong1">He didn't a winner yesterday.</option>
+                            <option value="correct">He wasn't a winner yesterday.</option>
+                            <option value="wrong2">He wasn't a winner tomorrow.</option>
+                        </select>
+                    </div>
+
+                    <!-- Question Row -->
+                    <div class="row-builder">
+                        <div class="row-label"><span class="sign-badge sign-q">?</span> Select the correct question form:</div>
+                        <select id="s3-q">
+                            <option value="">-- Choose Sentence --</option>
+                            <option value="correct">Were they standing together in uniforms?</option>
+                            <option value="wrong1">Did they were standing together in uniforms?</option>
+                            <option value="wrong2">Was they standing together in uniforms?</option>
+                        </select>
+                    </div>
+
+                    <button class="action-btn" onclick="validateSector(3, ['s3-p', 's3-n', 's3-q'])">Lock Strategy 3</button>
+                    <div class="status-box" id="status-3"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const sectorScores = { 1: 0, 2: 0, 3: 0 };
+
+        function validateSector(sectorNum, elementIds) {
+            let correctCount = 0;
+            let incomplete = false;
+
+            elementIds.forEach(id => {
+                const selectElement = document.getElementById(id);
+                if (selectElement.value === "") {
+                    incomplete = true;
+                } else if (selectElement.value === "correct") {
+                    correctCount++;
+                }
+            });
+
+            const statusBox = document.getElementById(`status-${sectorNum}`);
+            statusBox.style.display = "block";
+
+            if (incomplete) {
+                statusBox.className = "status-box status-error";
+                statusBox.innerText = "❌ STRATEGY DENIED: Please fill in all variables for this sector!";
+                return;
+            }
+
+            if (correctCount === 3) {
+                statusBox.className = "status-box status-ok";
+                statusBox.innerText = "🏁 TELEMETRY OPTIMAL: 3/3 commands verified! Sector green.";
+                sectorScores[sectorNum] = 30;
+            } else {
+                statusBox.className = "status-box status-error";
+                statusBox.innerText = `⚠️ BOX, BOX! Collision detected. Only ${correctCount}/3 inputs are correct. Fix telemetry configuration!`;
+                sectorScores[sectorNum] = 0;
+            }
+            updateTotalScore();
+        }
+
+        function updateTotalScore() {
+            const total = sectorScores[1] + sectorScores[2] + sectorScores[3];
+            document.getElementById("total-score").innerText = total;
+
+            const rankText = document.getElementById("rank-text");
+            if (total === 90) {
+                rankText.innerText = "🏎️ Team Principal Master";
+                rankText.style.color = "var(--success-green)";
+            } else if (total >= 60) {
+                rankText.innerText = "🛠️ Senior Race Engineer";
+                rankText.style.color = "var(--text-dark)";
+            } else if (total >= 30) {
+                rankText.innerText = "📊 Junior Data Analyst";
+                rankText.style.color = "var(--text-muted)";
+            } else {
+                rankText.innerText = "⏱️ Paddock Intern";
+                rankText.style.color = "var(--text-muted)";
+            }
+        }
+    </script>
+</body>
+</html>
