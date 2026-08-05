@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wordwall Style Quiz - Vocabulary & Grammar</title>
+<style>
+  :root {
+    --primary: #58cc02;
+    --primary-hover: #46a302;
+    --primary-shadow: #52b802;
+    --bg: #ffffff;
+    --text: #3c3c3c;
+    --gray: #e5e5e5;
+    --correct: #58cc02;
+    --correct-bg: #d7f5c5;
+    --wrong: #ea2b2b;
+    --wrong-bg: #ffd8d8;
+  }
+
+  body {
+    font-family: "Nunito", "Segoe UI", sans-serif;
+    background-color: #f0f4f8;
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .quiz-container {
+    background: var(--bg);
+    border: 2px solid var(--gray);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 550px;
+    box-shadow: 0 8px 0 var(--gray);
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .progress-container {
+    width: 100%;
+    background-color: var(--gray);
+    border-radius: 10px;
+    height: 16px;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: var(--primary);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+  }
+
+  .category-tag {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #afafaf;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .question {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .highlight-gap {
+    color: #3498db;
+    border-bottom: 3px dashed #3498db;
+    padding: 0 8px;
+    font-weight: 800;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .option-btn {
+    background: var(--bg);
+    border: 2px solid var(--gray);
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--gray);
+    transition: all 0.1s ease;
+    text-align: center;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .option-btn:active:not(.disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0px 0 var(--gray);
+  }
+
+  .option-btn.correct-choice {
+    background-color: var(--correct-bg);
+    border-color: var(--correct);
+    color: #2b7700;
+    box-shadow: 0 4px 0 var(--correct);
+  }
+
+  .option-btn.wrong-choice {
+    background-color: var(--wrong-bg);
+    border-color: var(--wrong);
+    color: #ae1c1c;
+    box-shadow: 0 4px 0 var(--wrong);
+  }
+
+  .shake {
+    animation: shakeAnim 0.4s ease-in-out;
+  }
+
+  @keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+  }
+
+  .result-screen {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ff9000;
+    margin-bottom: 15px;
+  }
+
+  .result-score {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
+  }
+
+  .action-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--primary-shadow);
+    transition: all 0.1s ease;
+    width: 100%;
+  }
+
+  .action-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 0px 0 var(--primary-shadow);
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+  <div class="progress-container" id="progress-wrapper">
+    <div class="progress-bar" id="bar"></div>
+  </div>
+
+  <div id="game-zone">
+    <div class="category-tag" id="q-category">Fill in the Gap</div>
+    <div class="question" id="q-text">Loading...</div>
+    <div class="options-grid" id="options-box"></div>
+  </div>
+
+  <div class="result-screen" id="end-zone">
+    <div class="result-title" id="res-title">Awesome!</div>
+    <div class="result-score" id="res-score">0 / 0</div>
+    <button class="action-btn" onclick="resetQuiz()">Start Again</button>
+  </div>
+</div>
+
+<script>
+  const masterQuestions = [
+    // Vocabulary Gap Fill
+    { cat: "Vocabulary", q: "Mike's hair is short and <span class='highlight-gap'>____</span>.", a: "wavy", o: ["wavy", "slim", "twins", "late"] },
+    { cat: "Vocabulary", q: "Susan is tall and <span class='highlight-gap'>____</span> with long, dark hair.", a: "slim", o: ["slim", "wavy", "middle", "north"] },
+    { cat: "Vocabulary", q: "Paris is the <span class='highlight-gap'>____</span> city of France.", a: "capital", o: ["capital", "north", "deserts", "nationality"] },
+    { cat: "Vocabulary", q: "Peter has got two sisters. They are <span class='highlight-gap'>____</span>.", a: "twins", o: ["twins", "late", "middle", "wavy"] },
+    { cat: "Vocabulary", q: "Milan is in the <span class='highlight-gap'>____</span> of Italy.", a: "north", o: ["north", "capital", "deserts", "driving"] },
+    { cat: "Vocabulary", q: "His father is a <span class='highlight-gap'>____</span>-aged man.", a: "middle", o: ["middle", "late", "slim", "wavy"] },
+    { cat: "Vocabulary", q: "In Africa there are a lot of <span class='highlight-gap'>____</span>.", a: "deserts", o: ["deserts", "capital", "north", "twins"] },
+    { cat: "Vocabulary", q: "My grandparents are in their <span class='highlight-gap'>____</span> sixties.", a: "late", o: ["late", "middle", "slim", "wavy"] },
+    { cat: "Vocabulary", q: "\"What <span class='highlight-gap'>____</span> is he?\" \"He's Canadian.\"", a: "nationality", o: ["nationality", "capital", "deserts", "twins"] },
+    { cat: "Vocabulary", q: "Have you got a <span class='highlight-gap'>____</span> licence?", a: "driving", o: ["driving", "credit", "capital", "middle"] },
+    
+    // Grammar Pronouns Underline
+    { cat: "Grammar", q: "<span class='highlight-gap'>____</span> house is very modern.", a: "Their", o: ["Their", "Theirs"] },
+    { cat: "Grammar", q: "This little puppy isn't <span class='highlight-gap'>____</span>.", a: "ours", o: ["ours", "our"] },
+    { cat: "Grammar", q: "Meg has got a new flat. <span class='highlight-gap'>____</span> flat is spacious.", a: "Her", o: ["Her", "Our"] },
+    { cat: "Grammar", q: "Tom and Sarah are <span class='highlight-gap'>____</span> friends.", a: "my", o: ["my", "mine"] },
+    { cat: "Grammar", q: "Is Ben <span class='highlight-gap'>____</span> brother?", a: "your", o: ["your", "yours"] },
+    { cat: "Grammar", q: "What is <span class='highlight-gap'>____</span> address?", a: "his", o: ["his", "hers"] },
+    { cat: "Grammar", q: "What's <span class='highlight-gap'>____</span> phone number?", a: "her", o: ["her", "yours"] }
+  ];
+
+  let activePool = [];
+  let currentIdx = 0;
+  let correctCount = 0;
+  let blockClicks = false;
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    activePool = shuffle(JSON.parse(JSON.stringify(masterQuestions)));
+    currentIdx = 0;
+    correctCount = 0;
+    blockClicks = false;
+
+    document.getElementById("game-zone").style.display = "block";
+    document.getElementById("progress-wrapper").style.display = "block";
+    document.getElementById("end-zone").style.display = "none";
+    
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    blockClicks = false;
+    const currentQ = activePool[currentIdx];
+    
+    const progressPercent = (currentIdx / activePool.length) * 100;
+    document.getElementById("bar").style.width = `${progressPercent}%`;
+
+    document.getElementById("q-category").textContent = currentQ.cat;
+    document.getElementById("q-text").innerHTML = currentQ.q;
+    
+    const optionsBox = document.getElementById("options-box");
+    optionsBox.innerHTML = "";
+
+    const dynamicOptions = shuffle([...currentQ.o]);
+
+    dynamicOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = opt;
+      btn.onclick = () => checkUserAnswer(btn, opt, currentQ.a);
+      optionsBox.appendChild(btn);
+    });
+  }
+
+  function checkUserAnswer(selectedBtn, userChoice, rightChoice) {
+    if (blockClicks) return;
+    blockClicks = true;
+
+    const allButtons = document.querySelectorAll(".option-btn");
+    allButtons.forEach(b => b.classList.add("disabled"));
+
+    if (userChoice === rightChoice) {
+      selectedBtn.classList.add("correct-choice");
+      correctCount++;
+      setTimeout(advanceStep, 1000);
+    } else {
+      selectedBtn.classList.add("wrong-choice");
+      document.getElementById("quiz-box").classList.add("shake");
+      
+      allButtons.forEach(b => {
+        if (b.textContent === rightChoice) {
+          b.classList.add("correct-choice");
+        }
+      });
+
+      setTimeout(() => {
+        document.getElementById("quiz-box").classList.remove("shake");
+        advanceStep();
+      }, 1400);
+    }
+  }
+
+  function advanceStep() {
+    currentIdx++;
+    if (currentIdx < activePool.length) {
+      renderQuestion();
+    } else {
+      showFinalResults();
+    }
+  }
+
+  function showFinalResults() {
+    document.getElementById("game-zone").style.display = "none";
+    document.getElementById("progress-wrapper").style.display = "none";
+    
+    const endZone = document.getElementById("end-zone");
+    const titleBox = document.getElementById("res-title");
+    const scoreBox = document.getElementById("res-score");
+    
+    endZone.style.display = "block";
+    scoreBox.textContent = `${correctCount} / ${activePool.length}`;
+    
+    const ratio = correctCount / activePool.length;
+    if (ratio === 1) {
+      titleBox.textContent = "Perfect Score Master! 👑";
+      titleBox.style.color = "#58cc02";
+    } else if (ratio >= 0.75) {
+      titleBox.textContent = "Awesome Job! 🔥";
+      titleBox.style.color = "#ff9000";
+    } else if (ratio >= 0.5) {
+      titleBox.textContent = "Passed Successfully! 👍";
+      titleBox.style.color = "#3498db";
+    } else {
+      titleBox.textContent = "Let's Review Again! 💪";
+      titleBox.style.color = "#ea2b2b";
+    }
+  }
+
+  function resetQuiz() {
+    startQuiz();
+  }
+
+  window.onload = startQuiz;
+</script>
+</body>
+</html>

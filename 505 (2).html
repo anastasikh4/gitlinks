@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vocabulary Quiz - Module 1</title>
+<style>
+  :root {
+    --primary: #58cc02;
+    --primary-hover: #46a302;
+    --primary-shadow: #52b802;
+    --bg: #ffffff;
+    --text: #3c3c3c;
+    --gray: #e5e5e5;
+    --correct: #58cc02;
+    --correct-bg: #d7f5c5;
+    --wrong: #ea2b2b;
+    --wrong-bg: #ffd8d8;
+  }
+
+  body {
+    font-family: "Nunito", "Segoe UI", sans-serif;
+    background-color: #f7f7f7;
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .quiz-container {
+    background: var(--bg);
+    border: 2px solid var(--gray);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 8px 0 var(--gray);
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    width: 100%;
+    background-color: var(--gray);
+    border-radius: 10px;
+    height: 16px;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: var(--primary);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+  }
+
+  /* Category Tag */
+  .category-tag {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #afafaf;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  /* Question Text */
+  .question {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  /* Options Grid */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .option-btn {
+    background: var(--bg);
+    border: 2px solid var(--gray);
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--gray);
+    transition: all 0.1s ease;
+    text-align: left;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .option-btn:active:not(.disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0px 0 var(--gray);
+  }
+
+  /* Status Colors */
+  .option-btn.correct-choice {
+    background-color: var(--correct-bg);
+    border-color: var(--correct);
+    color: #2b7700;
+    box-shadow: 0 4px 0 var(--correct);
+  }
+
+  .option-btn.wrong-choice {
+    background-color: var(--wrong-bg);
+    border-color: var(--wrong);
+    color: #ae1c1c;
+    box-shadow: 0 4px 0 var(--wrong);
+  }
+
+  .option-btn.disabled {
+    pointer-events: none;
+  }
+
+  /* Animations */
+  .shake {
+    animation: shakeAnim 0.4s ease-in-out;
+  }
+
+  @keyframes shakeAnim {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+  }
+
+  /* Result Screen */
+  .result-screen {
+    display: none;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ff9000;
+    margin-bottom: 15px;
+  }
+
+  .result-score {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 30px;
+  }
+
+  .action-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--primary-shadow);
+    transition: all 0.1s ease;
+    width: 100%;
+  }
+
+  .action-btn:active {
+    transform: translateY(5px);
+    box-shadow: 0 0px 0 var(--primary-shadow);
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+  <!-- Progress Header -->
+  <div class="progress-container" id="progress-wrapper">
+    <div class="progress-bar" id="bar"></div>
+  </div>
+
+  <!-- Interactive Question Zone -->
+  <div id="game-zone">
+    <div class="category-tag" id="q-category">Vocabulary</div>
+    <div class="question" id="q-text">Loading...</div>
+    <div class="options-grid" id="options-box"></div>
+  </div>
+
+  <!-- Final Screen -->
+  <div class="result-screen" id="end-zone">
+    <div class="result-title" id="res-title">Awesome!</div>
+    <div class="result-score" id="res-score">0 / 0</div>
+    <button class="action-btn" onclick="resetQuiz()">Start Again</button>
+  </div>
+</div>
+
+<script>
+  // Database built from your Module 1 tasks
+  const masterQuestions = [
+    // Nationalities
+    { cat: "Nationalities", q: "Germany ➔ German | Brazil ➔ ...", a: "Brazilian", o: ["Brazilian", "Brazilese", "Braziler", "Brazilish"] },
+    { cat: "Nationalities", q: "Germany ➔ German | Britain ➔ ...", a: "British", o: ["British", "Britanian", "Britisher", "England"] },
+    { cat: "Nationalities", q: "Germany ➔ German | Japan ➔ ...", a: "Japanese", o: ["Japanese", "Japanish", "Japanian", "Japaneser"] },
+    { cat: "Nationalities", q: "Germany ➔ German | Poland ➔ ...", a: "Polish", o: ["Polish", "Polander", "Polandish", "Polishe"] },
+    { cat: "Nationalities", q: "Germany ➔ German | Spain ➔ ...", a: "Spanish", o: ["Spanish", "Spaniard", "Spainish", "Spaniardish"] },
+    
+    // Form Filling - SHAPE UP FITNESS CLUB
+    { cat: "Fitness Club Form", q: "Simpson is the user's ...", a: "Surname", o: ["Surname", "Name", "Address", "Postcode"] },
+    { cat: "Fitness Club Form", q: "Complete the field:\n[ ... ]: 15, Silver Street", a: "Address", o: ["Address", "Postcode", "Membership", "Phone"] },
+    { cat: "Fitness Club Form", q: "Complete the field:\n[ ... ]: SH3 6WM", a: "Postcode", o: ["Postcode", "Address", "Phone", "Surname"] },
+    { cat: "Fitness Club Form", q: "Complete the field:\n[ ... ] number: 030 67438970", a: "Phone", o: ["Phone", "Membership", "Surname", "Address"] },
+    { cat: "Fitness Club Form", q: "Complete the field:\n[ ... ] number: 554", a: "Membership", o: ["Membership", "Phone", "Postcode", "Surname"] },
+    
+    // Spelling / Word Recognition Items with emojis replacing textual descriptions
+    { cat: "Objects", q: "📷", a: "camera", o: ["camera", "phone", "key", "wallet"] },
+    { cat: "Objects", q: "👛", a: "wallet", o: ["wallet", "camera", "postcode", "membership"] },
+    { cat: "Objects", q: "🔑", a: "key", o: ["key", "camera", "phone", "address"] },
+    { cat: "Objects", q: "🎒", a: "bag", o: ["bag", "wallet", "postcode", "key"] },
+    { cat: "Objects", q: "⌚", a: "watch", o: ["watch", "camera", "phone", "bag"] }
+  ];
+
+  let activePool = [];
+  let currentIdx = 0;
+  let correctCount = 0;
+  let blockClicks = false;
+
+  // Fisher-Yates shuffle algorithm
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    activePool = shuffle(JSON.parse(JSON.stringify(masterQuestions)));
+    currentIdx = 0;
+    correctCount = 0;
+    blockClicks = false;
+
+    document.getElementById("game-zone").style.display = "block";
+    document.getElementById("progress-wrapper").style.display = "block";
+    document.getElementById("end-zone").style.display = "none";
+    
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    blockClicks = false;
+    const currentQ = activePool[currentIdx];
+    
+    const progressPercent = (currentIdx / activePool.length) * 100;
+    document.getElementById("bar").style.width = `${progressPercent}%`;
+
+    document.getElementById("q-category").textContent = currentQ.cat;
+    document.getElementById("q-text").innerText = currentQ.q;
+    
+    const optionsBox = document.getElementById("options-box");
+    optionsBox.innerHTML = "";
+
+    const dynamicOptions = shuffle([...currentQ.o]);
+
+    dynamicOptions.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.className = "option-btn";
+      btn.textContent = opt;
+      btn.onclick = () => checkUserAnswer(btn, opt, currentQ.a);
+      optionsBox.appendChild(btn);
+    });
+  }
+
+  function checkUserAnswer(selectedBtn, userChoice, rightChoice) {
+    if (blockClicks) return;
+    blockClicks = true;
+
+    const allButtons = document.querySelectorAll(".option-btn");
+    allButtons.forEach(b => b.classList.add("disabled"));
+
+    if (userChoice === rightChoice) {
+      selectedBtn.classList.add("correct-choice");
+      correctCount++;
+      setTimeout(advanceStep, 1000);
+    } else {
+      selectedBtn.classList.add("wrong-choice");
+      document.getElementById("quiz-box").classList.add("shake");
+      
+      allButtons.forEach(b => {
+        if (b.textContent === rightChoice) {
+          b.classList.add("correct-choice");
+        }
+      });
+
+      setTimeout(() => {
+        document.getElementById("quiz-box").classList.remove("shake");
+        advanceStep();
+      }, 1400);
+    }
+  }
+
+  function advanceStep() {
+    currentIdx++;
+    if (currentIdx < activePool.length) {
+      renderQuestion();
+    } else {
+      showFinalResults();
+    }
+  }
+
+  function showFinalResults() {
+    document.getElementById("game-zone").style.display = "none";
+    document.getElementById("progress-wrapper").style.display = "none";
+    
+    const endZone = document.getElementById("end-zone");
+    const titleBox = document.getElementById("res-title");
+    const scoreBox = document.getElementById("res-score");
+
+    endZone.style.display = "block";
+    scoreBox.textContent = `${correctCount} / ${activePool.length}`;
+
+    const ratio = correctCount / activePool.length;
+    if (ratio === 1) {
+      titleBox.textContent = "Vocabulary Master! 👑";
+      titleBox.style.color = "#58cc02";
+    } else if (ratio >= 0.75) {
+      titleBox.textContent = "Great Job! 🔥";
+      titleBox.style.color = "#ff9000";
+    } else if (ratio >= 0.5) {
+      titleBox.textContent = "Nice Effort! 👍";
+      titleBox.style.color = "#3498db";
+    } else {
+      titleBox.textContent = "Keep Studying! 💪";
+      titleBox.style.color = "#ea2b2b";
+    }
+  }
+
+  function resetQuiz() {
+    startQuiz();
+  }
+
+  window.onload = startQuiz;
+</script>
+</body>
+</html>
