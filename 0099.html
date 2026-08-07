@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Fill in the Blank · Adjectives & Prepositions (12 questions)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f9fafb;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .progress-area {
+            padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #afafaf;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar-bg {
+            background-color: #e5e5e5;
+            height: 10px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: #58cc02;
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .quiz-content {
+            padding: 1.5rem;
+        }
+
+        .hint-card {
+            background: #f7f7f7;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #4b4b4b;
+            text-align: center;
+            margin-bottom: 1rem;
+            border: 1px solid #eee;
+        }
+
+        .sentence-card {
+            background: #fff;
+            border-radius: 2rem;
+            padding: 1.8rem 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            border: 2px solid #e5e5e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 90px;
+            background: #fff3cd;
+            border-bottom: 3px solid #ffc107;
+            border-radius: 12px;
+            padding: 0 8px;
+            color: #c78100;
+            font-weight: 800;
+            transition: all 0.2s ease;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e2e2e2;
+            border-bottom: 5px solid #d4d4d4;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: center;
+            color: #2d2d2d;
+            cursor: pointer;
+            transition: all 0.08s linear;
+            width: 100%;
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn.correct {
+            background: #d7ffb7 !important;
+            border-color: #58cc02 !important;
+            border-bottom-color: #46a302 !important;
+            color: #2d6a0a !important;
+        }
+
+        .option-btn.wrong {
+            background: #ffe0e0 !important;
+            border-color: #ff4b4b !important;
+            border-bottom-color: #c03434 !important;
+            color: #b91c1c !important;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+        }
+
+        .shake {
+            animation: shakeAnim 0.4s ease-in-out;
+        }
+
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-7px); }
+            40%, 80% { transform: translateX(7px); }
+        }
+
+        .next-btn {
+            background: #58cc02;
+            border: none;
+            border-bottom: 5px solid #46a302;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.08s;
+            display: none;
+        }
+
+        .next-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .result-screen {
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #1cb0f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-score {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+        }
+
+        .restart-btn {
+            background: #1cb0f6;
+            border: none;
+            border-bottom: 5px solid #1899d6;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .restart-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .sentence-card {
+                font-size: 1.1rem;
+                padding: 1.2rem;
+                min-height: 60px;
+            }
+            .option-btn {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+            .hint-card {
+                font-size: 0.9rem;
+            }
+            .blank {
+                min-width: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="progress-area">
+            <div class="progress-header">
+                <span>🧪 DOCTOR Q: PREPOSITIONS</span>
+                <span id="counter">1 / 12</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Quiz screen -->
+        <div id="quizScreen">
+            <div class="quiz-content">
+                <div class="hint-card" id="hintText">🇷🇺 Подсказка</div>
+                <div class="sentence-card" id="sentenceText">Loading sentence...</div>
+                <div class="options-grid" id="optionsGrid"></div>
+                <button class="next-btn" id="nextBtn">Continue →</button>
+            </div>
+        </div>
+
+        <!-- Result screen -->
+        <div id="resultScreen" class="result-screen hidden">
+            <div class="result-icon" id="resultIcon">🏆</div>
+            <div class="result-title" id="resultTitle">Lesson Complete!</div>
+            <div class="result-score" id="finalScore">0 / 12</div>
+            <button class="restart-btn" id="restartBtn">Try Again →</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== 12 QUESTIONS BASED ON THE TEXTBOOK PAGE =====
+        const quizData = [
+            { ru: "Я плохо катаюсь на лыжах. Я часто падаю.", en: "I'm bad ___ skiing. I often fall.", target: "at", options: ["at", "about", "in", "of"] },
+            { ru: "Я в восторге от своего нового изобретения. Оно фантастическое!", en: "I'm excited ___ my new invention. It's fantastic!", target: "about", options: ["about", "at", "in", "of"] },
+            { ru: "Я беспокоюсь о Пи. Я нигде не могу его найти.", en: "I'm worried ___ Pi. I can't find him anywhere.", target: "about", options: ["about", "of", "at", "in"] },
+            { ru: "У меня хорошо получается изобретать вещи!", en: "I'm good ___ inventing things!", target: "at", options: ["at", "about", "in", "of"] },
+            { ru: "Я боюсь пауков.", en: "I'm scared ___ spiders.", target: "of", options: ["of", "at", "about", "in"] },
+            { ru: "Я интересуюсь наукой.", en: "I'm interested ___ science.", target: "in", options: ["in", "at", "of", "about"] },
+            { ru: "Она очень хорошо рисует.", en: "She is really good ___ drawing.", target: "at", options: ["at", "in", "about", "of"] },
+            { ru: "Вы интересуетесь изучением языков?", en: "Are you interested ___ learning languages?", target: "in", options: ["in", "about", "of", "at"] },
+            { ru: "Не волнуйся, он не боится темноты.", en: "Don't worry, he isn't scared ___ the dark.", target: "of", options: ["of", "at", "in", "about"] },
+            { ru: "Мы так рады нашей предстоящей поездке!", en: "We are so excited ___ our upcoming trip!", target: "about", options: ["about", "at", "of", "in"] },
+            { ru: "Он беспокоится о результатах экзамена.", en: "He is worried ___ his exam results.", target: "about", options: ["about", "in", "at", "of"] },
+            { ru: "Я всегда плохо играл в шахматы.", en: "I've always been bad ___ playing chess.", target: "at", options: ["at", "of", "about", "in"] }
+        ];
+
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const counterEl = document.getElementById('counter');
+        const progressFillEl = document.getElementById('progressFill');
+        const hintTextEl = document.getElementById('hintText');
+        const sentenceTextEl = document.getElementById('sentenceText');
+        const optionsGridEl = document.getElementById('optionsGrid');
+        const nextBtnEl = document.getElementById('nextBtn');
+        const quizScreenEl = document.getElementById('quizScreen');
+        const resultScreenEl = document.getElementById('resultScreen');
+        const finalScoreEl = document.getElementById('finalScore');
+        const resultIconEl = document.getElementById('resultIcon');
+        const resultTitleEl = document.getElementById('resultTitle');
+        const restartBtnEl = document.getElementById('restartBtn');
+        const appContainer = document.getElementById('app');
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            shuffledQuestions = shuffleArray(JSON.parse(JSON.stringify(quizData)));
+            currentQuestionIndex = 0;
+            score = 0;
+            quizScreenEl.classList.remove('hidden');
+            resultScreenEl.classList.add('hidden');
+            nextBtnEl.style.display = 'none';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            nextBtnEl.style.display = 'none';
+            optionsGridEl.innerHTML = '';
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+            counterEl.textContent = `${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
+            const progressPercent = (currentQuestionIndex / shuffledQuestions.length) * 100;
+            progressFillEl.style.width = `${progressPercent}%`;
+
+            hintTextEl.textContent = `🇷🇺 ${currentQuestion.ru}`;
+
+            const parts = currentQuestion.en.split('___');
+            sentenceTextEl.innerHTML = `${parts[0]}<span class="blank" id="currentBlank">______</span>${parts[1]}`;
+
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            shuffledOptions.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectOption(btn, option, currentQuestion.target);
+                optionsGridEl.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedBtn, selectedValue, correctValue) {
+            const allButtons = optionsGridEl.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.classList.add('disabled'));
+
+            const blankEl = document.getElementById('currentBlank');
+            blankEl.textContent = selectedValue;
+
+            if (selectedValue === correctValue) {
+                selectedBtn.classList.add('correct');
+                blankEl.style.background = '#d7ffb7';
+                blankEl.style.borderColor = '#58cc02';
+                blankEl.style.color = '#2d6a0a';
+                score++;
+            } else {
+                selectedBtn.classList.add('wrong');
+                appContainer.classList.add('shake');
+                blankEl.style.background = '#ffe0e0';
+                blankEl.style.borderColor = '#ff4b4b';
+                blankEl.style.color = '#b91c1c';
+                setTimeout(() => {
+                    appContainer.classList.remove('shake');
+                }, 400);
+                allButtons.forEach(btn => {
+                    if (btn.textContent === correctValue) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            nextBtnEl.style.display = 'block';
+        }
+
+        nextBtnEl.onclick = () => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        function showResults() {
+            progressFillEl.style.width = '100%';
+            quizScreenEl.classList.add('hidden');
+            resultScreenEl.classList.remove('hidden');
+            finalScoreEl.textContent = `${score} / ${shuffledQuestions.length}`;
+
+            if (score === shuffledQuestions.length) {
+                resultIconEl.textContent = '👑';
+                resultTitleEl.textContent = 'Perfect Score!';
+            } else if (score >= 8) {
+                resultIconEl.textContent = '🏆';
+                resultTitleEl.textContent = 'Great Job!';
+            } else {
+                resultIconEl.textContent = '💪';
+                resultTitleEl.textContent = 'Keep Practicing!';
+            }
+        }
+
+        restartBtnEl.onclick = initQuiz;
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
