@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>F1 Racing Academy: Language Grand Prix</title>
+<style>
+  :root {
+    --f1-red: #e10600;
+    --f1-dark: #15151e;
+    --f1-light: #f3f3f3;
+    --success-green: #388e3c;
+    --gold: #ffd700;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: var(--f1-dark);
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+  }
+
+  .dashboard {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #1f1f2e;
+    border: 4px solid var(--f1-red);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  /* Header and HUD Style */
+  .hud-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px dashed var(--f1-red);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+  }
+
+  .hud-title h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--f1-red);
+    text-shadow: 2px 2px 0px #000;
+  }
+
+  .score-box {
+    background: #000;
+    border: 2px solid var(--gold);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--gold);
+    text-align: center;
+  }
+
+  /* Mission Layout Cards */
+  .mission-card {
+    background: #2a2a3a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-left: 8px solid var(--f1-red);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  .mission-card h2 {
+    margin-top: 0;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mission-desc {
+    font-style: italic;
+    color: #ccc;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+  }
+
+  /* Interactive Elements */
+  .select-box, .input-box {
+    background: #15151e;
+    border: 2px solid #555;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 140px;
+    text-align: center;
+    margin: 5px;
+    transition: all 0.3s ease;
+  }
+
+  .select-box:focus, .input-box:focus {
+    border-color: var(--f1-red);
+    outline: none;
+  }
+
+  /* Подсветка ответов */
+  .field-correct {
+    background-color: rgba(56, 142, 60, 0.2) !important;
+    border-color: #4caf50 !important;
+    color: #4caf50 !important;
+  }
+
+  .field-wrong {
+    background-color: rgba(244, 67, 54, 0.2) !important;
+    border-color: #f44336 !important;
+    color: #f44336 !important;
+  }
+
+  .word-bank {
+    background: #15151e;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .word-badge {
+    background: var(--f1-red);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  /* Letter Jumble Elements */
+  .scramble-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  .letter-block {
+    background: #e65100;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    letter-spacing: 3px;
+  }
+
+  /* Action Buttons */
+  .action-btn {
+    background: var(--success-green);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+  }
+
+  .action-btn:hover {
+    background: #2e7d32;
+  }
+
+  .feedback {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .correct-msg { color: #4caf50; }
+  .wrong-msg { color: #f44336; }
+
+  /* Podium Trophy Pop-up styling */
+  #podium {
+    display: none;
+    text-align: center;
+    background: rgba(255, 215, 0, 0.15);
+    border: 3px solid var(--gold);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+  <!-- HUD Header Bar -->
+  <div class="hud-header">
+    <div class="hud-title">
+      <h1>🏁 Mission Control</h1>
+      <p style="margin:5px 0 0 0; color:#aaa;">Driver Academy Status: A1 Level</p>
+    </div>
+    <div class="score-box">
+      SCORE: <span id="total-points">0</span> / 60 PTS
+    </div>
+  </div>
+
+  <!-- MISSION 1: Past Tense Pit Stop (С выпадающим списком) -->
+  <div class="mission-card" id="mission1">
+    <h2>🛠️ Mission 1: The Engineering Pit Stop</h2>
+    <div class="mission-desc">Analyze yesterday's garage report. Select the correct past simple words from the dropdown menus.</div>
+    
+    <div class="word-bank">
+      <span class="word-badge">was</span>
+      <span class="word-badge">didn't</span>
+      <span class="word-badge">painted</span>
+      <span class="word-badge">drive</span>
+      <span class="word-badge">uniform</span>
+    </div>
+
+    <div style="line-height: 2.2;">
+      1. What did the mechanic do yesterday?<br>
+      2. He 
+      <select id="m1-q1" class="select-box">
+        <option value="">-- Choose --</option>
+        <option value="was">was</option>
+        <option value="didn't">didn't</option>
+        <option value="painted">painted</option>
+        <option value="drive">drive</option>
+        <option value="uniform">uniform</option>
+      </select> a red car inside the garage.<br>
+      
+      3. Was he wearing his team 
+      <select id="m1-q2" class="select-box">
+        <option value="">-- Choose --</option>
+        <option value="was">was</option>
+        <option value="didn't">didn't</option>
+        <option value="painted">painted</option>
+        <option value="drive">drive</option>
+        <option value="uniform">uniform</option>
+      </select>?<br>
+      
+      4. Yes, he 
+      <select id="m1-q3" class="select-box">
+        <option value="">-- Choose --</option>
+        <option value="was">was</option>
+        <option value="didn't">didn't</option>
+        <option value="painted">painted</option>
+        <option value="drive">drive</option>
+        <option value="uniform">uniform</option>
+      </select>.<br>
+      
+      5. Did he 
+      <select id="m1-q4" class="select-box">
+        <option value="">-- Choose --</option>
+        <option value="was">was</option>
+        <option value="didn't">didn't</option>
+        <option value="painted">painted</option>
+        <option value="drive">drive</option>
+        <option value="uniform">uniform</option>
+      </select> the Formula 1 car on the track?<br>
+      
+      6. No, he 
+      <select id="m1-q5" class="select-box">
+        <option value="">-- Choose --</option>
+        <option value="was">was</option>
+        <option value="didn't">didn't</option>
+        <option value="painted">painted</option>
+        <option value="drive">drive</option>
+        <option value="uniform">uniform</option>
+      </select>.
+    </div>
+    <button class="action-btn" onclick="checkMission1()">Deploy Telemetry</button>
+    <div id="m1-feedback" class="feedback"></div>
+  </div>
+
+  <!-- MISSION 2: Driver Biographies (Unscramble) -->
+  <div class="mission-card" id="mission2">
+    <h2>🏎️ Mission 2: Identify the Grid Drivers</h2>
+    <div class="mission-desc">Unscramble the letters to complete the physical descriptions of the team's drivers.</div>
+    
+    <div class="scramble-container">
+      <div>Charles has <span class="letter-block">d k a r</span> hair:</div>
+      <input type="text" id="m2-q1" class="input-box" placeholder="Unscramble...">
+    </div>
+
+    <div class="scramble-container">
+      <div>Lewis has curly and <span class="letter-block">n g l o</span> hair:</div>
+      <input type="text" id="m2-q2" class="input-box" placeholder="Unscramble...">
+    </div>
+
+    <div class="scramble-container">
+      <div>The female driver has <span class="letter-block">r f a i</span> hair:</div>
+      <input type="text" id="m2-q3" class="input-box" placeholder="Unscramble...">
+    </div>
+    <button class="action-btn" onclick="checkMission2()">Verify Driver Profiles</button>
+    <div id="m2-feedback" class="feedback"></div>
+  </div>
+
+  <!-- REWARD PODIUM ZONE -->
+  <div id="podium">
+    <h2 style="color: var(--gold); margin: 0 0 10px 0;">🏆 P1 Finish! Grand Prix Victory!</h2>
+    <p style="margin: 5px 0;">Outstanding driving! All systems checked. You unlocked the golden helmet trophy!</p>
+    <p><a href="https://magnific.com" target="_blank" style="color: #4caf50; font-weight: bold; text-decoration: underline;">View Your Podium Celebration Experience</a></p>
+  </div>
+</div>
+
+<script>
+  let pointsM1 = 0;
+  let pointsM2 = 0;
+
+  function updateHUD() {
+    document.getElementById('total-points').innerText = pointsM1 + pointsM2;
+    if ((pointsM1 + pointsM2) === 60) {
+      document.getElementById('podium').style.display = 'block';
+    }
+  }
+
+  function handleHighlight(elementId, isCorrect) {
+    const el = document.getElementById(elementId);
+    if (isCorrect) {
+      el.classList.remove('field-wrong');
+      el.classList.add('field-correct');
+    } else {
+      el.classList.remove('field-correct');
+      el.classList.add('field-wrong');
+    }
+  }
+
+  function checkMission1() {
+    const a1 = document.getElementById('m1-q1').value;
+    const a2 = document.getElementById('m1-q2').value;
+    const a3 = document.getElementById('m1-q3').value;
+    const a4 = document.getElementById('m1-q4').value;
+    const a5 = document.getElementById('m1-q5').value;
+
+    const isCorrect1 = (a1 === 'painted');
+    const isCorrect2 = (a2 === 'uniform');
+    const isCorrect3 = (a3 === 'was');
+    const isCorrect4 = (a4 === 'drive');
+    const isCorrect5 = (a5 === "didn't");
+
+    handleHighlight('m1-q1', isCorrect1);
+    handleHighlight('m1-q2', isCorrect2);
+    handleHighlight('m1-q3', isCorrect3);
+    handleHighlight('m1-q4', isCorrect4);
+    handleHighlight('m1-q5', isCorrect5);
+
+    if (isCorrect1 && isCorrect2 && isCorrect3 && isCorrect4 && isCorrect5) {
+      pointsM1 = 30;
+      document.getElementById('m1-feedback').innerHTML = "<span class='correct-msg'>🟢 Pit Stop Complete! +30 Points! Perfect alignment.</span>";
+    } else {
+      pointsM1 = 0;
+      document.getElementById('m1-feedback').innerHTML = "<span class='wrong-msg'>🔴 Engine Misfire! Check the red highlights and try again.</span>";
+    }
+    updateHUD();
+  }
+
+  function checkMission2() {
+    const a1 = document.getElementById('m2-q1').value.trim().toLowerCase();
+    const a2 = document.getElementById('m2-q2').value.trim().toLowerCase();
+    const a3 = document.getElementById('m2-q3').value.trim().toLowerCase();
+
+    const isCorrect1 = (a1 === 'dark');
+    const isCorrect2 = (a2 === 'long');
+    const isCorrect3 = (a3 === 'fair');
+
+    handleHighlight('m2-q1', isCorrect1);
+    handleHighlight('m2-q2', isCorrect2);
+    handleHighlight('m2-q3', isCorrect3);
+
+    if (isCorrect1 && isCorrect2 && isCorrect3) {
+      pointsM2 = 30;
+      document.getElementById('m2-feedback').innerHTML = "<span class='correct-msg'>🟢 Driver Recognition Confirmed! +30 Points! Profiles locked.</span>";
+    } else {
+      pointsM2 = 0;
+      document.getElementById('m2-feedback').innerHTML = "<span class='wrong-msg'>🔴 Signal Distorted! Check the red fields and try again.</span>";
+    }
+    updateHUD();
+  }
+</script>
+
+</body>
+</html>

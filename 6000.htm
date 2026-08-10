@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Grand Prix: English Mission - 8 Quests</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-blue: #00f2fe;
+            --correct-green: #2ecc71;
+            --wrong-red: #e74c3c;
+            --bg-dark: #0a0a0a;
+            --card-bg: #151515;
+            --text-main: #ffffff;
+            --quest-gold: #ffcc00;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .score-tracker {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            padding: 15px;
+            border-bottom: 2px solid var(--f1-red);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 100;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(225, 6, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .mission-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(225, 6, 0, 0.3);
+        }
+
+        h1, h2 { 
+            text-transform: uppercase; 
+            text-align: center; 
+            margin: 10px 0; 
+            letter-spacing: 1px;
+        }
+        
+        h1 {
+            color: var(--f1-red);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .quest-box {
+            border-bottom: 1px solid #333;
+            padding: 25px 0;
+        }
+
+        .image-box {
+            width: 100%;
+            max-width: 450px;
+            height: 240px;
+            object-fit: cover;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .variant-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .variant-btn {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .variant-btn:hover {
+            border-color: var(--f1-blue);
+            background: #2a2a2a;
+        }
+
+        /* Success/Fail States */
+        .variant-btn.correct { background-color: var(--correct-green) !important; border-color: white; color: white; }
+        .variant-btn.wrong { background-color: var(--wrong-red) !important; opacity: 0.7; color: white; }
+
+        .reading-text {
+            background: #000;
+            padding: 15px;
+            border-left: 4px solid var(--f1-blue);
+            margin: 10px 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="score-tracker">
+    RACE PROGRESS: <span id="score">0</span> / 8 LAP | DRIVER RANK: <span id="rank" style="color: var(--f1-red)">ROOKIE</span>
+</div>
+
+<div class="mission-container">
+    <h1>F1 LANGUAGE GRAND PRIX: 8 LAPS</h1>
+
+    <!-- Q1: Vocabulary - Appearance -->
+    <div class="quest-box">
+        <h2>Lap 01: Driver Kit</h2>
+        <img src="https://avatars.mds.yandex.net/i?id=6245f1540b9e904b600f0d07e2860abe_l-10906089-images-thumbs&n=13" class="image-box">
+        <p style="text-align:center; font-size:1.1rem;"><b>"The mechanics always wear a team ______ in the pit lane."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">SCARF</button>
+            <button class="variant-btn" onclick="check(this, true)">UNIFORM</button>
+            <button class="variant-btn" onclick="check(this, false)">COAT</button>
+        </div>
+    </div>
+
+    <!-- Q2: Grammar - Some/Any -->
+    <div class="quest-box">
+        <h2>Lap 02: Garage Supplies</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"Are there ______ cars left in the garage?"</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">SOME</button>
+            <button class="variant-btn" onclick="check(this, true)">ANY</button>
+            <button class="variant-btn" onclick="check(this, false)">AN</button>
+        </div>
+    </div>
+
+    <!-- Q3: Vocabulary - Quantifiers -->
+    <div class="quest-box">
+        <h2>Lap 03: Driver Hydration</h2>
+        <img src="https://i.pinimg.com/736x/72/29/50/72295098de0d56049b8895b82e905344.jpg" class="image-box">
+        <p style="text-align:center; font-size:1.1rem;"><b>"The driver needs a ______ of water during the stop."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">BOTTLE</button>
+            <button class="variant-btn" onclick="check(this, false)">BAR</button>
+            <button class="variant-btn" onclick="check(this, false)">CARTON</button>
+        </div>
+    </div>
+
+    <!-- Q4: Grammar - Negative Quantifiers -->
+    <div class="quest-box">
+        <h2>Lap 04: Fuel Logistics</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"There isn't ______ gas in the car."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">ANY</button>
+            <button class="variant-btn" onclick="check(this, false)">SOME</button>
+            <button class="variant-btn" onclick="check(this, false)">MANY</button>
+        </div>
+    </div>
+
+    <!-- Q5: Grammar - Continuous Forms -->
+    <div class="quest-box">
+        <h2>Lap 05: Live Action</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"Look! Charles Leclerc is ______ his car on the track now."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">drive</button>
+            <button class="variant-btn" onclick="check(this, true)">driving</button>
+            <button class="variant-btn" onclick="check(this, false)">drives</button>
+        </div>
+    </div>
+
+    <!-- Q6: Reading Comprehension -->
+    <div class="quest-box">
+        <h2>Lap 06: Telemetry Analysis</h2>
+        <div class="reading-text">"Three engineers are checking the engines. They aren't looking at the computer monitors."</div>
+        <p style="text-align:center; font-size:1.1rem;"><b>Are the engineers looking at the screens?</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">YES, THEY ARE</button>
+            <button class="variant-btn" onclick="check(this, true)">NO, THEY AREN'T</button>
+        </div>
+    </div>
+
+    <!-- Q7: Grammar - Pronouns -->
+    <div class="quest-box">
+        <h2>Lap 07: Team Property</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"This is our trophy. It belongs to us, so it is ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">OURS</button>
+            <button class="variant-btn" onclick="check(this, false)">OUR</button>
+            <button class="variant-btn" onclick="check(this, false)">US</button>
+        </div>
+    </div>
+
+    <!-- Q8: Final Boss Challenge -->
+    <div class="quest-box" style="border: 2px solid var(--f1-red); padding: 20px; background: #1a0202; border-radius: 8px;">
+        <h2 style="color: var(--quest-gold);">🏆 FINAL BOSS: GRID CHAMPION</h2>
+        <img src="https://statsf1.hu/pilot_2019/HAMILTON_19.png" class="image-box">
+        <p style="text-align:center; font-size:1.1rem;"><b>"He has dark hair, so his hair is NOT ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">SHORT</button>
+            <button class="variant-btn" onclick="check(this, false)">CURLY</button>
+            <button class="variant-btn" onclick="check(this, true)">FAIR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let points = 0;
+    const total = 8;
+
+    function check(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        
+        if (isCorrect) {
+            if(!btn.classList.contains('correct')) {
+                btn.classList.add('correct');
+                points++;
+                updateScore();
+            }
+        } else {
+            btn.classList.add('wrong');
+        }
+        
+        // Disable click on all options in this specific block after an option is selected
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+    }
+
+    function updateScore() {
+        document.getElementById('score').innerText = points;
+        let rank = "ROOKIE";
+        if (points >= 3) rank = "MID-FIELD RACER";
+        if (points >= 5) rank = "PODIUM CONTENDER";
+        if (points >= 7) rank = "QUALIFYING PRO";
+        if (points === 8) rank = "🏆 P1 WORLD CHAMPION";
+        
+        document.getElementById('rank').innerText = rank;
+    }
+</script>
+
+</body>
+</html>

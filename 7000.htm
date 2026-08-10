@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Racing Academy: 6-Stage Telemetry HUD</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --terminal-blue: #00f2fe;
+            --hud-bg: #0c0c0e;
+            --metal: #bdc3c7;
+            --gold: #ffd700;
+        }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background-color: #000; 
+            color: var(--metal); 
+            padding: 20px; 
+        }
+        .hud-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            border: 4px solid var(--f1-red); 
+            background: var(--hud-bg); 
+            padding: 25px; 
+            border-radius: 10px; 
+            box-shadow: inset 0 0 15px rgba(225, 6, 0, 0.3); 
+        }
+        
+        /* Progress Bar */
+        .progress-container { 
+            background: #222; 
+            border: 2px solid var(--metal); 
+            height: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 10px; 
+            overflow: hidden; 
+        }
+        #progress-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: var(--terminal-blue); 
+            transition: 0.5s ease; 
+            box-shadow: 0 0 10px var(--terminal-blue); 
+        }
+
+        h1 { 
+            color: var(--f1-red); 
+            font-size: 1.4rem; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .mission-panel { 
+            border: 2px solid #333; 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            background: rgba(255, 255, 255, 0.03); 
+        }
+        
+        /* Interactive Graphic Container Style */
+        .hud-image {
+            width: 100%;
+            height: auto;
+            max-height: 250px;
+            object-fit: cover;
+            border: 2px solid var(--f1-red);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(225, 6, 0, 0.4);
+        }
+
+        .question-block {
+            margin-top: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #333;
+        }
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .question-text { font-weight: bold; margin-bottom: 12px; color: var(--terminal-blue); font-size: 1.05rem; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .opt-btn {
+            background: #1c1c1f;
+            border: 1px solid #444;
+            color: var(--metal);
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        .opt-btn:hover { border-color: var(--terminal-blue); background: #242429; }
+
+        .opt-btn.correct { background: var(--terminal-blue) !important; color: #000 !important; font-weight: bold; border-color: #fff !important; }
+        .opt-btn.incorrect { background: var(--f1-red) !important; color: #fff !important; animation: shake 0.3s; border-color: #ff3333 !important; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .badge-slot { text-align: center; font-weight: bold; font-size: 1.2rem; color: var(--gold); margin-top: 20px; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div class="hud-container">
+    <h1>[ MISSION: GRAND PRIX TELEMETRY DATA SCAN ]</h1>
+
+    <div class="progress-container">
+        <div id="progress-fill"></div>
+    </div>
+
+    <!-- STAGE 1: GARAGE REPORT & PAST SIMPLE -->
+    <div class="mission-panel">
+        <img src="https://img.magnific.com/premium-photo/race-car-mechanics-working-formula-one-vehicle-garage_93675-183308.jpg?w=2000" alt="F1 Garage Pit" class="hud-image">
+
+        <div class="question-block">
+            <p class="question-text">1. What did the mechanic do yesterday?</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 1)">A) He painted a car inside.</button>
+                <button class="opt-btn" onclick="check(this, false, 1)">B) He drive a car inside.</button>
+            </div>
+        </div>
+        
+        <div class="question-block">
+            <p class="question-text">2. Was he wearing his team uniform?</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 2)">A) Yes, he didn't.</button>
+                <button class="opt-btn" onclick="check(this, true, 2)">B) Yes, he was.</button>
+            </div>
+        </div>
+        
+        <div class="question-block">
+            <p class="question-text">3. Did he drive the Formula 1 car on the track?</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 3)">A) No, he didn't.</button>
+                <button class="opt-btn" onclick="check(this, false, 3)">B) No, he wasn't.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STAGE 2: PADDOCK CATERING LOGISTICS -->
+    <div class="mission-panel">
+        <img src="https://stiripesurse.md/wp-content/uploads/KitKat-se-convierte-en-nuevo-patrocinador-de-la-Formula-1.png" alt="Paddock Catering" class="hud-image">
+
+        <div class="question-block">
+            <p class="question-text">4. :</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 4)">A) A bottle of chocolate</button>
+                <button class="opt-btn" onclick="check(this, true, 4)">B) A bar of chocolate</button>
+            </div>
+        </div>
+        
+        <div class="question-block">
+            <p class="question-text">5.  "How ______ water is left in the bottle?"</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 5)">A) much</button>
+                <button class="opt-btn" onclick="check(this, false, 5)">B) many</button>
+            </div>
+        </div>
+        
+        <div class="question-block">
+            <p class="question-text">6.  "Are there ______ apples in the car?"</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 6)">A) some</button>
+                <button class="opt-btn" onclick="check(this, true, 6)">B) any</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-slot">RANK STATUS: <span id="rank">ROOKIE DRIVER</span></div>
+</div>
+
+<script>
+    let correctCount = 0;
+    const answeredQuestions = new Set();
+    const totalQuestions = 6;
+
+    function check(btn, isCorrect, qId) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('.opt-btn');
+        
+        buttons.forEach(b => b.classList.remove('correct', 'incorrect'));
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            if (!answeredQuestions.has(qId)) {
+                answeredQuestions.add(qId);
+                correctCount++;
+                updateProgress();
+            }
+        } else {
+            btn.classList.add('incorrect');
+        }
+    }
+
+    function updateProgress() {
+        const progress = (correctCount / totalQuestions) * 100;
+        document.getElementById('progress-fill').style.width = progress + "%";
+        
+        const rankSpan = document.getElementById('rank');
+        if (correctCount === 0) rankSpan.innerText = "ROOKIE DRIVER";
+        else if (correctCount <= 2) rankSpan.innerText = "TEST DRIVER";
+        else if (correctCount <= 4) rankSpan.innerText = "MID-FIELD RACER";
+        else if (correctCount < 6) rankSpan.innerText = "PODIUM CONTENDER";
+        else if (correctCount === 6) rankSpan.innerText = "🏆 WORLD CHAMPION (P1)";
+    }
+</script>
+
+</body>
+</html>
