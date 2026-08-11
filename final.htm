@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Jungle Plurals & Greetings</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+        }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: #a5d6a7;
+            text-align: center;
+            color: #1b5e20;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .game-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 30px;
+            background: var(--safari-sand);
+            border-radius: 30px;
+            border: 8px solid var(--jungle-green);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        .level { display: none; }
+        .level.active { display: block; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 3px solid var(--jungle-green);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            transition: 0.2s;
+        }
+        .btn-correct { background: var(--correct-btn); }
+        .btn-wrong { background: var(--wrong-btn); }
+
+        .emoji-display {
+            font-size: 100px;
+            margin: 10px;
+        }
+        .feedback {
+            font-weight: bold;
+            height: 30px;
+            margin-top: 10px;
+            font-size: 22px;
+        }
+        #score-board {
+            font-size: 22px;
+            background: white;
+            padding: 10px;
+            border-radius: 20px;
+            border: 2px dashed var(--jungle-green);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .salute {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🌴 Jungle Plurals & Greetings 🌴</h1>
+    <div id="score-board">Level: <span id="current-level">1</span> | Score: <span id="score">0</span></div>
+
+    <!-- LEVEL 1: Matching singular and plural -->
+    <div id="level1" class="level active">
+        <h3>Match singular and plural</h3>
+        <div id="l1-grid" class="grid"></div>
+        <div id="l1-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 2: Listening greetings -->
+    <div id="level2" class="level">
+        <h3>Listen and choose the right answer</h3>
+        <button onclick="speakCurrentGreeting()" style="background: var(--jungle-green); margin-bottom:10px;">🔊 Listen</button>
+        <div id="l2-grid" class="grid"></div>
+        <div id="l2-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 3: Choose correct response -->
+    <div id="level3" class="level">
+        <h3 id="l3-question">Question?</h3>
+        <div id="l3-emoji" class="emoji-display">💬</div>
+        <div class="options-row">
+            <button class="btn-correct" onclick="checkL3('left')" id="l3-left-btn">Left</button>
+            <button class="btn-correct" onclick="checkL3('right')" id="l3-right-btn">Right</button>
+        </div>
+        <div id="l3-feedback" class="feedback"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 40px;">YOU ARE A JUNGLE HERO! 🏆</h2>
+        <p>Plurals and greetings mastered!</p>
+        <button onclick="location.reload()" style="background: var(--jungle-green)">Play Again</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLvl = 1;
+
+    // PLURALS PAIRS (singular - plural)
+    const pluralPairs = [
+        { singular: "cat", plural: "cats" },
+        { singular: "dog", plural: "dogs" },
+        { singular: "fox", plural: "foxes" },
+        { singular: "baby", plural: "babies" }
+    ];
+
+    // GREETINGS FOR LISTENING (text and correct emoji response)
+    const greetingTasks = [
+        { audio: "Hello!", correctIcon: "👋", wrongIcon: "❓" },
+        { audio: "What's your name?", correctIcon: "❓", wrongIcon: "🔢" },
+        { audio: "How old are you?", correctIcon: "🔢", wrongIcon: "📛" },
+        { audio: "Nice to meet you!", correctIcon: "🤝", wrongIcon: "❌" },
+        { audio: "Goodbye!", correctIcon: "👋", wrongIcon: "🤝" }
+    ];
+
+    // QUESTION AND ANSWERS FOR LEVEL 3
+    const questionTasks = [
+        { question: "What's your name?", left: "My name is Tom.", right: "I'm seven.", correct: "left" },
+        { question: "How old are you?", left: "Nice to meet you.", right: "I'm five.", correct: "right" },
+        { question: "Hello!", left: "Hi!", right: "Goodbye.", correct: "left" },
+        { question: "Nice to meet you!", left: "I'm fine.", right: "Nice to meet you, too!", correct: "right" },
+        { question: "How are you?", left: "I'm happy, thanks.", right: "I'm eight.", correct: "left" }
+    ];
+
+    // ----- SALUTE EFFECT -----
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        const rect = box.getBoundingClientRect();
+        for (let i = 0; i < 20; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * rect.width;
+            const y = Math.random() * rect.height;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // ====== LEVEL 1: PLURALS MATCHING ======
+    let selectedL1 = null;
+
+    function initLevel1() {
+        const grid = document.getElementById('l1-grid');
+        grid.innerHTML = '';
+        document.getElementById('l1-feedback').innerText = '';
+
+        let items = [
+            ...pluralPairs.map(p => ({ type: 'singular', text: p.singular })),
+            ...pluralPairs.map(p => ({ type: 'plural', text: p.plural }))
+        ];
+
+        items.sort(() => Math.random() - 0.5);
+
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerText = item.text;
+            div.dataset.type = item.type;
+            div.onclick = () => handleL1Click(div, item);
+            grid.appendChild(div);
+        });
+    }
+
+    function handleL1Click(div, item) {
+        const feed = document.getElementById('l1-feedback');
+        if (div.style.visibility === 'hidden') return;
+
+        if (!selectedL1) {
+            selectedL1 = { div, item };
+            div.style.background = "#fff176";
+        } else {
+            const match = pluralPairs.find(p =>
+                (p.singular === selectedL1.item.text && p.plural === item.text) ||
+                (p.plural === selectedL1.item.text && p.singular === item.text)
+            );
+
+            if (match && selectedL1.item.type !== item.type) {
+                div.style.visibility = 'hidden';
+                selectedL1.div.style.visibility = 'hidden';
+                score += 10;
+                feed.innerText = "Correct! ✅";
+                triggerSalute();
+                document.getElementById('score').innerText = score;
+
+                const remaining = Array.from(document.querySelectorAll('#l1-grid .card'))
+                    .every(c => c.style.visibility === 'hidden');
+                if (remaining) {
+                    setTimeout(nextLevel, 1000);
+                }
+            } else {
+                selectedL1.div.style.background = "white";
+                feed.innerText = "Try again! ❌";
+            }
+            selectedL1 = null;
+        }
+    }
+
+    // ====== LEVEL 2: LISTENING GREETINGS ======
+    let l2Index = 0;
+
+    function initLevel2() {
+        const grid = document.getElementById('l2-grid');
+        const feed = document.getElementById('l2-feedback');
+        grid.innerHTML = '';
+        feed.innerText = '';
+
+        if (l2Index >= greetingTasks.length) {
+            nextLevel();
+            return;
+        }
+
+        const task = greetingTasks[l2Index];
+
+        const cards = [
+            { icon: task.correctIcon, correct: true },
+            { icon: task.wrongIcon, correct: false }
+        ].sort(() => Math.random() - 0.5);
+
+        cards.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerText = c.icon;
+            div.onclick = () => handleL2Click(c.correct);
+            grid.appendChild(div);
+        });
+
+        setTimeout(() => speakCurrentGreeting(), 500);
+    }
+
+    function speakCurrentGreeting() {
+        const msg = new SpeechSynthesisUtterance(greetingTasks[l2Index].audio);
+        msg.lang = 'en-US';
+        window.speechSynthesis.speak(msg);
+    }
+
+    function handleL2Click(isCorrect) {
+        const feed = document.getElementById('l2-feedback');
+        if (isCorrect) {
+            score += 10;
+            feed.innerText = "Correct! ✅";
+            triggerSalute();
+            l2Index++;
+            document.getElementById('score').innerText = score;
+            if (l2Index < greetingTasks.length) {
+                setTimeout(initLevel2, 1000);
+            } else {
+                setTimeout(nextLevel, 1000);
+            }
+        } else {
+            feed.innerText = "Listen again! ❌";
+        }
+    }
+
+    // ====== LEVEL 3: QUESTION-ANSWER ======
+    let l3Index = 0;
+
+    function initLevel3() {
+        const feed = document.getElementById('l3-feedback');
+        feed.innerText = '';
+
+        if (l3Index >= questionTasks.length) {
+            showWin();
+            return;
+        }
+
+        const task = questionTasks[l3Index];
+        document.getElementById('l3-question').innerText = task.question;
+        document.getElementById('l3-left-btn').innerText = task.left;
+        document.getElementById('l3-right-btn').innerText = task.right;
+    }
+
+    function checkL3(side) {
+        const feed = document.getElementById('l3-feedback');
+        const task = questionTasks[l3Index];
+
+        if (side === task.correct) {
+            score += 10;
+            feed.innerText = "Correct! ✅";
+            triggerSalute();
+            l3Index++;
+            document.getElementById('score').innerText = score;
+            if (l3Index < questionTasks.length) {
+                setTimeout(initLevel3, 1000);
+            } else {
+                setTimeout(nextLevel, 1000);
+            }
+        } else {
+            feed.innerText = "Try again! ❌";
+        }
+    }
+
+    function nextLevel() {
+        const current = document.getElementById(`level${currentLvl}`);
+        if (current) current.classList.remove('active');
+
+        currentLvl++;
+        document.getElementById('current-level').innerText = currentLvl;
+
+        if (currentLvl === 2) {
+            document.getElementById('level2').classList.add('active');
+            initLevel2();
+        } else if (currentLvl === 3) {
+            document.getElementById('level3').classList.add('active');
+            initLevel3();
+        } else {
+            showWin();
+        }
+    }
+
+    function showWin() {
+        ['level1','level2','level3'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+        document.getElementById('win-screen').classList.add('active');
+        for (let i = 0; i < 5; i++) {
+            setTimeout(triggerSalute, i * 300);
+        }
+    }
+
+    // Start game
+    initLevel1();
+</script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATH SAFARI: ADD & SUBTRACT UP TO 10</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Luckiest+Guy&display=swap');
+
+        :root {
+            --jungle: #1b5e20;
+            --leaf: #4caf50;
+            --wood: #5d4037;
+            --banana: #ffeb3b;
+            --sky: #e1f5fe;
+            --berry: #d81b60;
+        }
+
+        body {
+            background-color: var(--sky);
+            background-image: linear-gradient(rgba(255,255,255,0.3) 2px, transparent 2px),
+                              linear-gradient(90deg, rgba(255,255,255,0.3) 2px, transparent 2px);
+            background-size: 50px 50px;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-card {
+            width: 90%;
+            max-width: 550px;
+            background: #fff;
+            border-radius: 40px;
+            border: 10px solid var(--wood);
+            box-shadow: 0 20px 0px var(--jungle), 0 30px 50px rgba(0,0,0,0.2);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #game-card::before {
+            content: '🌿'; position: absolute; top: -10px; left: -10px; font-size: 50px;
+        }
+        #game-card::after {
+            content: '🦜'; position: absolute; top: -10px; right: -10px; font-size: 50px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--wood);
+        }
+
+        .xp-pill {
+            background: var(--banana);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 3px solid var(--wood);
+            font-family: 'Luckiest Guy', cursive;
+        }
+
+        .stage-tag {
+            background: var(--berry);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .display-area {
+            background: #f1f8e9;
+            height: 180px;
+            border-radius: 25px;
+            border: 5px solid var(--leaf);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            transition: 0.3s;
+        }
+
+        .emoji-main { font-size: 60px; margin: 0; }
+        .math-text { font-size: 48px; color: var(--wood); margin: 0; font-weight: 800; }
+
+        .question-label {
+            font-size: 22px;
+            color: var(--jungle);
+            margin-bottom: 20px;
+            min-height: 30px;
+            text-align: center;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-zoo {
+            background: white;
+            border: 4px solid var(--leaf);
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 28px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.1s;
+            box-shadow: 0 6px 0 var(--jungle);
+            color: var(--wood);
+        }
+
+        .btn-zoo:hover { background: #f9fff9; }
+        .btn-zoo:active { transform: translateY(4px); box-shadow: none; }
+
+        .progress-path {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 2px solid var(--wood);
+            position: relative;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--leaf);
+            border-radius: 8px;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .correct { animation: bounce 0.5s; background: var(--banana) !important; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        #win-screen {
+            display: none;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        #win-screen h1 {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 60px;
+            color: var(--berry);
+            margin: 0;
+        }
+
+        .confetti {
+            position: absolute; width: 10px; height: 10px; border-radius: 2px;
+            animation: fall 1s ease-out forwards;
+        }
+        @keyframes fall {
+            0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div class="stage-tag" id="stage-name">Math Safari</div>
+            <div class="xp-pill">🍌 <span id="xp-val">0</span></div>
+        </div>
+
+        <div class="display-area" id="main-display">
+            <p class="emoji-main" id="emoji-box"></p>
+            <p class="math-text" id="math-box"></p>
+        </div>
+
+        <div class="question-label" id="quest-text"></div>
+
+        <div class="btn-grid" id="choices-box"></div>
+
+        <div class="progress-path">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div id="win-screen">
+        <h1>GG! 🏆</h1>
+        <p style="font-size: 20px; font-weight: bold;">MATH MASTER ACCOMPLISHED!</p>
+        <button class="btn-zoo" onclick="location.reload()" style="width: 100%; padding: 20px;">REPLAY MISSION</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let current = 0;
+
+    // 15 mixed addition and subtraction questions (numbers written as words)
+    const missions = [
+        { math: "five + two = ?", emoji: "🐵", quest: "How many bananas?", ans: "seven", opts: ["seven", "eight"] },
+        { math: "eight - three = ?", emoji: "🦁", quest: "Count the roar!", ans: "five", opts: ["five", "six"] },
+        { math: "four + four = ?", emoji: "🐘", quest: "Elephant ears?", ans: "eight", opts: ["eight", "nine"] },
+        { math: "nine - one = ?", emoji: "🦒", quest: "Tall spots?", ans: "eight", opts: ["eight", "seven"] },
+        { math: "seven + two = ?", emoji: "🐸", quest: "Jumping frogs?", ans: "nine", opts: ["nine", "eight"] },
+        { math: "six - two = ?", emoji: "🦊", quest: "Sly answer?", ans: "four", opts: ["four", "five"] },
+        { math: "three + five = ?", emoji: "🐻", quest: "Honey pots?", ans: "eight", opts: ["eight", "seven"] },
+        { math: "ten - four = ?", emoji: "🐨", quest: "Eucalyptus leaves?", ans: "six", opts: ["six", "five"] },
+        { math: "one + six = ?", emoji: "🐧", quest: "Waddle count?", ans: "seven", opts: ["seven", "eight"] },
+        { math: "eight - five = ?", emoji: "🐼", quest: "Bamboo snacks?", ans: "three", opts: ["three", "four"] },
+        { math: "two + seven = ?", emoji: "🐯", quest: "Stripes?", ans: "nine", opts: ["nine", "eight"] },
+        { math: "six - three = ?", emoji: "🐗", quest: "Boar tusks?", ans: "three", opts: ["three", "two"] },
+        { math: "four + three = ?", emoji: "🐊", quest: "Crocodile teeth?", ans: "seven", opts: ["seven", "eight"] },
+        { math: "nine - six = ?", emoji: "🐍", quest: "Slither?", ans: "three", opts: ["three", "four"] },
+        { math: "five + five = ?", emoji: "🦅", quest: "Eagle wings?", ans: "ten", opts: ["ten", "nine"] }
+    ];
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function loadMission() {
+        if(current >= missions.length) {
+            document.getElementById('play-area').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+            return;
+        }
+
+        const m = missions[current];
+        document.getElementById('stage-name').innerText = "Math Safari";
+        document.getElementById('math-box').innerText = m.math;
+        document.getElementById('emoji-box').innerText = m.emoji;
+        document.getElementById('quest-text').innerText = m.quest;
+        
+        const grid = document.getElementById('choices-box');
+        grid.innerHTML = "";
+        const opts = shuffleArray([...m.opts]);
+        opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-zoo';
+            btn.innerText = opt;
+            btn.onclick = () => check(opt, btn, m.ans);
+            grid.appendChild(btn);
+        });
+
+        document.getElementById('progress-fill').style.width = (current / missions.length * 100) + "%";
+    }
+
+    function check(choice, btn, correctAns) {
+        if(choice === correctAns) {
+            btn.classList.add('correct');
+            score += 100;
+            document.getElementById('xp-val').innerText = score;
+            popConfetti();
+            current++;
+            setTimeout(loadMission, 800);
+        } else {
+            btn.style.borderColor = "var(--berry)";
+            btn.style.color = "var(--berry)";
+            setTimeout(() => {
+                btn.style.borderColor = "var(--leaf)";
+                btn.style.color = "var(--wood)";
+            }, 500);
+        }
+    }
+
+    function popConfetti() {
+        for(let i=0; i<15; i++) {
+            const c = document.createElement('div');
+            c.className = 'confetti';
+            c.style.background = ['#ff4081','#ffeb3b','#4caf50','#2196f3'][Math.floor(Math.random()*4)];
+            c.style.left = '50%'; c.style.top = '40%';
+            c.style.setProperty('--x', (Math.random()-0.5)*400 + 'px');
+            c.style.setProperty('--y', (Math.random()-0.5)*400 + 'px');
+            document.getElementById('game-card').appendChild(c);
+            setTimeout(() => c.remove(), 1000);
+        }
+    }
+
+    window.onload = () => {
+        shuffleArray(missions);
+        loadMission();
+    };
+</script>
+</body>
+</html>
