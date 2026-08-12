@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jungle Grammar · A/An, Some/Any (10 Questions)</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+        }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: #a5d6a7;
+            background-image: url('https://www.transparenttextures.com');
+            text-align: center;
+            color: #1b5e20;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .game-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 30px;
+            background: var(--safari-sand);
+            border-radius: 30px;
+            border: 8px solid var(--jungle-green);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+        .level { display: none; }
+        .active { display: block; }
+        .question-card {
+            background: white;
+            border: 3px solid var(--jungle-green);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .options-row {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .choice-btn {
+            padding: 18px 45px;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            transition: 0.2s;
+            background: var(--correct-btn);
+            box-shadow: 0 5px 0 #388e3c;
+            min-width: 120px;
+        }
+        .choice-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #388e3c;
+        }
+        .choice-btn.wrong {
+            background: var(--wrong-btn);
+            box-shadow: 0 5px 0 #c62828;
+        }
+        .feedback {
+            font-weight: bold;
+            height: 35px;
+            margin-top: 15px;
+            font-size: 24px;
+        }
+        #score-board {
+            font-size: 22px;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 20px;
+            border: 2px dashed var(--jungle-green);
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+        .salute {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        #win-screen {
+            text-align: center;
+        }
+        #win-screen h2 {
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🌴 Jungle Grammar 🌴</h1>
+    <div id="score-board">📝 Question: <span id="current-q">1</span>/10 | ⭐ Score: <span id="score">0</span></div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="level active">
+        <div class="question-card" id="question-text"></div>
+        <div class="options-row" id="options-container"></div>
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="level">
+        <h2>🎉 ROAR-SOME! 🎉</h2>
+        <p style="font-size: 28px;">You tamed the grammar jungle!</p>
+        <p style="font-size: 24px;">Final Score: <span id="final-score">0</span> / 10</p>
+        <button onclick="location.reload()" style="background: var(--jungle-green); color: white; padding: 15px 40px; font-size: 24px; border: none; border-radius: 50px; cursor: pointer;">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // 10 questions covering a/an, some/any
+    const questions = [
+        {
+            sentence: "There is ___ wardrobe in the bedroom.",
+            options: ["a", "any"],
+            correct: "a"
+        },
+        {
+            sentence: "There is ___ fireplace in the living room.",
+            options: ["a", "any"],
+            correct: "a"
+        },
+        {
+            sentence: "There aren't ___ paintings on the walls.",
+            options: ["some", "any"],
+            correct: "any"
+        },
+        {
+            sentence: "There aren't ___ chairs in the dining room.",
+            options: ["any", "a"],
+            correct: "any"
+        },
+        {
+            sentence: "There is ___ armchair opposite the fireplace.",
+            options: ["a", "an", "some"],
+            correct: "an"
+        },
+        {
+            sentence: "Is there ___ mirror in the bathroom?",
+            options: ["a", "any"],
+            correct: "a"
+        },
+        {
+            sentence: "There are ___ cushions on the sofa.",
+            options: ["some", "any"],
+            correct: "some"
+        },
+        {
+            sentence: "Are there ___ windows in the room?",
+            options: ["some", "any"],
+            correct: "any"
+        },
+        {
+            sentence: "There is ___ old clock on the wall.",
+            options: ["a", "an"],
+            correct: "an"
+        },
+        {
+            sentence: "There isn't ___ desk in the kitchen.",
+            options: ["a", "an", "any"],
+            correct: "a"
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    // Display current question
+    function loadQuestion() {
+        if (currentQuestion >= questions.length) {
+            showWin();
+            return;
+        }
+
+        answered = false;
+        const q = questions[currentQuestion];
+        document.getElementById('question-text').innerText = q.sentence;
+        document.getElementById('current-q').innerText = currentQuestion + 1;
+        document.getElementById('feedback').innerText = '';
+
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        // Shuffle options to avoid always left=correct
+        const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, btn) {
+        if (answered) return;
+        answered = true;
+
+        const correct = questions[currentQuestion].correct;
+        const feed = document.getElementById('feedback');
+        const allBtns = document.querySelectorAll('.choice-btn');
+
+        // Disable all buttons
+        allBtns.forEach(b => b.disabled = true);
+
+        if (choice === correct) {
+            btn.style.background = '#388e3c';
+            feed.innerText = '✅ Correct!';
+            feed.style.color = '#2e7d32';
+            score++;
+            document.getElementById('score').innerText = score;
+            triggerSalute();
+        } else {
+            btn.classList.add('wrong');
+            feed.innerText = `❌ The correct word is "${correct}".`;
+            feed.style.color = '#c62828';
+            // Highlight correct button
+            allBtns.forEach(b => {
+                if (b.innerText === correct) {
+                    b.style.background = '#4caf50';
+                    b.style.boxShadow = '0 5px 0 #388e3c';
+                }
+            });
+        }
+
+        // Move to next question after short delay
+        setTimeout(() => {
+            currentQuestion++;
+            loadQuestion();
+        }, 1500);
+    }
+
+    function showWin() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        document.getElementById('final-score').innerText = score;
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Confetti/salute effect (same as original)
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 20; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 600;
+            const y = Math.random() * 400;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // Start the quiz
+    loadQuestion();
+</script>
+</body>
+</html>

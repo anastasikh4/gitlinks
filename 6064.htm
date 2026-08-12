@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Duolingo Style · Prepositions & Questions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --duo-green: #58cc02;
+      --duo-green-shadow: #46a302;
+      --duo-red: #ff4b4b;
+      --duo-red-shadow: #ea2b2b;
+      --duo-blue: #1cb0f6;
+      --duo-gray: #afafaf;
+      --duo-light-gray: #e5e5e5;
+      --duo-text: #3c3c3c;
+      --duo-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Nunito', -apple-system, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: #f7f7f7;
+      color: var(--duo-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 16px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 550px;
+      background: var(--duo-bg);
+      border: 2px solid var(--duo-light-gray);
+      border-radius: 24px;
+      padding: 24px 20px 28px;
+      box-shadow: 0 8px 0 var(--duo-light-gray);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .exit-btn {
+      font-size: 28px;
+      color: var(--duo-gray);
+      background: none;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 14px;
+      background: var(--duo-light-gray);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--duo-green);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--duo-blue);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .sentence-box {
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: #f7f7f7;
+      padding: 20px;
+      border-radius: 18px;
+      border: 2px solid var(--duo-light-gray);
+      margin-bottom: 25px;
+      text-align: center;
+      color: #2b2b2b;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .option-btn {
+      background: #fff;
+      border: 2px solid var(--duo-light-gray);
+      border-bottom: 5px solid var(--duo-light-gray);
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--duo-text);
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:active:not(.disabled) {
+      transform: translateY(3px);
+      border-bottom-width: 2px;
+    }
+
+    .option-btn.correct {
+      background: #d7ffb8 !important;
+      border-color: #58cc02 !important;
+      border-bottom-color: #46a302 !important;
+      color: #2d6a0a !important;
+    }
+
+    .option-btn.wrong {
+      background: #ffd8d8 !important;
+      border-color: #ff4b4b !important;
+      border-bottom-color: #ea2b2b !important;
+      color: #b91c1c !important;
+    }
+
+    .option-btn.disabled {
+      pointer-events: none;
+    }
+
+    .shake {
+      animation: shakeAnim 0.4s ease-in-out;
+    }
+
+    @keyframes shakeAnim {
+      0%,100%{ transform: translateX(0); }
+      20%,60%{ transform: translateX(-10px); }
+      40%,80%{ transform: translateX(10px); }
+    }
+
+    .matching-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .matching-table td {
+      padding: 10px 8px;
+      font-weight: 700;
+      font-size: 1rem;
+      border-bottom: 1px solid #eee;
+      vertical-align: top;
+    }
+
+    .matching-table select {
+      background: #fff;
+      border: 2px solid var(--duo-light-gray);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--duo-text);
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .action-btn {
+      background: var(--duo-green);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--duo-green-shadow);
+      width: 100%;
+      transition: 0.1s;
+      margin-top: 10px;
+    }
+
+    .action-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+
+    .feedback-msg {
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin: 15px 0;
+      text-align: center;
+      min-height: 2em;
+    }
+
+    .result-box { text-align: center; }
+
+    .final-score {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--duo-green);
+      margin: 20px 0;
+    }
+
+    .hidden { display: none; }
+
+    /* Glow states for Exercise 2 */
+    #ex2Screen.correct-glow {
+      border-color: #58cc02;
+      box-shadow: 0 0 12px rgba(88,204,2,0.7);
+      background: #f4ffea;
+    }
+    #ex2Screen.error-glow {
+      border-color: #ff4b4b;
+      box-shadow: 0 0 12px rgba(255,75,75,0.7);
+      background: #ffecec;
+    }
+  </style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="top-bar">
+    <button class="exit-btn" onclick="restartQuiz()">×</button>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Exercise 1: Prepositions -->
+  <div id="ex1Screen" class="screen active">
+    <div class="section-title">📦 Exercise 1: Prepositions of Place</div>
+    <div class="sentence-box" id="ex1Sentence"></div>
+    <div class="options-grid" id="ex1Options"></div>
+    <div class="feedback-msg" id="ex1Feedback"></div>
+  </div>
+
+  <!-- Exercise 2: Matching -->
+  <div id="ex2Screen" class="screen">
+    <div class="section-title">🔗 Exercise 2: Match Questions & Answers</div>
+    <table class="matching-table">
+      <tbody>
+        <tr><td>1. Whose birthday is in winter?</td><td><select id="m1"><option value="">-- Select --</option></select></td></tr>
+        <tr><td>2. What's your favourite day of the week?</td><td><select id="m2"><option value="">-- Select --</option></select></td></tr>
+        <tr><td>3. When is your birthday?</td><td><select id="m3"><option value="">-- Select --</option></select></td></tr>
+        <tr><td>4. How old are you?</td><td><select id="m4"><option value="">-- Select --</option></select></td></tr>
+        <tr><td>5. What's the date today?</td><td><select id="m5"><option value="">-- Select --</option></select></td></tr>
+        <tr><td>6. What time is it?</td><td><select id="m6"><option value="">-- Select --</option></select></td></tr>
+      </tbody>
+    </table>
+    <button class="action-btn" id="checkMatchBtn" onclick="checkMatching()">Check Answers</button>
+    <div class="feedback-msg" id="ex2Feedback"></div>
+    <button class="action-btn hidden" id="restartBtn" onclick="restartQuiz()">Try Again</button>
+  </div>
+
+  <!-- Final Result Screen -->
+  <div id="resultScreen" class="screen result-box">
+    <div class="section-title">🎉 All Done!</div>
+    <div class="final-score" id="totalScore"></div>
+    <p style="font-size:1.2rem; font-weight:700; color:var(--duo-gray);">Prepositions & Matching Mastered</p>
+    <button class="action-btn" onclick="restartQuiz()">Restart</button>
+  </div>
+</div>
+
+<script>
+  const prepQuestions = [
+    { sentence: "Where is the cat? – It’s ___ the table.", correct: "under" },
+    { sentence: "Mike sits ___ the computer all day long.", correct: "in front of" },
+    { sentence: "I will put the flowers ___ the vase.", correct: "in" },
+    { sentence: "Jess sits ___ Peter in class. They are good friends.", correct: "next to" }
+  ];
+  const allPreps = ["under", "next to", "in front of", "in"];
+
+  const matchingAnswers = ["C", "E", "B", "F", "A", "D"];
+  const answerOptions = [
+    { letter: "A", text: "Today is the 9th of March." },
+    { letter: "B", text: "It’s on the 12th of June." },
+    { letter: "C", text: "It’s Jack’s." },
+    { letter: "D", text: "It’s a quarter to nine." },
+    { letter: "E", text: "It’s Saturday!" },
+    { letter: "F", text: "I am 12." }
+  ];
+
+  let ex1Index = 0;
+  let ex1Score = 0;
+  let ex2Score = 0;
+  let ex1Locked = false;
+
+  const ex1Screen = document.getElementById('ex1Screen');
+  const ex2Screen = document.getElementById('ex2Screen');
+  const resultScreen = document.getElementById('resultScreen');
+  const progressBar = document.getElementById('progressBar');
+  const checkMatchBtn = document.getElementById('checkMatchBtn');
+  const ex2Feedback = document.getElementById('ex2Feedback');
+  const totalScoreEl = document.getElementById('totalScore');
+  const restartBtn = document.getElementById('restartBtn');
+
+  function updateProgress(percent) {
+    progressBar.style.width = percent + '%';
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function renderEx1Question() {
+    if (ex1Index >= prepQuestions.length) {
+      goToExercise2();
+      return;
+    }
+    ex1Locked = false;
+    const q = prepQuestions[ex1Index];
+
+    document.getElementById('ex1Sentence').innerHTML =
+      q.sentence.replace(
+        '___',
+        '<span style="color:var(--duo-blue); border-bottom:3px dashed var(--duo-blue); padding:0 8px;">______</span>'
+      );
+
+    const optionsDiv = document.getElementById('ex1Options');
+    optionsDiv.innerHTML = '';
+
+    const opts = shuffle([...allPreps]);
+    opts.forEach(prep => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = prep;
+      btn.addEventListener('click', function() {
+        handleEx1Answer(prep, btn);
+      });
+      optionsDiv.appendChild(btn);
+    });
+
+    const fb = document.getElementById('ex1Feedback');
+    fb.textContent = '';
+    fb.style.color = 'var(--duo-text)';
+  }
+
+  function handleEx1Answer(chosen, btn) {
+    if (ex1Locked) return;
+    ex1Locked = true;
+
+    const q = prepQuestions[ex1Index];
+    const allBtns = document.querySelectorAll('#ex1Options .option-btn');
+    allBtns.forEach(b => b.classList.add('disabled'));
+
+    const isCorrect = (chosen === q.correct);
+    const fb = document.getElementById('ex1Feedback');
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      ex1Score++;
+      fb.textContent = '✅';
+      fb.style.color = '#46a302';
+    } else {
+      btn.classList.add('wrong');
+      fb.textContent = '';
+      allBtns.forEach(b => {
+        if (b.textContent === q.correct) b.classList.add('correct');
+      });
+      ex1Screen.classList.add('shake');
+      setTimeout(() => ex1Screen.classList.remove('shake'), 400);
+    }
+
+    ex1Index++;
+    updateProgress((ex1Index / prepQuestions.length) * 100);
+
+    setTimeout(() => {
+      if (ex1Index < prepQuestions.length) {
+        renderEx1Question();
+      } else {
+        goToExercise2();
+      }
+    }, 800);
+  }
+
+  function goToExercise2() {
+    ex1Screen.classList.remove('active');
+    ex2Screen.classList.add('active');
+    initExercise2();
+    updateProgress(0);
+  }
+
+  function initExercise2() {
+    ex2Screen.classList.remove('correct-glow', 'error-glow');
+
+    const selects = ['m1','m2','m3','m4','m5','m6'].map(id => document.getElementById(id));
+    selects.forEach(sel => {
+      sel.innerHTML = '<option value="">-- Select --</option>';
+      const shuffledAnswers = shuffle([...answerOptions]);
+      shuffledAnswers.forEach(ans => {
+        const opt = document.createElement('option');
+        opt.value = ans.letter;
+        opt.textContent = ans.letter + ') ' + ans.text;
+        sel.appendChild(opt);
+      });
+      sel.style.background = '#fff';
+      sel.style.borderColor = 'var(--duo-light-gray)';
+    });
+
+    ex2Feedback.textContent = '';
+    ex2Feedback.style.color = 'var(--duo-text)';
+    checkMatchBtn.classList.remove('hidden');
+    restartBtn.classList.add('hidden');
+
+    ex2Score = 0;
+
+    const oldBtn = document.getElementById('showResultBtn');
+    if (oldBtn) oldBtn.remove();
+  }
+
+  function checkMatching() {
+    let correct = 0;
+    const total = matchingAnswers.length;
+
+    for (let i = 0; i < total; i++) {
+      const select = document.getElementById('m' + (i + 1));
+
+      if (select.value === matchingAnswers[i]) {
+        correct++;
+        select.style.background = '#d7ffb8';
+        select.style.borderColor = '#58cc02';
+      } else {
+        select.style.background = '#ffd8d8';
+        select.style.borderColor = '#ff4b4b';
+      }
+    }
+
+    ex2Score = correct;
+
+    if (correct === total) {
+      ex2Screen.classList.remove('error-glow');
+      ex2Screen.classList.add('correct-glow');
+      ex2Feedback.textContent = '✅ All correct!';
+      ex2Feedback.style.color = '#46a302';
+    } else {
+      ex2Screen.classList.remove('correct-glow');
+      ex2Screen.classList.add('error-glow');
+      ex2Feedback.textContent = '❌ Some answers are wrong. Check the red lines.';
+      ex2Feedback.style.color = '#ea2b2b';
+    }
+
+    checkMatchBtn.classList.add('hidden');
+    restartBtn.classList.remove('hidden');
+
+    if (!document.getElementById('showResultBtn')) {
+      const btn = document.createElement('button');
+      btn.className = 'action-btn';
+      btn.id = 'showResultBtn';
+      btn.textContent = 'View Final Score';
+      btn.onclick = showFinalResult;
+      ex2Screen.appendChild(btn);
+    }
+
+    updateProgress(100);
+  }
+
+  function showFinalResult() {
+    ex2Screen.classList.remove('active');
+    resultScreen.classList.add('active');
+    const total = ex1Score + ex2Score;
+    const max = prepQuestions.length + matchingAnswers.length;
+    totalScoreEl.textContent = total + ' / ' + max;
+    updateProgress(100);
+  }
+
+  function restartQuiz() {
+    ex1Index = 0;
+    ex1Score = 0;
+    ex2Score = 0;
+    ex1Locked = false;
+
+    ex1Screen.classList.add('active');
+    ex2Screen.classList.remove('active', 'correct-glow', 'error-glow');
+    resultScreen.classList.remove('active');
+
+    checkMatchBtn.classList.remove('hidden');
+    restartBtn.classList.add('hidden');
+
+    const oldBtn = document.getElementById('showResultBtn');
+    if (oldBtn) oldBtn.remove();
+
+    updateProgress(0);
+    renderEx1Question();
+  }
+
+  // сделать функции глобальными для кнопок
+  window.checkMatching = checkMatching;
+  window.restartQuiz = restartQuiz;
+
+  // старт
+  updateProgress(0);
+  renderEx1Question();
+</script>
+</body>
+</html>
