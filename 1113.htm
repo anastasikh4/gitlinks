@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMONG US: FOOD TELEMETRY SABOTAGE</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --crew-blue: #225ee1;
+            --imp-red: #ea0606;
+            --task-green: #39fd32;
+            --ship-dark: #0d121a;
+            --white: #ffffff;
+            --btn-gray: #4e5d6a;
+        }
+
+        body {
+            background-color: var(--ship-dark);
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 550px;
+            background: #1e2732;
+            border-radius: 15px;
+            border: 4px solid #3f484e;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
+        .task-status { color: var(--task-green); font-weight: bold; font-family: monospace; border: 1px solid var(--task-green); padding: 5px 10px; border-radius: 4px; }
+
+        .display-area {
+            background: #283341;
+            min-height: 160px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #3f484e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .sentence-text { font-size: 1.25rem; margin-bottom: 20px; line-height: 1.5; font-weight: 700; }
+        .word-builder { 
+            background: #000; 
+            padding: 12px; 
+            border-radius: 8px; 
+            min-height: 45px; 
+            font-size: 1.8rem; 
+            letter-spacing: 4px; 
+            color: var(--task-green);
+            font-weight: 800;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #3f484e;
+        }
+
+        .letter-grid { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; min-height: 60px; }
+
+        .btn-letter {
+            background: var(--crew-blue);
+            border: none;
+            border-bottom: 4px solid #163da1;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.1s;
+        }
+
+        .btn-letter:active { transform: translateY(2px); border-bottom: 2px solid #163da1; }
+        
+        .controls { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-control { flex: 1; padding: 12px; border-radius: 6px; border: none; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 1rem; }
+        .reset-btn { background: var(--imp-red); color: white; border-bottom: 4px solid #b30303; }
+        .reset-btn:active { transform: translateY(2px); border-bottom: 2px solid #b30303; }
+
+        #total-progress { width: 100%; height: 20px; background: #000; border: 1px solid #3f484e; border-radius: 5px; margin-top: 25px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--task-green); transition: 0.4s; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div style="font-weight: 800; letter-spacing: 0.5px;">PADDOCK SABOTAGE DETECTION</div>
+            <div class="task-status">QUANTIFIERS: <span id="done-count">1</span>/6</div>
+        </div>
+
+        <div class="display-area">
+            <div class="sentence-text" id="sentence-box">Loading...</div>
+            <div class="word-builder" id="user-word"></div>
+        </div>
+
+        <div class="letter-grid" id="letter-box"></div>
+        
+        <div class="controls">
+            <button class="btn-control reset-btn" onclick="resetWord()">Clear ❌</button>
+        </div>
+
+        <div id="total-progress"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="win-screen">
+        <h1 style="color: var(--task-green); font-size: 38px; font-weight: 800; margin-bottom: 10px;">CATERING RESTORED!</h1>
+        <p style="font-size: 1.1rem; color: #cbd5e1; margin-bottom: 25px;">All countable and uncountable logs are verified.</p>
+        <button class="btn-letter" onclick="location.reload()" style="width:100%; background: var(--task-green); border-bottom: 4px solid #2bbd25;">RUN NEXT LAP</button>
+    </div>
+</div>
+
+<script>
+    let current = 0;
+    let typedWord = "";
+    
+    // Данные адаптированы под упражнения 4, 5 и 6 с вашей картинки
+    const tasks = [
+        { q: "How _____ apples are there on the grid?", ans: "MANY", icon: "🍏" },
+        { q: "Is there _____ sugar inside the storage?", ans: "ANY", icon: "🧂" },
+        { q: "There is _____ tuna left in the cafeteria room.", ans: "SOME", icon: "🐟" },
+        { q: "How _____ water is inside the racing suit?", ans: "MUCH", icon: "💧" },
+        { q: "There isn't _____ milk left in the carton.", ans: "ANY", icon: "🥛" },
+        { q: "There _____ ten biscuits on the table map.", ans: "ARE", icon: "🍪" }
+    ];
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function loadTask() {
+        const t = tasks[current];
+        typedWord = "";
+        document.getElementById('user-word').innerText = "";
+        document.getElementById('sentence-box').innerHTML = `<div style="font-size: 2.2rem; margin-bottom: 10px;">${t.icon}</div><div>${t.q}</div>`;
+        document.getElementById('done-count').innerText = current + 1;
+        
+        const letterBox = document.getElementById('letter-box');
+        letterBox.innerHTML = '';
+        
+        // Разделяем слово на буквы и перемешиваем
+        const letters = shuffle(t.ans.split(''));
+        letters.forEach(char => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-letter';
+            btn.innerText = char;
+            btn.onclick = () => addLetter(char, btn);
+            letterBox.appendChild(btn);
+        });
+
+        document.getElementById('progress-fill').style.width = (current / tasks.length * 100) + '%';
+    }
+
+    function addLetter(char, btn) {
+        typedWord += char;
+        document.getElementById('user-word').innerText = typedWord;
+        btn.style.visibility = "hidden"; // Прячем использованную букву
+        
+        if (typedWord.length === tasks[current].ans.length) {
+            if (typedWord === tasks[current].ans) {
+                setTimeout(nextLevel, 400);
+            } else {
+                alert("SABOTAGE UNRESOLVED! Incorrect quantifier sequence.");
+                resetWord();
+            }
+        }
+    }
+
+    function resetWord() {
+        typedWord = "";
+        document.getElementById('user-word').innerText = "";
+        const buttons = document.querySelectorAll('.btn-letter');
+        buttons.forEach(b => b.style.visibility = "visible");
+    }
+
+    function nextLevel() {
+        current++;
+        if (current < tasks.length) {
+            loadTask();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            showWin();
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-area').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+    }
+
+    // Первичная инициализация игры при старте
+    window.onload = loadTask;
+</script>
+</body>
+</html>

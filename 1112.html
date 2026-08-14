@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обучающая игра: Контейнеры и Еда</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --green: #58cc02; 
+            --dark-green: #46a302; 
+            --blue: #1cb0f6; 
+            --gray: #e5e5e5; 
+            --text: #4b4b4b; 
+        }
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: #fff; 
+            color: var(--text); 
+        }
+        header { 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            box-sizing: border-box; 
+        }
+        .progress-bar { 
+            flex-grow: 1; 
+            height: 16px; 
+            background: var(--gray); 
+            border-radius: 10px; 
+        }
+        #fill { 
+            width: 0%; 
+            height: 100%; 
+            background: var(--green); 
+            border-radius: 10px; 
+            transition: width 0.4s; 
+        }
+        main { 
+            width: 100%; 
+            max-width: 500px; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        h1 { 
+            font-size: 24px; 
+            font-weight: 800; 
+            margin-bottom: 30px; 
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 20px; 
+        }
+        .card { 
+            background: white; 
+            border: 2px solid var(--gray); 
+            border-bottom: 4px solid var(--gray); 
+            border-radius: 15px; 
+            padding: 15px; 
+            font-size: 18px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            transition: all 0.1s; 
+        }
+        .card:active { 
+            transform: translateY(2px); 
+        }
+        .card.selected { 
+            background: #ddf4ff; 
+            border-color: #84d8ff; 
+            color: var(--blue); 
+        }
+        .card.correct { 
+            background: #d7ffb8; 
+            border-color: #58cc02; 
+            color: #58a700; 
+        }
+        .hidden { 
+            display: none; 
+        }
+        #feedback { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 20px; 
+            display: none; 
+            justify-content: center; 
+            background: #d7ffb8; 
+            border-top: 2px solid #58cc02; 
+        }
+        .next-btn { 
+            background: var(--green); 
+            color: white; 
+            border: none; 
+            border-bottom: 4px solid var(--dark-green); 
+            padding: 12px 40px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">Обучающая игра: Еда</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">ПРОДОЛЖИТЬ</button>
+</div>
+
+<script>
+    // --- ДАННЫЕ ИГРЫ (Основано на вашей картинке) ---
+
+    // Level 1: Сопоставление (6 пар на базе задания)
+    const level1Data = [
+        { id: 1, text: 'a bottle of water', type: 'word' }, { id: 1, text: '💧', type: 'emoji' },
+        { id: 2, text: 'a carton of milk', type: 'word' }, { id: 2, text: '🥛', type: 'emoji' },
+        { id: 3, text: 'a packet of flour', type: 'word' }, { id: 3, text: '🥡', type: 'emoji' },
+        { id: 4, text: 'a bar of chocolate', type: 'word' }, { id: 4, text: '🍫', type: 'emoji' },
+        { id: 5, text: 'a jar of jam', type: 'word' }, { id: 5, text: '🫙', type: 'emoji' },
+        { id: 6, text: 'a can of tuna', type: 'word' }, { id: 6, text: '🥫', type: 'emoji' }
+    ];
+
+    // Level 2: Множественный выбор
+    const questions2 = [
+        { emoji: '🍫', correct: 'a bar of chocolate', options: ['a packet of flour', 'a bar of chocolate', 'a jar of jam', 'a bottle of water'] },
+        { emoji: '🫙', correct: 'a jar of jam', options: ['a can of tuna', 'a carton of milk', 'a jar of jam', 'a bar of chocolate'] },
+        { emoji: '🥫', correct: 'a can of tuna', options: ['a can of tuna', 'a bottle of water', 'a packet of flour', 'a carton of milk'] }
+    ];
+
+    // Level 3: Аудирование
+    const targetWords3 = ['a bottle of water', 'a carton of milk', 'a packet of flour'];
+    const wordEmojiMap = {
+        'a bottle of water': '💧',
+        'a carton of milk': '🥛',
+        'a packet of flour': '🥡'
+    };
+
+    // --- ЛОГИКА ИГРЫ ---
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "Найди пары";
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            [...level1Data].sort(() => Math.random() - 0.5).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+        } 
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "Выбери правильное описание";
+            const q = questions2[subStep];
+            area.innerHTML = `<div style="font-size: 80px; margin-bottom: 20px;">${q.emoji}</div>`;
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "Послушай и выбери";
+            const word = targetWords3[subStep];
+            area.innerHTML = `<button class="card" onclick="speak('${word}')" style="width:100%; margin-bottom:20px; background: #eef8ff; border-color: #84d8ff; color: var(--blue);">🔊 ПОСЛУШАТЬ</button>`;
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            Object.values(wordEmojiMap).sort(() => Math.random() - 0.5).forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.style.fontSize = '40px';
+                btn.innerText = emoji;
+                btn.onclick = () => checkLevel3(emoji, btn);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+            speak(word);
+        }
+    }
+
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.includes(card)) return;
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            if (selectedCards[0].item.id === selectedCards[1].item.id && selectedCards[0].item.type !== selectedCards[1].item.type) {
+                selectedCards.forEach(c => { c.card.classList.remove('selected'); c.card.classList.add('correct'); });
+                selectedCards = [];
+                if (document.querySelectorAll('.correct').length === level1Data.length) showNext();
+            } else {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.card.classList.remove('selected'));
+                    selectedCards = [];
+                }, 500);
+            }
+        }
+    }
+
+    function checkLevel2(choice, btn) {
+        if (choice === questions2[subStep].correct) {
+            btn.classList.add('correct');
+            showNext();
+        } else {
+            btn.style.borderColor = '#ff4b4b';
+        }
+    }
+
+    function checkLevel3(choice, btn) {
+        const correctEmoji = wordEmojiMap[targetWords3[subStep]];
+        if (choice === correctEmoji) {
+            btn.classList.add('correct');
+            showNext();
+        } else {
+            btn.style.borderColor = '#ff4b4b';
+        }
+    }
+
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+        let totalSteps = 1 + questions2.length + targetWords3.length;
+        let currentProgress = (currentLevel === 1) ? 1 : (currentLevel === 2 ? 1 + subStep + 1 : 1 + questions2.length + subStep + 1);
+        document.getElementById('fill').style.width = (currentProgress / totalSteps * 100) + '%';
+    }
+
+    function nextStep() {
+        if (currentLevel === 1) { currentLevel = 2; subStep = 0; }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) { currentLevel = 3; subStep = 0; }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= targetWords3.length) {
+                document.getElementById('game-area').innerHTML = "<h2>Отлично! Ты освоил упаковку продуктов! 🎉🥫</h2>";
+                document.getElementById('feedback').style.display = 'none';
+                return;
+            }
+        }
+        initLevel();
+    }
+
+    // Полноценный рабочий метод озвучки Web Speech API
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // Остановка предыдущей озвучки
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-US'; // Английское произношение
+            msg.rate = 0.85;    // Чуть замедленный темп для понимания
+            window.speechSynthesis.speak(msg);
+        }
+    }
+
+    // Запуск первой сцены при загрузке страницы
+    window.onload = initLevel;
+</script>
+
+</body>
+</html>
