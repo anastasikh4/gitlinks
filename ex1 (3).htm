@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Mega Presentation Mission</title>
+    <style>
+        :root {
+            --jungle-green: #3498db;
+            --tiger-orange: #f39c12;
+            --super-purple: #9b59b6;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(180deg, #3498db 0%, #2c3e50 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #game-frame {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 40px;
+            text-align: center;
+            border: 6px solid #fff;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .level-badge { background: #eee; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .score-badge { background: var(--tiger-orange); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+
+        /* Контейнер для вывода графики или эмодзи */
+        .visual-zone {
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .hero-emoji { 
+            font-size: 5rem; 
+            line-height: 1;
+            animation: bounce 2s infinite; 
+        }
+
+        .hero-img {
+            height: 110px;
+            width: auto;
+            max-width: 180px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 2px solid #ddd;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+        .sentence-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            border: 2px dashed #ccc;
+            text-align: left;
+        }
+
+        .gap {
+            background: #fff3cd;
+            border-bottom: 3px solid var(--tiger-orange);
+            padding: 2px 12px;
+            border-radius: 10px;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option-btn:hover { background: #f0f0f0; border-color: var(--jungle-green); }
+        .option-btn.correct { background: #2ecc71 !important; color: white; border-color: #27ae60; }
+        .option-btn.wrong { background: #ff6b6b !important; color: white; border-color: #c0392b; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <div class="level-badge">Mission <span id="lvl-num">1</span>/7</div>
+            <div class="score-badge">Stars: <span id="score">0</span></div>
+        </div>
+
+        <!-- Сюда скрипт динамически вставляет либо эмодзи, либо картинку -->
+        <div class="visual-zone" id="media-container"></div>
+        
+        <div class="sentence-box" id="sentence"></div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="win-screen">
+        <h1 style="color: #2ecc71; font-size: 2.8rem; margin-bottom: 10px;">🏆 SUPER HERO WIN!</h1>
+        <p style="font-size: 1.4rem; color: #566573; margin-bottom: 25px;">Excellent! You know all profiles and superhero names!</p>
+        <button onclick="resetGame()" style="padding:15px 40px; border-radius:20px; cursor:pointer; font-weight:bold; font-size:1.2rem; background: var(--tiger-orange); color:white; border:none; box-shadow: 0 4px 0 #d35400;">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // Массив данных: для уровней 5, 6 и 7 тип изменен на "img", замените заглушки src на ваши ссылки
+    const missions = [
+        /* PART 1: KIDS & PETS */
+        {
+            type: "emoji",
+            content: "👦",
+            text: "Hi! My name is <span class='gap' id='g1'>_______ 1)</span>.<br>I'm <span class='gap' id='g2'>_______ 2)</span> years old.",
+            answers: ["John", "eight"],
+            options: ["John", "eight", "Anna", "good"]
+        },
+        {
+            type: "emoji",
+            content: "🐈",
+            text: "This is my <span class='gap' id='g1'>_______ 3)</span>.<br>It's <span class='gap' id='g2'>_______ 4)</span>.",
+            answers: ["cat", "orange"],
+            options: ["cat", "orange", "fish", "blue"]
+        },
+        {
+            type: "emoji",
+            content: "👧",
+            text: "Hi! My name is <span class='gap' id='g1'>_______ 5)</span>.<br>I'm <span class='gap' id='g2'>_______ 6)</span> years old.",
+            answers: ["Anna", "six"],
+            options: ["Anna", "six", "John", "sad"]
+        },
+        {
+            type: "emoji",
+            content: "🐠",
+            text: "This is my <span class='gap' id='g1'>_______ 7)</span>.<br>It's <span class='gap' id='g2'>_______ 8)</span>.",
+            answers: ["fish", "blue"],
+            options: ["fish", "blue", "cat", "white"]
+        },
+        /* PART 2: SUPERHERO TRAINING */
+        {
+            type: "img",
+            content: "https://avatars.mds.yandex.net/i?id=e20c916bf646a902cee9ff66676f6717_l-7564157-images-thumbs&n=13", // Вставьте вашу ссылку на Супермена здесь
+            text: "A: <span class='gap' id='g1'>_______ ?</span><br>B: That's <span class='gap' id='g2'>_______ .</span> (Picture 2)",
+            answers: ["Who's that", "Superman"],
+            options: ["Who's that", "Superman", "Batman", "What's that"]
+        },
+        {
+            type: "img",
+            content: "https://clipartspub.com/images600_/clipart-avengers-hulk-4.png", // Вставьте вашу ссылку на Халка здесь
+            text: "A: <span class='gap' id='g1'>_______ ?</span><br>B: That's <span class='gap' id='g2'>_______ .</span> (Picture 3)",
+            answers: ["Who's that", "Hulk"],
+            options: ["Who's that", "Hulk", "Spider-Man", "Batman"]
+        },
+        {
+            type: "img",
+            content: "https://img.ixbt.site/live/images/original/35/79/76/2026/05/06/9791203e75.jpg", // Вставьте вашу ссылку на Человека-Паука здесь
+            text: "A: <span class='gap' id='g1'>_______ ?</span><br>B: That's <span class='gap' id='g2'>_______ .</span> (Picture 4)",
+            answers: ["Who's that", "Spider-Man"],
+            options: ["Who's that", "Spider-Man", "Superman", "Hulk"]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentStep = 0;
+    let score = 0;
+
+    function loadLevel() {
+        const m = missions[currentLevel];
+        document.getElementById('lvl-num').innerText = currentLevel + 1;
+        document.getElementById('sentence').innerHTML = m.text;
+        
+        // Отрисовка медиа-зоны
+        const mediaContainer = document.getElementById('media-container');
+        if (m.type === "img") {
+            mediaContainer.innerHTML = `<img src="${m.content}" class="hero-img" alt="superhero">`;
+        } else {
+            mediaContainer.innerHTML = `<div class="hero-emoji">${m.content}</div>`;
+        }
+        
+        // Смена цвета темы для супергероев
+        if (currentLevel >= 4) {
+            document.documentElement.style.setProperty('--jungle-green', 'var(--super-purple)');
+        }
+
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        
+        const shuffledOptions = [...m.options].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleChoice(btn, opt);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function handleChoice(btn, val) {
+        const m = missions[currentLevel];
+        if (val === m.answers[currentStep]) {
+            btn.classList.add('correct');
+            document.getElementById(`g${currentStep + 1}`).innerText = val;
+            score += 10;
+            document.getElementById('score').innerText = score;
+            currentStep++;
+            
+            if (currentStep === 2) {
+                setTimeout(() => {
+                    currentLevel++;
+                    currentStep = 0;
+                    if (currentLevel < missions.length) loadLevel();
+                    else showWin();
+                }, 1000);
+            }
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+    }
+
+    function resetGame() {
+        location.reload();
+    }
+
+    window.onload = loadLevel;
+</script>
+
+</body>
+</html>

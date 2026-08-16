@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Supplies Color Constructor</title>
+    <style>
+        :root { 
+            --primary: #6c5ce7; 
+            --success: #2ecc71; 
+            --light-green: #eefbf2;
+            --bg: #f8f9fc; 
+        }
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border: 5px solid #fff; }
+        
+        .progress { color: #aaa; font-weight: bold; text-transform: uppercase; margin-bottom: 10px; }
+        
+        /* Interactive Visual Box with soft borders and fixed sizing for real images */
+        .visual-box { margin: 15px 0; min-height: 160px; display: flex; justify-content: center; align-items: center; background: #f1f2f6; border-radius: 20px; transition: background-color 0.4s ease, border 0.4s ease; border: 4px solid transparent; padding: 15px; }
+        .supplies-img { height: 110px; width: 110px; object-fit: contain; }
+
+        .builder { border: 4px dashed var(--primary); min-height: 85px; margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 8px; border-radius: 20px; background: #fff; padding: 10px; flex-wrap: wrap; }
+        .word-tag { background: var(--primary); color: white; padding: 10px 20px; border-radius: 12px; font-weight: bold; font-size: 1.3rem; animation: pop 0.2s; box-shadow: 0 4px 0 #4834d4; }
+        
+        .pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        .action-btn { background: #fff; padding: 12px 18px; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        .feedback { margin-top: 15px; font-size: 1.8rem; font-weight: bold; min-height: 45px; }
+        .next-btn { display: none; background: var(--success); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.4rem; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #27ae60; }
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress">Mission: 1 / 6</div>
+    <div id="visual" class="visual-box"></div>
+    <h3 id="instr">Build the color phrase:</h3>
+
+    <div class="builder" id="builder"></div>
+    <div class="pool" id="pool"></div>
+
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT ➔</button>
+</div>
+
+<script>
+    let currentStep = 0;
+    let userPath = [];
+
+    // All emoji targets have been completely replaced with premium Flaticon illustration links
+    const rawData = [
+        { src: "https://static.vecteezy.com/system/resources/thumbnails/027/153/815/small_2x/rubber-eraser-school-supplies-isolated-icon-photo.jpg", hex: "#ff4d4d", instr: "Make sentence: The rubber...", correct: ["The", "rubber", "is", "red."], extras: ["blue.", "pencil"], ans: "The rubber is red." },
+        { src: "https://img.joomcdn.net/d3969d136193c57f27cb78d47a60fa3bd7816927_original.jpeg", hex: "#2ecc71", instr: "Make sentence: The schoolbag...", correct: ["The", "schoolbag", "is", "green."], extras: ["orange.", "book"], ans: "The schoolbag is green." },
+        { src: "https://avatars.mds.yandex.net/get-mpic/14036716/2a0000019763a862d2206522240e4ab4b4d5/orig", hex: "#9b59b6", instr: "Make sentence: The pencil case...", correct: ["The", "pencil", "case", "is", "purple."], extras: ["yellow.", "desk"], ans: "The pencil case is purple." },
+        { src: "https://cdn.basicdecor.ru/files/media/product_photos/1d/2330416/big/ql10275yw_1.jpg", hex: "#f1c40f", instr: "Make sentence: The pencil...", correct: ["The", "pencil", "is", "yellow."], extras: ["green.", "rubber"], ans: "The pencil is yellow." },
+        { src: "https://static.vecteezy.com/system/resources/previews/053/963/062/non_2x/3d-render-of-a-classic-blue-book-free-png.png", hex: "#3498db", instr: "Make sentence: The book...", correct: ["The", "book", "is", "blue."], extras: ["purple.", "schoolbag"], ans: "The book is blue." },
+        { src: "https://i.pinimg.com/736x/44/ab/31/44ab310616825eaa3b1fbcefc1b36fa5.jpg", hex: "#e67e22", instr: "Make sentence: The desk...", correct: ["The", "desk", "is", "orange."], extras: ["red.", "case"], ans: "The desk is orange." }
+    ];
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if(!q) { showWin(); return; }
+
+        document.getElementById('progress').innerText = `Mission: ${currentStep + 1} / 6`;
+        
+        // Render a native image tag linking directly to the graphics asset instead of text emojis
+        document.getElementById('visual').innerHTML = `<img src="${q.src}" class="supplies-img" alt="school supply">`;
+        
+        document.getElementById('visual').style.backgroundColor = "#f1f2f6";
+        document.getElementById('visual').style.borderColor = "transparent";
+
+        document.getElementById('instr').innerText = q.instr;
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('builder').innerHTML = ""; 
+        
+        const pool = document.getElementById('pool');
+        pool.innerHTML = "";
+        userPath = [];
+
+        let allOptions = [...q.correct, ...q.extras];
+        allOptions.sort(() => Math.random() - 0.5).forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            btn.onclick = () => {
+                userPath.push(item);
+                const tag = document.createElement('span');
+                tag.className = "word-tag";
+                tag.innerText = item;
+                document.getElementById('builder').appendChild(tag);
+                
+                if(userPath.length === q.correct.length) {
+                    if(userPath.join(" ") === q.ans) {
+                        document.getElementById('feedback').innerText = "COLORED! 🎨🌟";
+                        document.getElementById('feedback').style.color = "var(--success)";
+                        
+                        document.getElementById('visual').style.backgroundColor = q.hex + "22"; 
+                        document.getElementById('visual').style.borderColor = q.hex;
+                        
+                        document.getElementById('next-btn').style.display = "inline-block";
+                    } else {
+                        document.getElementById('feedback').innerText = "TRY AGAIN! ❌";
+                        document.getElementById('feedback').style.color = "var(--success)";
+                        
+                        document.getElementById('visual').style.backgroundColor = "var(--light-green)";
+                        document.getElementById('visual').style.borderColor = "var(--success)";
+                        setTimeout(loadGame, 1100);
+                    }
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { currentStep++; loadGame(); }
+
+    function showWin() {
+        document.querySelector('.quiz-container').innerHTML = `
+            <img src="https://flaticon.com" style="height:120px; margin-bottom:20px;" alt="trophy">
+            <h2>COLOR MASTER!</h2>
+            <p style="font-size: 1.2rem; color: #555;">You read and colored all school objects from Task 14!</p>
+            <button class="action-btn" onclick="location.reload()" style="background:var(--success); color:white; border:none; padding:15px 40px; border-radius: 50px; font-size: 1.2rem; box-shadow: 0 4px 0 #27ae60;">PLAY AGAIN</button>
+        `;
+    }
+
+    window.onload = loadGame;
+</script>
+</body>
+</html>

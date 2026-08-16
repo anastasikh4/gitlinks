@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Supplies Writing Trace: Lesson 8</title>
+    <style>
+        :root { 
+            --bg: #fdfefe; 
+            --accent: #2980b9; 
+            --btn-green: #2ecc71; 
+            --betty-orange: #e67e22;
+        }
+        body { font-family: 'Comic Sans MS', 'Comic Neue', sans-serif; background: #eef2f7; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        
+        .card { background: white; width: 100%; max-width: 800px; padding: 30px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border: 6px solid #aed6f1; }
+        
+        .progress { color: var(--accent); font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        /* Стилизация контейнера для картинок и эмодзи */
+        .image-hint-container {
+            height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .img-hint { 
+            height: 100px; 
+            width: 100px; 
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); 
+        }
+        .emoji-hint { 
+            font-size: 6rem; 
+            line-height: 1;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); 
+        }
+
+        /* ENLARGED WRITING SANDBOX */
+        #canvas-box { position: relative; background: #fff; border: 4px dashed #9bc5e2; border-radius: 30px; margin: 20px auto; width: 700px; height: 320px; touch-action: none; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 2; cursor: crosshair; }
+        
+        /* TRACING TEXT FONT SIZE */
+        .trace-text { position: absolute; width: 100%; top: 50%; transform: translateY(-50%); font-size: 85px; color: #ebf5fb; user-select: none; z-index: 1; letter-spacing: 3px; font-weight: bold; text-align: center; text-transform: lowercase; }
+        
+        #notebook { display: none; padding: 40px 20px; background: #fdf9e7; border: 4px solid #f1c40f; border-radius: 30px; margin: 20px 0; }
+        
+        /* NOTEBOOK TEXT FONT SIZE */
+        .word-show { font-size: 6.5rem; font-weight: bold; color: #2d3436; margin-bottom: 15px; text-transform: lowercase; line-height: 1; }
+        
+        .instr-text { font-size: 1.8rem; color: #2980b9; font-weight: bold; margin-bottom: 10px; }
+
+        .btn-row { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        button { padding: 15px 45px; font-size: 1.5rem; font-weight: bold; border-radius: 30px; cursor: pointer; border: none; transition: 0.2s; font-family: inherit; }
+        .btn-next { background: var(--btn-green); color: white; box-shadow: 0 6px 0 #27ae60; }
+        .btn-next:active { transform: translateY(4px); box-shadow: none; }
+        .btn-clear { background: #ff6b6b; color: white; box-shadow: 0 6px 0 #ee5253; }
+        .btn-clear:active { transform: translateY(4px); box-shadow: none; }
+
+        h1 { font-size: 3.5rem; color: #2ecc71; margin-bottom: 10px; }
+        p { font-size: 1.8rem; color: #566573; margin-bottom: 25px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="progress" id="info">Word 1 of 7</div>
+    <div class="image-hint-container" id="image-hint-zone">
+        <!-- Первое слово - карандаш в виде эмодзи -->
+        <div class="emoji-hint" id="visual-element">✏️</div>
+    </div>
+    <div class="instr-text" id="instr">Trace the word! ✍️</div>
+
+    <div id="canvas-box">
+        <div class="trace-text" id="trace-text">pencil</div>
+        <canvas id="drawCanvas" width="700" height="320"></canvas>
+    </div>
+
+    <div id="notebook">
+        <div class="word-show" id="big-word">pencil</div>
+        <h2 style="color: #e67e22; margin:0; font-size: 2.2rem;">📓 Запиши в тетрадь!</h2>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn-clear" id="clear-btn" onclick="clearDraw()">Clear</button>
+        <button class="btn-next" id="main-btn" onclick="goNext()">DONE ✨</button>
+    </div>
+</div>
+
+<script>
+    // Массив данных: только у ластика (rubber) тип "img" и внешняя ссылка, у остальных — тип "emoji"
+    const data = [
+        { word: "pencil", type: "emoji", emoji: "✏️" },
+        { word: "rubber", type: "img", src: "https://cdn-icons-png.flaticon.com/512/6558/6558588.png" }, // Изображение ластика по вашей ссылке
+        { word: "book", type: "emoji", emoji: "📘" },
+        { word: "pencil case", type: "emoji", emoji: "👝" },
+        { word: "desk", type: "img", src: "https://imgproxy.attic.sh/hpuq3pjlQq7S9IUoNrScT3cNRhsANE3X6HWpGA4TWtw/rs:fit:540:540:1:1/t:1:FF00FF:false:false/aHR0cHM6Ly9hdHRp/Yy5zaC9maDF0OW52/bTNtdHgzaWwzMXM1/YTBoMnN5ZGR2.webp" },
+        { word: "schoolbag", type: "emoji", emoji: "🎒" },
+        { word: "aeroplane", type: "emoji", emoji: "✈️" }
+    ];
+
+    let idx = 0;
+    let isNotebook = false;
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#3498db';
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches.clientX);
+        const clientY = e.clientY || (e.touches && e.touches.clientY);
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function start(e) { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }
+    function move(e) { if (!drawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function stop() { drawing = false; }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start);
+    canvas.addEventListener('touchmove', move);
+    canvas.addEventListener('touchend', stop);
+
+    function clearDraw() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function updateVisualHint() {
+        const zone = document.getElementById('image-hint-zone');
+        const currentItem = data[idx];
+        
+        if (currentItem.type === "img") {
+            zone.innerHTML = `<img src="${currentItem.src}" class="img-hint" id="visual-element" alt="hint">`;
+        } else {
+            zone.innerHTML = `<div class="emoji-hint" id="visual-element">${currentItem.emoji}</div>`;
+        }
+    }
+
+    function goNext() {
+        if (!isNotebook) {
+            document.getElementById('canvas-box').style.display = 'none';
+            document.getElementById('notebook').style.display = 'block';
+            document.getElementById('clear-btn').style.display = 'none';
+            document.getElementById('instr').innerText = "Now write it on paper:";
+            document.getElementById('big-word').innerText = data[idx].word;
+            isNotebook = true;
+        } else {
+            idx++;
+            if (idx < data.length) {
+                isNotebook = false;
+                document.getElementById('canvas-box').style.display = 'block';
+                document.getElementById('notebook').style.display = 'none';
+                document.getElementById('clear-btn').style.display = 'inline-block';
+                document.getElementById('instr').innerText = "Trace the word! ✍️";
+                document.getElementById('trace-text').innerText = data[idx].word;
+                updateVisualHint();
+                document.getElementById('info').innerText = `Word ${idx + 1} of ${data.length}`;
+                clearDraw();
+            } else {
+                document.querySelector('.card').innerHTML = "<h1>🎖️ EXCELLENT!</h1><p>You mastered all school supplies from Lesson 8!</p><button class='btn-next' onclick='location.reload()'>START AGAIN</button>";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

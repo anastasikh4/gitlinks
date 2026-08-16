@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonics Hero: Long E & Short E Edition</title>
+    <style>
+        :root {
+            --hero-blue: #2980b9;
+            --hero-purple: #8e44ad;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #27ae60;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--hero-blue);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        #academy-card {
+            background-color: var(--white);
+            width: 95%;
+            max-width: 550px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--hero-purple);
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .shake { animation: shake 0.3s ease-in-out; }
+        .bounce { animation: bounce 0.5s ease-in-out; }
+
+        .header { text-align: center; border-bottom: 4px solid var(--comic-black); margin-bottom: 20px; }
+        .lvl-badge { background: var(--hero-purple); color: white; padding: 5px 15px; display: inline-block; transform: rotate(-2deg); font-size: 0.9rem; border: 3px solid var(--comic-black); }
+
+        /* Level 0 Memory */
+        .memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .card { height: 110px; cursor: pointer; perspective: 1000px; position: relative; }
+        .card-inner { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; transition: 0.5s; border: 3px solid var(--comic-black); border-radius: 10px; }
+        .flipped .card-inner { transform: rotateY(180deg); }
+        .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border-radius: 8px; }
+        .front { background: var(--comic-black); color: var(--hero-yellow); font-size: 1.5rem; }
+        .back { background: #fff !important; transform: rotateY(180deg); padding: 5px; color: #000 !important; }
+        .back b { display: block; color: #000; font-size: 0.85rem; margin-top: 5px; text-transform: uppercase; }
+        .back span { font-size: 2.2rem; }
+
+        /* General UI */
+        .trial-zone { text-align: center; margin: 20px 0; }
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .hero-btn {
+            background: var(--hero-yellow); border: 3px solid var(--comic-black); padding: 18px;
+            font-size: 1.1rem; cursor: pointer; font-weight: bold; border-radius: 10px;
+            box-shadow: 0 4px 0 #333;
+        }
+
+        .tile-container { display: flex; gap: 10px; justify-content: center; margin: 20px 0; flex-wrap: wrap; }
+        .tile { background: var(--hero-purple); color: white; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 1.5rem; border: 3px solid var(--comic-black); }
+        .answer-slot { font-size: 2.5rem; letter-spacing: 5px; border-bottom: 5px dashed var(--hero-purple); min-height: 50px; margin-bottom: 20px; color: var(--hero-purple); text-align: center; }
+
+        .hidden { display: none; }
+        .progress-bar { height: 12px; background: #eee; border: 2px solid #333; margin-top: 20px; border-radius: 6px; overflow: hidden; }
+        #fill { height: 100%; background: var(--success); width: 0%; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div id="academy-card">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-badge">LEVEL 0: SOUND CHECK</div>
+        <div style="margin: 10px 0; font-size: 0.8rem; color: #666;">Voice Engine: <span id="voice-name">Searching for Linda...</span></div>
+    </div>
+
+    <!-- LEVEL 0: MEMORY PAIRS -->
+    <div id="lvl0" class="screen">
+        <div id="memory-grid" class="memory-grid"></div>
+    </div>
+
+    <!-- LEVEL 1: MULTIPLE CHOICE -->
+    <div id="lvl1" class="hidden">
+        <div class="trial-zone">
+            <button class="hero-btn" onclick="playL1Sound()" style="background: var(--hero-purple); color: white; width: 100%; margin-bottom: 20px;">🔊 LISTEN TO PHONICS</button>
+            <div id="l1-options" class="btn-grid"></div>
+        </div>
+    </div>
+
+    <!-- LEVEL 2: SPELLING UNSCRAMBLE -->
+    <div id="lvl2" class="hidden">
+        <div class="trial-zone">
+            <button class="hero-btn" onclick="playL2Sound()" style="background: var(--hero-purple); color: white; width: 100%; margin-bottom: 20px;">🔊 HEAR & SPELL WORD</button>
+            <div id="answer-display" class="answer-slot"></div>
+            <div id="tile-box" class="tile-container"></div>
+            <button onclick="resetUnscramble()" style="background:none; border:none; text-decoration:underline; cursor:pointer; color: #7f8c8d; font-weight: bold; margin-top: 10px;">Reset letters</button>
+        </div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win" class="hidden" style="text-align: center;">
+        <h1 style="font-size: 4rem; margin: 10px 0;">🏆</h1>
+        <h2 style="font-size: 1.8rem; margin-bottom: 20px;">E & EE & EA PHONICS MASTER!</h2>
+        <button class="hero-btn" onclick="location.reload()" style="width: 100%; background: var(--hero-blue); color:white;">PLAY AGAIN</button>
+    </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+</div>
+
+<script>
+    const synth = window.speechSynthesis;
+    let lindaVoice = null;
+
+    function findLinda() {
+        const voices = synth.getVoices();
+        lindaVoice = voices.find(v => v.name.includes("Linda")) || voices.find(v => v.lang.includes("en-GB")) || voices.find(v => v.lang.includes("en-US")) || voices[0];
+        document.getElementById('voice-name').innerText = lindaVoice ? lindaVoice.name : "System Speaker Active";
+    }
+
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = findLinda;
+    }
+
+    function speak(text) {
+        if(!text) return;
+        synth.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        if(lindaVoice) utter.voice = lindaVoice;
+        utter.rate = 0.75;
+        synth.speak(utter);
+    }
+
+    // Данные для уровня 0 (Сопоставление звуков и написания)
+    const memData = [
+        {w: "Bed", e: "🛏️", id: 1},   // Short E
+        {w: "Bee", e: "🐝", id: 2},   // Long E (ee)
+        {w: "Leaf", e: "🍃", id: 3}   // Long E (ea)
+    ];
+
+    // Задания для уровня 1 (Аудирование и выбор)
+    const l1Missions = [
+        { word: "Green", opts: ["Green", "Ten"] },  // ee vs short e
+        { word: "Meat", opts: ["Meat", "Met"] },    // ea vs short e
+        { word: "Desk", opts: ["Desk", "Deep"] },   // short e vs ee
+        { word: "Seed", opts: ["Seed", "Set"] },    // ee vs short e
+        { word: "Tea", opts: ["Tea", "Tell"] }      // ea vs short e
+    ];
+
+    // Слова для сборки на уровне 2
+    const l2Words = ["BEE", "LEAF", "BED", "MEAT", "RED"];
+
+    let currentLvl = 0, currentIdx = 0, matches = 0, flipped = [], unscrambleAns = "", l2WordIdx = 0;
+
+    function nextLevel() {
+        document.querySelectorAll('#lvl0, #lvl1, #lvl2, #win').forEach(s => s.classList.add('hidden'));
+        currentLvl++;
+        if(currentLvl === 1) { 
+            document.getElementById('lvl1').classList.remove('hidden'); 
+            document.getElementById('lvl-tag').innerText = "LEVEL 1: HEAR & FIND"; 
+            loadL1(); 
+        } else if(currentLvl === 2) { 
+            document.getElementById('lvl2').classList.remove('hidden'); 
+            document.getElementById('lvl-tag').innerText = "LEVEL 2: SPELL IT"; 
+            loadL2(); 
+        } else { 
+            document.getElementById('win').classList.remove('hidden'); 
+            document.getElementById('lvl-tag').innerText = "MISSION COMPLETE";
+        }
+        document.getElementById('fill').style.width = ((currentLvl / 3) * 100) + "%";
+    }
+
+    function loadL0() {
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        let cards = [...memData, ...memData].sort(() => Math.random() - 0.5);
+        cards.forEach(c => {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.innerHTML = `<div class="card-inner">
+                <div class="face front">Aa Bb Cc</div>
+                <div class="face back">
+                    <span>${c.e}</span><b>${c.w}</b>
+                </div>
+            </div>`;
+            el.onclick = () => {
+                if(flipped.length < 2 && !el.classList.contains('flipped')) {
+                    el.classList.add('flipped');
+                    speak(c.w);
+                    flipped.push({el, c});
+                    if(flipped.length === 2) {
+                        if(flipped[0].c.id === flipped[1].c.id) {
+                            matches++;
+                            flipped = [];
+                            if(matches === memData.length) setTimeout(nextLevel, 1000);
+                        } else {
+                            setTimeout(() => {
+                                flipped.forEach(f => f.el.classList.remove('flipped'));
+                                flipped = [];
+                            }, 1000);
+                        }
+                    }
+                }
+            };
+            grid.appendChild(el);
+        });
+    }
+
+    function loadL1() {
+        if(currentIdx >= l1Missions.length) { nextLevel(); return; }
+        const m = l1Missions[currentIdx];
+        const box = document.getElementById('l1-options');
+        box.innerHTML = '';
+        setTimeout(() => speak(m.word), 400);
+        [...m.opts].sort(() => Math.random() - 0.5).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'hero-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(opt === m.word) {
+                    btn.style.background = 'var(--success)';
+                    btn.style.color = 'white';
+                    btn.classList.add('bounce');
+                    currentIdx++;
+                    setTimeout(loadL1, 900);
+                } else {
+                    btn.style.background = '#ff4b4b';
+                    btn.style.color = 'white';
+                    document.getElementById('academy-card').classList.add('shake');
+                    setTimeout(() => document.getElementById('academy-card').classList.remove('shake'), 300);
+                }
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function playL1Sound() { speak(l1Missions[currentIdx].word); }
+    function playL2Sound() { speak(l2Words[l2WordIdx]); }
+
+    function loadL2() {
+        if(l2WordIdx >= l2Words.length) { nextLevel(); return; }
+        const word = l2Words[l2WordIdx];
+        unscrambleAns = "";
+        document.getElementById('answer-display').innerText = "";
+        setTimeout(() => speak(word), 400);
+        const box = document.getElementById('tile-box');
+        box.innerHTML = '';
+        word.split('').sort(() => Math.random() - 0.5).forEach(char => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.innerText = char;
+            tile.onclick = () => {
+                unscrambleAns += char;
+                document.getElementById('answer-display').innerText = unscrambleAns;
+                tile.style.display = 'none';
+                if(unscrambleAns.length === word.length) {
+                    if(unscrambleAns === word) {
+                        l2WordIdx++;
+                        setTimeout(loadL2, 900);
+                    } else {
+                        alert("TRY AGAIN!");
+                        resetUnscramble();
+                    }
+                }
+            };
+            box.appendChild(tile);
+        });
+    }
+
+    function resetUnscramble() { loadL2(); }
+
+    window.onload = () => { findLinda(); loadL0(); };
+</script>
+
+</body>
+</html>

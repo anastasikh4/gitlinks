@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blox Academy: Starter Unit Obby</title>
+    <style>
+        :root {
+            --rbx-blue: #00a2ff;
+            --rbx-green: #00e676;
+            --rbx-dark: #393b3d;
+            --rbx-bg: #85e3ff;
+            --rbx-silver: #bdc3c7;
+            --rbx-orange: #ff9800;
+        }
+        body {
+            font-family: 'Arial Black', 'Arial Rounded MT Bold', sans-serif;
+            background-color: var(--rbx-bg);
+            background-image: radial-gradient(#ffffff 15%, transparent 15%);
+            background-size: 40px 40px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .game-wrapper {
+            max-width: 650px;
+            width: 100%;
+            background: white;
+            border-radius: 25px;
+            border-bottom: 8px solid var(--rbx-silver);
+            padding: 25px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            background: var(--rbx-dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .img-box {
+            width: 120px;
+            height: 120px;
+            margin: 15px auto;
+            border-radius: 50%;
+            border: 5px solid var(--rbx-silver);
+            background: #f5f6fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mystery-icon { font-size: 60px; }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 12px;
+            border: none;
+            background: var(--rbx-blue);
+            color: white;
+            border-bottom: 5px solid #0076bb;
+            transition: 0.1s;
+            text-align: left;
+            padding-left: 25px;
+        }
+        button:hover { background: #33b5ff; }
+        button:active { transform: translateY(3px); border-bottom-width: 2px; }
+        
+        .feedback {
+            font-size: 22px;
+            height: 35px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            width: 12px; height: 12px;
+            border-radius: 3px;
+            animation: shoot 0.7s ease-out forwards;
+            z-index: 10;
+        }
+        @keyframes shoot {
+            0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) rotate(360deg); opacity: 0; }
+        }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .active { animation: zoomIn 0.3s ease-out; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="game-wrapper" id="stage">
+        <h1 style="color: #333; margin-top:0; font-size: 1.8rem; letter-spacing: 0.5px;">STARTER OBBY: STAGE COMPILER 🛠️</h1>
+        <div class="hud">
+            <span>STAGE: <span id="q-num">1</span>/8</span>
+            <span>XP: <span id="score">0</span></span>
+        </div>
+
+        <div id="game-content" class="active">
+            <h2 id="question-text" style="color: #2c3e50; font-size: 1.35rem; min-height: 60px; line-height: 1.4; padding: 0 10px;">Loading...</h2>
+            <div class="img-box" id="img-container">
+                <span class="mystery-icon" id="mystery">💬</span>
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <div class="btn-grid" id="options"></div>
+        </div>
+
+        <div id="win-screen" style="display:none;">
+            <h2 style="font-size: 38px; color: var(--rbx-green); margin-bottom: 10px;">STAGE COMPLETE! 🏆</h2>
+            <p style="font-size: 20px; color: #555; margin-bottom: 25px;">You solved all Starter Unit tasks perfectly!</p>
+            <button onclick="location.reload()" style="background: var(--rbx-green); border-bottom-color: #00a354; text-align: center; padding-left: 15px; width: 100%;">PLAY AGAIN</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentIdx = 0;
+
+    // Данные полностью воссоздают задания №3 и №4 из вашего файла
+    const missionData = [
+        /* EXERCISE 3: READ AND CHOOSE */
+        { q: ":<br>1. What's your name?", icon: "👋", options: ["a) Hello, Harry.", "b) I'm Emma."], ans: "b) I'm Emma." },
+        { q: ":<br>2. Who's this?", icon: "🕵️‍♂️", options: ["a) This is Erlina.", "b) This is a ball."], ans: "a) This is Erlina." },
+        { q: ":<br>3. How old are you?", icon: "🎂", options: ["a) Oh, that's Alvin.", "b) I'm ten."], ans: "b) I'm ten." },
+        { q: ":<br>4. Hi, I'm Steve.", icon: "🧑", options: ["a) Hello!", "b) This is Steve."], ans: "a) Hello!" },
+        
+        /* EXERCISE 4: READ AND COMPLETE THE DIALOGUE */
+        { q: ":<br>Bob: Hi, I'm Bob! 1) What's your name?<br>Tom: 2) __________, I'm Tom! Nice to meet you.", icon: "📝", options: ["Hi", "How", "I'm"], ans: "Hi" },
+        { q: ":<br>Tom: Hi, I'm Tom!<br>Bob: 3) __________ old are you?", icon: "📝", options: ["What's", "How", "I'm"], ans: "How" },
+        { q: ":<br>Bob: How old are you?<br>Tom: 4) __________ nine.", icon: "📝", options: ["I'm", "Hi", "What's"], ans: "I'm" },
+        { q: ": 'What's your name?' — ", icon: "🏁", options: ["I'm Tom!", "This is a ball."], ans: "I'm Tom!" }
+    ];
+
+    function triggerSalute() {
+        const stage = document.getElementById('stage');
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const colors = ['#00a2ff', '#00e676', '#ff9800'];
+            p.style.background = colors[Math.floor(Math.random()*3)];
+            p.style.left = '50%';
+            p.style.top = '45%';
+            p.style.setProperty('--x', (Math.random()-0.5)*500 + 'px');
+            p.style.setProperty('--y', (Math.random()-0.5)*500 + 'px');
+            stage.appendChild(p);
+            setTimeout(() => p.remove(), 700);
+        }
+    }
+
+    function loadQuestion() {
+        if (currentIdx >= missionData.length) {
+            document.getElementById('game-content').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+            return;
+        }
+
+        const data = missionData[currentIdx];
+        document.getElementById('q-num').innerText = currentIdx + 1;
+        document.getElementById('question-text').innerHTML = data.q;
+        document.getElementById('mystery').innerText = data.icon;
+
+        document.getElementById('feedback').innerText = "";
+        const optContainer = document.getElementById('options');
+        optContainer.innerHTML = "";
+
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt);
+            optContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected) {
+        const data = missionData[currentIdx];
+        const fb = document.getElementById('feedback');
+        
+        if (selected === data.ans) {
+            score += 100;
+            document.getElementById('score').innerText = score;
+            fb.style.color = "var(--rbx-green)";
+            fb.innerText = "⭐ SUCCESS! +100 XP";
+            triggerSalute();
+            currentIdx++;
+            setTimeout(loadQuestion, 1100);
+        } else {
+            fb.style.color = "var(--rbx-orange)";
+            fb.innerText = "OOF! TRY AGAIN ❌";
+        }
+    }
+
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
