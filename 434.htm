@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>F1 PADDOCK RACE · Language Grand Prix A1-A2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0b0c10;
+      background-image: radial-gradient(circle at 20% 10%, #1f2833 5%, #0b0c10 80%);
+      font-family: 'Raleway', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #c5a059;
+    }
+    .game-ui {
+      max-width: 750px;
+      width: 100%;
+      background: rgba(26, 38, 57, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 3px solid #e10600;
+      box-shadow: 0 0 50px rgba(225, 6, 0, 0.3), inset 0 0 30px rgba(0,0,0,0.6);
+      border-radius: 40px;
+      padding: 24px 28px 30px;
+    }
+    .dmc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #e10600;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: #e10600;
+      text-shadow: 0 0 15px rgba(225, 6, 0, 0.6);
+      letter-spacing: 2px;
+      font-weight: 900;
+    }
+    .style-meter {
+      background: #0f172a;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      color: #00f2fe;
+      font-size: 1.3rem;
+      border: 2px solid #e10600;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .quest-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #e10600;
+      border-radius: 30px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      color: #00f2fe;
+      margin-bottom: 12px;
+      border-left: 10px solid #e10600;
+      padding-left: 18px;
+      display: inline-block;
+      font-weight: 900;
+    }
+    .question-area {
+      background: #0f172a;
+      border-radius: 25px;
+      padding: 25px 20px;
+      margin: 20px 0;
+      border: 2px solid #334155;
+      transition: all 0.3s;
+    }
+    .question-image {
+      width: 100%;
+      max-width: 400px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      border: 2px solid #e10600;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .options-grid {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .word-btn {
+      background: #1e293b;
+      border: 2px solid #475569;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 120px;
+    }
+    .word-btn:hover {
+      background: #334155;
+      border-color: #00f2fe;
+    }
+    .word-btn.correct-glow {
+      background: #2ecc71 !important;
+      color: #ffffff !important;
+      border-color: #fff !important;
+      box-shadow: 0 0 25px #2ecc71;
+      pointer-events: none;
+    }
+    .word-btn.wrong-shake {
+      animation: shake 0.25s ease-in-out;
+      background: #7f1d1d !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+      pointer-events: none;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+    .feedback-msg {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 18px 0 10px;
+      min-height: 2.5rem;
+    }
+    .progress-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    .red-orb {
+      width: 14px;
+      height: 14px;
+      background: #e10600;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #e10600;
+      transition: all 0.3s;
+    }
+    .next-btn {
+      background: #e10600;
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 14px 35px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #990400;
+      margin-top: 12px;
+      transition: 0.1s;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .next-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #5f0300;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .restart-link {
+      font-size: 0.95rem;
+      color: #00f2fe;
+      cursor: pointer;
+      margin-left: 15px;
+      text-decoration: underline;
+    }
+    .reading-text {
+      background: #020617;
+      padding: 15px;
+      border-left: 4px solid #00f2fe;
+      margin: 15px 0;
+      font-style: italic;
+      text-align: left;
+      border-radius: 0 10px 10px 0;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+    .mission-label {
+      font-size: 0.9rem;
+      color: #ff4d4d;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+    }
+  </style>
+</head>
+<body>
+<div class="game-ui">
+  <div class="dmc-header">
+    <span class="logo">🏁 F1 ACADEMY</span>
+    <div class="style-meter">⚡ TELEMETRY: OK</div>
+  </div>
+
+  <div class="quest-card" id="mainQuest">
+    <div id="missionTag" class="mission-label"></div>
+    <h2 id="questTitle">LAP LOG</h2>
+    <div id="questionArea" class="question-area"></div>
+    <div id="feedbackMsg" class="feedback-msg"></div>
+    <div class="progress-indicator" id="progressOrbs"></div>
+    <button id="nextBtn" class="next-btn hidden">NEXT LAP ▶</button>
+    <span class="restart-link" id="restartAll">↻ restart grand prix</span>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const allQuestions = [
+      { type: 'vocab', img: "https://avatars.mds.yandex.net/i?id=0f957ba96e35f555b8ac56a06fd4806e_l-5865919-images-thumbs&n=13", word: "uniforms", fakes: ["uniformes", "unforms", "uniforins"], title: "🏎️ PIT LANE TECH", mission: "VOCABULARY" },
+      { type: 'vocab', img: "https://i.pinimg.com/originals/3d/9b/b4/3d9bb48df5e5cd29cae60bce8c88d37e.jpg?nii=t", word: "headphones", fakes: ["headfones", "headphons", "hedphones"], title: "🏎️ PIT LANE TECH", mission: "VOCABULARY" },
+      { type: 'vocab', img: "https://yandex-images.clstorage.net/c9TzD7370/c950f5SdP/XvSJ0qPHatwR_PVjcXwaFCU88aSKMqSjfD__riCAu8DtP9JlNRpJyeH1O_6B1Tpnj0eqlua8ocyLmKP9NMkvJjvxzMP-0hPAEeikT1hMciRlacHRhmesx2wim54wdRoJDaZK1fmyxAgJiHbTiMCWnp7efvu-IHllxzVyhZikzhtKqEXex7OHzBHkNFNZVC48ocVtqK5PSKZQv97TLAVCAWGOYtF9pjDgcQTDwxQoKoOONk6niuh9hWeJGulskMqjApwB4q-vZ7RFJDx3sTz2zJ1BiUDGb_CKxCvyc-iRbpmVyr6hlVaQ7C38Y9-gUA7rOrpy94qEIYkPnUIZaOiGowY4meYP02M8vahoUw00LjABuVWofgvQ7hQX5pMYSXLBDTqyQdl2xMjl3E-3hNROt9peNgvuFIH1o52u2WzoXneW-MUyBy8_2HHkvGPFKIq0NQWBoALnNJqI13qHUD1-6QWeYgGRGnQQpUzvS3iATodWBjp7HhBxUdclziVcKCpHYmABYoe3v9DliBwXITAWpB2RKbSmt6AqvPtCxxw1el3BmppBZc70PLk8X6tEnF67Klpao_5UiS1rVZp5oPACQwL86aLPzwdgbcAg8wlcZqyR6Z3UltfUkrAnin8UqW4hUXqyARU-ZODVJD-ziNx2-zpG2jsO_J2Zjx0GPQjEpusW7AXGR4cffK1oePOdtLaouTX1EIJnfNbYw0L_QDECST3uevm1chCgAahPNwzQvou-HsoLInDJ7Tflml0o4AKXhjgVFrPbZ3hpSIzzuWwqAKUV8SCmK_CCQIeOD-DdJqFVqnZ99dbMxPVYs19csDrbvpoOtyIgbd3LkS6ZUDz6-x4QmYaTq7fsKSCg89Ugjox5Ec3MdgfEMqQ_9vNkybZpHYIKZRE29AyNuD9fRMjOZyZWtjvShBnVU6Fqveg4SkvuoAXGg4fvUKng4PMdfA7c6b2JpBLHxKZQl8J31Jk4", word: "bottles", fakes: ["botles", "bootles", "bottels"], title: "🏎️ PIT LANE TECH", mission: "VOCABULARY" },
+      
+      { type: 'grammar', title: "📊 LOGISTICS CONTROL", mission: "GRAMMAR CHECK",
+        text: 'Does the team need ______ more gas?', options: ['some', 'any'], correct: 'any',
+        secondText: 'No, they ______', secondOptions: ["don't", "doesn't"], secondCorrect: "don't" },
+      { type: 'grammar', title: "📊 LOGISTICS CONTROL", mission: "GRAMMAR CHECK",
+        text: 'The crew can see ______ water on the track surface.', options: ['much', 'many'], correct: 'much', secondText: null },
+      { type: 'grammar', title: "📊 LOGISTICS CONTROL", mission: "GRAMMAR CHECK",
+        text: 'There are ______ mechanics standing inside the garage.', options: ['much', 'many'], correct: 'many', secondText: null },
+      
+      { type: 'reading', title: "📜 STEWARDS JOURNAL", mission: "DATA DECODE",
+        story: 'The drivers are in the paddock. They are not sitting down right now. They are all standing and looking at the camera.',
+        question: 'Are the drivers sitting?', options: ['Yes, they are.', "No, they aren't."], correct: "No, they aren't." },
+      { type: 'reading', title: "📜 STEWARDS JOURNAL", mission: "DATA DECODE",
+        story: 'The drivers are serious. There is no music. There is much light from the stadium lamps.',
+        question: 'The drivers are laughing and joking.', options: ['True', 'False'], correct: 'False' }
+    ];
+
+    let currentIdx = 0;
+
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+    function initGame() {
+        currentIdx = 0;
+        document.getElementById('restartAll').onclick = initGame;
+        document.getElementById('nextBtn').onclick = () => { currentIdx++; renderStage(); };
+        renderStage();
+    }
+
+    function renderStage() {
+        const fb = document.getElementById('feedbackMsg');
+        const next = document.getElementById('nextBtn');
+        fb.innerText = "";
+        fb.style.color = "inherit";
+        next.classList.add('hidden');
+
+        if(currentIdx >= allQuestions.length) {
+            document.getElementById('missionTag').innerText = "FINISH";
+            document.getElementById('questTitle').innerText = "🏆 P1 CHAMPION!";
+            document.getElementById('questionArea').innerHTML = "<p style='font-size:1.5rem; text-align:center; color: #2ecc71; font-weight: bold;'>CHEQUERED FLAG! All paddock systems are operational.</p>";
+            return;
+        }
+
+        const q = allQuestions[currentIdx];
+        document.getElementById('missionTag').innerText = q.mission;
+        document.getElementById('questTitle').innerText = q.title;
+
+        const area = document.getElementById('questionArea');
+        area.innerHTML = "";
+
+        const orbs = document.getElementById('progressOrbs');
+        orbs.innerHTML = "";
+        for(let i=0; i<allQuestions.length; i++) {
+            const orb = document.createElement('span');
+            orb.className = "red-orb";
+            orb.style.opacity = i <= currentIdx ? "1" : "0.25";
+            orbs.appendChild(orb);
+        }
+
+        if(q.type === 'vocab') {
+            area.innerHTML = `<img src="${q.img}" class="question-image" alt="target"><br><p style='font-size:1.15rem; margin-bottom:15px; font-weight: bold;'>Identify the correct spelling from the telemetry board:</p>`;
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+            shuffle([q.word, ...q.fakes]).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === q.word) {
+                        btn.classList.add('correct-glow');
+                        fb.innerText = "🟢 TELEMETRY SYNCED!";
+                        fb.style.color = "#2ecc71";
+                        next.classList.remove('hidden');
+                    } else {
+                        btn.classList.add('wrong-shake');
+                        setTimeout(() => btn.classList.remove('wrong-shake'), 300);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if(q.type === 'grammar') {
+            area.innerHTML = `<p style='font-size:1.3rem; margin-bottom:15px; line-height: 1.4;'>${q.text.replace('______', '<u>???</u>')}</p>`;
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === q.correct) {
+                        btn.classList.add('correct-glow');
+                        if(q.secondText) {
+                            const nextStep = document.createElement('div');
+                            nextStep.innerHTML = `<p style='font-size:1.3rem; margin:25px 0 15px;'>${q.secondText.replace('______', '<u>???</u>')}</p>`;
+                            const nextGrid = document.createElement('div');
+                            nextGrid.className = 'options-grid';
+                            q.secondOptions.forEach(sOpt => {
+                                const sBtn = document.createElement('button');
+                                sBtn.className = 'word-btn';
+                                sBtn.innerText = sOpt;
+                                sBtn.onclick = () => {
+                                    if(sOpt === q.secondCorrect) {
+                                        sBtn.classList.add('correct-glow');
+                                        fb.innerText = "🟢 LAP VALIDATED!";
+                                        fb.style.color = "#2ecc71";
+                                        next.classList.remove('hidden');
+                                    } else {
+                                        sBtn.classList.add('wrong-shake');
+                                        setTimeout(() => sBtn.classList.remove('wrong-shake'), 300);
+                                    }
+                                };
+                                nextGrid.appendChild(sBtn);
+                            });
+                            nextStep.appendChild(nextGrid);
+                            area.appendChild(nextStep);
+                        } else {
+                            fb.innerText = "🟢 LAP VALIDATED!";
+                            fb.style.color = "#2ecc71";
+                            next.classList.remove('hidden');
+                        }
+                    } else {
+                        btn.classList.add('wrong-shake');
+                        setTimeout(() => btn.classList.remove('wrong-shake'), 300);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if(q.type === 'reading') {
+            area.innerHTML = `<div class='reading-text'>${q.story}</div><p style='font-size:1.2rem; margin:15px 0; font-weight: bold;'>${q.question}</p>`;
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === q.correct) {
+                        btn.classList.add('correct-glow');
+                        fb.innerText = "🟢 SIGNAL CONFIRMED!";
+                        fb.style.color = "#00f2fe";
+                        next.classList.remove('hidden');
+                    } else {
+                        btn.classList.add('wrong-shake');
+                        setTimeout(() => btn.classList.remove('wrong-shake'), 300);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+    }
+
+    window.onload = initGame;
+  })();
+</script>
+</body>
+</html>

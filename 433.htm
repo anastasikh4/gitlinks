@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Racing Quiz: A2 English Level</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-blue: #00f2fe;
+            --correct-green: #2ecc71;
+            --wrong-red: #e74c3c;
+            --bg-dark: #0a0a0a;
+            --card-bg: #151515;
+            --text-main: #ffffff;
+            --quest-gold: #ffcc00;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .score-tracker {
+            position: sticky;
+            top: 0;
+            background: rgba(10, 10, 10, 0.95);
+            padding: 15px;
+            border-bottom: 2px solid var(--f1-red);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            z-index: 100;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(225, 6, 0, 0.2);
+            letter-spacing: 1px;
+        }
+
+        .mission-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(225, 6, 0, 0.3);
+        }
+
+        h1, h2 { 
+            text-transform: uppercase; 
+            text-align: center; 
+            margin: 10px 0; 
+            letter-spacing: 1px;
+        }
+        
+        h1 {
+            color: var(--f1-red);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+        }
+
+        .quest-box {
+            border-bottom: 1px solid #333;
+            padding: 25px 0;
+        }
+
+        .image-box {
+            width: 100%;
+            max-width: 450px;
+            height: 240px;
+            object-fit: cover;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .variant-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .variant-btn {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .variant-btn:hover {
+            border-color: var(--f1-blue);
+            background: #2a2a2a;
+        }
+
+        /* Success/Fail States */
+        .variant-btn.correct { background-color: var(--correct-green) !important; border-color: white; color: white; }
+        .variant-btn.wrong { background-color: var(--wrong-red) !important; opacity: 0.7; color: white; }
+
+        .reading-text {
+            background: #000;
+            padding: 15px;
+            border-left: 4px solid var(--f1-blue);
+            margin: 10px 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="score-tracker">
+    RACE REPORT: <span id="score">0</span> / 8 LAPS | RANK: <span id="rank" style="color: var(--f1-red)">BEGINNER DRIVER</span>
+</div>
+
+<div class="mission-container">
+    <h1>F1 Paddock A2 Level Challenge</h1>
+
+    <!-- Q1: Much/Many (Uncountable) -->
+    <div class="quest-box">
+        <h2>Lap 01: In the Garage</h2>
+        <img src="https://i.pinimg.com/736x/05/89/b3/0589b3bb3ac721d2816f687c3fe74c53.jpg" class="image-box" alt="F1 Mechanic">
+        <p style="text-align:center; font-size:1.1rem;"><b>"He can see ______ water on the floor."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">MUCH</button>
+            <button class="variant-btn" onclick="check(this, false)">MANY</button>
+            <button class="variant-btn" onclick="check(this, false)">NOT</button>
+        </div>
+    </div>
+
+    <!-- Q2: Basic Adjectives -->
+    <div class="quest-box">
+        <h2>Lap 02: Team Meeting</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"The drivers are not laughing. They are very ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">LIGHT</button>
+            <button class="variant-btn" onclick="check(this, true)">SERIOUS</button>
+            <button class="variant-btn" onclick="check(this, false)">DARK</button>
+        </div>
+    </div>
+
+    <!-- Q3: Basic Nouns -->
+    <div class="quest-box">
+        <h2>Lap 03: Radio Check</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"The mechanic has ______ on his head to hear the driver."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">UNIFORMS</button>
+            <button class="variant-btn" onclick="check(this, false)">BOTTLES</button>
+            <button class="variant-btn" onclick="check(this, true)">HEADPHONES</button>
+        </div>
+    </div>
+
+    <!-- Q4: Actions (Sitting/Standing) -->
+    <div class="quest-box">
+        <h2>Lap 04: Pit Stop Team</h2>
+        <img src="https://thumbs.dreamstime.com/b/team-ferrari-f1-engineers-38242404.jpg" class="image-box" alt="F1 Team">
+        <p style="text-align:center; font-size:1.1rem;"><b>"The workers are not sitting down. They are ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">STANDING</button>
+            <button class="variant-btn" onclick="check(this, false)">SITTING</button>
+            <button class="variant-btn" onclick="check(this, false)">DRIVE</button>
+        </div>
+    </div>
+
+    <!-- Q5: Plural Countable Nouns -->
+    <div class="quest-box">
+        <h2>Lap 05: Drinks Zone</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"There are many ______ of juice on the table."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">UNIFORMS</button>
+            <button class="variant-btn" onclick="check(this, true)">BOTTLES</button>
+            <button class="variant-btn" onclick="check(this, false)">LIGHT</button>
+        </div>
+    </div>
+
+    <!-- Q6: Simple Reading Logic -->
+    <div class="quest-box">
+        <h2>Lap 06: Weather Report</h2>
+        <div class="reading-text">"The rain stopped two minutes ago. The sky is bright now. There is much light!"</div>
+        <p style="text-align:center; font-size:1.1rem;"><b>How is the sky now?</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">IT IS DARK</button>
+            <button class="variant-btn" onclick="check(this, true)">THERE IS MUCH LIGHT</button>
+        </div>
+    </div>
+
+    <!-- Q7: Negative Markers -->
+    <div class="quest-box">
+        <h2>Lap 07: Camera Check</h2>
+        <p style="text-align:center; font-size:1.1rem;"><b>"The manager is ______ looking at the camera right now."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">NOT</button>
+            <button class="variant-btn" onclick="check(this, false)">MUCH</button>
+            <button class="variant-btn" onclick="check(this, false)">MANY</button>
+        </div>
+    </div>
+
+    <!-- Q8: A2 Grammar (Don't vs Doesn't) -->
+    <div class="quest-box" style="border: 2px solid var(--f1-red); padding: 20px; background: #1a0202; border-radius: 8px;">
+        <h2 style="color: var(--quest-gold);">🏎️ FINAL LAP: GRID CHAMPION</h2>
+        <img src="https://sun9-2.userapi.com/SBHyrssSOPyufdRCVM1LRQ51YRnJigmgniUwBA/TuXpKcWqUYg.jpg" class="image-box" alt="Racing Car">
+        <p style="text-align:center; font-size:1.1rem;"><b>"They usually ______ use a lot of gas during the race."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">DON'T</button>
+            <button class="variant-btn" onclick="check(this, false)">DOESN'T</button>
+            <button class="variant-btn" onclick="check(this, false)">NOT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let points = 0;
+
+    function check(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        
+        if (isCorrect) {
+            if(!btn.classList.contains('correct')) {
+                btn.classList.add('correct');
+                points++;
+                updateScore();
+            }
+        } else {
+            btn.classList.add('wrong');
+        }
+        
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+    }
+
+    function updateScore() {
+        document.getElementById('score').innerText = points;
+        let rank = "BEGINNER DRIVER";
+        if (points >= 3) rank = "JUNIOR RACER";
+        if (points >= 5) rank = "SPEED CONTENDER";
+        if (points >= 7) rank = "PRO DRIVER";
+        if (points === 8) rank = "🏆 P1 CHIEF CHAMPION";
+        
+        document.getElementById('rank').innerText = rank;
+    }
+</script>
+
+</body>
+</html>
