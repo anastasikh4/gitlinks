@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Starlight: 10-Step Grammar Mission 🌟</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #eefbf2 0%, #d7ffb8 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 15px;
+        }
+        .app { max-width: 600px; width: 100%; }
+        .card { 
+            background: white; 
+            padding: 35px; 
+            border-radius: 40px; 
+            border: 8px solid #58cc02; 
+            box-shadow: 0 15px 0 #46a302; 
+            text-align: center; 
+            position: relative;
+        }
+        .progress-container { width: 100%; height: 12px; background: #f3f4f6; border-radius: 10px; margin-bottom: 25px; overflow: hidden; border: 1px solid #e5e7eb; }
+        .progress-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.4s; }
+        
+        .visual { font-size: 4.5rem; margin-bottom: 15px; display: block; }
+        .prompt { font-size: 1.4rem; font-weight: 700; margin-bottom: 25px; color: #0f172a; line-height: 1.5; }
+        
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .btn { 
+            background: #fffcf2; border: 3px solid #bdf096; border-radius: 20px; padding: 18px; 
+            font-size: 1.2rem; font-weight: 700; color: #3d7a0a; cursor: pointer; transition: 0.2s;
+            font-family: inherit; outline: none;
+        }
+        .btn:hover:not(:disabled) { background: #f4fbf0; transform: translateY(-3px); }
+        
+        .btn.correct { background: #4def8d !important; border-color: #22c55e !important; color: #14532d !important; }
+        .btn.wrong { background: #fff3cd !important; border-color: #f39c12 !important; color: #b45309 !important; }
+
+        #winScreen { display: none; }
+        .score-box { font-weight: bold; font-size: 1.1rem; color: #3d7a0a; margin-bottom: 10px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="card" id="quizCard">
+        <div id="gamePlay">
+            <div class="score-box">Grammar Stars: <span id="scoreText">0</span></div>
+            <div class="progress-container"><div class="progress-fill" id="pFill"></div></div>
+            
+            <span class="visual" id="visualBox">🏠</span>
+            <div class="prompt" id="promptText">Loading...</div>
+            <div class="options" id="optionsBox"></div>
+        </div>
+
+        <div id="winScreen">
+            <span class="visual">🏆🎉</span>
+            <h2 style="font-size: 2.2rem; color: #3d7a0a; margin-bottom: 15px;">MISSION ACCOMPLISHED!</h2>
+            <p id="finalScore" style="font-size: 1.2rem; color: #64748b; margin-bottom: 25px;"></p>
+            <button class="btn" onclick="location.reload()" style="width: 100%; background: #58cc02; color: white; border-color: #46a302;">RESTART HUNT</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Массив расширен до 10 вопросов на базе правил: a/an, some/any, there is/there are
+    const questions = [
+        { v: "🔥🛋️", q: "There is ________ fireplace in the living room.", a: ["a", "an"], c: "a" },
+        { v: "🛋️✨", q: "There are ________ cushions on the sofa.", a: ["any", "some"], c: "some" },
+        { v: "🖼️❌", q: "There aren't ________ paintings on the wall.", a: ["some", "any"], c: "any" },
+        { v: "🪑☕", q: "There's ________ armchair opposite the coffee table.", a: ["an", "a"], c: "an" },
+        { v: "🪑❌", q: "There aren't ________ chairs in the dining room.", a: ["any", "a"], c: "any" },
+        { v: "👗🚪", q: "There is ________ wardrobe in the bedroom.", a: ["an", "a"], c: "a" },
+        { v: "🪟✨", q: "There is ________ big window in the kitchen.", a: ["a", "an"], c: "a" },
+        { v: "🪑❓", q: "Are there ________ books on the desk?", a: ["some", "any"], c: "any" },
+        { v: "🧸床", q: "There are ________ toys on the bed.", a: ["any", "some"], c: "some" },
+        { v: "🍎❌", q: "There isn't ________ apple on the table.", a: ["an", "a"], c: "an" }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        if (current >= questions.length) {
+            document.getElementById('gamePlay').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            document.getElementById('pFill').style.width = '100%';
+            document.getElementById('finalScore').innerText = `You earned ${score} grammar stars! You solved all 10 house structure tasks perfectly!`;
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('visualBox').innerText = data.v;
+        document.getElementById('promptText').innerText = `${current + 1}. ${data.q}`;
+        
+        const box = document.getElementById('optionsBox');
+        box.innerHTML = '';
+        
+        data.a.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => verify(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function verify(choice, btnElement) {
+        const data = questions[current];
+        const buttons = document.querySelectorAll('.btn');
+
+        if (choice === data.c) {
+            buttons.forEach(b => b.disabled = true);
+            btnElement.classList.add('correct');
+            score += 100;
+            document.getElementById('scoreText').innerText = score;
+            setTimeout(() => {
+                current++;
+                loadQuestion();
+            }, 850);
+        } else {
+            btnElement.classList.add('wrong');
+            setTimeout(() => {
+                btnElement.classList.remove('wrong');
+            }, 800);
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
+

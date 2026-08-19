@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛏️ Minecraft · Starter Units Obby</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+        }
+        body {
+            background: #2d2d2d;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            max-width: 720px;
+            width: 100%;
+            background: #4a4a4a;
+            border-radius: 16px;
+            padding: 24px 22px 32px;
+            border: 4px solid #6b6b6b;
+            box-shadow: inset 0 -6px 0 #2d2d2d, 0 8px 0 #1a1a1a;
+        }
+        .quest-header {
+            background: #6b6b6b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-bottom: 6px solid #3d3d3d;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .quest-badge {
+            background: #f9c74f;
+            padding: 4px 14px;
+            font-weight: 900;
+            color: #1a1a1a;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border-bottom: 4px solid #b38a2a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quest-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 0 #1a1a1a;
+        }
+        .can-badge {
+            margin-left: auto;
+            background: #58cc02;
+            color: #1a1a1a;
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            border-bottom: 4px solid #2d7a0a;
+        }
+
+        .mine-block {
+            background: #6b6b6b;
+            border-radius: 8px;
+            padding: 20px;
+            border-bottom: 6px solid #3d3d3d;
+            margin-bottom: 18px;
+        }
+        .mine-block p {
+            color: #f0f0f0;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .option-btn {
+            background: #8b8b8b;
+            border: none;
+            border-bottom: 6px solid #4d4d4d;
+            border-radius: 8px;
+            padding: 16px 12px;
+            font-weight: 800;
+            color: #f0f0f0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            text-align: center;
+        }
+        .option-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn.correct {
+            background: #58cc02 !important;
+            border-bottom-color: #2d7a0a !important;
+        }
+        .option-btn.wrong {
+            background: #f9c74f !important;
+            border-bottom-color: #b38a2a !important;
+            color: #1a1a1a !important;
+        }
+
+        .feedback-area {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #3d3d3d;
+            border-radius: 8px;
+            border-left: 6px solid #f9c74f;
+            color: #f0f0f0;
+            font-weight: 600;
+            min-height: 60px;
+            text-shadow: 1px 1px 0 #1a1a1a;
+        }
+
+        .img-preview {
+            background: #3d3d3d;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid #6b6b6b;
+            margin: 12px 0;
+            font-size: 3rem;
+        }
+
+        .progress-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0 6px;
+        }
+        .progress-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: #4d4d4d;
+            border-bottom: 3px solid #2d2d2d;
+        }
+        .progress-dot.done { background: #58cc02; }
+        .progress-dot.active { background: #f9c74f; border-bottom-color: #b38a2a; }
+
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #6b6b6b;
+            border: none;
+            border-bottom: 6px solid #3d3d3d;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 800;
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: 0.05s linear;
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: #f9c74f;
+            border-bottom-color: #b38a2a;
+            color: #1a1a1a;
+        }
+        .tab-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .grammar-select {
+            font-family: 'Courier New', monospace;
+            font-weight: 800;
+            padding: 4px 8px;
+            background: #3d3d3d;
+            color: #fff;
+            border: 2px solid #6b6b6b;
+            border-radius: 4px;
+            font-size: 1.1rem;
+        }
+        .grammar-select.correct-select { background: #2d7a0a !important; }
+        .grammar-select.wrong-select { background: #b38a2a !important; color: #1a1a1a; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="quest-header">
+        <span class="quest-badge">🏠 LEVEL UP</span>
+        <span class="quest-title">Starter Unit Tasks</span>
+        <span class="can-badge">MINECRAFT</span>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab1" id="tab1Btn">🔗 1. Choose Word</button>
+        <button class="tab-btn" data-tab="tab2" id="tab2Btn" disabled>🎒 2. Inventory</button>
+        <button class="tab-btn" data-tab="tab3" id="tab3Btn" disabled>📝 3. Dialogue</button>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+        <div class="img-preview">🕵️‍♂️</div>
+        <div id="matchArea" class="mine-block"></div>
+        <div class="feedback-area" id="matchFeedback">⚡ Select the block with the correct grammar form.</div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="img-preview">🎒</div>
+        <div id="inventoryArea" class="mine-block"></div>
+        <div class="feedback-area" id="inventoryFeedback">⚡ Pick the correct have/has/haven't/hasn't word.</div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div class="img-preview">📝</div>
+        <div class="mine-block">
+            <p>
+                Katy: Hi, there! <select id="dial-q1" class="grammar-select"><option value="">?</option><option value="this">this</option><option value="together">together</option></select> is my friend, Paul.<br>
+                Matt: <select id="dial-q2" class="grammar-select"><option value="">?</option><option value="Hi">Hi</option><option value="nice">nice</option></select> to meet you, Paul. I'm Matt.<br>
+                Katy: Matt is my best friend. We go to school <select id="dial-q3" class="grammar-select"><option value="">?</option><option value="together">together</option><option value="go">go</option></select>.<br>
+                Paul: Do you like films, Matt?<br>
+                Matt: Yes, I <select id="dial-q4" class="grammar-select"><option value="">?</option><option value="love">love</option><option value="nice">nice</option></select> films!<br>
+                Katy: Cool. Would you like to come to the cinema with us? We often <select id="dial-q5" class="grammar-select"><option value="">?</option><option value="go">go</option><option value="this">this</option></select> there at the weekend.
+            </p>
+            <button onclick="checkDialogue()" style="margin-top:15px; width:100%;" class="option-btn">Submit Dialogue Box</button>
+        </div>
+        <div class="feedback-area" id="dialogueFeedback">⚡ Fill in the text stream from the command box options.</div>
+    </div>
+
+    <div class="progress-indicator" id="progressOrbs"></div>
+</div>
+
+<script>
+  (function() {
+    const matchTasks = [
+        { q: "1. This is ______ aunt.", opts: ["our", "we"], ans: "our" },
+        { q: "2. Is this ______ bag?", opts: ["Ann", "Ann's"], ans: "Ann's" },
+        { q: "3. This is ______ apple.", opts: ["a", "an"], ans: "an" },
+        { q: "4. ______ is Mary.", opts: ["She", "Her"], ans: "She" },
+        { q: "5. Bob is ______ brother.", opts: ["he", "his"], ans: "his" }
+    ];
+
+    const invTasks = [
+        { q: "Slava ______ got a skateboard, but he hasn't got a camera, and a watch.", opts: ["have", "has", "haven't", "hasn't"], ans: "has" },
+        { q: "Anya ______ got a poster and a football.", opts: ["has", "have", "hasen't", "haven't"], ans: "has" },
+        { q: "But Slava ______ got any watches.", opts: ["have", "has", "haven't", "hasn't"], ans: "hasn't" },
+        { q: "Anya ______ got a stereo.", opts: ["have", "haves", "haven't", "hasn't"], ans: "hasn't" },
+        { q: "They ______ got a poster.", opts: ["have", "has", "haven't", "hasn't"], ans: "have" },
+        { q: "But they ______ got a camera.", opts: ["have", "has", "haven't", "hasn't"], ans: "haven't" }
+    ];
+
+    let matchIdx = 0;
+    let invIdx = 0;
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabs = document.querySelectorAll('.tab-content');
+
+    function switchTab(tabId) {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        switchTab(btn.dataset.tab);
+        if (btn.dataset.tab === 'tab2') loadInventoryTask();
+        if (btn.dataset.tab === 'tab3') renderDialogueDots();
+      });
+    });
+
+    function loadMatchTask() {
+        const area = document.getElementById('matchArea');
+        area.innerHTML = "";
+        if(matchIdx >= matchTasks.length) {
+            area.innerHTML = "<p>🎉 STAGE 1 COMPLETE!<br>Opening Inventory...</p>";
+            document.getElementById('tab2Btn').removeAttribute('disabled');
+            switchTab('tab2');
+            loadInventoryTask();
+            return;
+        }
+        const task = matchTasks[matchIdx];
+        const p = document.createElement('p');
+        p.innerHTML = task.q;
+        area.appendChild(p);
+        const grid = document.createElement('div');
+        grid.className = 'option-grid';
+        task.opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(opt === task.ans) {
+                    btn.classList.add('correct');
+                    document.getElementById('matchFeedback').innerText = "⛏️ BLOCK SECURED! Telemetry synced.";
+                    matchIdx++;
+                    setTimeout(loadMatchTask, 1000);
+                } else {
+                    btn.classList.add('wrong');
+                    document.getElementById('matchFeedback').innerText = "OOF! Try another block. 👍";
+                    setTimeout(() => btn.classList.remove('wrong'), 600);
+                }
+            };
+            grid.appendChild(btn);
+        });
+        area.appendChild(grid);
+        renderDots(matchTasks.length, matchIdx);
+    }
+
+    function loadInventoryTask() {
+        const area = document.getElementById('inventoryArea');
+        area.innerHTML = "";
+        if(invIdx >= invTasks.length) {
+            area.innerHTML = "<p>🎉 STAGE 2 COMPLETE!<br>Opening Dialogue...</p>";
+            document.getElementById('tab3Btn').removeAttribute('disabled');
+            switchTab('tab3');
+            renderDialogueDots();
+            return;
+        }
+        const task = invTasks[invIdx];
+        const p = document.createElement('p');
+        p.innerHTML = task.q;
+        area.appendChild(p);
+        const grid = document.createElement('div');
+        grid.className = 'option-grid';
+        task.opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(opt === task.ans) {
+                    btn.classList.add('correct');
+                    document.getElementById('inventoryFeedback').innerText = "⛏️ CHEST LOG LOCKED! Inventory synced.";
+                    invIdx++;
+                    setTimeout(loadInventoryTask, 1000);
+                } else {
+                    btn.classList.add('wrong');
+                    document.getElementById('inventoryFeedback').innerText = "Check have/has/haven't/hasn't again. 👍";
+                    setTimeout(() => btn.classList.remove('wrong'), 600);
+                }
+            };
+            grid.appendChild(btn);
+        });
+        area.appendChild(grid);
+        renderDots(invTasks.length, invIdx);
+    }
+
+    window.checkDialogue = function() {
+        const d1 = document.getElementById('dial-q1');
+        const d2 = document.getElementById('dial-q2');
+        const d3 = document.getElementById('dial-q3');
+        const d4 = document.getElementById('dial-q4');
+        const d5 = document.getElementById('dial-q5');
+
+        const v1 = (d1.value === 'this');
+        const v2 = (d2.value === 'nice');
+        const v3 = (d3.value === 'together');
+        const v4 = (d4.value === 'love');
+        const v5 = (d5.value === 'go');
+
+        d1.className = "grammar-select " + (v1 ? "correct-select" : "wrong-select");
+        d2.className = "grammar-select " + (v2 ? "correct-select" : "wrong-select");
+        d3.className = "grammar-select " + (v3 ? "correct-select" : "wrong-select");
+        d4.className = "grammar-select " + (v4 ? "correct-select" : "wrong-select");
+        d5.className = "grammar-select " + (v5 ? "correct-select" : "wrong-select");
+
+        const fb = document.getElementById('dialogueFeedback');
+        if(v1 && v2 && v3 && v4 && v5) {
+            fb.innerText = "🏆 MISSION ACCOMPLISHED! All nodes compiled perfectly!";
+            fb.style.color = "#58cc02";
+        } else {
+            fb.innerText = "Check the yellow item drops and try again! 👍";
+            fb.style.color = "#f9c74f";
+        }
+        renderDialogueDots();
+    };
+
+    function renderDialogueDots() {
+        const total = 5;
+        let correct = 0;
+        const vals = ['dial-q1','dial-q2','dial-q3','dial-q4','dial-q5'];
+        const correctVals = ['this','nice','together','love','go'];
+        vals.forEach((id, i) => {
+            if (document.getElementById(id).value === correctVals[i]) correct++;
+        });
+        renderDots(total, correct);
+    }
+
+    function renderDots(total, current) {
+        const orbs = document.getElementById('progressOrbs');
+        orbs.innerHTML = "";
+        for(let i=0; i<total; i++) {
+            const dot = document.createElement('span');
+            dot.className = "progress-dot" + (i < current ? " done" : (i === current ? " active" : ""));
+            orbs.appendChild(dot);
+        }
+    }
+
+    window.onload = loadMatchTask;
+  })();
+</script>
+
+</body>
+</html>

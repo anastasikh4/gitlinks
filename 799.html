@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Style: Present Continuous & Chores Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #58cc02;
+            --dark-green: #46a302;
+            --blue: #1cb0f6;
+            --gray: #e5e5e5;
+            --text-dark: #3c3c3c;
+            --correct-light: #d7ffb8;
+            --correct-border: #58cc02;
+            --warning-amber: #f39c12;
+            --soft-green-bg: #eefbf2;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f7f9fa;
+            color: var(--text-dark);
+        }
+
+        .test-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border: 3px solid var(--gray);
+            border-bottom: 6px solid var(--gray);
+            border-radius: 24px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--blue);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-dark);
+            border-bottom: 3px solid var(--gray);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .exercise-desc {
+            font-size: 15px;
+            font-weight: 700;
+            color: #777;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .block-card {
+            background: #fafafa;
+            border: 2px solid var(--gray);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+            line-height: 2;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .grammar-select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            padding: 6px 12px;
+            border: 2px solid var(--gray);
+            border-radius: 10px;
+            background: white;
+            color: var(--text-dark);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .field-correct {
+            background-color: var(--correct-light) !important;
+            border-color: var(--correct-border) !important;
+            color: #58a700 !important;
+        }
+
+        .field-wrong {
+            background-color: var(--soft-green-bg) !important;
+            border-color: var(--warning-amber) !important;
+            color: var(--warning-amber) !important;
+        }
+
+        .choice-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .choice-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border: 2px solid var(--gray);
+            padding: 10px 15px;
+            border-radius: 12px;
+        }
+
+        .btn-check {
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-bottom: 4px solid #1092cc;
+            padding: 12px 30px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            text-transform: uppercase;
+        }
+
+        .btn-check:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: 800;
+            font-size: 17px;
+            text-align: center;
+            min-height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>Chore Practice Grid</h1>
+
+    <h2>Task 1: Fill in the correct form of "to be".</h2>
+    <div class="exercise-desc">Complete the paddock kitchen logs using the dropdown boxes.</div>
+    
+    <div class="block-card" id="ex1-card">
+        1. A: 
+        <select id="ex1-q1" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="Am">Am</option>
+            <option value="Is">Is</option>
+            <option value="Are">Are</option>
+        </select> you making breakfast right now?<br>
+        B: No, I 
+        <select id="ex1-q2" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="am not">am not</option>
+            <option value="isn't">isn't</option>
+            <option value="aren't">aren't</option>
+        </select>. I 
+        <select id="ex1-q3" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="am">am</option>
+            <option value="is">is</option>
+            <option value="are">are</option>
+        </select> cooking dinner.<br><br>
+
+        2. A: 
+        <select id="ex1-q4" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="Am">Am</option>
+            <option value="Is">Is</option>
+            <option value="Are">Are</option>
+        </select> he washing the dishes?<br>
+        B: Yes, he 
+        <select id="ex1-q5" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="am">am</option>
+            <option value="is">is</option>
+            <option value="are">are</option>
+        </select>.<br><br>
+
+        3. A: 
+        <select id="ex1-q6" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="Am">Am</option>
+            <option value="Is">Is</option>
+            <option value="Are">Are</option>
+        </select> they tidying their room?<br>
+        B: Yes, they 
+        <select id="ex1-q7" class="grammar-select">
+            <option value="">-- ? --</option>
+            <option value="am">am</option>
+            <option value="is">is</option>
+            <option value="are">are</option>
+        </select>.
+        
+        <button class="btn-check" onclick="checkExercise1()">Verify Task 1</button>
+        <div id="ex1-feedback" class="feedback"></div>
+    </div>
+
+    <h2>Task 2: Answer the questions.</h2>
+    <div class="exercise-desc">Select the correct short answers according to the pictures.</div>
+
+    <div class="block-card">
+        <div class="choice-grid">
+            <div class="choice-row">
+                <span>1. Are you washing your clothes? 🧺</span>
+                <select id="ex2-q1" class="grammar-select">
+                    <option value="">-- Select --</option>
+                    <option value="correct">No, I'm not.</option>
+                    <option value="wrong">No, it isn't.</option>
+                </select>
+            </div>
+            <div class="choice-row">
+                <span>2. Is he making his bed? 🛏️</span>
+                <select id="ex2-q2" class="grammar-select">
+                    <option value="">-- Select --</option>
+                    <option value="wrong">Yes, I am.</option>
+                    <option value="correct">Yes, he is.</option>
+                </select>
+            </div>
+            <div class="choice-row">
+                <span>3. Is your room tidy? ✨</span>
+                <select id="ex2-q3" class="grammar-select">
+                    <option value="">-- Select --</option>
+                    <option value="correct">Yes, it is.</option>
+                    <option value="wrong">Yes, they are.</option>
+                </select>
+            </div>
+            <div class="choice-row">
+                <span>4. Are they looking after their sister? 👶</span>
+                <select id="ex2-q4" class="grammar-select">
+                    <option value="">-- Select --</option>
+                    <option value="wrong">No, he isn't.</option>
+                    <option value="correct">No, they aren't.</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-check" style="background: var(--green); border-color: var(--dark-green);" onclick="checkExercise2()">Verify Task 2</button>
+        <div id="ex2-feedback" class="feedback"></div>
+    </div>
+</div>
+
+<script>
+    function toggleHighlight(elementId, isCorrect) {
+        const el = document.getElementById(elementId);
+        if (isCorrect) {
+            el.classList.remove('field-wrong');
+            el.classList.add('field-correct');
+        } else {
+            el.classList.remove('field-correct');
+            el.classList.add('field-wrong');
+        }
+    }
+
+    function checkExercise1() {
+        const a1 = document.getElementById('ex1-q1').value;
+        const a2 = document.getElementById('ex1-q2').value;
+        const a3 = document.getElementById('ex1-q3').value;
+        const a4 = document.getElementById('ex1-q4').value;
+        const a5 = document.getElementById('ex1-q5').value;
+        const a6 = document.getElementById('ex1-q6').value;
+        const a7 = document.getElementById('ex1-q7').value;
+
+        const c1 = (a1 === 'Are');
+        const c2 = (a2 === 'am not');
+        const c3 = (a3 === 'am');
+        const c4 = (a4 === 'Is');
+        const c5 = (a5 === 'is');
+        const c6 = (a6 === 'Are');
+        const c7 = (a7 === 'are');
+
+        toggleHighlight('ex1-q1', c1);
+        toggleHighlight('ex1-q2', c2);
+        toggleHighlight('ex1-q3', c3);
+        toggleHighlight('ex1-q4', c4);
+        toggleHighlight('ex1-q5', c5);
+        toggleHighlight('ex1-q6', c6);
+        toggleHighlight('ex1-q7', c7);
+
+        const fb = document.getElementById('ex1-feedback');
+        if (c1 && c2 && c3 && c4 && c5 && c6 && c7) {
+            fb.innerText = "Excellent work! +100 XP 🌟";
+            fb.style.color = "var(--correct-border)";
+        } else {
+            fb.innerText = "Check your blanks and try again! 👍";
+            fb.style.color = "var(--warning-amber)";
+        }
+    }
+
+    function checkExercise2() {
+        const a1 = document.getElementById('ex2-q1').value;
+        const a2 = document.getElementById('ex2-q2').value;
+        const a3 = document.getElementById('ex2-q3').value;
+        const a4 = document.getElementById('ex2-q4').value;
+
+        const c1 = (a1 === 'correct');
+        const c2 = (a2 === 'correct');
+        const c3 = (a3 === 'correct');
+        const c4 = (a4 === 'correct');
+
+        toggleHighlight('ex2-q1', c1);
+        toggleHighlight('ex2-q2', c2);
+        toggleHighlight('ex2-q3', c3);
+        toggleHighlight('ex2-q4', c4);
+
+        const fb = document.getElementById('ex2-feedback');
+        if (c1 && c2 && c3 && c4) {
+            fb.innerText = "Perfect! Round Completed! 🎉";
+            fb.style.color = "var(--correct-border)";
+        } else {
+            fb.innerText = "Look closely at the pronouns! 👍";
+            fb.style.color = "var(--warning-amber)";
+        }
+    }
+</script>
+
+</body>
+</html>
