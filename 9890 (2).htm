@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Combo Grid Mission</title>
+    <style>
+        :root { --primary: #6c5ce7; --success: #2ecc71; --error: #ff4757; --bg: #fff9db; }
+        * { box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; min-height: 100vh; }
+        .quiz-container { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border: 6px solid #ffcc00; }
+        
+        .grid-info { background: #f1f2f6; padding: 15px; border-radius: 20px; margin-bottom: 20px; font-weight: bold; color: #555; display: flex; justify-content: space-around; }
+        .visual-box { font-size: 5rem; margin: 15px 0; min-height: 140px; display: flex; justify-content: center; align-items: center; background: #fffcf0; border-radius: 20px; border: 3px solid #eee; gap: 15px; }
+        
+        .builder { border: 4px dashed var(--primary); min-height: 85px; margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 8px; border-radius: 20px; background: #fff; padding: 10px; flex-wrap: wrap; }
+        .word-tag { background: var(--primary); color: white; padding: 8px 15px; border-radius: 12px; font-weight: bold; font-size: 1.2rem; animation: pop 0.2s; box-shadow: 0 4px 0 #4834d4; }
+        
+        .pool { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 20px; border-top: 2px solid #eee; padding-top: 20px; }
+        .action-btn { background: #fff; padding: 10px 15px; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 0 #ccc; transition: 0.1s; font-family: inherit; }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 4px 0 #ccc; }
+        .action-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+        
+        .feedback { margin-top: 15px; font-size: 1.6rem; font-weight: bold; min-height: 40px; }
+        .next-btn { display: none; background: var(--success); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.4rem; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #27ae60; font-family: inherit; font-weight: bold; }
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="grid-info">
+        <span>MISSION: <span id="cur-step">1</span> / 10</span>
+        <span>SCORE: <span id="score">0</span></span>
+    </div>
+    <div id="visual" class="visual-box">🖼️</div>
+    <h3 id="instr">Assemble the matching English sentence:</h3>
+
+    <div class="builder" id="builder"></div>
+    <div class="pool" id="pool"></div>
+
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="next-btn" onclick="nextQuestion()">NEXT ITEM ➔</button>
+</div>
+
+<script>
+    let currentStep = 0;
+    let userPath = [];
+    let score = 0;
+
+    const gridData = [
+        // Actions with gender hint tags
+        { visual: "👧💃", loc: "1A", correct: ["She", "is", "dancing"], extras: ["running", "He"], ans: "She is dancing" },
+        { visual: "👦🏃‍♂️", loc: "1B", correct: ["He", "is", "running"], extras: ["sleeping", "She"], ans: "He is running" },
+        { visual: "👦🛌", loc: "1C", correct: ["He", "is", "sleeping"], extras: ["eating", "She"], ans: "He is sleeping" },
+        { visual: "👧🍽️", loc: "1D", correct: ["She", "is", "eating"], extras: ["drinking", "He"], ans: "She is eating" },
+        { visual: "👦🥤", loc: "2A", correct: ["He", "is", "drinking"], extras: ["sleeping", "She"], ans: "He is drinking" },
+        
+        // Objects with looking combo strings
+        { visual: "👦🪑👀", loc: "2B", correct: ["He", "is", "looking", "at the chair"], extras: ["at the pencil", "She"], ans: "He is looking at the chair" },
+        { visual: "👧✏️👀", loc: "2C", correct: ["She", "is", "looking", "at the pencil"], extras: ["book", "He"], ans: "She is looking at the pencil" },
+        { visual: "👦✈️👀", loc: "2D", correct: ["He", "is", "looking", "at the aeroplane"], extras: ["at the chair", "She"], ans: "He is looking at the aeroplane" },
+        { visual: "👦📖👓", loc: "3A", correct: ["He", "is", "reading", "a book"], extras: ["looking", "at the pencil case"], ans: "He is reading a book" },
+        { visual: "👧👝👀", loc: "3B", correct: ["She", "is", "looking", "at the pencil case"], extras: ["at the aeroplane", "He"], ans: "She is looking at the pencil case" }
+    ];
+
+    function loadGame() {
+        const q = gridData[currentStep];
+        if(!q) { showWin(); return; }
+
+        document.getElementById('cur-step').innerText = currentStep + 1;
+        document.getElementById('visual').innerHTML = `<div style="text-align:center">${q.visual}<br><small style="font-size:1.5rem; color:#aaa">Location: ${q.loc}</small></div>`;
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('next-btn').style.display = "none";
+        document.getElementById('builder').innerHTML = ""; 
+        
+        const pool = document.getElementById('pool');
+        pool.innerHTML = "";
+        userPath = [];
+
+        let allOptions = [...q.correct, ...q.extras].sort(() => Math.random() - 0.5);
+        allOptions.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            btn.onclick = () => {
+                btn.disabled = true;
+                
+                userPath.push(item);
+                const tag = document.createElement('span');
+                tag.className = "word-tag";
+                tag.innerText = item;
+                document.getElementById('builder').appendChild(tag);
+                
+                if(userPath.length === q.correct.length) {
+                    document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+                    
+                    if(userPath.join(" ") === q.ans) {
+                        document.getElementById('feedback').innerText = "EXCELLENT! 🌟";
+                        document.getElementById('feedback').style.color = "var(--success)";
+                        document.getElementById('next-btn').style.display = "inline-block";
+                        score += 100;
+                        document.getElementById('score').innerText = score;
+                    } else {
+                        document.getElementById('feedback').innerText = "WRONG GRID! ❌";
+                        document.getElementById('feedback').style.color = "var(--error)";
+                        setTimeout(loadGame, 1200);
+                    }
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function nextQuestion() { currentStep++; loadGame(); }
+
+    function showWin() {
+        document.querySelector('.quiz-container').innerHTML = `
+            <h1 style="font-size:4rem;">🎯</h1>
+            <h2>GRID MASTER!</h2>
+            <p style="font-size:1.5rem; margin-bottom:20px;">Final Score: ${score} XP</p>
+            <button class="action-btn" onclick="location.reload()" style="background:var(--primary); color:white; border:none; padding:15px 30px; font-size:1.2rem;">PLAY AGAIN</button>
+        `;
+    }
+
+    loadGame();
+</script>
+</body>
+</html>
