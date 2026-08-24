@@ -4,17 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Red Bull Racing: Holiday English Mission A1</title>
+
     <style>
         :root {
             --f1-red: #e10600;
+            --f1-red-dark: #b80500;
             --dark-bg: #1f1f24;
             --card-bg: #2d2d35;
+            --quest-bg: #232329;
+            --input-bg: #151518;
             --text-light: #ffffff;
             --text-muted: #b2b2b9;
             --neon-green: #00ff66;
+            --correct-bg: #1e3a2a;
+            --correct-border: #2ecc71;
+            --incorrect-bg: #3a1e1e;
+            --incorrect-border: #e74c3c;
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
             margin: 0;
@@ -23,21 +36,24 @@
             flex-direction: column;
             align-items: center;
         }
+
         .game-container {
             max-width: 850px;
             width: 100%;
             background: var(--card-bg);
             border-radius: 16px;
             padding: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             border-top: 6px solid var(--f1-red);
         }
+
         header {
             text-align: center;
             margin-bottom: 30px;
             border-bottom: 2px dashed #444;
             padding-bottom: 20px;
         }
+
         h1 {
             color: var(--f1-red);
             text-transform: uppercase;
@@ -45,58 +61,85 @@
             margin: 0 0 10px 0;
             font-size: 2rem;
         }
+
+        header p {
+            color: var(--text-muted);
+            margin: 5px 0 15px 0;
+        }
+
         .scoreboard {
             display: flex;
             justify-content: space-around;
-            background: #151518;
+            gap: 15px;
+            background: var(--input-bg);
             padding: 15px;
             border-radius: 8px;
             font-weight: bold;
             font-size: 1.1rem;
             border: 1px solid #444;
+            flex-wrap: wrap;
         }
-        .score-item span { color: var(--neon-green); }
+
+        .score-item span {
+            color: var(--neon-green);
+        }
+
         .quest-card {
-            background: #232329;
+            background: var(--quest-bg);
             border-left: 5px solid var(--f1-red);
             padding: 20px;
             margin-bottom: 25px;
             border-radius: 6px;
         }
+
         .quest-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
             margin-bottom: 15px;
         }
+
         .quest-title {
             font-size: 1.3rem;
             color: var(--text-light);
             text-transform: uppercase;
             font-weight: bold;
         }
+
         .points-badge {
             background: var(--f1-red);
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: bold;
+            white-space: nowrap;
         }
+
         .img-row {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
+
+        .img-row a {
+            display: block;
+        }
+
         .quest-img {
-            width: 100%;
-            max-width: 240px;
+            width: 240px;
             height: 150px;
             object-fit: cover;
             border-radius: 8px;
             border: 2px solid #444;
+            display: block;
         }
-        .interactive-area { margin-top: 15px; }
+
+        .interactive-area {
+            margin-top: 15px;
+        }
+
         .input-group {
             margin-bottom: 12px;
             display: flex;
@@ -104,45 +147,80 @@
             gap: 10px;
             flex-wrap: wrap;
         }
+
         label {
             font-size: 1rem;
             color: var(--text-muted);
             min-width: 200px;
+            flex: 1 1 300px;
         }
-        input[type="text"], select {
-            background: #151518;
+
+        input[type="text"],
+        select {
+            background: var(--input-bg);
             border: 1px solid #555;
-            color: #fff;
+            color: var(--text-light);
             padding: 8px 12px;
             border-radius: 4px;
             font-size: 1rem;
             width: 100%;
             max-width: 260px;
         }
-        input[type="text"]:focus, select:focus {
+
+        input[type="text"]:focus,
+        select:focus {
             border-color: var(--f1-red);
             outline: none;
+            box-shadow: 0 0 0 2px rgba(225, 6, 0, 0.25);
         }
-        button.btn-check {
-            background: var(--f1-red);
-            color: white;
+
+        button.btn-check,
+        button.btn-reset {
+            color: var(--text-light);
             border: none;
             padding: 10px 20px;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
             text-transform: uppercase;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.2s;
+            margin-top: 5px;
         }
-        button.btn-check:hover { background: #b80500; }
+
+        button.btn-check {
+            background: var(--f1-red);
+        }
+
+        button.btn-check:hover {
+            background: var(--f1-red-dark);
+            transform: translateY(-1px);
+        }
+
+        button.btn-reset {
+            background: #555;
+            margin-left: 8px;
+        }
+
+        button.btn-reset:hover {
+            background: #707070;
+            transform: translateY(-1px);
+        }
+
         .feedback {
             margin-top: 10px;
             font-weight: bold;
             font-size: 1rem;
             display: none;
         }
-        .success { color: var(--neon-green); }
-        .error { color: #ff3333; }
+
+        .success {
+            color: var(--neon-green);
+        }
+
+        .error {
+            color: #ff3333;
+        }
+
         .story-text {
             background: #1a1a20;
             padding: 15px;
@@ -152,90 +230,245 @@
             margin-bottom: 15px;
             color: #e0e0e6;
         }
-        /* Подсветка правильных и неправильных ответов */
+
         .correct-field {
-            border-color: #2ecc71 !important;
-            background-color: #1e3a2a !important;
+            border-color: var(--correct-border) !important;
+            background-color: var(--correct-bg) !important;
             color: #a3e4a3 !important;
         }
+
         .incorrect-field {
-            border-color: #e74c3c !important;
-            background-color: #3a1e1e !important;
+            border-color: var(--incorrect-border) !important;
+            background-color: var(--incorrect-bg) !important;
             color: #ff9e9e !important;
         }
+
         @media (max-width: 600px) {
-            .game-container { padding: 15px; }
-            h1 { font-size: 1.5rem; }
-            .input-group { flex-direction: column; align-items: stretch; }
-            label { min-width: auto; }
-            input[type="text"], select { max-width: 100%; }
-            .scoreboard { flex-direction: column; align-items: center; gap: 5px; }
+            body {
+                padding: 10px;
+            }
+
+            .game-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .quest-card {
+                padding: 15px;
+            }
+
+            .quest-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            label {
+                min-width: auto;
+            }
+
+            input[type="text"],
+            select {
+                max-width: 100%;
+            }
+
+            .quest-img {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .scoreboard {
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+
+            button.btn-reset {
+                margin-left: 0;
+            }
         }
     </style>
 </head>
+
 <body>
+
 <div class="game-container">
+
     <header>
         <h1>🏎️ Red Bull Racing: Holiday English Mission A1</h1>
-        <p style="color: var(--text-muted); margin: 5px 0 15px 0;">Celebrate with the team! Unscramble, choose grammar, and read the holiday report.</p>
+
+        <p>
+            Celebrate with the team! Unscramble, choose grammar,
+            and read the holiday report.
+        </p>
+
         <div class="scoreboard">
-            <div class="score-item">Current Score: <span id="total-score">0</span> XP</div>
-            <div class="score-item">Status: <span id="rank-status">Rookie Pit Crew</span></div>
+            <div class="score-item">
+                Current Score:
+                <span id="total-score">0</span> XP
+            </div>
+
+            <div class="score-item">
+                Status:
+                <span id="rank-status">Rookie Pit Crew</span>
+            </div>
         </div>
     </header>
 
-    <!-- QUEST 1: Vocabulary -->
+    <!-- QUEST 1: VOCABULARY -->
     <div class="quest-card" id="quest1">
+
         <div class="quest-header">
-            <span class="quest-title">Quest 1: Holiday Scrambled Words</span>
+            <span class="quest-title">
+                Quest 1: Holiday Scrambled Words
+            </span>
+
             <span class="points-badge">+60 XP</span>
         </div>
-        <p>Unscramble the letters to find holiday and racing words!</p>
+
+        <p>
+            Unscramble the letters to find holiday and racing words!
+        </p>
+
         <div class="img-row">
-            <a href="https://unsplash.com" target="_blank">
-                <img src="https://i.ytimg.com/vi/noOGPk6KyNw/maxresdefault.jpg" alt="F1 Driver Helmet" class="quest-img">
+            <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
+                <img
+                    src="https://i.ytimg.com/vi/noOGPk6KyNw/maxresdefault.jpg"
+                    alt="Formula 1 driver wearing a helmet"
+                    class="quest-img"
+                >
             </a>
-            <a href="https://unsplash.com" target="_blank">
-                <img src="https://i.pinimg.com/736x/54/f3/88/54f38876e5b7724c431a172c43dd9fea.jpg" alt="Racing Team" class="quest-img">
+
+            <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">
+                <img
+                    src="https://i.pinimg.com/736x/54/f3/88/54f38876e5b7724c431a172c43dd9fea.jpg"
+                    alt="A racing team"
+                    class="quest-img"
+                >
             </a>
         </div>
+
         <div class="interactive-area">
+
             <div class="input-group">
-                <label>1. <b>(c s r i h t m a s)</b> – December 25th</label>
-                <input type="text" id="q1-ans1" placeholder="Type word...">
+                <label for="q1-ans1">
+                    1. <b>(c s r i h t m a s)</b> – December 25th
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans1"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
             </div>
+
             <div class="input-group">
-                <label>2. <b>(p r e e s n t s)</b> – gifts under the tree</label>
-                <input type="text" id="q1-ans2" placeholder="Type word...">
+                <label for="q1-ans2">
+                    2. <b>(p r e e s n t s)</b> – gifts under the tree
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans2"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
             </div>
+
             <div class="input-group">
-                <label>3. <b>(s c o t u m e s)</b> – special clothes for parties</label>
-                <input type="text" id="q1-ans3" placeholder="Type word...">
+                <label for="q1-ans3">
+                    3. <b>(s c o t u m e s)</b> – special clothes for parties
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans3"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
             </div>
-          
+
             <div class="input-group">
-                <label>4. <b>(s n n u y)</b> – bright weather</label>
-                <input type="text" id="q1-ans5" placeholder="Type word...">
+                <label for="q1-ans4">
+                    4. <b>(h o l i d a y)</b> – a special day or time
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans4"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
             </div>
+
             <div class="input-group">
-                <label>5. <b>(e s a r )</b> – you listen with them</label>
-                <input type="text" id="q1-ans6" placeholder="Type word...">
+                <label for="q1-ans5">
+                    5. <b>(s n n u y)</b> – bright weather
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans5"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
             </div>
-            <button class="btn-check" onclick="checkQuest1()">Check Words</button>
+
+            <div class="input-group">
+                <label for="q1-ans6">
+                    6. <b>(e s a r)</b> – you listen with them
+                </label>
+
+                <input
+                    type="text"
+                    id="q1-ans6"
+                    placeholder="Type word..."
+                    autocomplete="off"
+                >
+            </div>
+
+            <button class="btn-check" onclick="checkQuest1()">
+                Check Words
+            </button>
+
+            <button class="btn-reset" onclick="resetQuest1()">
+                Reset
+            </button>
+
             <div class="feedback" id="q1-feedback"></div>
         </div>
     </div>
 
-    <!-- QUEST 2: Grammar -->
+    <!-- QUEST 2: GRAMMAR -->
     <div class="quest-card" id="quest2">
+
         <div class="quest-header">
-            <span class="quest-title">Quest 2: Grammar Pit Stop</span>
+            <span class="quest-title">
+                Quest 2: Grammar Pit Stop
+            </span>
+
             <span class="points-badge">+40 XP</span>
         </div>
-        <p>Choose the correct word: past, present, future, or much/many.</p>
+
+        <p>
+            Choose the correct word: past, present, future, or much/many.
+        </p>
+
         <div class="interactive-area">
+
             <div class="input-group">
-                <label>1. Yesterday they _______ a race.</label>
+                <label for="q2-ans1">
+                    1. Yesterday they _______ a race.
+                </label>
+
                 <select id="q2-ans1">
                     <option value="">-- Select --</option>
                     <option value="won">won</option>
@@ -243,8 +476,12 @@
                     <option value="will win">will win</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>2. He usually _______ a helmet.</label>
+                <label for="q2-ans2">
+                    2. He usually _______ a helmet.
+                </label>
+
                 <select id="q2-ans2">
                     <option value="">-- Select --</option>
                     <option value="wears">wears</option>
@@ -252,8 +489,12 @@
                     <option value="will wear">will wear</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>3. Tomorrow they _______ to the track.</label>
+                <label for="q2-ans3">
+                    3. Tomorrow they _______ to the track.
+                </label>
+
                 <select id="q2-ans3">
                     <option value="">-- Select --</option>
                     <option value="will go">will go</option>
@@ -261,24 +502,36 @@
                     <option value="go">go</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>4. There are _______ presents.</label>
+                <label for="q2-ans4">
+                    4. There are _______ presents.
+                </label>
+
                 <select id="q2-ans4">
                     <option value="">-- Select --</option>
                     <option value="many">many</option>
                     <option value="much">much</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>5. There is _______ snow.</label>
+                <label for="q2-ans5">
+                    5. There is _______ snow.
+                </label>
+
                 <select id="q2-ans5">
                     <option value="">-- Select --</option>
                     <option value="much">much</option>
                     <option value="many">many</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>6. She _______ got a new car.</label>
+                <label for="q2-ans6">
+                    6. She _______ got a new car.
+                </label>
+
                 <select id="q2-ans6">
                     <option value="">-- Select --</option>
                     <option value="has">has</option>
@@ -286,53 +539,110 @@
                     <option value="is">is</option>
                 </select>
             </div>
-            <button class="btn-check" onclick="checkQuest2()">Transmit Answers</button>
+
+            <button class="btn-check" onclick="checkQuest2()">
+                Transmit Answers
+            </button>
+
+            <button class="btn-reset" onclick="resetQuest2()">
+                Reset
+            </button>
+
             <div class="feedback" id="q2-feedback"></div>
         </div>
     </div>
 
-    <!-- QUEST 3: Reading -->
+    <!-- QUEST 3: READING -->
     <div class="quest-card" id="quest3">
+
         <div class="quest-header">
-            <span class="quest-title">Quest 3: Holiday Race Report</span>
+            <span class="quest-title">
+                Quest 3: Holiday Race Report
+            </span>
+
             <span class="points-badge">+30 XP</span>
         </div>
-        <p>Read the story about the team and answer the questions.</p>
+
+        <p>
+            Read the story about the team and answer the questions.
+        </p>
+
         <div class="story-text">
-            "Red Bull Racing is a famous Formula 1 team. They have many fans. Every year they celebrate Christmas and New Year. The drivers usually wear special costumes for the holiday show. Last year Max wore a Santa costume. There was much snow, but the cars were safe in the garage. Next year they will have a new Honda engine. The team has got a red and blue car. They will test it in sunny weather."
+            “Red Bull Racing is a famous Formula 1 team.
+            They have many fans. Every year they celebrate Christmas
+            and New Year. The drivers usually wear special costumes
+            for the holiday show. Last year Max wore a Santa costume.
+            There was much snow, but the cars were safe in the garage.
+            Next year they will have a new Honda engine.
+            The team has got a red and blue car.
+            They will test it in sunny weather.”
         </div>
+
         <div class="interactive-area">
+
             <div class="input-group">
-                <label>1. What team is in the story?</label>
+                <label for="q3-ans1">
+                    1. What team is in the story?
+                </label>
+
                 <select id="q3-ans1">
                     <option value="">-- Select --</option>
-                    <option value="wrong1">Ferrari</option>
-                    <option value="correct">Red Bull Racing</option>
-                    <option value="wrong2">Mercedes</option>
+                    <option value="ferrari">Ferrari</option>
+                    <option value="red bull racing">Red Bull Racing</option>
+                    <option value="mercedes">Mercedes</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>2. What holidays do they celebrate?</label>
+                <label for="q3-ans2">
+                    2. What holidays do they celebrate?
+                </label>
+
                 <select id="q3-ans2">
                     <option value="">-- Select --</option>
-                    <option value="wrong1">Halloween and Easter</option>
-                    <option value="correct">Christmas and New Year</option>
-                    <option value="wrong2">Independence Day</option>
+                    <option value="halloween and easter">
+                        Halloween and Easter
+                    </option>
+                    <option value="christmas and new year">
+                        Christmas and New Year
+                    </option>
+                    <option value="independence day">
+                        Independence Day
+                    </option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>3. What costume did Max wear last year?</label>
+                <label for="q3-ans3">
+                    3. What costume did Max wear last year?
+                </label>
+
                 <select id="q3-ans3">
                     <option value="">-- Select --</option>
-                    <option value="correct">Santa costume</option>
-                    <option value="wrong1">Clown costume</option>
-                    <option value="wrong2">Superhero costume</option>
+                    <option value="santa costume">
+                        Santa costume
+                    </option>
+                    <option value="clown costume">
+                        Clown costume
+                    </option>
+                    <option value="superhero costume">
+                        Superhero costume
+                    </option>
                 </select>
             </div>
-            <button class="btn-check" onclick="checkQuest3()">Submit Report</button>
+
+            <button class="btn-check" onclick="checkQuest3()">
+                Submit Report
+            </button>
+
+            <button class="btn-reset" onclick="resetQuest3()">
+                Reset
+            </button>
+
             <div class="feedback" id="q3-feedback"></div>
         </div>
     </div>
+
 </div>
 
 <script>
@@ -341,134 +651,324 @@
     let scoreQuest3 = 0;
 
     function updateGlobalScore() {
-        let total = scoreQuest1 + scoreQuest2 + scoreQuest3;
-        document.getElementById('total-score').innerText = total;
+        const total = scoreQuest1 + scoreQuest2 + scoreQuest3;
+
+        document.getElementById("total-score").textContent = total;
+
         let status = "Rookie Pit Crew";
-        if (total >= 30) status = "Junior Mechanic";
-        if (total >= 70) status = "Race Engineer";
-        if (total === 130) status = "🏎️ GRAND PRIX CHAMPION!";
-        document.getElementById('rank-status').innerText = status;
+
+        if (total >= 30) {
+            status = "Junior Mechanic";
+        }
+
+        if (total >= 70) {
+            status = "Race Engineer";
+        }
+
+        if (total === 130) {
+            status = "🏎️ GRAND PRIX CHAMPION!";
+        }
+
+        document.getElementById("rank-status").textContent = status;
     }
 
-    // Вспомогательная функция подсветки поля
     function setFieldColor(id, isCorrect) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.classList.remove('correct-field', 'incorrect-field');
-        if (isCorrect) {
-            el.classList.add('correct-field');
-        } else {
-            el.classList.add('incorrect-field');
+        const field = document.getElementById(id);
+
+        if (!field) {
+            return;
         }
+
+        field.classList.remove(
+            "correct-field",
+            "incorrect-field"
+        );
+
+        if (isCorrect) {
+            field.classList.add("correct-field");
+        } else {
+            field.classList.add("incorrect-field");
+        }
+    }
+
+    function showFeedback(id, message, isCorrect) {
+        const feedback = document.getElementById(id);
+
+        feedback.innerHTML = message;
+        feedback.className = isCorrect
+            ? "feedback success"
+            : "feedback error";
+
+        feedback.style.display = "block";
     }
 
     function checkQuest1() {
-        let a1 = document.getElementById('q1-ans1').value.trim().toLowerCase();
-        let a2 = document.getElementById('q1-ans2').value.trim().toLowerCase();
-        let a3 = document.getElementById('q1-ans3').value.trim().toLowerCase();
-        let a4 = document.getElementById('q1-ans4').value.trim().toLowerCase();
-        let a5 = document.getElementById('q1-ans5').value.trim().toLowerCase();
-        let a6 = document.getElementById('q1-ans6').value.trim().toLowerCase();
-        let fb = document.getElementById('q1-feedback');
-
         const answers = [
-            { id: 'q1-ans1', val: a1, correct: 'christmas' },
-            { id: 'q1-ans2', val: a2, correct: 'presents' },
-            { id: 'q1-ans3', val: a3, correct: 'costumes' },
-            { id: 'q1-ans4', val: a4, correct: 'holiday' },
-            { id: 'q1-ans5', val: a5, correct: 'sunny' },
-            { id: 'q1-ans6', val: a6, correct: 'ears' }
+            {
+                id: "q1-ans1",
+                correct: "christmas"
+            },
+            {
+                id: "q1-ans2",
+                correct: "presents"
+            },
+            {
+                id: "q1-ans3",
+                correct: "costumes"
+            },
+            {
+                id: "q1-ans4",
+                correct: "holiday"
+            },
+            {
+                id: "q1-ans5",
+                correct: "sunny"
+            },
+            {
+                id: "q1-ans6",
+                correct: "ears"
+            }
         ];
 
-        let allCorrect = true;
-        answers.forEach(item => {
-            const ok = item.val === item.correct;
-            setFieldColor(item.id, ok);
-            if (!ok) allCorrect = false;
+        let correctCount = 0;
+
+        answers.forEach(function(item) {
+            const field = document.getElementById(item.id);
+
+            const userAnswer = field.value
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, " ");
+
+            const isCorrect = userAnswer === item.correct;
+
+            setFieldColor(item.id, isCorrect);
+
+            if (isCorrect) {
+                correctCount++;
+            }
         });
 
-        if (allCorrect) {
-            fb.innerHTML = "✅ Perfect! All words decoded. +60 XP!";
-            fb.className = "feedback success";
+        if (correctCount === answers.length) {
             scoreQuest1 = 60;
+
+            showFeedback(
+                "q1-feedback",
+                "✅ Perfect! All words decoded. +60 XP!",
+                true
+            );
         } else {
-            fb.innerHTML = "❌ Some words are wrong. Check the highlighted fields.";
-            fb.className = "feedback error";
             scoreQuest1 = 0;
+
+            showFeedback(
+                "q1-feedback",
+                "❌ Correct answers: " +
+                correctCount +
+                "/" +
+                answers.length +
+                ". Check the highlighted fields.",
+                false
+            );
         }
-        fb.style.display = "block";
+
         updateGlobalScore();
     }
 
     function checkQuest2() {
-        let a1 = document.getElementById('q2-ans1').value;
-        let a2 = document.getElementById('q2-ans2').value;
-        let a3 = document.getElementById('q2-ans3').value;
-        let a4 = document.getElementById('q2-ans4').value;
-        let a5 = document.getElementById('q2-ans5').value;
-        let a6 = document.getElementById('q2-ans6').value;
-        let fb = document.getElementById('q2-feedback');
-
         const answers = [
-            { id: 'q2-ans1', val: a1, correct: 'won' },
-            { id: 'q2-ans2', val: a2, correct: 'wears' },
-            { id: 'q2-ans3', val: a3, correct: 'will go' },
-            { id: 'q2-ans4', val: a4, correct: 'many' },
-            { id: 'q2-ans5', val: a5, correct: 'much' },
-            { id: 'q2-ans6', val: a6, correct: 'has' }
+            {
+                id: "q2-ans1",
+                correct: "won"
+            },
+            {
+                id: "q2-ans2",
+                correct: "wears"
+            },
+            {
+                id: "q2-ans3",
+                correct: "will go"
+            },
+            {
+                id: "q2-ans4",
+                correct: "many"
+            },
+            {
+                id: "q2-ans5",
+                correct: "much"
+            },
+            {
+                id: "q2-ans6",
+                correct: "has"
+            }
         ];
 
-        let allCorrect = true;
-        answers.forEach(item => {
-            const ok = item.val === item.correct;
-            setFieldColor(item.id, ok);
-            if (!ok) allCorrect = false;
+        let correctCount = 0;
+
+        answers.forEach(function(item) {
+            const field = document.getElementById(item.id);
+            const isCorrect = field.value === item.correct;
+
+            setFieldColor(item.id, isCorrect);
+
+            if (isCorrect) {
+                correctCount++;
+            }
         });
 
-        if (allCorrect) {
-            fb.innerHTML = "✅ Grammar tuned to perfection! +40 XP!";
-            fb.className = "feedback success";
+        if (correctCount === answers.length) {
             scoreQuest2 = 40;
+
+            showFeedback(
+                "q2-feedback",
+                "✅ Grammar tuned to perfection! +40 XP!",
+                true
+            );
         } else {
-            fb.innerHTML = "❌ Check your tenses and much/many again.";
-            fb.className = "feedback error";
             scoreQuest2 = 0;
+
+            showFeedback(
+                "q2-feedback",
+                "❌ Correct answers: " +
+                correctCount +
+                "/" +
+                answers.length +
+                ". Check your tenses and much/many again.",
+                false
+            );
         }
-        fb.style.display = "block";
+
         updateGlobalScore();
     }
 
     function checkQuest3() {
-        let a1 = document.getElementById('q3-ans1').value;
-        let a2 = document.getElementById('q3-ans2').value;
-        let a3 = document.getElementById('q3-ans3').value;
-        let fb = document.getElementById('q3-feedback');
-
         const answers = [
-            { id: 'q3-ans1', val: a1, correct: 'correct' },
-            { id: 'q3-ans2', val: a2, correct: 'correct' },
-            { id: 'q3-ans3', val: a3, correct: 'correct' }
+            {
+                id: "q3-ans1",
+                correct: "red bull racing"
+            },
+            {
+                id: "q3-ans2",
+                correct: "christmas and new year"
+            },
+            {
+                id: "q3-ans3",
+                correct: "santa costume"
+            }
         ];
 
-        let allCorrect = true;
-        answers.forEach(item => {
-            const ok = item.val === item.correct;
-            setFieldColor(item.id, ok);
-            if (!ok) allCorrect = false;
+        let correctCount = 0;
+
+        answers.forEach(function(item) {
+            const field = document.getElementById(item.id);
+            const isCorrect = field.value === item.correct;
+
+            setFieldColor(item.id, isCorrect);
+
+            if (isCorrect) {
+                correctCount++;
+            }
         });
 
-        if (allCorrect) {
-            fb.innerHTML = "✅ Race report analysed correctly! +30 XP!";
-            fb.className = "feedback success";
+        if (correctCount === answers.length) {
             scoreQuest3 = 30;
+
+            showFeedback(
+                "q3-feedback",
+                "✅ Race report analysed correctly! +30 XP!",
+                true
+            );
         } else {
-            fb.innerHTML = "❌ One or more answers are wrong. Re-read the report.";
-            fb.className = "feedback error";
             scoreQuest3 = 0;
+
+            showFeedback(
+                "q3-feedback",
+                "❌ Correct answers: " +
+                correctCount +
+                "/" +
+                answers.length +
+                ". Re-read the report.",
+                false
+            );
         }
-        fb.style.display = "block";
+
+        updateGlobalScore();
+    }
+
+    function resetQuest1() {
+        const fieldIds = [
+            "q1-ans1",
+            "q1-ans2",
+            "q1-ans3",
+            "q1-ans4",
+            "q1-ans5",
+            "q1-ans6"
+        ];
+
+        fieldIds.forEach(function(id) {
+            const field = document.getElementById(id);
+
+            field.value = "";
+            field.classList.remove(
+                "correct-field",
+                "incorrect-field"
+            );
+        });
+
+        document.getElementById("q1-feedback").style.display = "none";
+
+        scoreQuest1 = 0;
+        updateGlobalScore();
+    }
+
+    function resetQuest2() {
+        const fieldIds = [
+            "q2-ans1",
+            "q2-ans2",
+            "q2-ans3",
+            "q2-ans4",
+            "q2-ans5",
+            "q2-ans6"
+        ];
+
+        fieldIds.forEach(function(id) {
+            const field = document.getElementById(id);
+
+            field.value = "";
+            field.classList.remove(
+                "correct-field",
+                "incorrect-field"
+            );
+        });
+
+        document.getElementById("q2-feedback").style.display = "none";
+
+        scoreQuest2 = 0;
+        updateGlobalScore();
+    }
+
+    function resetQuest3() {
+        const fieldIds = [
+            "q3-ans1",
+            "q3-ans2",
+            "q3-ans3"
+        ];
+
+        fieldIds.forEach(function(id) {
+            const field = document.getElementById(id);
+
+            field.value = "";
+            field.classList.remove(
+                "correct-field",
+                "incorrect-field"
+            );
+        });
+
+        document.getElementById("q3-feedback").style.display = "none";
+
+        scoreQuest3 = 0;
         updateGlobalScore();
     }
 </script>
+
 </body>
 </html>
