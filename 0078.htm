@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Bull Racing: Holiday English Mission A1</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --dark-bg: #1f1f24;
+            --card-bg: #2d2d35;
+            --text-light: #ffffff;
+            --text-muted: #b2b2b9;
+            --neon-green: #00ff66;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            border-top: 6px solid var(--f1-red);
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed #444;
+            padding-bottom: 20px;
+        }
+        h1 {
+            color: var(--f1-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            background: #151518;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 1px solid #444;
+        }
+        .score-item span { color: var(--neon-green); }
+        .quest-card {
+            background: #232329;
+            border-left: 5px solid var(--f1-red);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+        .quest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .quest-title {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .points-badge {
+            background: var(--f1-red);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .img-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .quest-img {
+            width: 100%;
+            max-width: 240px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #444;
+        }
+        .interactive-area { margin-top: 15px; }
+        .input-group {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            min-width: 200px;
+        }
+        input[type="text"], select {
+            background: #151518;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 260px;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: var(--f1-red);
+            outline: none;
+        }
+        button.btn-check {
+            background: var(--f1-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background 0.2s;
+        }
+        button.btn-check:hover { background: #b80500; }
+        .feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: none;
+        }
+        .success { color: var(--neon-green); }
+        .error { color: #ff3333; }
+        .story-text {
+            background: #1a1a20;
+            padding: 15px;
+            border-radius: 6px;
+            line-height: 1.6;
+            border-left: 3px solid #777;
+            margin-bottom: 15px;
+            color: #e0e0e6;
+        }
+        /* Подсветка правильных и неправильных ответов */
+        .correct-field {
+            border-color: #2ecc71 !important;
+            background-color: #1e3a2a !important;
+            color: #a3e4a3 !important;
+        }
+        .incorrect-field {
+            border-color: #e74c3c !important;
+            background-color: #3a1e1e !important;
+            color: #ff9e9e !important;
+        }
+        @media (max-width: 600px) {
+            .game-container { padding: 15px; }
+            h1 { font-size: 1.5rem; }
+            .input-group { flex-direction: column; align-items: stretch; }
+            label { min-width: auto; }
+            input[type="text"], select { max-width: 100%; }
+            .scoreboard { flex-direction: column; align-items: center; gap: 5px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <header>
+        <h1>🏎️ Red Bull Racing: Holiday English Mission A1</h1>
+        <p style="color: var(--text-muted); margin: 5px 0 15px 0;">Celebrate with the team! Unscramble, choose grammar, and read the holiday report.</p>
+        <div class="scoreboard">
+            <div class="score-item">Current Score: <span id="total-score">0</span> XP</div>
+            <div class="score-item">Status: <span id="rank-status">Rookie Pit Crew</span></div>
+        </div>
+    </header>
+
+    <!-- QUEST 1: Vocabulary -->
+    <div class="quest-card" id="quest1">
+        <div class="quest-header">
+            <span class="quest-title">Quest 1: Holiday Scrambled Words</span>
+            <span class="points-badge">+60 XP</span>
+        </div>
+        <p>Unscramble the letters to find holiday and racing words!</p>
+        <div class="img-row">
+            <a href="https://unsplash.com" target="_blank">
+                <img src="https://i.ytimg.com/vi/noOGPk6KyNw/maxresdefault.jpg" alt="F1 Driver Helmet" class="quest-img">
+            </a>
+            <a href="https://unsplash.com" target="_blank">
+                <img src="https://i.pinimg.com/736x/54/f3/88/54f38876e5b7724c431a172c43dd9fea.jpg" alt="Racing Team" class="quest-img">
+            </a>
+        </div>
+        <div class="interactive-area">
+            <div class="input-group">
+                <label>1. <b>(c s r i h t m a s)</b> – December 25th</label>
+                <input type="text" id="q1-ans1" placeholder="Type word...">
+            </div>
+            <div class="input-group">
+                <label>2. <b>(p r e e s n t s)</b> – gifts under the tree</label>
+                <input type="text" id="q1-ans2" placeholder="Type word...">
+            </div>
+            <div class="input-group">
+                <label>3. <b>(s c o t u m e s)</b> – special clothes for parties</label>
+                <input type="text" id="q1-ans3" placeholder="Type word...">
+            </div>
+          
+            <div class="input-group">
+                <label>4. <b>(s n n u y)</b> – bright weather</label>
+                <input type="text" id="q1-ans5" placeholder="Type word...">
+            </div>
+            <div class="input-group">
+                <label>5. <b>(e s a r )</b> – you listen with them</label>
+                <input type="text" id="q1-ans6" placeholder="Type word...">
+            </div>
+            <button class="btn-check" onclick="checkQuest1()">Check Words</button>
+            <div class="feedback" id="q1-feedback"></div>
+        </div>
+    </div>
+
+    <!-- QUEST 2: Grammar -->
+    <div class="quest-card" id="quest2">
+        <div class="quest-header">
+            <span class="quest-title">Quest 2: Grammar Pit Stop</span>
+            <span class="points-badge">+40 XP</span>
+        </div>
+        <p>Choose the correct word: past, present, future, or much/many.</p>
+        <div class="interactive-area">
+            <div class="input-group">
+                <label>1. Yesterday they _______ a race.</label>
+                <select id="q2-ans1">
+                    <option value="">-- Select --</option>
+                    <option value="won">won</option>
+                    <option value="win">win</option>
+                    <option value="will win">will win</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>2. He usually _______ a helmet.</label>
+                <select id="q2-ans2">
+                    <option value="">-- Select --</option>
+                    <option value="wears">wears</option>
+                    <option value="wore">wore</option>
+                    <option value="will wear">will wear</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>3. Tomorrow they _______ to the track.</label>
+                <select id="q2-ans3">
+                    <option value="">-- Select --</option>
+                    <option value="will go">will go</option>
+                    <option value="went">went</option>
+                    <option value="go">go</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>4. There are _______ presents.</label>
+                <select id="q2-ans4">
+                    <option value="">-- Select --</option>
+                    <option value="many">many</option>
+                    <option value="much">much</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>5. There is _______ snow.</label>
+                <select id="q2-ans5">
+                    <option value="">-- Select --</option>
+                    <option value="much">much</option>
+                    <option value="many">many</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>6. She _______ got a new car.</label>
+                <select id="q2-ans6">
+                    <option value="">-- Select --</option>
+                    <option value="has">has</option>
+                    <option value="have">have</option>
+                    <option value="is">is</option>
+                </select>
+            </div>
+            <button class="btn-check" onclick="checkQuest2()">Transmit Answers</button>
+            <div class="feedback" id="q2-feedback"></div>
+        </div>
+    </div>
+
+    <!-- QUEST 3: Reading -->
+    <div class="quest-card" id="quest3">
+        <div class="quest-header">
+            <span class="quest-title">Quest 3: Holiday Race Report</span>
+            <span class="points-badge">+30 XP</span>
+        </div>
+        <p>Read the story about the team and answer the questions.</p>
+        <div class="story-text">
+            "Red Bull Racing is a famous Formula 1 team. They have many fans. Every year they celebrate Christmas and New Year. The drivers usually wear special costumes for the holiday show. Last year Max wore a Santa costume. There was much snow, but the cars were safe in the garage. Next year they will have a new Honda engine. The team has got a red and blue car. They will test it in sunny weather."
+        </div>
+        <div class="interactive-area">
+            <div class="input-group">
+                <label>1. What team is in the story?</label>
+                <select id="q3-ans1">
+                    <option value="">-- Select --</option>
+                    <option value="wrong1">Ferrari</option>
+                    <option value="correct">Red Bull Racing</option>
+                    <option value="wrong2">Mercedes</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>2. What holidays do they celebrate?</label>
+                <select id="q3-ans2">
+                    <option value="">-- Select --</option>
+                    <option value="wrong1">Halloween and Easter</option>
+                    <option value="correct">Christmas and New Year</option>
+                    <option value="wrong2">Independence Day</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>3. What costume did Max wear last year?</label>
+                <select id="q3-ans3">
+                    <option value="">-- Select --</option>
+                    <option value="correct">Santa costume</option>
+                    <option value="wrong1">Clown costume</option>
+                    <option value="wrong2">Superhero costume</option>
+                </select>
+            </div>
+            <button class="btn-check" onclick="checkQuest3()">Submit Report</button>
+            <div class="feedback" id="q3-feedback"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let scoreQuest1 = 0;
+    let scoreQuest2 = 0;
+    let scoreQuest3 = 0;
+
+    function updateGlobalScore() {
+        let total = scoreQuest1 + scoreQuest2 + scoreQuest3;
+        document.getElementById('total-score').innerText = total;
+        let status = "Rookie Pit Crew";
+        if (total >= 30) status = "Junior Mechanic";
+        if (total >= 70) status = "Race Engineer";
+        if (total === 130) status = "🏎️ GRAND PRIX CHAMPION!";
+        document.getElementById('rank-status').innerText = status;
+    }
+
+    // Вспомогательная функция подсветки поля
+    function setFieldColor(id, isCorrect) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.remove('correct-field', 'incorrect-field');
+        if (isCorrect) {
+            el.classList.add('correct-field');
+        } else {
+            el.classList.add('incorrect-field');
+        }
+    }
+
+    function checkQuest1() {
+        let a1 = document.getElementById('q1-ans1').value.trim().toLowerCase();
+        let a2 = document.getElementById('q1-ans2').value.trim().toLowerCase();
+        let a3 = document.getElementById('q1-ans3').value.trim().toLowerCase();
+        let a4 = document.getElementById('q1-ans4').value.trim().toLowerCase();
+        let a5 = document.getElementById('q1-ans5').value.trim().toLowerCase();
+        let a6 = document.getElementById('q1-ans6').value.trim().toLowerCase();
+        let fb = document.getElementById('q1-feedback');
+
+        const answers = [
+            { id: 'q1-ans1', val: a1, correct: 'christmas' },
+            { id: 'q1-ans2', val: a2, correct: 'presents' },
+            { id: 'q1-ans3', val: a3, correct: 'costumes' },
+            { id: 'q1-ans4', val: a4, correct: 'holiday' },
+            { id: 'q1-ans5', val: a5, correct: 'sunny' },
+            { id: 'q1-ans6', val: a6, correct: 'ears' }
+        ];
+
+        let allCorrect = true;
+        answers.forEach(item => {
+            const ok = item.val === item.correct;
+            setFieldColor(item.id, ok);
+            if (!ok) allCorrect = false;
+        });
+
+        if (allCorrect) {
+            fb.innerHTML = "✅ Perfect! All words decoded. +60 XP!";
+            fb.className = "feedback success";
+            scoreQuest1 = 60;
+        } else {
+            fb.innerHTML = "❌ Some words are wrong. Check the highlighted fields.";
+            fb.className = "feedback error";
+            scoreQuest1 = 0;
+        }
+        fb.style.display = "block";
+        updateGlobalScore();
+    }
+
+    function checkQuest2() {
+        let a1 = document.getElementById('q2-ans1').value;
+        let a2 = document.getElementById('q2-ans2').value;
+        let a3 = document.getElementById('q2-ans3').value;
+        let a4 = document.getElementById('q2-ans4').value;
+        let a5 = document.getElementById('q2-ans5').value;
+        let a6 = document.getElementById('q2-ans6').value;
+        let fb = document.getElementById('q2-feedback');
+
+        const answers = [
+            { id: 'q2-ans1', val: a1, correct: 'won' },
+            { id: 'q2-ans2', val: a2, correct: 'wears' },
+            { id: 'q2-ans3', val: a3, correct: 'will go' },
+            { id: 'q2-ans4', val: a4, correct: 'many' },
+            { id: 'q2-ans5', val: a5, correct: 'much' },
+            { id: 'q2-ans6', val: a6, correct: 'has' }
+        ];
+
+        let allCorrect = true;
+        answers.forEach(item => {
+            const ok = item.val === item.correct;
+            setFieldColor(item.id, ok);
+            if (!ok) allCorrect = false;
+        });
+
+        if (allCorrect) {
+            fb.innerHTML = "✅ Grammar tuned to perfection! +40 XP!";
+            fb.className = "feedback success";
+            scoreQuest2 = 40;
+        } else {
+            fb.innerHTML = "❌ Check your tenses and much/many again.";
+            fb.className = "feedback error";
+            scoreQuest2 = 0;
+        }
+        fb.style.display = "block";
+        updateGlobalScore();
+    }
+
+    function checkQuest3() {
+        let a1 = document.getElementById('q3-ans1').value;
+        let a2 = document.getElementById('q3-ans2').value;
+        let a3 = document.getElementById('q3-ans3').value;
+        let fb = document.getElementById('q3-feedback');
+
+        const answers = [
+            { id: 'q3-ans1', val: a1, correct: 'correct' },
+            { id: 'q3-ans2', val: a2, correct: 'correct' },
+            { id: 'q3-ans3', val: a3, correct: 'correct' }
+        ];
+
+        let allCorrect = true;
+        answers.forEach(item => {
+            const ok = item.val === item.correct;
+            setFieldColor(item.id, ok);
+            if (!ok) allCorrect = false;
+        });
+
+        if (allCorrect) {
+            fb.innerHTML = "✅ Race report analysed correctly! +30 XP!";
+            fb.className = "feedback success";
+            scoreQuest3 = 30;
+        } else {
+            fb.innerHTML = "❌ One or more answers are wrong. Re-read the report.";
+            fb.className = "feedback error";
+            scoreQuest3 = 0;
+        }
+        fb.style.display = "block";
+        updateGlobalScore();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>F1 Weather & Word Order Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #f7f9fa;
+    --card-bg: #ffffff;
+    --text-dark: #3c3c3c;
+    --text-muted: #afafaf;
+    --primary-color: #58cc02;
+    --primary-dark: #46a302;
+    --warning-color: #f39c12;
+    --border-color: #e5e5e5;
+    --font-heading: 'Fredoka', sans-serif;
+    --font-body: 'Quicksand', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+
+  .quiz-wrapper {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 550px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 0 var(--border-color);
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress-track {
+    flex-grow: 1;
+    height: 16px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .counter-display {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .screen {
+    display: none;
+    animation: slideUpFade 0.4s ease forwards;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-box {
+    background: #e1f5fe;
+    border: 2px solid #b3e5fc;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0288d1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .question-sentence {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 25px;
+    color: var(--text-dark);
+    text-align: left;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+    background: #f1f5f9;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .blank-space {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--text-dark);
+    text-align: center;
+    color: var(--primary-color);
+    padding: 0 4px;
+  }
+
+  .options-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 5px;
+  }
+
+  .option-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-bottom: 4px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s;
+    user-select: none;
+    outline: none;
+  }
+
+  .option-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  .option-btn.state-correct {
+    background-color: #d7ffb8 !important;
+    border-color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-dark) !important;
+    color: #527e02 !important;
+  }
+
+  .option-btn.state-incorrect {
+    background-color: #fff3cd !important;
+    border-color: var(--warning-color) !important;
+    border-bottom-color: #b45309 !important;
+    color: #b45309 !important;
+  }
+
+  .finish-layout {
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .award-icon {
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+    animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scalePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .finish-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffc800;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 0 #e6b400;
+  }
+
+  .finish-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 35px;
+  }
+
+  .action-trigger {
+    width: 100%;
+    background-color: var(--primary-color);
+    border: none;
+    border-bottom: 4px solid var(--primary-dark);
+    border-radius: 14px;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .action-trigger:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 5px; }
+    .quiz-wrapper { border-radius: 16px; padding: 18px; }
+    .question-sentence { font-size: 1.15rem; }
+    .option-btn { font-size: 1.05rem; padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrapper" id="masterContainer">
+  <div class="quiz-header" id="trackerHeader">
+    <div class="progress-track">
+      <div class="progress-fill" id="statusBar"></div>
+    </div>
+    <div class="counter-display" id="indexCounter">1/8</div>
+  </div>
+
+  <div class="screen active" id="gameboard">
+    <div class="hint-box">
+      <span>💡</span>
+      <span id="translationHint">Task: Choose the correct answer</span>
+    </div>
+    <div class="image-container" id="imageBox" style="display: none;">
+      <img src="" id="taskImage" alt="Racing Context">
+    </div>
+    <div class="question-sentence" id="sentencePrompt">
+      Loading item...
+    </div>
+    <div class="options-stack" id="buttonGrid"></div>
+  </div>
+
+  <div class="screen" id="summaryBoard">
+    <div class="finish-layout">
+      <div class="award-icon" id="badgeIcon">🏆</div>
+      <div class="finish-title" id="performanceTitle">Championship Complete!</div>
+      <div class="finish-score" id="scoreOverview">Your score: 0/8</div>
+      <button class="action-trigger" id="resetAction">Начать заново</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ========== ДАННЫЕ С БОЛЕЕ ОЧЕВИДНЫМИ ВАРИАНТАМИ ==========
+  const vocabularyPool = [
+    { 
+      hint: "Vocabulary: Look at Card 1 (Sunset). What is the weather?", 
+      img: "https://i.pinimg.com/originals/b5/a9/da/b5a9dab3321452fbf083407272f8afbf.jpg?nii=t", 
+      en: "We can see a beautiful racing <span class='blank-space'>______</span>.", 
+      cut: "track outside in the evening", 
+      pool: ["a rainy day", "a cold winter", "a sunny beach"] 
+    },
+    { 
+      hint: "Vocabulary: Look at Card 2 (Charles). What is happening?", 
+      img: "https://i.pinimg.com/736x/68/43/32/6843324a54a059fd864fac5de49db6e5.jpg", 
+      en: "<span class='blank-space'>______</span> beautiful flowers in spring.", 
+      cut: "Yesterday Charles saw", 
+      pool: ["Next week Charles will ", "Charles is a driver", "The car has flowers"] 
+    },
+    { 
+      hint: "Vocabulary: Look at Card 3 (Rain). Describe the photo.", 
+      img: "https://sidepodcast.com/static/content/2014/03/rosberg-in-the-rain-malaysia.jpg", 
+      en: "<span class='blank-space'>______</span>, because it is always in autumn rainy weather.", 
+      cut: "The driver has an umbrella", 
+      pool: ["The driver is a car", "An umbrella has the driver", "The umbrella is on the track"] 
+    },
+    { 
+      hint: "Vocabulary: Look at Card 4 (Snow). Describe the conditions.", 
+      img: "https://c.f1news.ru/userfiles/127219.jpg", 
+      en: "<span class='blank-space'>______</span> weather because it is a winter day now.", 
+      cut: "The car is driving in cold", 
+      pool: ["The car is hot", "Driving is the car", "In cold the car driving is"] 
+    },
+    { 
+      hint: "Word Order: Make a sentence with [be / will / in / summer / The / car].", 
+      img: null, 
+      en: "☀️ <span class='blank-space'>______</span>", 
+      cut: "The car will be in summer.", 
+      pool: ["Summer in the car will be", "The car be will in summer", "Will  the car in summer"] 
+    },
+    { 
+      hint: "Word Order: Make a sentence with [an / has / driver / umbrella / The].", 
+      img: null, 
+      en: "☔ <span class='blank-space'>______</span>", 
+      cut: "The driver has an umbrella.", 
+      pool: ["The driver an umbrella has", "An umbrella has the driver", "Driver the has an umbrella"] 
+    },
+    { 
+      hint: "Word Order: Make a sentence with [driving / cold / is / in / The / car].", 
+      img: null, 
+      en: "❄️ <span class='blank-space'>______</span>", 
+      cut: "The car is driving in cold.", 
+      pool: ["The car in cold driving is", "Is driving the car in cold", "In cold the car driving is"] 
+    },
+    { 
+      hint: "Word Order: Make a sentence with [in / flowers / spring / Charles / saw].", 
+      img: null, 
+      en: "🌸 <span class='blank-space'>______</span>", 
+      cut: "Charles saw flowers in spring.", 
+      pool: ["Charles flowers in spring saw", "In spring saw Charles flowers", "Flowers saw Charles in spring"] 
+    }
+  ];
+
+  let currentStep = 0;
+  let score = 0;
+  let inputLocked = false;
+
+  function initGame() {
+    currentStep = 0;
+    score = 0;
+    inputLocked = false;
+    document.getElementById('gameboard').classList.add('active');
+    document.getElementById('summaryBoard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'flex';
+    loadTask();
+  }
+
+  function loadTask() {
+    if (currentStep >= vocabularyPool.length) {
+      showResults();
+      return;
+    }
+
+    inputLocked = false;
+    const task = vocabularyPool[currentStep];
+
+    document.getElementById('indexCounter').innerText = `${currentStep + 1}/${vocabularyPool.length}`;
+    const percent = (currentStep / vocabularyPool.length) * 100;
+    document.getElementById('statusBar').style.width = `${percent}%`;
+
+    document.getElementById('translationHint').innerText = task.hint;
+    document.getElementById('sentencePrompt').innerHTML = task.en;
+
+    const imgBox = document.getElementById('imageBox');
+    if (task.img) {
+      imgBox.style.display = 'block';
+      document.getElementById('taskImage').src = task.img;
+    } else {
+      imgBox.style.display = 'none';
+    }
+
+    const allOptions = [task.cut, ...task.pool].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('buttonGrid');
+    grid.innerHTML = '';
+    allOptions.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.addEventListener('click', () => checkAnswer(opt, btn));
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedText, btn) {
+    if (inputLocked) return;
+    inputLocked = true;
+
+    const task = vocabularyPool[currentStep];
+    const correct = task.cut;
+    const allBtns = document.querySelectorAll('#buttonGrid .option-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    const isCorrect = selectedText === correct;
+    if (isCorrect) {
+      btn.classList.add('state-correct');
+      score++;
+    } else {
+      btn.classList.add('state-incorrect');
+      allBtns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('state-correct');
+      });
+    }
+
+    document.getElementById('statusBar').style.width = `${((currentStep + 1) / vocabularyPool.length) * 100}%`;
+
+    setTimeout(() => {
+      currentStep++;
+      loadTask();
+    }, 1500);
+  }
+
+  function showResults() {
+    document.getElementById('gameboard').classList.remove('active');
+    document.getElementById('summaryBoard').classList.add('active');
+    document.getElementById('statusBar').style.width = '100%';
+    document.getElementById('scoreOverview').innerText = `Your score: ${score}/${vocabularyPool.length}`;
+
+    let title = 'Championship Complete!';
+    let icon = '🏆';
+    if (score === vocabularyPool.length) {
+      title = 'Perfect Grand Prix! 👑';
+      icon = '🏁';
+    } else if (score >= 5) {
+      title = 'Great Race! 🏎️';
+      icon = '🏅';
+    } else {
+      title = 'Pit Stop Needed! 🔧';
+      icon = '⚙️';
+    }
+    document.getElementById('performanceTitle').innerText = title;
+    document.getElementById('badgeIcon').innerText = icon;
+  }
+
+  document.getElementById('resetAction').addEventListener('click', initGame);
+  window.addEventListener('DOMContentLoaded', initGame);
+</script>
+
+</body>
+</html>

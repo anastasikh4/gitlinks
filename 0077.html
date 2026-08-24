@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>F1 Time Markers & Q&A Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Raleway:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --f1-red: #e10600;
+    --f1-dark: #15151e;
+    --f1-light: #f7f9fa;
+    --f1-carbon: #2d2d35;
+    --f1-neon-green: #00ff66;
+    --f1-gold: #f1c40f;
+    --f1-silver: #cccccc;
+    --f1-blue: #00b4d8;
+    --f1-border: #3d3d4e;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--f1-dark);
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(225,6,0,0.15) 0%, transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(0,255,102,0.08) 0%, transparent 45%);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+
+  /* Шашечная лента сверху */
+  .quiz-wrapper::before {
+    content: "";
+    display: block;
+    height: 12px;
+    background-image: linear-gradient(45deg, #fff 25%, transparent 25%),
+                      linear-gradient(-45deg, #fff 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #fff 75%),
+                      linear-gradient(-45deg, transparent 75%, #fff 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #000;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 15px;
+    opacity: 0.8;
+  }
+
+  .quiz-wrapper {
+    background: rgba(30, 30, 40, 0.92);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 580px;
+    border: 3px solid var(--f1-red);
+    border-radius: 20px;
+    padding: 24px 24px 28px;
+    box-shadow: 0 0 30px rgba(225,6,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress-track {
+    flex-grow: 1;
+    height: 14px;
+    background-color: var(--f1-carbon);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--f1-border);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--f1-red), #ff5e3a);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(225,6,0,0.5);
+  }
+
+  .counter-display {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--f1-gold);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+
+  .screen {
+    display: none;
+    animation: slideUpFade 0.4s ease forwards;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-box {
+    background: rgba(0,180,216,0.15);
+    border: 2px solid var(--f1-blue);
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #aee6f5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .question-sentence {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    color: #ffffff;
+    text-align: left;
+  }
+
+  /* Замена image-container на стилизованный блок эмодзи */
+  .emoji-race-card {
+    width: 100%;
+    min-height: 90px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 2px solid var(--f1-red);
+    background: linear-gradient(145deg, rgba(225,6,0,0.2), rgba(0,180,216,0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    padding: 10px;
+  }
+
+  .blank-space {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--f1-gold);
+    text-align: center;
+    color: var(--f1-gold);
+    padding: 0 4px;
+  }
+
+  .options-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 5px;
+  }
+
+  .option-btn {
+    background: #252530;
+    border: 2px solid var(--f1-border);
+    border-bottom: 4px solid #1a1a24;
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s, border-color 0.1s;
+    user-select: none;
+    outline: none;
+    letter-spacing: 0.3px;
+  }
+
+  .option-btn:hover {
+    border-color: var(--f1-blue);
+  }
+
+  .option-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  .option-btn.state-correct {
+    background: rgba(0,255,102,0.15) !important;
+    border-color: var(--f1-neon-green) !important;
+    border-bottom-color: #00b84c !important;
+    color: #d0ffdd !important;
+    box-shadow: 0 0 20px rgba(0,255,102,0.3);
+  }
+
+  .option-btn.state-incorrect {
+    background: rgba(241,196,15,0.15) !important;
+    border-color: var(--f1-gold) !important;
+    border-bottom-color: #b38a2a !important;
+    color: #ffe08a !important;
+  }
+
+  .finish-layout {
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .award-icon {
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+    animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scalePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .finish-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--f1-gold);
+    margin-bottom: 12px;
+    text-shadow: 0 2px 0 #b38a2a;
+    letter-spacing: 1px;
+  }
+
+  .finish-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #cccccc;
+    margin-bottom: 35px;
+  }
+
+  .action-trigger {
+    width: 100%;
+    background-color: var(--f1-red);
+    border: none;
+    border-bottom: 4px solid #990400;
+    border-radius: 14px;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: background 0.1s;
+  }
+
+  .action-trigger:hover {
+    background: #ff1e2c;
+  }
+
+  .action-trigger:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 5px; }
+    .quiz-wrapper { border-radius: 16px; padding: 18px; }
+    .question-sentence { font-size: 1.15rem; }
+    .option-btn { font-size: 1.05rem; padding: 14px; }
+    .emoji-race-card { font-size: 2.8rem; min-height: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrapper" id="masterContainer">
+  <div class="quiz-header" id="trackerHeader">
+    <div class="progress-track">
+      <div class="progress-fill" id="statusBar"></div>
+    </div>
+    <div class="counter-display" id="indexCounter">1/7</div>
+  </div>
+
+  <div class="screen active" id="gameboard">
+    <div class="hint-box">
+      <span>💡</span>
+      <span id="translationHint">Task: Practice grammar & phrase structures</span>
+    </div>
+    <!-- Стилизованный блок вместо image-container -->
+    <div class="emoji-race-card" id="emojiRaceCard">
+      🏁
+    </div>
+    <div class="question-sentence" id="sentencePrompt">
+      Loading item...
+    </div>
+    <div class="options-stack" id="buttonGrid">
+      <!-- Options rendered dynamically -->
+    </div>
+  </div>
+
+  <div class="screen" id="summaryBoard">
+    <div class="finish-layout">
+      <div class="award-icon" id="badgeIcon">🏆</div>
+      <div class="finish-title" id="performanceTitle">Paddock Mission Complete!</div>
+      <div class="finish-score" id="scoreOverview">Your score: 0/7</div>
+      <button class="action-trigger" id="resetAction">Начать заново</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const vocabularyPool = [
+    { hint: "Q&A Match: Look at the question about March 8th.", emoji: "🏎️🌸", en: "Question: What did a driver have on his car on the eighth of March?<br>Answer: <span class='blank-space'>______</span>.", cut: "He had flowers for women", pool: ["No, it won't", "They draw clown-faces", "Yes, he was"] },
+    { hint: "Q&A Match: Look at the question about the thirty-first of October.", emoji: "🎃🏁", en: "Question: What do drivers draw on their faces on the thirty-first of October?<br>Answer: <span class='blank-space'>______</span>.", cut: "They draw clown-faces", pool: ["No, he didn't", "Yes, they do", "No, it won't"] },
+    { hint: "Q&A Match: Look at the question about New Year.", emoji: "🎆🚗", en: "Question: Will a car drive inside on the New Year?<br>Answer: <span class='blank-space'>______</span>.", cut: "No, it won't", pool: ["Yes, he was", "No, he didn't", "He had flowers for women"] },
+    { hint: "Time Markers: Complete the phrase for 'tomorrow'.", emoji: "🔮🏁", en: "🔮 [tomorrow] -> <span class='blank-space'>______</span> next to the car.", cut: "She will stand", pool: ["He saw much", "People see a car", "track every December"] },
+    { hint: "Time Markers: Complete the phrase for 'yesterday'.", emoji: "☔🏎️", en: "☔ [yesterday] -> <span class='blank-space'>______</span> rain outside in an autumn day.", cut: "He saw much", pool: ["She will stand", "People see a car", "in a summer weather"] },
+    { hint: "Time Markers: Complete the phrase for 'every day'.", emoji: "❄️🏁", en: "❄️ [every day] -> <span class='blank-space'>______</span> on the winter track every December.", cut: "People see a car", pool: ["She will stand", "He saw much", "in a summer weather"] },
+    { hint: "Time Markers: Complete the phrase describing seasonal tracking conditions.", emoji: "🏆❄️", en: "🏁 The engineering crew checks the racing <span class='blank-space'>______</span>.", cut: "track every December in a summer weather", pool: ["on the winter next to the car", "rain outside in an autumn day", "She will stand next to the car"] }
+  ];
+
+  let currentStep = 0;
+  let score = 0;
+  let inputLocked = false;
+
+  function initGame() {
+    currentStep = 0;
+    score = 0;
+    inputLocked = false;
+    document.getElementById('gameboard').classList.add('active');
+    document.getElementById('summaryBoard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'flex';
+    loadTask();
+  }
+
+  function loadTask() {
+    if (currentStep >= vocabularyPool.length) {
+      showResults();
+      return;
+    }
+
+    inputLocked = false;
+    const task = vocabularyPool[currentStep];
+    
+    document.getElementById('indexCounter').innerText = `${currentStep + 1}/${vocabularyPool.length}`;
+    document.getElementById('statusBar').style.width = `${((currentStep) / vocabularyPool.length) * 100}%`;
+
+    document.getElementById('translationHint').innerText = task.hint;
+    document.getElementById('sentencePrompt').innerHTML = task.en;
+
+    // Устанавливаем эмодзи вместо картинки
+    document.getElementById('emojiRaceCard').innerText = task.emoji || '🏁';
+
+    const grid = document.getElementById('buttonGrid');
+    grid.innerHTML = '';
+    const options = [...task.pool, task.cut].sort(() => Math.random() - 0.5);
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(opt, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selected, element) {
+    if (inputLocked) return;
+    inputLocked = true;
+
+    const task = vocabularyPool[currentStep];
+    const buttons = document.querySelectorAll('.option-btn');
+
+    if (selected === task.cut) {
+      element.classList.add('state-correct');
+      score++;
+      document.getElementById('statusBar').style.width = `${((currentStep + 1) / vocabularyPool.length) * 100}%`;
+      setTimeout(() => {
+        currentStep++;
+        loadTask();
+      }, 900);
+    } else {
+      element.classList.add('state-incorrect');
+      buttons.forEach(b => {
+        if (b.innerText === task.cut) {
+          b.classList.add('state-correct');
+        }
+      });
+      setTimeout(() => {
+        element.classList.remove('state-incorrect');
+        buttons.forEach(b => b.classList.remove('state-correct'));
+        inputLocked = false;
+      }, 1100);
+    }
+  }
+
+  function showResults() {
+    document.getElementById('statusBar').style.width = '100%';
+    document.getElementById('gameboard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'none';
+    const summary = document.getElementById('summaryBoard');
+    summary.classList.add('active');
+    document.getElementById('scoreOverview').innerText = `Your score: ${score}/${vocabularyPool.length}`;
+
+    const title = document.getElementById('performanceTitle');
+    const icon = document.getElementById('badgeIcon');
+    if (score === vocabularyPool.length) {
+      title.innerText = "Championship Winner! 🏆";
+      icon.innerText = "👑";
+    } else if (score >= 4) {
+      title.innerText = "Podium Finish! 🏎️";
+      icon.innerText = "🥈";
+    } else {
+      title.innerText = "Paddock Finisher! 🏁";
+      icon.innerText = "⏱️";
+    }
+  }
+
+  document.getElementById('resetAction').addEventListener('click', initGame);
+  window.onload = initGame;
+</script>
+
+</body>
+</html>
