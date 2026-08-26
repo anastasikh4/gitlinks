@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Mega Starlight Quest: Easy Pointers 🌟</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #000 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+        .app { max-width: 650px; width: 100%; }
+        .card { 
+            background: white; 
+            color: #1e293b;
+            padding: 35px; 
+            border-radius: 40px; 
+            border: 8px solid #60a5fa; 
+            box-shadow: 0 15px 0 #2563eb; 
+            text-align: center; 
+            position: relative;
+        }
+        .header { margin-bottom: 25px; }
+        .badge { background: #ef4444; color: #fff; padding: 6px 16px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 10px; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+        .score-box { font-weight: bold; font-size: 1.2rem; color: #2563eb; margin-bottom: 15px; }
+        
+        .progress-bar { width: 100%; height: 12px; background: #e2e8f0; border-radius: 10px; margin-bottom: 25px; overflow: hidden; border: 1px solid #cbd5e1; }
+        .progress-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.3s; }
+        
+        /* Визуальный контейнер расстояния */
+        .visual-container {
+            background: #f8fafc;
+            border: 2px dashed #93c5fd;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            min-height: 110px;
+        }
+        .arrow-indicator { font-size: 1.8rem; color: #3b82f6; letter-spacing: -2px; font-weight: 900; }
+        .object-emoji { font-size: 4rem; }
+
+        .prompt { font-size: 1.5rem; font-weight: 700; margin-bottom: 25px; color: #0f172a; line-height: 1.4; min-height: 3.2rem; }
+        .prompt span { color: #2563eb; border-bottom: 3px dashed #2563eb; padding: 0 8px; }
+        
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .btn { 
+            background: #f0f9ff; border: 3px solid #93c5fd; border-radius: 20px; padding: 15px; 
+            font-size: 1.2rem; font-weight: 700; color: #1d4ed8; cursor: pointer; transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn:hover:not(:disabled) { background: #dbeafe; transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: translateY(0); }
+        .btn.correct { background: #4def8d !important; border-color: #10b981 !important; color: #064e3b !important; }
+        .btn.wrong { background: #fecaca !important; border-color: #ef4444 !important; color: #7f1d1d !important; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .win-screen { display: none; }
+        .win-screen h2 { color: #2563eb; font-size: 2.2rem; margin-bottom: 10px; }
+        .win-screen .trophy-box { font-size: 4.5rem; margin-bottom: 15px; display: block; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="card" id="quizCard">
+        <div class="header">
+            <div id="missionBadge" class="badge">Mission Loading...</div>
+            <div class="score-box">XP POINTS: <span id="scoreText">0</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div id="gamePlay">
+            <div class="visual-container">
+                <span class="arrow-indicator" id="arrowBox">➡️</span>
+                <span class="object-emoji" id="emojiBox">✏️</span>
+            </div>
+            
+            <div class="prompt" id="promptText">Analyzing mission intel...</div>
+            <div class="options" id="optionsBox"></div>
+        </div>
+
+        <div id="winScreen" class="win-screen">
+            <span class="trophy-box">🏆🎉✨</span>
+            <h2>QUEST COMPLISHED!</h2>
+            <p id="finalScore" style="font-size: 1.2rem; color: #64748b; margin-bottom: 25px;"></p>
+            <button class="btn" onclick="location.reload()" style="width: 100%;">START RE-ENTRY</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Массив вопросов строго в легком формате
+    // "➡️" — близко (Look! This is...), "————➡️" — далеко (Look there. That is...)
+    const questions = [
+        // MISSION 1: SCHOOL OBJECTS
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "➡️", emoji: "📐", q: "Look! <span>_______</span> is a ruler.", a: ["This", "That"], c: "This" },
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "————➡️", emoji: "✏️", q: "Look there. <span>_______</span> is a pencil.", a: ["This", "That"], c: "That" },
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "➡️", emoji: "📖", q: "Look! <span>_______</span> is a book.", a: ["This", "That"], c: "This" },
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "————➡️", emoji: "👝", q: "Look there. <span>_______</span> is a pencil case.", a: ["This", "That"], c: "That" },
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "➡️", emoji: "🧽", q: "Look! <span>_______</span> is a rubber.", a: ["This", "That"], c: "This" },
+        { m: "MISSION 1: SCHOOL ITEMS", arrow: "————➡️", emoji: "🎒", q: "Look there. <span>_______</span> is a schoolbag.", a: ["This", "That"], c: "That" },
+
+        // MISSION 2: CLOTHES & SHAPES
+        { m: "MISSION 2: CLOTHES ITEMS", arrow: "➡️", emoji: "👕", q: "Look! <span>_______</span> is a T-shirt.", a: ["This", "That"], c: "This" },
+        { m: "MISSION 2: CLOTHES ITEMS", arrow: "————➡️", emoji: "🧥", q: "Look there. <span>_______</span> is a jacket.", a: ["This", "That"], c: "That" },
+        { m: "MISSION 2: CLOTHES ITEMS", arrow: "➡️", emoji: "👗", q: "Look! <span>_______</span> is a dress.", a: ["This", "That"], c: "This" },
+        { m: "MISSION 2: CLOTHES ITEMS", arrow: "————➡️", emoji: "👚", q: "Look there. <span>_______</span> is a jumper.", a: ["This", "That"], c: "That" },
+
+        // MISSION 3: EXTRA ITEMS
+        { m: "MISSION 3: EXTRA BONUS", arrow: "————➡️", emoji: "✈️", q: "Look there. <span>_______</span> is an aeroplane.", a: ["This", "That"], c: "That" },
+        { m: "MISSION 3: EXTRA BONUS", arrow: "➡️", emoji: "🪑", q: "Look! <span>_______</span> is a chair.", a: ["This", "That"], c: "This" }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        if (current >= questions.length) {
+            document.getElementById('gamePlay').style.display = 'none';
+            document.getElementById('missionBadge').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            document.getElementById('pFill').style.width = '100%';
+            document.getElementById('finalScore').innerText = `You earned ${score} XP points and mastered easy pointers!`;
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('missionBadge').innerText = data.m;
+        document.getElementById('arrowBox').innerText = data.arrow;
+        document.getElementById('emojiBox').innerText = data.emoji;
+        document.getElementById('promptText').innerHTML = data.q;
+        
+        const box = document.getElementById('optionsBox');
+        box.innerHTML = '';
+        
+        data.a.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => verifySelection(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function verifySelection(choice, btnElement) {
+        const data = questions[current];
+        const buttons = document.getElementById('optionsBox').querySelectorAll('.btn');
+        
+        if (choice === data.c) {
+            buttons.forEach(b => b.disabled = true);
+            btnElement.classList.add('correct');
+            
+            document.querySelector('.prompt span').innerText = data.c;
+            document.querySelector('.prompt span').style.borderBottom = 'none';
+            
+            score += 50;
+            document.getElementById('scoreText').innerText = score;
+            setTimeout(() => {
+                current++;
+                loadQuestion();
+            }, 1000);
+        } else {
+            btnElement.classList.add('wrong');
+            buttons.forEach(b => b.disabled = true);
+            setTimeout(() => {
+                btnElement.classList.remove('wrong');
+                buttons.forEach(b => b.disabled = false);
+            }, 800);
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
+
+
+
