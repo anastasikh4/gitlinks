@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 English Master: Daily Chores</title>
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --wrong: #ff4b4b;
+            --text: #4b4b4b;
+            --bg: #ffffff;
+            --gray: #e5e5e5;
+            --blue: #1cb0f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--gray);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .question-card {
+            flex-grow: 1;
+            animation: fadeIn 0.5s ease;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text);
+            text-align: left;
+        }
+
+        .sentence {
+            font-size: 22px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid var(--gray);
+            border-radius: 15px;
+            background: #fafafa;
+        }
+
+        .gap {
+            color: var(--blue);
+            font-weight: bold;
+            border-bottom: 2px solid var(--blue);
+            padding: 0 5px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: left;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f7f7f7;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn.correct {
+            background-color: #d7ffb8;
+            border-color: #58cc02;
+            border-bottom-color: #46a302;
+            color: #46a302;
+        }
+
+        .option-btn.wrong {
+            background-color: #ffdfe0;
+            border-color: #ff4b4b;
+            border-bottom-color: #ea2b2b;
+            color: #ea2b2b;
+            animation: shake 0.4s;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .trophy { font-size: 80px; margin-bottom: 20px; }
+        .restart-btn {
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            border-radius: 15px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div id="quiz-container">
+        <div class="header">
+            <div class="progress-container">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="question-card" id="current-question">
+            <h2 id="instruction">Complete the collocations (Daily Chores):</h2>
+            <div class="sentence" id="sentence-text"></div>
+            <div class="options-grid" id="options-grid"></div>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <div class="trophy">🏆🎉</div>
+        <h1 id="result-title">Chore Master!</h1>
+        <p id="result-score"></p>
+        <button class="restart-btn" onclick="location.reload()">PRACTICE AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // Массив вопросов, полностью сдублированный с вашего скриншота упражнения №2
+    const questions = [
+        { q: "Can you iron _______", a: "my T-shirt, please?", options: ["my T-shirt, please?", "out the rubbish.", "away her clothes."] },
+        { q: "Anna always puts _______", a: "away her clothes.", options: ["beds before we go to school.", "away her clothes.", "the table, please."] },
+        { q: "Dad often clears the _______", a: "table after dinner.", options: ["table after dinner.", "washing machine.", "our plants on hot days."] },
+        { q: "We make our _______", a: "beds before we go to school.", options: ["my T-shirt, please?", "beds before we go to school.", "out the rubbish."] },
+        { q: "Please take _______", a: "out the rubbish.", options: ["away her clothes.", "the table, please.", "out the rubbish."] },
+        { q: "Grandpa waters _______", a: "our plants on hot days.", options: ["our plants on hot days.", "the washing machine.", "table after dinner."] },
+        { q: "Set _______", a: "the table, please.", options: ["the table, please.", "away her clothes.", "out the rubbish."] },
+        { q: "Tina usually loads _______", a: "the washing machine.", options: ["the table, please.", "the washing machine.", "our plants on hot days."] }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let shuffledQuestions = [];
+
+    function initQuiz() {
+        // Перемешиваем список, чтобы при перезапуске порядок менялся
+        shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = shuffledQuestions[currentIndex];
+        const sentenceEl = document.getElementById('sentence-text');
+        const optionsEl = document.getElementById('options-grid');
+        const progressEl = document.getElementById('progress-fill');
+
+        // Рассчитываем и плавно двигаем полосу прогресса
+        progressEl.style.width = `${(currentIndex / shuffledQuestions.length) * 100}%`;
+        sentenceEl.innerHTML = q.q + " <span class='gap'>_______</span>";
+        
+        optionsEl.innerHTML = '';
+        
+        // Перемешиваем варианты ответов внутри самой карточки
+        const currentOptions = [...q.options].sort(() => Math.random() - 0.5);
+        
+        currentOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, btn) {
+        const correct = shuffledQuestions[currentIndex].a;
+        const allBtns = document.querySelectorAll('.option-btn');
+        
+        // Блокируем кнопки от повторных кликов в момент анимации
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+            document.querySelector('.gap').innerText = correct;
+            document.querySelector('.gap').style.borderBottom = 'none';
+        } else {
+            btn.classList.add('wrong');
+            // Если ученик ошибся, Duolingo подсветит правильную карточку зеленым для запоминания
+            allBtns.forEach(b => {
+                if (b.innerText === correct) b.classList.add('correct');
+            });
+        }
+
+        // Переходим к следующему шагу с задержкой в 1.2 секунды
+        setTimeout(() => {
+            currentIndex++;
+            if (currentIndex < shuffledQuestions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }, 1200);
+    }
+
+    function showResult() {
+        document.getElementById('quiz-container').style.display = 'none';
+        const resultScreen = document.getElementById('result-screen');
+        resultScreen.style.display = 'block';
+        document.getElementById('result-score').innerText = `You correctly matched ${score} out of ${shuffledQuestions.length} sentences.`;
+    }
+
+    // Точка входа в игру
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>

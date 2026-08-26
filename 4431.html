@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autumn Hub: Charlie's Chores & Dates Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;800&family=Bangers&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --autumn-orange: #e67e22;
+            --deep-red: #c0392b;
+            --forest-dark: #2c3e50;
+            --paper: #fdf2e9;
+            --success: #27ae60;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--forest-dark);
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .story-card {
+            background: var(--paper);
+            max-width: 850px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 5px solid var(--autumn-orange);
+        }
+
+        h1 {
+            font-family: 'Bangers', cursive;
+            font-size: 3rem;
+            color: var(--deep-red);
+            text-align: center;
+            letter-spacing: 2px;
+            margin-top: 0;
+            text-shadow: 2px 2px 0px var(--autumn-orange);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: var(--forest-dark);
+            border-bottom: 3px solid var(--autumn-orange);
+            padding-bottom: 5px;
+            margin-top: 35px;
+            text-transform: uppercase;
+        }
+
+        .word-bank {
+            margin: 15px 0;
+            padding: 15px;
+            background: #fff;
+            border-radius: 12px;
+            border: 2px dashed var(--autumn-orange);
+            text-align: center;
+        }
+
+        .word-tag {
+            display: inline-block;
+            background: var(--forest-dark);
+            color: white;
+            padding: 6px 14px;
+            margin: 5px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .story-content {
+            font-size: 22px;
+            line-height: 1.8;
+            text-align: justify;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .gap-container {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        select {
+            font-family: 'Raleway', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--deep-red);
+            background: transparent;
+            border: none;
+            border-bottom: 3px dashed var(--autumn-orange);
+            cursor: pointer;
+            padding: 0 5px;
+            outline: none;
+            text-align: center;
+            width: 150px;
+        }
+
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .month-row {
+            background: white;
+            border: 2px solid var(--forest-dark);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 4px 4px 0px var(--autumn-orange);
+        }
+
+        .month-name {
+            font-weight: 900;
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--deep-red);
+        }
+
+        .season-select {
+            width: 100%;
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
+        }
+
+        .dates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .date-card {
+            background: white;
+            border: 2px solid var(--forest-dark);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 4px 4px 0px var(--autumn-orange);
+        }
+
+        .date-num {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--deep-red);
+            margin-bottom: 8px;
+        }
+
+        .date-select {
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 6px;
+            cursor: pointer;
+        }
+
+        .check-btn {
+            display: block;
+            margin: 40px auto 0;
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 22px;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1e7e34;
+            transition: 0.1s;
+        }
+
+        .check-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e7e34;
+        }
+
+        @media (max-width: 750px) {
+            .months-grid, .dates-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="story-card">
+    <h1>AUTUMN QUEST: DAILY CHORES</h1>
+
+    <!-- EXERCISE 1 -->
+    <h2>1. Katie's Blog: Charlie's Chores</h2>
+    <div class="word-bank">
+        <span class="word-tag">bed</span>
+        <span class="word-tag">cat</span>
+        <span class="word-tag">dinner</span>
+        <span class="word-tag">dishwasher</span>
+        <span class="word-tag">plants</span>
+    </div>
+
+    <div class="story-content">
+        Hi. Today I want to tell you about my new friend, Charlie. 
+        Charlie helps his parents every day. He makes his 
+        <div class="gap-container">
+            <select id="story-q1">
+                <option value="">[Choose...]</option>
+                <option value="correct">bed</option>
+                <option value="wrong">plants</option>
+            </select>
+        </div> 
+        after he gets up. Before breakfast he empties the 
+        <div class="gap-container">
+            <select id="story-q2">
+                <option value="">[Choose...]</option>
+                <option value="wrong">dinner</option>
+                <option value="correct">dishwasher</option>
+            </select>
+        </div> 
+        and puts the plates and glasses in the kitchen cupboard. When it's hot, he waters the 
+        <div class="gap-container">
+            <select id="story-q3">
+                <option value="">[Choose...]</option>
+                <option value="correct">plants</option>
+                <option value="wrong">cat</option>
+            </select>
+        </div> 
+        in the garden. Then he goes to school. He gets home from school at two o'clock and he feeds the 
+        <div class="gap-container">
+            <select id="story-q4">
+                <option value="">[Choose...]</option>
+                <option value="wrong">bed</option>
+                <option value="correct">cat</option>
+            </select>
+        </div> 
+        because it's her lunch time. His favourite chore is cooking 
+        <div class="gap-container">
+            <select id="story-q5">
+                <option value="">[Choose...]</option>
+                <option value="correct">dinner</option>
+                <option value="wrong">dishwasher</option>
+            </select>
+        </div> 
+        with his dad because it's fun. They make great meals and then eat them together! What chores do you like doing?
+    </div>
+
+    <!-- EXERCISE 2 (4 месяца) -->
+    <h2>2. Read the Month and Choose the Season</h2>
+    <div class="months-grid" id="monthsContainer"></div>
+
+    <!-- EXERCISE 3 (4 даты, варианты только словами) -->
+    <h2>3. Read the Numbers and Choose the Date in Words</h2>
+    <div class="dates-grid" id="datesContainer"></div>
+
+    <button class="check-btn" onclick="validateQuest()">CHECK EVERYTHING</button>
+</div>
+
+<script>
+    // ---------- Генерация месяцев (4 штуки) ----------
+    const months = [
+        { name: "January", season: "Winter" },
+        { name: "April", season: "Spring" },
+        { name: "July", season: "Summer" },
+        { name: "October", season: "Autumn" }
+    ];
+
+    const seasons = ["Winter", "Spring", "Summer", "Autumn"];
+    const monthsContainer = document.getElementById('monthsContainer');
+
+    months.forEach(month => {
+        const row = document.createElement('div');
+        row.className = 'month-row';
+        row.innerHTML = `
+            <div class="month-name">${month.name}</div>
+            <select class="season-select" data-correct="${month.season}">
+                <option value="">Season</option>
+                ${seasons.map(s => `<option value="${s}">${s}</option>`).join('')}
+            </select>
+        `;
+        monthsContainer.appendChild(row);
+    });
+
+    // ---------- Генерация дат (4 штуки, варианты полностью словами) ----------
+    const dateItems = [
+        { num: "17/08", correct: "the seventeenth of August" },
+        { num: "03/06", correct: "the third of June" },
+        { num: "01/01", correct: "the first of January" },
+        { num: "29/10", correct: "the twenty-ninth of October" }
+    ];
+
+    const dateOptions = [
+        "the first of January",
+        "the third of June",
+        "the seventeenth of August",
+        "the twenty-ninth of October",
+        "the seventh of August",
+        "the twenty-third of September"
+    ];
+
+    const datesContainer = document.getElementById('datesContainer');
+
+    dateItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'date-card';
+        card.innerHTML = `
+            <div class="date-num">${item.num}</div>
+            <select class="date-select" data-correct="${item.correct}">
+                <option value="">Choose...</option>
+                ${dateOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
+            </select>
+        `;
+        datesContainer.appendChild(card);
+    });
+
+    // ---------- Проверка всех трёх блоков ----------
+    function validateQuest() {
+        let totalScore = 0;
+        const maxScore = 5 + 4 + 4; // 5 слов + 4 месяца + 4 даты
+
+        for (let i = 1; i <= 5; i++) {
+            if (document.getElementById('story-q' + i).value === 'correct') totalScore++;
+        }
+
+        document.querySelectorAll('.season-select').forEach(select => {
+            if (select.value === select.dataset.correct) totalScore++;
+        });
+
+        document.querySelectorAll('.date-select').forEach(select => {
+            if (select.value === select.dataset.correct) totalScore++;
+        });
+
+        if (totalScore === maxScore) {
+            alert("✨ PERFECT QUEST! All words, months and dates are correct!");
+        } else {
+            alert(`Score: ${totalScore} / ${maxScore}. Check your answers and try again!`);
+        }
+    }
+</script>
+
+</body>
+</html>
