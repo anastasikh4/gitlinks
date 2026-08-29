@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Clothes & Actions – 8 Questions</title>
+    <style>
+        :root {
+            --jungle-green: #2ecc71;
+            --tiger-orange: #f39c12;
+            --text-dark: #2c3e50;
+            --blue: #1cb0f6;
+        }
+
+        body {
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(180deg, #3498db 0%, #2980b9 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #game-frame {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 40px;
+            text-align: center;
+            border: 6px solid #fff;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .level-badge {
+            background: #eee;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .score-badge {
+            background: var(--tiger-orange);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .hero-emoji {
+            font-size: 5rem;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .sentence-box {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            border: 2px dashed #ccc;
+            color: var(--text-dark);
+        }
+
+        .gap {
+            background: #fff3cd;
+            border-bottom: 3px solid var(--tiger-orange);
+            padding: 2px 12px;
+            border-radius: 10px;
+            color: #e67e22;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .gap.filled {
+            background: #d7ffb8;
+            color: #58a700;
+            border-bottom-color: #58cc02;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-dark);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #f0f0f0;
+            border-color: var(--blue);
+        }
+
+        .option-btn.correct {
+            background: #2ecc71 !important;
+            color: white !important;
+            border-color: #2ecc71 !important;
+        }
+
+        .option-btn.wrong {
+            background: #ff6b6b !important;
+            color: white !important;
+            border-color: #ff6b6b !important;
+            animation: shake 0.4s;
+        }
+
+        .option-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        #win-screen {
+            display: none;
+            color: var(--text-dark);
+        }
+
+        #win-screen h1 {
+            font-size: 2.5rem;
+            color: var(--jungle-green);
+        }
+
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            animation: burst 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1.4) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
+        .btn-restart {
+            padding: 15px 40px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--blue);
+            color: white;
+            border: none;
+            transition: 0.2s;
+        }
+
+        .btn-restart:hover {
+            background: #0f8bc7;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <div class="level-badge">Mission <span id="lvl-num">1</span>/8</div>
+            <div class="score-badge">Stars: <span id="score">0</span></div>
+        </div>
+
+        <div class="hero-emoji" id="hero">👦👖</div>
+        <div class="sentence-box" id="sentence"></div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="win-screen">
+        <h1>✨ Brilliant Job! 🎉</h1>
+        <p style="font-size: 1.3rem; margin: 15px 0;">You mastered Present Continuous and clothes words!</p>
+        <div style="font-size: 4rem; margin-bottom: 20px;">👕👗🧥🩳👖</div>
+        <button class="btn-restart" onclick="resetGame()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // 8 missions – repeating jeans, T‑shirt, dress, jacket
+    const missions = [
+        {
+            hero: "👦👖",
+            text: "Look at Tom! He <span class='gap' id='g1'>___</span> wearing blue <span class='gap' id='g2'>___</span> today.",
+            answers: ["is", "jeans"],
+            options: ["is", "are", "jeans", "shorts"]
+        },
+        {
+            hero: "👧👕",
+            text: "Look at Ann! She <span class='gap' id='g1'>___</span> wearing a green <span class='gap' id='g2'>___</span>.",
+            answers: ["is", "T-shirt"],
+            options: ["is", "am", "T-shirt", "dress"]
+        },
+        {
+            hero: "👩👗",
+            text: "My sister <span class='gap' id='g1'>___</span> wearing a beautiful blue <span class='gap' id='g2'>___</span>.",
+            answers: ["is", "dress"],
+            options: ["is", "are", "dress", "jacket"]
+        },
+        {
+            hero: "👨🧥",
+            text: "Dad <span class='gap' id='g1'>___</span> wearing a brown <span class='gap' id='g2'>___</span> because it's cold.",
+            answers: ["is", "jacket"],
+            options: ["is", "are", "jacket", "jeans"]
+        },
+        {
+            hero: "👦🩳",
+            text: "The boys <span class='gap' id='g1'>___</span> wearing summer <span class='gap' id='g2'>___</span> today.",
+            answers: ["are", "shorts"],
+            options: ["is", "are", "shorts", "T-shirt"]
+        },
+        {
+            hero: "👧👗",
+            text: "Lucy <span class='gap' id='g1'>___</span> wearing a blue <span class='gap' id='g2'>___</span> for the party.",
+            answers: ["is", "dress"],
+            options: ["is", "are", "dress", "jacket"]
+        },
+        {
+            hero: "👦👖",
+            text: "Sam and I <span class='gap' id='g1'>___</span> wearing new <span class='gap' id='g2'>___</span> to school.",
+            answers: ["are", "jeans"],
+            options: ["is", "are", "jeans", "shorts"]
+        },
+        {
+            hero: "👩👕",
+            text: "Our teacher <span class='gap' id='g1'>___</span> wearing a green <span class='gap' id='g2'>___</span> and a blue skirt.",
+            answers: ["is", "T-shirt"],
+            options: ["is", "are", "T-shirt", "dress"]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentStep = 0;
+    let score = 0;
+    let isLocked = false;
+
+    function loadLevel() {
+        const m = missions[currentLevel];
+        document.getElementById('lvl-num').innerText = currentLevel + 1;
+        document.getElementById('hero').innerText = m.hero;
+        document.getElementById('sentence').innerHTML = m.text;
+
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+
+        const shuffledOptions = [...m.options].sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleChoice(btn, opt);
+            optionsEl.appendChild(btn);
+        });
+
+        document.querySelectorAll('.gap').forEach(el => {
+            el.innerText = '___';
+            el.className = 'gap';
+        });
+
+        isLocked = false;
+    }
+
+    function launchHearts() {
+        const heartEmojis = ["❤️", "💖", "💝", "💕", "💘"];
+        const count = 28;
+        const frame = document.getElementById('game-frame');
+        const rect = frame.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+
+        for (let i = 0; i < count; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = `${originX}px`;
+            heart.style.top = `${originY}px`;
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 140 + Math.random() * 200;
+            const targetX = Math.cos(angle) * distance;
+            const targetY = Math.sin(angle) * distance;
+            const rotation = Math.random() * 90 - 45;
+
+            heart.style.setProperty('--tx', `${targetX}px`);
+            heart.style.setProperty('--ty', `${targetY}px`);
+            heart.style.setProperty('--rot', `${rotation}deg`);
+
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 900);
+        }
+    }
+
+    function handleChoice(btn, val) {
+        if (isLocked) return;
+        const m = missions[currentLevel];
+
+        if (val === m.answers[currentStep]) {
+            btn.classList.add('correct');
+            btn.disabled = true;
+
+            const gapId = `g${currentStep + 1}`;
+            const gapEl = document.getElementById(gapId);
+            gapEl.innerText = val;
+            gapEl.className = 'gap filled';
+
+            score += 10;
+            document.getElementById('score').innerText = score;
+            currentStep++;
+
+            if (currentStep === 2) {
+                isLocked = true;
+                document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+                launchHearts();
+
+                setTimeout(() => {
+                    currentLevel++;
+                    currentStep = 0;
+                    if (currentLevel < missions.length) {
+                        loadLevel();
+                    } else {
+                        showWin();
+                    }
+                }, 1200);
+            }
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+        setTimeout(launchHearts, 300);
+        setTimeout(launchHearts, 800);
+    }
+
+    function resetGame() {
+        currentLevel = 0;
+        currentStep = 0;
+        score = 0;
+        isLocked = false;
+        document.getElementById('play-screen').style.display = 'block';
+        document.getElementById('win-screen').style.display = 'none';
+        document.getElementById('score').innerText = '0';
+        loadLevel();
+    }
+
+    loadLevel();
+</script>
+
+</body>
+</html>
