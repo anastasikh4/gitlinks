@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Family Actions · Present Continuous</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --green: #58cc02; --dark-green: #46a302; --blue: #1cb0f6; --gray: #e5e5e5; --text: #4b4b4b; }
+        body { font-family: 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background: #fff; color: var(--text); min-height: 100vh; }
+        header { width: 100%; max-width: 600px; padding: 20px; display: flex; align-items: center; box-sizing: border-box; }
+        .progress-bar { flex-grow: 1; height: 16px; background: var(--gray); border-radius: 10px; }
+        #fill { width: 0%; height: 100%; background: var(--green); border-radius: 10px; transition: width 0.4s; }
+        main { width: 100%; max-width: 500px; padding: 20px; text-align: center; }
+        h1 { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .card {
+            background: white; border: 2px solid var(--gray); border-bottom: 4px solid var(--gray);
+            border-radius: 15px; padding: 15px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.1s; text-align: center;
+        }
+        .card:active { transform: translateY(2px); }
+        .card.selected { background: #ddf4ff; border-color: #84d8ff; color: var(--blue); }
+        .card.correct { background: #d7ffb8; border-color: #58cc02; color: #58a700; }
+        .card.wrong { background: #ffdfe0; border-color: #ff4b4b; color: #a00000; }
+        .hidden { display: none; }
+        #feedback { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; display: none; justify-content: center; background: #d7ffb8; border-top: 2px solid #58cc02; z-index: 100; }
+        .next-btn { background: var(--green); color: white; border: none; border-bottom: 4px solid var(--dark-green); padding: 12px 40px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 18px; }
+        .next-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .emoji-big { font-size: 70px; margin-bottom: 15px; }
+        .listen-btn { background: #ffd966; border: 2px solid #f0b400; border-bottom: 4px solid #c99200; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 18px; width: 100%; margin-bottom: 15px; }
+        .completion { padding: 30px 0; }
+        .completion h2 { font-size: 32px; color: var(--green); }
+        .completion .icon { font-size: 72px; }
+        @media (max-width: 480px) {
+            .card { font-size: 14px; padding: 12px; }
+            .grid { gap: 8px; }
+            h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">Family Actions · Present Continuous</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">✨ CONTINUE ✨</button>
+</div>
+
+<script>
+    // ================================================================
+    //  LEVEL 1: MATCHING (word/phrase ↔ emoji)
+    // ================================================================
+    const level1Data = [
+        { id: 1, text: 'I am listening to music', type: 'word' }, { id: 1, text: '🎧', type: 'emoji' },
+        { id: 2, text: 'Dad is washing dishes', type: 'word' }, { id: 2, text: '🧼', type: 'emoji' },
+        { id: 3, text: 'Brothers are feeding the cat', type: 'word' }, { id: 3, text: '🐱', type: 'emoji' },
+        { id: 4, text: 'Sister is talking on phone', type: 'word' }, { id: 4, text: '📱', type: 'emoji' },
+        { id: 5, text: 'I am making my bed', type: 'word' }, { id: 5, text: '🛏️', type: 'emoji' }
+    ];
+
+    // ================================================================
+    //  LEVEL 2: MULTIPLE CHOICE (emoji → choose correct phrase)
+    // ================================================================
+    const questions2 = [
+        { emoji: '🎧', correct: 'I am listening to music', options: ['I am listening to music', 'Dad is washing dishes', 'Brothers are feeding the cat', 'Sister is talking on phone'] },
+        { emoji: '🧼', correct: 'Dad is washing dishes', options: ['Dad is washing dishes', 'I am making my bed', 'Sister is talking on phone', 'Brothers are feeding the cat'] },
+        { emoji: '🐱', correct: 'Brothers are feeding the cat', options: ['Brothers are feeding the cat', 'I am listening to music', 'Dad is washing dishes', 'Sister is talking on phone'] },
+        { emoji: '📱', correct: 'Sister is talking on phone', options: ['Sister is talking on phone', 'I am making my bed', 'Dad is washing dishes', 'Brothers are feeding the cat'] },
+        { emoji: '🛏️', correct: 'I am making my bed', options: ['I am making my bed', 'I am listening to music', 'Dad is washing dishes', 'Sister is talking on phone'] }
+    ];
+
+    // ================================================================
+    //  LEVEL 3: LISTENING (hear phrase → choose correct emoji)
+    // ================================================================
+    const targetWords3 = [
+        'I am listening to music',
+        'Dad is washing dishes',
+        'Brothers are feeding the cat',
+        'Sister is talking on phone',
+        'I am making my bed'
+    ];
+    const wordEmojiMap = {
+        'I am listening to music': '🎧',
+        'Dad is washing dishes': '🧼',
+        'Brothers are feeding the cat': '🐱',
+        'Sister is talking on phone': '📱',
+        'I am making my bed': '🛏️'
+    };
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    let totalSteps = 0;
+
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "🔍 Match the action with the emoji";
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            const shuffled = [...level1Data].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.dataset.id = item.id;
+                card.dataset.type = item.type;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+            totalSteps = 1 + questions2.length + targetWords3.length;
+        }
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "🎯 Choose the correct action";
+            const q = questions2[subStep];
+            area.innerHTML = `<div class="emoji-big">${q.emoji}</div>`;
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn, q.correct);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "🎧 Listen and choose the emoji";
+            const word = targetWords3[subStep];
+            area.innerHTML = `
+                <button class="listen-btn" onclick="speakPhrase('${word}')">🔊 LISTEN</button>
+                <div class="grid" id="listenGrid"></div>
+            `;
+            const grid = document.getElementById('listenGrid');
+            const allEmojis = Object.values(wordEmojiMap);
+            const shuffledEmojis = [...allEmojis].sort(() => Math.random() - 0.5);
+            shuffledEmojis.forEach(emoji => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.style.fontSize = '40px';
+                btn.innerText = emoji;
+                btn.onclick = () => checkLevel3(emoji, btn, word);
+                grid.appendChild(btn);
+            });
+            // auto-speak after a short delay
+            setTimeout(() => speakPhrase(word), 600);
+        }
+    }
+
+    // ---- LEVEL 1: Matching ----
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(p => p.card === card)) return;
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const a = selectedCards[0];
+            const b = selectedCards[1];
+            if (a.item.id === b.item.id && a.item.type !== b.item.type) {
+                a.card.classList.remove('selected');
+                b.card.classList.remove('selected');
+                a.card.classList.add('correct');
+                b.card.classList.add('correct');
+                selectedCards = [];
+                const allCorrect = document.querySelectorAll('.card.correct').length === level1Data.length;
+                if (allCorrect) showNext();
+            } else {
+                // wrong match
+                a.card.classList.add('wrong');
+                b.card.classList.add('wrong');
+                setTimeout(() => {
+                    a.card.classList.remove('selected', 'wrong');
+                    b.card.classList.remove('selected', 'wrong');
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+    }
+
+    // ---- LEVEL 2: Multiple Choice ----
+    function checkLevel2(choice, btn, correct) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (choice === correct) {
+            btn.classList.add('correct');
+            showNext();
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- LEVEL 3: Listening ----
+    function checkLevel3(selectedEmoji, btn, correctWord) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        const correctEmoji = wordEmojiMap[correctWord];
+        if (selectedEmoji === correctEmoji) {
+            btn.classList.add('correct');
+            showNext();
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- show "Continue" button ----
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+        let completed = 0;
+        if (currentLevel === 1) completed = 1;
+        else if (currentLevel === 2) completed = 1 + subStep + 1;
+        else if (currentLevel === 3) completed = 1 + questions2.length + subStep + 1;
+        const progress = (completed / totalSteps) * 100;
+        document.getElementById('fill').style.width = progress + '%';
+    }
+
+    // ---- next step ----
+    function nextStep() {
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) {
+                currentLevel = 3;
+                subStep = 0;
+            }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= targetWords3.length) {
+                // game complete!
+                document.getElementById('game-area').innerHTML = `
+                    <div class="completion">
+                        <div class="icon">🎉</div>
+                        <h2>Amazing! You're a Present Continuous Master! 🌟</h2>
+                        <p style="font-size:18px; color:#777;">You matched, chose, and listened to all family actions!</p>
+                        <button onclick="location.reload()" style="background:var(--green); color:white; border:none; border-bottom:4px solid var(--dark-green); padding:12px 40px; border-radius:12px; font-weight:800; cursor:pointer; font-size:18px; margin-top:20px;">🔄 Play Again</button>
+                    </div>
+                `;
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('fill').style.width = '100%';
+                return;
+            }
+        }
+        initLevel();
+    }
+
+    // ---- Speech Synthesis ----
+    function speakPhrase(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.85;
+        msg.pitch = 1;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // ---- start ----
+    initLevel();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Time Mission 🕐</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --rbx-blue: #00a2ff;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+        }
+
+        body { 
+            font-family: 'Arial Black', sans-serif; 
+            background: #a5d6a7; 
+            text-align: center; color: #1b5e20; margin: 0; padding: 20px;
+        }
+
+        .game-container { 
+            max-width: 750px; margin: 0 auto; padding: 30px; background: var(--safari-sand); 
+            border-radius: 30px; border: 8px solid var(--jungle-green); position: relative;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 { font-size: 42px; letter-spacing: 2px; text-shadow: 2px 2px white; margin-top: 0;}
+
+        .hud { 
+            display: flex; justify-content: space-between; background: #222;
+            color: white; padding: 12px 25px; border-radius: 15px; margin-bottom: 20px;
+            border: 3px solid var(--rbx-blue);
+        }
+
+        .level { display: none; }
+        .active { display: block; animation: zoomIn 0.4s ease-out; }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* LEVEL 1: FLIPPING CARDS */
+        .memory-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; perspective: 1000px; margin-top: 20px;
+        }
+        .card {
+            width: 100%; height: 130px; cursor: pointer;
+            position: relative; transform-style: preserve-3d; transition: transform 0.6s;
+        }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; border: 4px solid var(--jungle-green); font-size: 18px; font-weight: bold;
+            padding: 8px;
+            text-align: center;
+        }
+        .card-back { background: var(--rbx-blue); color: white; font-size: 40px; }
+        .card-front { background: white; transform: rotateY(180deg); color: #222; font-size: 18px; }
+
+        /* LEVEL 2 + QUIZ: MULTIPLE CHOICE BUTTONS */
+        .time-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .time-btn { 
+            padding: 25px; background: white; border: 3px solid var(--jungle-green); 
+            border-radius: 15px; font-size: 22px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 0 var(--jungle-green); transition: all 0.2s;
+        }
+        .time-btn:active { transform: translateY(3px); box-shadow: none; }
+        .time-btn.correct { background: var(--correct-btn); color: white; }
+        .time-btn.wrong { background: var(--wrong-btn); color: white; }
+        
+        /* LEVEL 3: TIME LOGIC STATEMENT */
+        .statement-box { 
+            background: white; padding: 40px 20px; border-radius: 20px; 
+            border: 5px solid var(--jungle-green); margin: 30px 0; font-size: 28px; 
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.1);
+        }
+        .btn-large {
+            width: 200px; padding: 25px; font-size: 22px; font-weight: bold;
+            border: none; border-radius: 15px; color: white; cursor: pointer;
+            margin: 0 10px; text-transform: uppercase;
+        }
+
+        .feedback { font-size: 24px; height: 35px; margin: 15px 0; font-weight: bold; }
+        .clock-display { font-size: 48px; font-weight: bold; color: #1b5e20; padding: 10px; background: #fff; border-radius: 15px; display: inline-block; margin-bottom: 10px; }
+
+        .quiz-progress {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 500px) {
+            .memory-grid { grid-template-columns: repeat(2, 1fr); }
+            .time-grid { grid-template-columns: 1fr; }
+            .card { height: 100px; }
+            .card-front { font-size: 14px; }
+            .game-container { padding: 15px; }
+            h1 { font-size: 28px; }
+            .btn-large { width: 140px; padding: 18px; font-size: 18px; }
+            .clock-display { font-size: 32px; }
+            .statement-box { font-size: 20px; padding: 25px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="game-box">
+    <h1>🕐 TIME MISSION ⏰</h1>
+    <div class="hud">
+        <span>MISSION: <span id="lvl-num">1</span>/4</span>
+        <span>STARS: <span id="score">0</span></span>
+    </div>
+
+    <!-- LEVEL 1 -->
+    <div id="lvl1" class="level active">
+        <div style="background:var(--rbx-blue); color:white; padding:8px 20px; border-radius:50px; display:inline-block; font-weight: bold;">MATCH THE PAIRS</div>
+        <div class="memory-grid" id="memory-grid"></div>
+        <div class="feedback" id="feedback-1"></div>
+    </div>
+
+    <!-- LEVEL 2 -->
+    <div id="lvl2" class="level">
+        <div style="background:var(--jungle-green); color:white; padding:8px 20px; border-radius:50px; display:inline-block; font-weight: bold;">ROUND <span id="round-num">1</span>/4</div>
+        <h2 id="lvl2-instr">What time is it?</h2>
+        <div class="clock-display" id="clock-display">1:30</div>
+        <button onclick="speakCurrentTarget()" style="background:#222; color:white; padding:15px 30px; border:none; border-radius:10px; margin-bottom:15px; cursor:pointer; font-weight: bold; font-size: 16px;">🔊 REPLAY</button>
+        <div class="time-grid" id="time-grid"></div>
+        <div class="feedback" id="feedback-2"></div>
+    </div>
+
+    <!-- LEVEL 3 -->
+    <div id="lvl3" class="level">
+        <div style="background:var(--rbx-blue); color:white; padding:8px 20px; border-radius:50px; display:inline-block; font-weight: bold;">READ AND DECIDE</div>
+        <div class="statement-box" id="statement-text">Loading sentence...</div>
+        <div style="display:flex; justify-content:center;">
+            <button class="btn-large" onclick="checkStatement(true)" style="background:var(--correct-btn); border-bottom: 6px solid #2e7d32;">YES ✅</button>
+            <button class="btn-large" onclick="checkStatement(false)" style="background:var(--wrong-btn); border-bottom: 6px solid #b71c1c;">NO ❌</button>
+        </div>
+        <div class="feedback" id="feedback-3"></div>
+    </div>
+
+    <!-- LEVEL 4: FINAL QUIZ (no audio) -->
+    <div id="lvl4" class="level">
+        <div style="background:var(--rbx-blue); color:white; padding:8px 20px; border-radius:50px; display:inline-block; font-weight: bold;">🎯 FINAL QUIZ</div>
+        <div class="quiz-progress">Question <span id="quiz-num">1</span> of 5</div>
+        <h2 id="lvl4-instr">What time is it?</h2>
+        <div class="clock-display" id="quiz-clock">1:30</div>
+        <div class="time-grid" id="quiz-grid"></div>
+        <div class="feedback" id="feedback-4"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win" class="level">
+        <h2 style="font-size: 55px; color: var(--correct-btn); margin-bottom: 10px;">TIME MASTER! ⏰</h2>
+        <p style="font-size: 24px;">You earned <span id="final-score">0</span> Stars!</p>
+        <button onclick="location.reload()" style="background:var(--rbx-blue); color:white; padding:20px 50px; border:none; border-radius:50px; font-size:20px; cursor:pointer; font-weight: bold;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let matchedPairs = 0;
+
+    // 4 time pairs → 8 cards total
+    const timeData = [
+        { digital: "1:30", written: "half past one", icon: "🕐" },
+        { digital: "2:10", written: "ten past two", icon: "🕑" },
+        { digital: "3:50", written: "ten to four", icon: "🕒" },
+        { digital: "7:30", written: "half past seven", icon: "🕖" }
+    ];
+
+    // All times for the final quiz (5 questions)
+    const quizTimes = [
+        { digital: "1:30", written: "half past one" },
+        { digital: "2:10", written: "ten past two" },
+        { digital: "3:50", written: "ten to four" },
+        { digital: "7:30", written: "half past seven" },
+        { digital: "5:15", written: "quarter past five" }
+    ];
+
+    // Extra times for distractors
+    const extraTimes = [
+        "ten past three",
+        "quarter to six",
+        "half past two",
+        "ten past four",
+        "quarter past seven",
+        "ten to six",
+        "half past five",
+        "quarter to eight",
+        "ten to two",
+        "quarter past four",
+        "half past eight",
+        "ten past six"
+    ];
+
+    function updateHUD(lvl) {
+        document.getElementById('lvl-num').textContent = lvl;
+        document.getElementById('score').textContent = score;
+    }
+
+    // --- SPEECH (only for Level 2) ---
+    let maleVoice = null;
+    function initVoice() {
+        const voices = window.speechSynthesis.getVoices();
+        maleVoice = voices.find(v => v.name.includes('David') || v.name.includes('Mark') || v.name.toLowerCase().includes('male')) || voices[0];
+    }
+    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = initVoice;
+    }
+
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        let msg = new SpeechSynthesisUtterance(text);
+        if(maleVoice) msg.voice = maleVoice;
+        msg.pitch = 0.85; 
+        msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // --- LEVEL 1: MEMORY MATCH (NO PRONUNCIATION) ---
+    function initLevel1() {
+        matchedPairs = 0;
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        let deck = [];
+        timeData.forEach((t, i) => {
+            deck.push({ val: t.digital, id: i, type: 'digital' });
+            deck.push({ val: t.written, id: i, type: 'written' });
+        });
+        deck.sort(() => Math.random() - 0.5);
+
+        deck.forEach(data => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = data.id;
+            card.dataset.type = data.type;
+            card.innerHTML = `<div class="card-front">${data.val}</div><div class="card-back">⏰</div>`;
+            card.onclick = () => flipCard(card);
+            grid.appendChild(card);
+        });
+        document.getElementById('feedback-1').textContent = "";
+    }
+
+    function flipCard(card) {
+        if (lockBoard || card === firstCard || card.classList.contains('flipped')) return;
+        
+        card.classList.add('flipped');
+
+        if (!firstCard) {
+            firstCard = card;
+            return;
+        }
+
+        secondCard = card;
+        lockBoard = true;
+
+        if (firstCard.dataset.id === secondCard.dataset.id) {
+            score += 100;
+            matchedPairs++;
+            updateHUD(1);
+            document.getElementById('feedback-1').textContent = "Perfect Match! ✨";
+            document.getElementById('feedback-1').style.color = "var(--correct-btn)";
+            resetTracker();
+            
+            if (matchedPairs === timeData.length) {
+                setTimeout(() => {
+                    document.getElementById('lvl1').classList.remove('active');
+                    document.getElementById('lvl2').classList.add('active');
+                    updateHUD(2);
+                    initLevel2();
+                }, 1500);
+            }
+        } else {
+            document.getElementById('feedback-1').textContent = "Not a match! ❌";
+            document.getElementById('feedback-1').style.color = "var(--wrong-btn)";
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetTracker();
+            }, 1000);
+        }
+    }
+
+    function resetTracker() {
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+    }
+
+    // --- LEVEL 2: MULTIPLE CHOICE ---
+    let lvl2Round = 0;
+    let lvl2Target = null;
+    let level2Pool = [];
+
+    function initLevel2() {
+        lvl2Round = 0;
+        level2Pool = [...timeData].sort(() => Math.random() - 0.5);
+        setupLvl2Round();
+    }
+
+    function setupLvl2Round() {
+        if (lvl2Round >= level2Pool.length) {
+            document.getElementById('lvl2').classList.remove('active');
+            document.getElementById('lvl3').classList.add('active');
+            updateHUD(3);
+            initLevel3();
+            return;
+        }
+        
+        document.getElementById('round-num').textContent = lvl2Round + 1;
+        document.getElementById('feedback-2').textContent = "";
+        lvl2Target = level2Pool[lvl2Round];
+        document.getElementById('clock-display').textContent = lvl2Target.digital;
+        document.getElementById('lvl2-instr').textContent = `What time is it?`;
+        
+        const grid = document.getElementById('time-grid');
+        grid.innerHTML = '';
+        
+        // Build 4 options: 1 correct + 3 distractors
+        let options = [lvl2Target.written];
+        let allWritten = timeData.map(t => t.written);
+        let available = allWritten.filter(w => w !== lvl2Target.written);
+        let shuffledAvail = available.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 3 && i < shuffledAvail.length; i++) {
+            options.push(shuffledAvail[i]);
+        }
+        while (options.length < 4) {
+            let extra = extraTimes[Math.floor(Math.random() * extraTimes.length)];
+            if (!options.includes(extra)) options.push(extra);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'time-btn';
+            btn.textContent = choice;
+            btn.onclick = () => verifyLvl2Choice(btn, choice);
+            grid.appendChild(btn);
+        });
+
+        setTimeout(() => speakCurrentTarget(), 500);
+    }
+
+    function speakCurrentTarget() {
+        if (lvl2Target) speak(lvl2Target.written);
+    }
+
+    function verifyLvl2Choice(selectedBtn, chosenName) {
+        const buttons = document.querySelectorAll('.time-btn');
+        buttons.forEach(b => b.disabled = true);
+
+        if (chosenName === lvl2Target.written) {
+            selectedBtn.classList.add('correct');
+            score += 150;
+            updateHUD(2);
+            document.getElementById('feedback-2').textContent = "✅ Correct! +150 Stars";
+            document.getElementById('feedback-2').style.color = "var(--correct-btn)";
+        } else {
+            selectedBtn.classList.add('wrong');
+            document.getElementById('feedback-2').textContent = "❌ Wrong!";
+            document.getElementById('feedback-2').style.color = "var(--wrong-btn)";
+            buttons.forEach(b => {
+                if(b.textContent === lvl2Target.written) b.classList.add('correct');
+            });
+        }
+
+        setTimeout(() => {
+            lvl2Round++;
+            setupLvl2Round();
+        }, 1800);
+    }
+
+    // --- LEVEL 3: TRUE / FALSE (NO AUDIO) ---
+    let lvl3Round = 0;
+    const timeStatements = [
+        { text: "1:30 is half past one.", answer: true },
+        { text: "2:10 is ten to two.", answer: false },
+        { text: "3:50 is ten to four.", answer: true },
+        { text: "7:30 is half past seven.", answer: true },
+        { text: "5:15 is half past five.", answer: false },
+        { text: "2:10 is ten past two.", answer: true },
+        { text: "3:50 is quarter to four.", answer: false },
+        { text: "1:30 is quarter past one.", answer: false }
+    ];
+
+    function initLevel3() {
+        lvl3Round = 0;
+        timeStatements.sort(() => Math.random() - 0.5);
+        setupLvl3Round();
+    }
+
+    function setupLvl3Round() {
+        if (lvl3Round >= 5) { 
+            document.getElementById('lvl3').classList.remove('active');
+            document.getElementById('lvl4').classList.add('active');
+            updateHUD(4);
+            initQuiz();
+            return;
+        }
+        document.getElementById('feedback-3').textContent = "";
+        const statement = timeStatements[lvl3Round];
+        document.getElementById('statement-text').textContent = statement.text;
+    }
+
+    function checkStatement(playerChoice) {
+        const target = timeStatements[lvl3Round];
+        if (playerChoice === target.answer) {
+            score += 200;
+            updateHUD(3);
+            document.getElementById('feedback-3').textContent = "✅ Brilliant! +200 Stars";
+            document.getElementById('feedback-3').style.color = "var(--correct-btn)";
+        } else {
+            document.getElementById('feedback-3').textContent = "❌ That's incorrect!";
+            document.getElementById('feedback-3').style.color = "var(--wrong-btn)";
+        }
+
+        setTimeout(() => {
+            lvl3Round++;
+            setupLvl3Round();
+        }, 2000);
+    }
+
+    // --- LEVEL 4: FINAL QUIZ (no audio) ---
+    let quizRound = 0;
+    let quizPool = [];
+
+    function initQuiz() {
+        quizRound = 0;
+        quizPool = [...quizTimes].sort(() => Math.random() - 0.5);
+        setupQuizRound();
+    }
+
+    function setupQuizRound() {
+        if (quizRound >= quizPool.length) {
+            document.getElementById('lvl4').classList.remove('active');
+            document.getElementById('win').classList.add('active');
+            document.getElementById('final-score').textContent = score;
+            return;
+        }
+
+        const q = quizPool[quizRound];
+        document.getElementById('quiz-num').textContent = quizRound + 1;
+        document.getElementById('feedback-4').textContent = "";
+        document.getElementById('quiz-clock').textContent = q.digital;
+        document.getElementById('lvl4-instr').textContent = `What time is it?`;
+
+        const grid = document.getElementById('quiz-grid');
+        grid.innerHTML = '';
+
+        // Build 4 options: 1 correct + 3 distractors
+        let options = [q.written];
+        let allWritten = quizTimes.map(t => t.written);
+        let available = allWritten.filter(w => w !== q.written);
+        let shuffledAvail = available.sort(() => Math.random() - 0.5);
+        for (let i = 0; i < 3 && i < shuffledAvail.length; i++) {
+            options.push(shuffledAvail[i]);
+        }
+        while (options.length < 4) {
+            let extra = extraTimes[Math.floor(Math.random() * extraTimes.length)];
+            if (!options.includes(extra)) options.push(extra);
+        }
+        options.sort(() => Math.random() - 0.5);
+
+        options.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'time-btn';
+            btn.textContent = choice;
+            btn.onclick = () => verifyQuizChoice(btn, choice, q);
+            grid.appendChild(btn);
+        });
+    }
+
+    function verifyQuizChoice(selectedBtn, chosenName, q) {
+        const buttons = document.querySelectorAll('#quiz-grid .time-btn');
+        buttons.forEach(b => b.disabled = true);
+
+        if (chosenName === q.written) {
+            selectedBtn.classList.add('correct');
+            score += 150;
+            updateHUD(4);
+            document.getElementById('feedback-4').textContent = "✅ Correct! +150 Stars";
+            document.getElementById('feedback-4').style.color = "var(--correct-btn)";
+        } else {
+            selectedBtn.classList.add('wrong');
+            document.getElementById('feedback-4').textContent = "❌ Wrong!";
+            document.getElementById('feedback-4').style.color = "var(--wrong-btn)";
+            buttons.forEach(b => {
+                if(b.textContent === q.written) b.classList.add('correct');
+            });
+        }
+
+        setTimeout(() => {
+            quizRound++;
+            setupQuizRound();
+        }, 1800);
+    }
+
+    // --- INIT ---
+    initVoice();
+    initLevel1();
+</script>
+
+</body>
+</html>

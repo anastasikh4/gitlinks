@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duolingo · Say it! A1+</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px 12px;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        .duolingo-card {
+            max-width: 520px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 28px 24px 24px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e8e8e8;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .header .title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1f1f1f;
+        }
+        .header .title span {
+            color: #58cc02;
+        }
+
+        .header .score {
+            margin-left: auto;
+            background: #f0f0f0;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #1f1f1f;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .score span {
+            color: #58cc02;
+            font-size: 18px;
+        }
+
+        .progress-wrap {
+            width: 100%;
+            height: 10px;
+            background: #e5e5e5;
+            border-radius: 20px;
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #58cc02;
+            border-radius: 20px;
+            transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .question-area {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .q-emoji {
+            font-size: 48px;
+            margin-bottom: 4px;
+        }
+
+        .q-context {
+            font-size: 16px;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .q-prompt {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f1f1f;
+            background: #f8f9fb;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 6px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0 14px;
+        }
+
+        .option-btn {
+            background: #f7f7f7;
+            border: 2px solid #e0e0e0;
+            border-bottom: 4px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #1f1f1f;
+            cursor: pointer;
+            transition: all 0.08s linear;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-btn .letter {
+            background: #e8e8e8;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+            color: #777;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct {
+            background: #d7ffb8;
+            border-color: #58cc02;
+            border-bottom-color: #46a302;
+        }
+        .option-btn.correct .letter {
+            background: #58cc02;
+            color: white;
+        }
+
+        .option-btn.wrong {
+            background: #ffdfe0;
+            border-color: #ff4b4b;
+            border-bottom-color: #d32f2f;
+            animation: shake 0.4s ease;
+        }
+        .option-btn.wrong .letter {
+            background: #ff4b4b;
+            color: white;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .continue-btn {
+            width: 100%;
+            background: #58cc02;
+            border: none;
+            border-bottom: 4px solid #46a302;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            display: none;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .continue-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .continue-btn.show {
+            display: block;
+            animation: fadeUp 0.25s ease;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback {
+            min-height: 40px;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 8px;
+            justify-content: center;
+        }
+
+        .feedback.correct {
+            color: #58a700;
+        }
+        .feedback.wrong {
+            color: #d32f2f;
+        }
+
+        .sayit-btn {
+            background: #1cb0f6;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            border-radius: 16px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .sayit-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .sayit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+
+        .result-screen.show {
+            display: block;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .result-icon {
+            font-size: 72px;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1f1f1f;
+        }
+
+        .result-sub {
+            font-size: 18px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .result-score {
+            font-size: 44px;
+            font-weight: 900;
+            color: #58cc02;
+            background: #f0f7e8;
+            display: inline-block;
+            padding: 6px 40px;
+            border-radius: 60px;
+            margin: 12px 0 20px;
+        }
+
+        .restart-btn {
+            background: #1cb0f6;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            border-radius: 16px;
+            padding: 14px 48px;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .restart-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .game-content.hidden {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .duolingo-card {
+                padding: 18px 14px 20px;
+                border-radius: 24px;
+            }
+            .q-prompt {
+                font-size: 16px;
+                padding: 10px 12px;
+            }
+            .option-btn {
+                font-size: 15px;
+                padding: 12px 14px;
+            }
+            .header .title {
+                font-size: 17px;
+            }
+            .result-title {
+                font-size: 22px;
+            }
+            .result-score {
+                font-size: 34px;
+                padding: 4px 28px;
+            }
+            .sayit-btn {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .q-prompt {
+                font-size: 14px;
+            }
+            .option-btn {
+                font-size: 13px;
+                padding: 10px 10px;
+            }
+            .option-btn .letter {
+                width: 24px;
+                height: 24px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="duolingo-card" id="app">
+
+    <div class="header">
+        <div class="title">🗣️ <span>Say it!</span> · A1+</div>
+        <div class="score">⭐ <span id="scoreDisplay">0</span></div>
+    </div>
+
+    <div class="progress-wrap">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="game-content" id="gameContent">
+        <div class="question-area">
+            <div class="q-emoji" id="qEmoji">💬</div>
+            <div class="q-context" id="qContext">What do you say?</div>
+            <div class="q-prompt" id="qPrompt">Loading...</div>
+        </div>
+
+        <div class="options" id="optionsContainer"></div>
+
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <button class="sayit-btn" id="sayitBtn">🔊 Say it!</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <button class="continue-btn" id="continueBtn">CONTINUE ➜</button>
+    </div>
+
+    <div class="result-screen" id="resultScreen">
+        <div class="result-icon" id="resultIcon">🏆</div>
+        <div class="result-title" id="resultTitle">Great Job!</div>
+        <div class="result-sub" id="resultSub">You mastered these phrases!</div>
+        <div class="result-score" id="resultScoreDisplay">0 / 0</div>
+        <button class="restart-btn" id="restartBtn">🔄 Try Again</button>
+    </div>
+
+</div>
+
+<script>
+    // ============================================================
+    //  QUESTION BANK  – A1+ level with simple, clear situations
+    // ============================================================
+    const questions = [
+        {
+            emoji: "🐟",
+            context: "Your friend asks: 'Do you like fish?' You don't like fish.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Not really."
+        },
+        {
+            emoji: "😏",
+            context: "Your friend tries to trick you, but you know it's a trick.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Nice try!"
+        },
+        {
+            emoji: "🌙",
+            context: "Your friend says: 'I can jump to the moon!'",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Yeah, right!"
+        },
+        {
+            emoji: "🍕",
+            context: "Your mum asks: 'Are you hungry?' You are not very hungry.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Not really."
+        },
+        {
+            emoji: "🤫",
+            context: "Your friend tries to guess your secret, but they are wrong.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Nice try!"
+        },
+        {
+            emoji: "😴",
+            context: "Your brother says: 'I never sleep.'",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Yeah, right!"
+        },
+        {
+            emoji: "🌳",
+            context: "Your dad asks: 'Do you want to go to the park?' You don't really want to.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Not really."
+        },
+        {
+            emoji: "🍪",
+            context: "Your friend tries to take your cookie, but you stop them.",
+            prompt: "What do you say?",
+            options: ["Not really.", "Nice try!", "Yeah, right!"],
+            correct: "Nice try!"
+        }
+    ];
+
+    // shuffle questions on load
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // ---- state ----
+    let shuffledQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+    let currentCorrect = "";
+
+    const letters = ['A', 'B', 'C'];
+
+    // ---- DOM refs ----
+    const qEmoji = document.getElementById('qEmoji');
+    const qContext = document.getElementById('qContext');
+    const qPrompt = document.getElementById('qPrompt');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const feedback = document.getElementById('feedback');
+    const continueBtn = document.getElementById('continueBtn');
+    const progressFill = document.getElementById('progressFill');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const gameContent = document.getElementById('gameContent');
+    const resultScreen = document.getElementById('resultScreen');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultSub = document.getElementById('resultSub');
+    const resultScoreDisplay = document.getElementById('resultScoreDisplay');
+    const restartBtn = document.getElementById('restartBtn');
+    const sayitBtn = document.getElementById('sayitBtn');
+
+    // ---- speak function ----
+    function speakPhrase(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // ---- load question ----
+    function loadQuestion() {
+        isAnswered = false;
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+        continueBtn.classList.remove('show');
+        sayitBtn.disabled = true;
+
+        const q = shuffledQuestions[currentIndex];
+        const total = shuffledQuestions.length;
+        const progress = (currentIndex / total) * 100;
+        progressFill.style.width = progress + '%';
+
+        qEmoji.textContent = q.emoji || '💬';
+        qContext.textContent = q.context || 'What do you say?';
+        qPrompt.textContent = q.prompt || 'Choose the right phrase.';
+        currentCorrect = q.correct;
+
+        // shuffle options
+        const shuffledOptions = shuffle([...q.options]);
+        optionsContainer.innerHTML = '';
+
+        shuffledOptions.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            const letter = letters[idx] || '?';
+            btn.innerHTML = `<span class="letter">${letter}</span> ${opt}`;
+            btn.dataset.value = opt;
+            btn.addEventListener('click', () => handleOptionClick(btn, opt, q.correct));
+            optionsContainer.appendChild(btn);
+        });
+
+        // enable sayit button after options are rendered
+        setTimeout(() => { sayitBtn.disabled = false; }, 100);
+    }
+
+    // ---- handle option click ----
+    function handleOptionClick(btn, selected, correct) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            feedback.textContent = '✅ Perfect! +10 ⭐';
+            feedback.className = 'feedback correct';
+            score += 10;
+            scoreDisplay.textContent = score;
+            speakPhrase(correct);
+        } else {
+            btn.classList.add('wrong');
+            feedback.textContent = '❌ The right phrase is: ' + correct;
+            feedback.className = 'feedback wrong';
+            allBtns.forEach(b => {
+                if (b.dataset.value === correct) {
+                    b.classList.add('correct');
+                }
+            });
+            speakPhrase(correct);
+        }
+
+        continueBtn.classList.add('show');
+    }
+
+    // ---- continue ----
+    function goToNext() {
+        currentIndex++;
+        if (currentIndex < shuffledQuestions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    // ---- say it button ----
+    sayitBtn.addEventListener('click', function() {
+        if (currentCorrect) {
+            speakPhrase(currentCorrect);
+        }
+    });
+
+    // ---- results ----
+    function showResults() {
+        gameContent.classList.add('hidden');
+        resultScreen.classList.add('show');
+        const total = shuffledQuestions.length;
+        const totalScore = score;
+        const maxScore = total * 10;
+
+        resultScoreDisplay.textContent = totalScore + ' / ' + maxScore;
+
+        const pct = totalScore / maxScore;
+        if (pct === 1) {
+            resultIcon.textContent = '🏆';
+            resultTitle.textContent = 'Perfect Score!';
+            resultSub.textContent = 'You\'re a phrase master!';
+        } else if (pct >= 0.7) {
+            resultIcon.textContent = '🌟';
+            resultTitle.textContent = 'Great Job!';
+            resultSub.textContent = 'Keep practicing!';
+        } else {
+            resultIcon.textContent = '💪';
+            resultTitle.textContent = 'Good Effort!';
+            resultSub.textContent = 'Review the phrases and try again!';
+        }
+        progressFill.style.width = '100%';
+    }
+
+    // ---- restart ----
+    function restartGame() {
+        shuffledQuestions = shuffle(questions);
+        currentIndex = 0;
+        score = 0;
+        scoreDisplay.textContent = '0';
+        resultScreen.classList.remove('show');
+        gameContent.classList.remove('hidden');
+        loadQuestion();
+    }
+
+    // ---- init ----
+    function init() {
+        shuffledQuestions = shuffle(questions);
+        currentIndex = 0;
+        score = 0;
+        scoreDisplay.textContent = '0';
+        resultScreen.classList.remove('show');
+        gameContent.classList.remove('hidden');
+        loadQuestion();
+
+        continueBtn.addEventListener('click', goToNext);
+        restartBtn.addEventListener('click', restartGame);
+    }
+
+    init();
+</script>
+
+</body>
+</html>
