@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Present Continuous · Short Answers Trace</title>
+    <style>
+        :root { 
+            --bg: #fdfefe; 
+            --accent: #ff9f43; 
+            --btn-green: #2ecc71; 
+            --betty-orange: #f39c12;
+            --purple: #6c5ce7;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Comic Neue', sans-serif; 
+            background: #f0f4ff; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh;
+            align-items: center;
+        }
+        
+        .card { 
+            background: white; 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 25px; 
+            border-radius: 40px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            text-align: center; 
+            border: 6px solid #a29bfe; 
+        }
+        
+        .progress { 
+            color: var(--purple); 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+        }
+        .emoji-hint { 
+            font-size: 4.5rem; 
+            margin: 5px 0; 
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); 
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 4px;
+        }
+
+        .answer-hint {
+            font-size: 1.0rem;
+            color: #6c5ce7;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        #canvas-box { 
+            position: relative; 
+            background: #fff; 
+            border: 3px dashed #a29bfe; 
+            border-radius: 30px; 
+            margin: 15px auto; 
+            width: 500px; 
+            height: 120px; 
+            touch-action: none; 
+            max-width: 100%;
+        }
+        canvas { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 2; 
+            cursor: crosshair; 
+            width: 100%;
+            height: 100%;
+        }
+        
+        .trace-text { 
+            position: absolute; 
+            width: 100%; 
+            top: 50%; 
+            left: 0;
+            transform: translateY(-50%); 
+            font-size: 2.4rem; 
+            color: #e8e0f0; 
+            user-select: none; 
+            z-index: 1; 
+            letter-spacing: 2px; 
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .instr-text { 
+            font-size: 1.2rem; 
+            color: #6c5ce7; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+        }
+
+        .btn-row { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-top: 15px; 
+        }
+        button { 
+            padding: 12px 35px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            border-radius: 25px; 
+            cursor: pointer; 
+            border: none; 
+            transition: 0.2s; 
+            font-family: inherit; 
+        }
+        .btn-next { 
+            background: var(--btn-green); 
+            color: white; 
+            box-shadow: 0 5px 0 #27ae60; 
+        }
+        .btn-next:active { 
+            transform: translateY(3px); 
+            box-shadow: none; 
+        }
+        .btn-clear { 
+            background: #ff6b6b; 
+            color: white; 
+            box-shadow: 0 5px 0 #ee5253; 
+        }
+        .btn-clear:active { 
+            transform: translateY(3px); 
+            box-shadow: none; 
+        }
+
+        .finish-screen {
+            padding: 20px 0;
+        }
+        .finish-screen h1 {
+            font-size: 3rem;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+        .finish-screen p {
+            font-size: 1.4rem;
+            color: #2d3436;
+        }
+
+        @media (max-width: 520px) {
+            .card { padding: 18px; }
+            .question-text { font-size: 1.2rem; }
+            .trace-text { font-size: 1.6rem; }
+            #canvas-box { height: 100px; }
+            .emoji-hint { font-size: 3.5rem; }
+            button { padding: 10px 20px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="app">
+    <div class="progress" id="info">Question 1 of 6</div>
+    <div class="emoji-hint" id="emoji">🍕</div>
+    <div class="question-text" id="question">Is she eating?</div>
+    <div class="answer-hint" id="answerHint">Trace the answer below ✍️</div>
+
+    <div id="canvas-box">
+        <div class="trace-text" id="trace-text">Yes, she is.</div>
+        <canvas id="drawCanvas" width="500" height="120"></canvas>
+    </div>
+
+    <div class="instr-text" id="instr">Trace the short answer with your finger or mouse</div>
+
+    <div class="btn-row">
+        <button class="btn-clear" id="clear-btn" onclick="clearDraw()">Clear</button>
+        <button class="btn-next" id="main-btn" onclick="goNext()">DONE ✅</button>
+    </div>
+</div>
+
+<script>
+    // ===== DATA: 6 Present Continuous short answers =====
+    const data = [
+        { question: "Is she eating?", answer: "Yes, she is.", emoji: "🍕" },
+        { question: "Is he running?", answer: "No, he isn't.", emoji: "🏃" },
+        { question: "Are they playing?", answer: "Yes, they are.", emoji: "⚽" },
+        { question: "Is it raining?", answer: "Yes, it is.", emoji: "☔" },
+        { question: "Are they sleeping?", answer: "No, they aren't.", emoji: "😴" },
+        { question: "Is he cooking?", answer: "No, he isn't.", emoji: "🍳" }
+    ];
+
+    let idx = 0;
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    // Set up canvas for high-res display
+    function resizeCanvas() {
+        // We keep the internal resolution 500x120, but CSS stretches it.
+        // That's fine, we'll just use the internal coordinates.
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#6c5ce7';
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+            e.preventDefault();
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        return { 
+            x: (clientX - rect.left) * scaleX, 
+            y: (clientY - rect.top) * scaleY 
+        };
+    }
+
+    function start(e) {
+        e.preventDefault();
+        drawing = true;
+        const p = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+    }
+
+    function move(e) {
+        e.preventDefault();
+        if (!drawing) return;
+        const p = getPos(e);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+    }
+
+    function stop(e) {
+        drawing = false;
+    }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    canvas.addEventListener('mouseup', stop);
+    canvas.addEventListener('mouseleave', stop);
+
+    canvas.addEventListener('touchstart', start, { passive: false });
+    canvas.addEventListener('touchmove', move, { passive: false });
+    canvas.addEventListener('touchend', stop, { passive: false });
+
+    function clearDraw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function loadQuestion(index) {
+        const item = data[index];
+        document.getElementById('info').innerText = `Question ${index + 1} of ${data.length}`;
+        document.getElementById('emoji').innerText = item.emoji;
+        document.getElementById('question').innerText = item.question;
+        document.getElementById('trace-text').innerText = item.answer;
+        document.getElementById('answerHint').innerText = 'Trace the answer below ✍️';
+        document.getElementById('instr').innerText = 'Trace the short answer with your finger or mouse';
+        clearDraw();
+    }
+
+    function goNext() {
+        idx++;
+        if (idx < data.length) {
+            loadQuestion(idx);
+        } else {
+            // Finish screen
+            const card = document.querySelector('.card');
+            card.innerHTML = `
+                <div class="finish-screen">
+                    <h1>🎉 BRAVO! 🎉</h1>
+                    <p>You traced all 6 short answers!</p>
+                    <div style="font-size: 4rem; margin: 15px 0;">✅🏆✅</div>
+                    <p style="font-size: 1.1rem; color: #6c5ce7; font-weight: bold;">Present Continuous Short Answers Master!</p>
+                    <button class="btn-next" onclick="location.reload()" style="margin-top: 20px;">🔄 Play Again</button>
+                </div>
+            `;
+        }
+    }
+
+    // Load first question
+    loadQuestion(0);
+
+    // Also clear on page load
+    window.addEventListener('load', () => {
+        setTimeout(clearDraw, 100);
+    });
+</script>
+
+</body>
+</html>

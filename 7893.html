@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMONG US: Present Continuous Short Answers</title>
+    <style>
+        :root {
+            --crew-blue: #225ee1;
+            --imp-red: #ea0606;
+            --task-green: #39fd32;
+            --ship-dark: #0d121a;
+            --white: #ffffff;
+            --btn-gray: #4e5d6a;
+        }
+
+        body {
+            background-color: var(--ship-dark);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 500px;
+            background: #1e2732;
+            border-radius: 15px;
+            border: 4px solid #3f484e;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .task-status {
+            color: var(--task-green);
+            font-weight: bold;
+            font-family: monospace;
+            border: 1px solid var(--task-green);
+            padding: 5px 10px;
+        }
+
+        .display-area {
+            background: #283341;
+            min-height: 150px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #3f484e;
+        }
+
+        .sentence-text {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .word-builder {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 55px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            color: var(--task-green);
+        }
+        .word-builder .prefix {
+            color: #88b0d0;
+            font-weight: 600;
+        }
+        .word-builder .typed-char {
+            color: var(--task-green);
+        }
+        .word-builder .space-char {
+            display: inline-block;
+            width: 18px;
+        }
+
+        .letter-grid {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn-letter {
+            background: var(--crew-blue);
+            border: none;
+            border-bottom: 4px solid #163da1;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            min-width: 50px;
+            transition: 0.05s linear;
+        }
+
+        .btn-letter:active {
+            transform: translateY(2px);
+            border-bottom: 2px solid #163da1;
+        }
+        .btn-letter.hidden {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-control {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .reset-btn {
+            background: var(--imp-red);
+            color: white;
+        }
+
+        #total-progress {
+            width: 100%;
+            height: 20px;
+            background: #000;
+            border: 1px solid #3f484e;
+            border-radius: 5px;
+            margin-top: 25px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--task-green);
+            transition: 0.4s;
+        }
+
+        #win-screen {
+            display: none;
+        }
+
+        .hint-text {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 8px;
+        }
+
+        .feedback-popup {
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 28px;
+        }
+        .feedback-popup.correct {
+            color: var(--task-green);
+        }
+        .feedback-popup.wrong {
+            color: #ff4b4b;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div style="font-weight: bold;">🛸 FIX THE SABOTAGE!</div>
+            <div class="task-status">TASK: <span id="done-count">1</span>/8</div>
+        </div>
+
+        <div class="display-area">
+            <div class="sentence-text" id="sentence-box">Loading...</div>
+            <div class="word-builder" id="user-word"></div>
+            <div class="feedback-popup" id="feedback-message"></div>
+            <div class="hint-text" id="hint-box">Click letters in order to spell the answer</div>
+        </div>
+
+        <div class="letter-grid" id="letter-box"></div>
+        
+        <div class="controls">
+            <button class="btn-control reset-btn" onclick="resetWord()">Clear ❌</button>
+        </div>
+
+        <div id="total-progress"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="win-screen">
+        <h1 style="color: var(--task-green); font-size: 40px;">🚀 SHIP FIXED!</h1>
+        <p>You mastered Present Continuous short answers!</p>
+        <button class="btn-letter" onclick="location.reload()" style="width:100%; background: var(--task-green); margin-top: 20px;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let current = 0;
+    let typedString = "";
+    let currentWordIndex = 0;
+    let currentPosInWord = 0;
+
+    // Each task: question, prefix (already typed for the user), wordParts (the rest),
+    // and the full display version.
+    // The combined string is the concatenation of wordParts without spaces.
+    const tasks = [
+        { q: "Is she eating? 🍕", prefix: "Yes, ", parts: ["she", "is"], display: "Yes, she is." },
+        { q: "Is he running? 🏃", prefix: "No, ", parts: ["he", "isn't"], display: "No, he isn't." },
+        { q: "Are they playing? ⚽", prefix: "Yes, ", parts: ["they", "are"], display: "Yes, they are." },
+        { q: "Is it raining? ☔", prefix: "Yes, ", parts: ["it", "is"], display: "Yes, it is." },
+        { q: "Are they sleeping? 😴", prefix: "No, ", parts: ["they", "aren't"], display: "No, they aren't." },
+        { q: "Is she dancing? 💃", prefix: "No, ", parts: ["she", "isn't"], display: "No, she isn't." },
+        { q: "Are they studying? 📚", prefix: "Yes, ", parts: ["they", "are"], display: "Yes, they are." },
+        { q: "Is he cooking? 🍳", prefix: "No, ", parts: ["he", "isn't"], display: "No, he isn't." }
+    ];
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    // Get the combined string (no spaces) from the parts
+    function getCombined(parts) {
+        return parts.map(p => p.replace(/[',.?!]/g, '')).join('');
+    }
+
+    // Build the display string with proper spaces and punctuation
+    function buildDisplay(prefix, typed, parts) {
+        let result = prefix;
+        let typedIndex = 0;
+        for (let i = 0; i < parts.length; i++) {
+            const word = parts[i];
+            const cleanWord = word.replace(/[',.?!]/g, '');
+            const typedPart = typed.slice(typedIndex, typedIndex + cleanWord.length);
+            result += typedPart;
+            typedIndex += cleanWord.length;
+            if (i < parts.length - 1) {
+                // Add a space after each word except the last one (the space will be added automatically)
+                // But we need to add it only if we've typed enough characters to complete the word
+                // Actually we'll add spaces dynamically in the render
+            }
+        }
+        return result;
+    }
+
+    function loadTask() {
+        const t = tasks[current];
+        typedString = "";
+        currentWordIndex = 0;
+        currentPosInWord = 0;
+        
+        document.getElementById('sentence-box').innerHTML = `<strong>❓ ${t.q}</strong><br><span style="font-size:0.9rem; color:#aaa;">Click the letters to complete the answer</span>`;
+        document.getElementById('done-count').innerText = current + 1;
+        document.getElementById('feedback-message').innerText = "";
+        document.getElementById('feedback-message').className = 'feedback-popup';
+        document.getElementById('hint-box').innerText = "Click letters in the correct order";
+
+        // Build the letter pool from the combined string
+        const combined = getCombined(t.parts);
+        const letters = shuffle(combined.split(''));
+        
+        const letterBox = document.getElementById('letter-box');
+        letterBox.innerHTML = '';
+        letters.forEach(char => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-letter';
+            btn.innerText = char;
+            btn.onclick = () => addLetter(char, btn);
+            letterBox.appendChild(btn);
+        });
+
+        renderBuilder();
+
+        document.getElementById('progress-fill').style.width = (current / tasks.length * 100) + '%';
+    }
+
+    function renderBuilder() {
+        const t = tasks[current];
+        const builder = document.getElementById('user-word');
+        builder.innerHTML = '';
+
+        // Add prefix
+        const prefixSpan = document.createElement('span');
+        prefixSpan.className = 'prefix';
+        prefixSpan.textContent = t.prefix;
+        builder.appendChild(prefixSpan);
+
+        // Add typed characters with spaces
+        let typedIndex = 0;
+        for (let i = 0; i < t.parts.length; i++) {
+            const word = t.parts[i];
+            const cleanWord = word.replace(/[',.?!]/g, '');
+            
+            // How many characters of this word have been typed?
+            const typedInWord = Math.min(typedString.length - typedIndex, cleanWord.length);
+            const typedPart = typedString.slice(typedIndex, typedIndex + typedInWord);
+            
+            // Add each character
+            for (let j = 0; j < typedPart.length; j++) {
+                const charSpan = document.createElement('span');
+                charSpan.className = 'typed-char';
+                charSpan.textContent = typedPart[j];
+                builder.appendChild(charSpan);
+            }
+            
+            typedIndex += cleanWord.length;
+            
+            // Add a space after each word, except the last one
+            if (i < t.parts.length - 1) {
+                const spaceSpan = document.createElement('span');
+                spaceSpan.className = 'space-char';
+                // Show the space only if we've completed the current word
+                if (typedPart.length === cleanWord.length) {
+                    spaceSpan.textContent = ' ';
+                } else {
+                    spaceSpan.textContent = ' ';
+                    spaceSpan.style.opacity = '0.3';
+                }
+                builder.appendChild(spaceSpan);
+            }
+        }
+
+        // If the answer is complete, show the full formatted version
+        const combined = getCombined(t.parts);
+        if (typedString === combined) {
+            builder.innerHTML = '';
+            const fullSpan = document.createElement('span');
+            fullSpan.style.color = 'var(--task-green)';
+            fullSpan.style.fontWeight = 'bold';
+            fullSpan.textContent = t.display;
+            builder.appendChild(fullSpan);
+        }
+    }
+
+    function addLetter(char, btn) {
+        const t = tasks[current];
+        const combined = getCombined(t.parts);
+        
+        // Don't allow more letters than needed
+        if (typedString.length >= combined.length) return;
+        
+        typedString += char;
+        btn.classList.add('hidden');
+        
+        renderBuilder();
+
+        // Check if the answer is complete
+        if (typedString.length === combined.length) {
+            if (typedString === combined) {
+                // Correct!
+                document.getElementById('feedback-message').innerHTML = "✅ Correct! Well done!";
+                document.getElementById('feedback-message').className = 'feedback-popup correct';
+                document.getElementById('hint-box').innerText = "";
+                // Show the full formatted answer
+                const builder = document.getElementById('user-word');
+                builder.innerHTML = '';
+                const fullSpan = document.createElement('span');
+                fullSpan.style.color = 'var(--task-green)';
+                fullSpan.style.fontWeight = 'bold';
+                fullSpan.textContent = t.display;
+                builder.appendChild(fullSpan);
+                setTimeout(nextLevel, 800);
+            } else {
+                // Wrong order
+                document.getElementById('feedback-message').innerHTML = "❌ Wrong order! Try again!";
+                document.getElementById('feedback-message').className = 'feedback-popup wrong';
+                document.getElementById('hint-box').innerText = "Check the order and try again";
+                // Flash red
+                const builder = document.getElementById('user-word');
+                builder.style.color = '#ff4b4b';
+                setTimeout(() => {
+                    builder.style.color = '';
+                }, 300);
+                setTimeout(resetWord, 600);
+            }
+        }
+    }
+
+    function resetWord() {
+        typedString = "";
+        // Show all hidden letters again
+        const buttons = document.querySelectorAll('.btn-letter');
+        buttons.forEach(b => b.classList.remove('hidden'));
+        document.getElementById('feedback-message').innerHTML = "";
+        document.getElementById('feedback-message').className = 'feedback-popup';
+        document.getElementById('hint-box').innerText = "Click letters in the correct order";
+        renderBuilder();
+        // Reset color
+        document.getElementById('user-word').style.color = '';
+    }
+
+    function nextLevel() {
+        current++;
+        if (current < tasks.length) {
+            loadTask();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            document.getElementById('play-area').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+        }
+    }
+
+    loadTask();
+</script>
+</body>
+</html>
