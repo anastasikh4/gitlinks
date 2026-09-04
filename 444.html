@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌟 Interactive English Quest 🌟</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --green: #58cc02;
+            --green-dark: #46a302;
+            --blue: #1cb0f6;
+            --blue-dark: #1899d6;
+            --gray: #e5e5e5;
+            --text: #3c3c3c;
+            --error: #ff4b4b;
+            --error-dark: #ea2b2b;
+            --correct-bg: #d7ffb8;
+            --correct-text: #58a700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #ffffff;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Полоса прогресса в стиле Duolingo */
+        header {
+            width: 100%;
+            padding: 10px 0 30px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            color: #afafaf;
+            cursor: pointer;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--gray);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--green);
+            border-radius: 10px;
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        /* Игровая зона */
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .question-box {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .russian-hint {
+            font-size: 16px;
+            color: #afafaf;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+
+        .context-sentence {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.5;
+            color: #111;
+        }
+
+        .blank {
+            color: var(--blue);
+            border-bottom: 3px dashed var(--blue);
+            padding: 0 8px;
+            display: inline-block;
+            min-width: 90px;
+            font-weight: 900;
+        }
+
+        /* Сетка крупных 3D кнопок */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.1s, transform 0.1s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #f7f7f7;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        /* Анимации состояний ответов */
+        .option-btn.correct {
+            background: #d7ffb8 !important;
+            border-color: var(--green) !important;
+            border-bottom-color: var(--green-dark) !important;
+            color: #58a700 !important;
+        }
+
+        .option-btn.wrong {
+            background: #ffdfe0 !important;
+            border-color: var(--error) !important;
+            border-bottom-color: var(--error-dark) !important;
+            color: #ea2b2b !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        footer {
+            margin-top: auto;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--green-dark);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .action-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        /* Финальный экран */
+        .result-screen {
+            display: none;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .result-emoji {
+            font-size: 90px;
+            margin-bottom: 15px;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .result-title {
+            font-size: 30px;
+            font-weight: 900;
+            color: var(--blue);
+            margin-bottom: 8px;
+        }
+
+        .result-score {
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 35px;
+            font-weight: 700;
+        }
+
+        /* Частицы салюта */
+        .heart-particle {
+            position: absolute;
+            font-size: 26px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            animation: burst 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        /* Ключевые анимации */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(0); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.4) rotate(var(--rot)); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header id="quizHeader">
+        <div class="close-btn" onclick="if(confirm('Хотите перезапустить квиз?')) restartGame()">✕</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </header>
+
+    <!-- ИГРОВОЙ ЭКРАН -->
+    <main id="gamePlay">
+        <div class="question-box">
+            <div class="russian-hint" id="hintText">Приведи его.</div>
+            <p class="context-sentence" id="sentenceText">Bring <span class="blank">____</span> in.</p>
+        </div>
+
+        <div class="options-grid" id="optionsContainer"></div>
+    </main>
+
+    <!-- ФИНАЛЬНЫЙ ЭКРАН -->
+    <div class="result-screen" id="resultScreen">
+        <div class="result-emoji">🏆</div>
+        <div class="result-title" id="resultTitle">ВЕЛИКОЛЕПНО!</div>
+        <div class="result-score" id="resultScore">Вы набрали 8/8 баллов.</div>
+        <button class="action-btn" style="display: block; background: var(--blue); border-bottom-color: var(--blue-dark);" onclick="restartGame()">ПОПРОБОВАТЬ СНОВА</button>
+    </div>
+
+    <footer>
+        <button class="action-btn" id="nextBtn" onclick="nextQuestion()">ПРОДОЛЖИТЬ</button>
+    </footer>
+</div>
+
+<script>
+    // Массив данных фраз с разметкой для пропуска
+    const rawQuestions = [
+        { ru: "Приведи его.", s: "Bring <span class='blank'>____</span> in.", c: "him", o: ["him", "her", "them", "it"] },
+        { ru: "Перейди к стратегии один.", s: "Go to <span class='blank'>____</span> one.", c: "strat", o: ["strat", "plan", "phase", "step"] },
+        { ru: "Пойдём найдём этих гремлинов.", s: "Let's go find those <span class='blank'>____</span>.", c: "gremlins", o: ["gremlins", "drivers", "friends", "monsters"] },
+        { ru: "Постарайся не убить нашего гонщика.", s: "Try not to <span class='blank'>____</span> our driver.", c: "kill", o: ["kill", "hurt", "stop", "lose"] },
+        { ru: "Каков вердикт?", s: "What's the <span class='blank'>____</span>?", c: "verdict", o: ["verdict", "problem", "plan", "status"] },
+        { ru: "Я не знаю, что происходит.", s: "I don't know what's <span class='blank'>____</span>.", c: "happening", o: ["happening", "going", "doing", "working"] },
+        { ru: "Мы должны дать ей порулить.", s: "We should let her <span class='blank'>____</span>.", c: "drive", o: ["drive", "walk", "run", "talk"] },
+        { ru: "Хуже не будет.", s: "Can't be any <span class='blank'>____</span>.", c: "worse", o: ["worse", "better", "good", "bad"] }
+    ];
+
+    // Банк дополнительных дистракторов
+    const extraDistractors = ["worse", "verdict", "gremlins", "strat", "happen", "kill", "drive", "walk", "talk", "plan"];
+
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    function initGame() {
+        // Перемешиваем вопросы при загрузке
+        questions = [...rawQuestions].sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        score = 0;
+        isAnswered = false;
+        document.getElementById('gamePlay').style.display = 'flex';
+        document.getElementById('quizHeader').style.display = 'flex';
+        document.getElementById('resultScreen').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnswered = false;
+        document.getElementById('nextBtn').style.display = 'none';
+        const currentQ = questions[currentIndex];
+        // Обновление полосы прогресса
+        const progressPercent = (currentIndex / questions.length) * 100;
+        document.getElementById('progressFill').style.width = progressPercent + '%';
+        // Вывод текстов
+        document.getElementById('hintText').innerText = currentQ.ru;
+        document.getElementById('sentenceText').innerHTML = currentQ.s;
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+        // Берем правильный ответ и перемешиваем варианты
+        let currentOptions = [...currentQ.o];
+        // Дополнительная валидация: если вариантов меньше 4, добавляем из дистракторов
+        while (currentOptions.length < 4) {
+            let rand = extraDistractors[Math.floor(Math.random() * extraDistractors.length)];
+            if (!currentOptions.includes(rand) && rand !== currentQ.c) {
+                currentOptions.push(rand);
+            }
+        }
+        currentOptions = currentOptions.slice(0, 4).sort(() => Math.random() - 0.5);
+        currentOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    // Физический салют из сердечек (эффект Duolingo + Firework)
+    function launchHearts() {
+        const heartEmojis = ["❤️", "💖", "💝", "💕", "💘"];
+        const count = 22;
+        const container = document.body;
+        const originX = window.innerWidth / 2;
+        const originY = window.innerHeight / 2;
+
+        for (let i = 0; i < count; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = originX + 'px';
+            heart.style.top = originY + 'px';
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 140 + Math.random() * 180;
+            const targetX = Math.cos(angle) * distance;
+            const targetY = Math.sin(angle) * distance;
+            const rotation = Math.random() * 90 - 45;
+
+            heart.style.setProperty('--tx', targetX + 'px');
+            heart.style.setProperty('--ty', targetY + 'px');
+            heart.style.setProperty('--rot', rotation + 'deg');
+
+            container.appendChild(heart);
+            setTimeout(() => heart.remove(), 800);
+        }
+    }
+
+    function checkAnswer(selectedOption, clickedBtn) {
+        if (isAnswered) return;
+        isAnswered = true;
+        const currentQ = questions[currentIndex];
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(btn => btn.disabled = true);
+
+        // API тактильной вибрации для мобильных устройств
+        if ('vibrate' in navigator) {
+            navigator.vibrate(selectedOption === currentQ.c ? 40 : [50, 50, 50]);
+        }
+
+        if (selectedOption === currentQ.c) {
+            clickedBtn.classList.add('correct');
+            document.querySelector('.blank').innerText = currentQ.c;
+            document.querySelector('.blank').style.borderBottom = 'none';
+            score++;
+            launchHearts(); // Салют из сердечек!
+        } else {
+            clickedBtn.classList.add('wrong');
+            // Подсвечиваем правильный вариант для обучения
+            allButtons.forEach(btn => {
+                if (btn.innerText === currentQ.c) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentIndex++;
+        const mainArea = document.getElementById('gamePlay');
+        mainArea.classList.add('fade-out');
+        setTimeout(() => {
+            if (currentIndex < questions.length) {
+                loadQuestion();
+                mainArea.classList.remove('fade-out');
+            } else {
+                showResults();
+            }
+        }, 250);
+    }
+
+    function showResults() {
+        document.getElementById('gamePlay').style.display = 'none';
+        document.getElementById('quizHeader').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+        const resultScreen = document.getElementById('resultScreen');
+        resultScreen.style.display = 'flex';
+        const percent = (score / questions.length) * 100;
+        let title = "ОТЛИЧНАЯ РАБОТА! 👍";
+        let emoji = "🎉";
+        if (percent === 100) {
+            title = "БЕЗУПРЕЧНЫЙ РЕЗУЛЬТАТ! 👑";
+            emoji = "🏆";
+        }
+        document.getElementById('resultTitle').innerText = title;
+        document.querySelector('.result-emoji').innerText = emoji;
+        document.getElementById('resultScore').innerText = 'Вы правильно заполнили пропуски в ' + score + ' из ' + questions.length + ' фраз.';
+    }
+
+    function restartGame() {
+        initGame();
+    }
+
+    window.onload = initGame;
+</script>
+
+</body>
+</html>
