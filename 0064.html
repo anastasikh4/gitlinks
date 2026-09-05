@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛸 ALIEN HUB: GRBRDR'S PARK MISSION</title>
+    <style>
+        :root {
+            --park-green: #2e7d32;
+            --sky-blue: #03a9f4;
+            --sun-yellow: #ffeb3b;
+            --grass: #81c784;
+            --rose: #e91e63;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f1f8e9;
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            padding: 16px;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 550px;
+            background: #fff;
+            border-radius: 40px;
+            border: 8px solid var(--park-green);
+            box-shadow: 0 12px 0px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+            transition: border-color 0.2s, transform 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .stars-pill {
+            background: var(--sun-yellow);
+            padding: 8px 18px;
+            border-radius: 25px;
+            border: 3px solid var(--park-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .mode-tag {
+            background: var(--sky-blue);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .mode-switch {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            background: #e8f5e9;
+            border: 3px solid var(--park-green);
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--park-green);
+        }
+
+        .mode-btn.active {
+            background: var(--park-green);
+            color: white;
+        }
+
+        .mode-btn:hover:not(.active) {
+            background: #c8e6c9;
+        }
+
+        .display-area {
+            background: #e3f2fd;
+            min-height: 160px;
+            border-radius: 30px;
+            border: 4px dashed var(--sky-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            transition: background 0.3s;
+        }
+
+        .display-area.correct-flash {
+            background: #c8e6c9;
+        }
+
+        .display-area.wrong-flash {
+            background: #ffcdd2;
+        }
+
+        .big-emoji {
+            font-size: 55px;
+            margin-bottom: 10px;
+            transition: transform 0.3s;
+        }
+
+        .big-emoji.bounce {
+            animation: emojiBounce 0.5s ease;
+        }
+
+        @keyframes emojiBounce {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        .sentence-text {
+            font-size: 1.35rem;
+            color: #333;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .gap {
+            color: var(--rose);
+            background: #fce4ec;
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-weight: 900;
+            text-decoration: underline;
+        }
+
+        .gap.correct-gap {
+            background: #c8e6c9;
+            color: var(--park-green);
+            text-decoration: none;
+        }
+
+        .btn-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-action {
+            background: white;
+            border: 4px solid var(--grass);
+            border-radius: 20px;
+            padding: 14px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 5px 0 var(--park-green);
+            transition: 0.1s;
+            color: #1b5e20;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background: #f1f8e9;
+            transform: scale(1.02);
+        }
+
+        .btn-action:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        .btn-action.correct-answer {
+            background: #66bb6a;
+            border-color: #2e7d32;
+            color: white;
+            box-shadow: 0 5px 0 #1b5e20;
+        }
+
+        .btn-action.wrong-answer {
+            background: #ef5350;
+            border-color: #c62828;
+            color: white;
+            box-shadow: 0 5px 0 #b71c1c;
+        }
+
+        /* Unscramble specific */
+        .unscramble-word {
+            display: inline-block;
+            background: #fff3e0;
+            border: 3px solid #ff9800;
+            border-radius: 12px;
+            padding: 8px 16px;
+            margin: 4px 6px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #e65100;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .unscramble-word:hover {
+            background: #ffe0b2;
+            transform: scale(1.05);
+        }
+
+        .unscramble-word.selected {
+            background: #ffcc80;
+            border-color: #f57c00;
+            transform: scale(0.95);
+        }
+
+        .unscramble-word.placed {
+            background: #c8e6c9;
+            border-color: #388e3c;
+            color: #1b5e20;
+            cursor: default;
+        }
+
+        .unscramble-word.placed:hover {
+            transform: none;
+        }
+
+        .unscramble-slot {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 4px dashed #ff9800;
+            margin: 0 4px;
+            padding: 4px 12px;
+            min-height: 40px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e65100;
+            background: #fff8e1;
+            border-radius: 8px 8px 0 0;
+            transition: 0.3s;
+        }
+
+        .unscramble-slot.filled {
+            border-bottom-color: #388e3c;
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .unscramble-wordbank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 16px 0;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 16px;
+            border: 2px dashed #bbb;
+            min-height: 60px;
+        }
+
+        .unscramble-hint {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 25px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--grass);
+            transition: 0.4s;
+        }
+
+        #win-screen {
+            display: none;
+        }
+
+        #win-screen.show {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Heart particles */
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            animation: burst 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
+        /* Confetti stars for win */
+        .confetti-star {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 5;
+            animation: starFall 2s ease-in forwards;
+        }
+
+        @keyframes starFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg) scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 520px) {
+            #game-card {
+                padding: 18px;
+            }
+            .sentence-text {
+                font-size: 1.1rem;
+            }
+            .big-emoji {
+                font-size: 40px;
+            }
+            .btn-action {
+                font-size: 1rem;
+                padding: 12px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .mode-tag,
+            .stars-pill {
+                text-align: center;
+            }
+            .unscramble-word {
+                font-size: 1.1rem;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .sentence-text {
+                font-size: 0.95rem;
+            }
+            .btn-action {
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f8e9;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--grass);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-card">
+        <!-- Mode switch -->
+        <div class="mode-switch">
+            <button class="mode-btn active" data-mode="mc" onclick="switchMode('mc')">🎯 Quiz</button>
+            <button class="mode-btn" data-mode="unscramble" onclick="switchMode('unscramble')">🔀 Unscramble</button>
+        </div>
+
+        <div id="play-area">
+            <div class="header">
+                <div class="mode-tag" id="mission-title">🎯 Quiz Mode</div>
+                <div class="stars-pill">✨ <span id="score-val">0</span></div>
+            </div>
+
+            <div class="display-area" id="displayArea">
+                <div class="big-emoji" id="main-emoji">👽</div>
+                <div class="sentence-text" id="sentence-box">Loading...</div>
+            </div>
+
+            <div class="btn-grid" id="choices-box"></div>
+
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div id="win-screen">
+            <h1 style="color: var(--park-green); font-size: 34px; margin-bottom: 10px;">🏆 PARK QUEST MASTER!</h1>
+            <p style="font-size: 1.25rem; color: #4b5563;">You mastered Present Continuous and prepositions with GrBrDr!</p>
+            <div style="font-size: 60px; margin: 20px;">👽🍭🐕🐈🌳🐈‍⬛</div>
+            <p style="font-weight: 700; font-size: 1.2rem; color: var(--rose);" id="final-score-text">Score: 0</p>
+            <button class="btn-action" onclick="location.reload()" style="width:100%; text-align:center;">PLAY AGAIN 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // DATA
+        // ================================================================
+
+        // --- Quiz questions (Multiple Choice) ---
+        const quizMissions = [
+            // PART 1: GrBrDr's Funny Walk
+            { emoji: "👽", text: "This is an alien GrBrDr. GrBrDr _____ walking in the park.", opts: ["is", "are"],
+                ans: "is", hint: "GrBrDr is singular (he) ➔ is walking" },
+            { emoji: "🍭", text: "He is funny! He is _____ fifteen lollipops.", opts: ["eat", "eating"],
+                ans: "eating", hint: "Present Continuous requires 'is + verb-ing' ➔ eating" },
+            { emoji: "👖", text: "He is wearing jeans _____ his head and socks on his hands.", opts: ["on", "under"],
+                ans: "on", hint: "Wearing clothes on a body part ➔ on his head" },
+            { emoji: "🚲", text: "He _____ riding a bike because he can't ride a bike.", opts: ["is", "isn't"],
+                ans: "isn't", hint: "He can't ride, so he is NOT riding ➔ isn't" },
+            { emoji: "🛑", text: "He cannot ride a bike because he can't _____ a bike.", opts: ["ride", "riding"],
+                ans: "ride", hint: "After 'can' or 'can't' we use the base verb ➔ ride" },
+
+            // PART 2: Animals Chase & Ginger Cat
+            { emoji: "🐕", text: "Three dogs are running after GrBrDr. They _____ angry!", opts: ["are", "is"],
+                ans: "are", hint: "Three dogs are plural (they) ➔ are angry" },
+            { emoji: "🐈", text: "Five cats are running _____ the dogs.", opts: ["in", "after"], ans: "after",
+                hint: "Running in a chase sequence ➔ running after the dogs" },
+            { emoji: "❓", text: "Are _____ happy? No, they aren't.", opts: ["it", "they"], ans: "they",
+                hint: "The answer says 'No, they...', so the question must match ➔ they" },
+            { emoji: "❌", text: "Are they happy? No, they _____.", opts: ["aren't", "isn't"], ans: "aren't",
+                hint: "Plural negative short answer ➔ they aren't" },
+            { emoji: "😡", text: "No, they aren't happy. They are _____ too.", opts: ["happy", "angry"],
+                ans: "angry", hint: "They aren't happy, they are running after each other ➔ angry" },
+            { emoji: "🐈‍⬛", text: "Ginger _____ running. He's climbing the tree.", opts: ["is", "isn't"],
+                ans: "isn't", hint: "He is climbing the tree, so he is NOT running ➔ isn't running" },
+            { emoji: "🌳", text: "He is happy because he likes spring! He's _____ the tree.", opts: ["climbing", "climb"],
+                ans: "climbing", hint: "'He's' means 'He is', so we need -ing for the action ➔ climbing" }
+        ];
+
+        // --- Unscramble questions ---
+        const unscrambleData = [{
+            emoji: "👽",
+            sentence: "GrBrDr is walking in the park.",
+            words: ["GrBrDr", "is", "walking", "in", "the", "park."],
+            hint: "Subject → verb → place"
+        }, {
+            emoji: "🍭",
+            sentence: "He is eating fifteen lollipops.",
+            words: ["He", "is", "eating", "fifteen", "lollipops."],
+            hint: "Subject → verb → object"
+        }, {
+            emoji: "👖",
+            sentence: "He is wearing jeans on his head.",
+            words: ["He", "is", "wearing", "jeans", "on", "his", "head."],
+            hint: "Subject → verb → object → place"
+        }, {
+            emoji: "🚲",
+            sentence: "He isn't riding a bike.",
+            words: ["He", "isn't", "riding", "a", "bike."],
+            hint: "Subject → negative → verb → object"
+        }, {
+            emoji: "🐕",
+            sentence: "Three dogs are running after GrBrDr.",
+            words: ["Three", "dogs", "are", "running", "after", "GrBrDr."],
+            hint: "Quantity → subject → verb → preposition → object"
+        }, {
+            emoji: "🐈",
+            sentence: "Five cats are running after the dogs.",
+            words: ["Five", "cats", "are", "running", "after", "the", "dogs."],
+            hint: "Quantity → subject → verb → preposition → object"
+        }, {
+            emoji: "🐈‍⬛",
+            sentence: "Ginger isn't running. He's climbing the tree.",
+            words: ["Ginger", "isn't", "running.", "He's", "climbing", "the", "tree."],
+            hint: "Subject → negative → verb. Subject → verb → object"
+        }];
+
+        // ================================================================
+        // STATE
+        // ================================================================
+
+        let currentMode = 'mc'; // 'mc' or 'unscramble'
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // Unscramble state
+        let unscrambleWords = [];
+        let unscrambleSlots = [];
+        let selectedWordIndex = null;
+        let unscrambleCurrent = null;
+
+        // DOM refs
+        const displayArea = document.getElementById('displayArea');
+        const mainEmoji = document.getElementById('main-emoji');
+        const sentenceBox = document.getElementById('sentence-box');
+        const choicesBox = document.getElementById('choices-box');
+        const progressFill = document.getElementById('progress-fill');
+        const scoreVal = document.getElementById('score-val');
+        const missionTitle = document.getElementById('mission-title');
+        const winScreen = document.getElementById('win-screen');
+        const playArea = document.getElementById('play-area');
+        const finalScoreText = document.getElementById('final-score-text');
+
+        // ================================================================
+        // HELPERS
+        // ================================================================
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function getTotalQuestions() {
+            return currentMode === 'mc' ? quizMissions.length : unscrambleData.length;
+        }
+
+        function getCurrentQuestion() {
+            if (currentMode === 'mc') {
+                return quizMissions[currentIndex] || null;
+            } else {
+                return unscrambleData[currentIndex] || null;
+            }
+        }
+
+        // ================================================================
+        // HEARTS & CONFETTI
+        // ================================================================
+
+        function launchHearts() {
+            const heartEmojis = ["❤️", "💖", "💝", "💕", "💘", "✨", "🌟"];
+            const count = 28;
+            const card = document.getElementById('game-card');
+            const rect = card.getBoundingClientRect();
+
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+                heart.style.left = `${originX}px`;
+                heart.style.top = `${originY}px`;
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * 200;
+                const targetX = Math.cos(angle) * distance;
+                const targetY = Math.sin(angle) * distance - 80;
+                const rotation = Math.random() * 90 - 45;
+
+                heart.style.setProperty('--tx', `${targetX}px`);
+                heart.style.setProperty('--ty', `${targetY}px`);
+                heart.style.setProperty('--rot', `${rotation}deg`);
+
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 900);
+            }
+        }
+
+        function launchConfetti() {
+            const stars = ["⭐", "🌟", "✨", "🎉", "🎊", "💫"];
+            for (let i = 0; i < 40; i++) {
+                const star = document.createElement('div');
+                star.className = 'confetti-star';
+                star.innerText = stars[Math.floor(Math.random() * stars.length)];
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 30 - 10}%`;
+                star.style.fontSize = `${18 + Math.random() * 24}px`;
+                star.style.animationDuration = `${1.5 + Math.random() * 1.5}s`;
+                star.style.animationDelay = `${Math.random() * 0.8}s`;
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 3500);
+            }
+        }
+
+        // ================================================================
+        // MODE SWITCH
+        // ================================================================
+
+        function switchMode(mode) {
+            if (mode === currentMode) return;
+
+            currentMode = mode;
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            // Update buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            // Reset win screen
+            winScreen.classList.remove('show');
+            winScreen.style.display = 'none';
+            playArea.style.display = 'block';
+
+            // Reset progress
+            progressFill.style.width = '0%';
+            scoreVal.textContent = '0';
+
+            // Load first question
+            loadQuestion();
+        }
+
+        // ================================================================
+        // LOAD QUESTION
+        // ================================================================
+
+        function loadQuestion() {
+            const total = getTotalQuestions();
+
+            if (currentIndex >= total) {
+                showWin();
+                return;
+            }
+
+            const q = getCurrentQuestion();
+            if (!q) {
+                showWin();
+                return;
+            }
+
+            isAnswered = false;
+            displayArea.className = 'display-area';
+            mainEmoji.className = 'big-emoji';
+            mainEmoji.textContent = q.emoji || '👽';
+
+            if (currentMode === 'mc') {
+                loadQuizQuestion(q);
+            } else {
+                loadUnscrambleQuestion(q);
+            }
+
+            // Update progress
+            const pct = Math.round((currentIndex / total) * 100);
+            progressFill.style.width = pct + '%';
+            scoreVal.textContent = score;
+
+            // Update mission title
+            missionTitle.textContent = currentMode === 'mc' ? '🎯 Quiz Mode' : '🔀 Unscramble Mode';
+        }
+
+        // ================================================================
+        // QUIZ MODE (Multiple Choice)
+        // ================================================================
+
+        function loadQuizQuestion(q) {
+            sentenceBox.innerHTML = q.text.replace("_____", "<span class='gap'>???</span>");
+
+            choicesBox.innerHTML = '';
+            const shuffled = shuffleArray([...q.opts]);
+
+            shuffled.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-action';
+                btn.textContent = opt;
+                btn.dataset.value = opt;
+                btn.onclick = () => handleQuizAnswer(opt, btn, q);
+                choicesBox.appendChild(btn);
+            });
+        }
+
+        function handleQuizAnswer(choice, btn, q) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const allBtns = document.querySelectorAll('#choices-box .btn-action');
+            allBtns.forEach(b => b.disabled = true);
+
+            const isCorrect = choice === q.ans;
+
+            if (isCorrect) {
+                btn.classList.add('correct-answer');
+                displayArea.classList.add('correct-flash');
+                mainEmoji.classList.add('bounce');
+                launchHearts();
+                score += 10;
+                scoreVal.textContent = score;
+            } else {
+                btn.classList.add('wrong-answer');
+                displayArea.classList.add('wrong-flash');
+                // Show correct answer
+                allBtns.forEach(b => {
+                    if (b.dataset.value === q.ans) {
+                        b.classList.add('correct-answer');
+                    }
+                });
+                // Show hint via alert
+                setTimeout(() => {
+                    alert('💡 Hint: ' + q.hint);
+                }, 300);
+            }
+
+            setTimeout(() => {
+                displayArea.className = 'display-area';
+                currentIndex++;
+                loadQuestion();
+            }, 1200);
+        }
+
+        // ================================================================
+        // UNSCRAMBLE MODE
+        // ================================================================
+
+        function loadUnscrambleQuestion(q) {
+            // Store reference
+            unscrambleCurrent = q;
+
+            // Shuffle words for the word bank
+            const shuffledWords = shuffleArray([...q.words]);
+            unscrambleWords = shuffledWords.map((w, i) => ({ id: i, word: w, placed: false }));
+
+            // Slots: same number as words
+            unscrambleSlots = q.words.map((_, i) => ({ id: i, filled: false, word: null }));
+
+            selectedWordIndex = null;
+
+            // Build display
+            let displayHtml = '';
+            q.words.forEach((_, idx) => {
+                displayHtml += `<span class="unscramble-slot" data-slot="${idx}" id="slot-${idx}">___</span>`;
+            });
+            sentenceBox.innerHTML = displayHtml;
+
+            // Build word bank
+            let bankHtml = '<div class="unscramble-wordbank">';
+            unscrambleWords.forEach((w, idx) => {
+                bankHtml +=
+                    `<span class="unscramble-word" data-id="${idx}" onclick="selectWord(${idx})">${w.word}</span>`;
+            });
+            bankHtml += '</div>';
+            bankHtml += `<div class="unscramble-hint">💡 ${q.hint}</div>`;
+
+            choicesBox.innerHTML = bankHtml;
+
+            // Update slots
+            updateSlots();
+        }
+
+        function selectWord(idx) {
+            if (isAnswered) return;
+            const word = unscrambleWords[idx];
+            if (word.placed) return;
+
+            // Find first empty slot
+            const emptySlot = unscrambleSlots.findIndex(s => !s.filled);
+            if (emptySlot === -1) return;
+
+            // Place word in slot
+            unscrambleSlots[emptySlot].filled = true;
+            unscrambleSlots[emptySlot].word = word.word;
+            word.placed = true;
+
+            // Update UI
+            updateSlots();
+            updateWordBank();
+
+            // Check if all slots are filled
+            if (unscrambleSlots.every(s => s.filled)) {
+                checkUnscramble();
+            }
+        }
+
+        function updateSlots() {
+            unscrambleSlots.forEach((slot, idx) => {
+                const el = document.getElementById(`slot-${idx}`);
+                if (el) {
+                    if (slot.filled) {
+                        el.textContent = slot.word;
+                        el.classList.add('filled');
+                    } else {
+                        el.textContent = '___';
+                        el.classList.remove('filled');
+                    }
+                }
+            });
+        }
+
+        function updateWordBank() {
+            const words = document.querySelectorAll('.unscramble-word');
+            words.forEach(el => {
+                const id = parseInt(el.dataset.id);
+                if (unscrambleWords[id].placed) {
+                    el.classList.add('placed');
+                } else {
+                    el.classList.remove('placed');
+                }
+            });
+        }
+
+        function checkUnscramble() {
+            isAnswered = true;
+
+            const userSentence = unscrambleSlots.map(s => s.word).join(' ');
+            const correctSentence = unscrambleCurrent.sentence;
+
+            // Compare ignoring trailing punctuation differences
+            const normalize = (s) => s.replace(/[.!?]+$/, '').trim();
+            const isCorrect = normalize(userSentence) === normalize(correctSentence);
+
+            if (isCorrect) {
+                displayArea.classList.add('correct-flash');
+                mainEmoji.classList.add('bounce');
+                launchHearts();
+                score += 15;
+                scoreVal.textContent = score;
+
+                // Highlight all slots green
+                document.querySelectorAll('.unscramble-slot').forEach(el => {
+                    el.style.borderBottomColor = '#388e3c';
+                    el.style.background = '#e8f5e9';
+                });
+            } else {
+                displayArea.classList.add('wrong-flash');
+                // Show correct sentence
+                setTimeout(() => {
+                    alert('❌ Not quite!\n\nCorrect: ' + correctSentence + '\n\nYour: ' + userSentence);
+                }, 300);
+
+                // Allow retry: reset slots
+                setTimeout(() => {
+                    resetUnscramble();
+                }, 1200);
+                return;
+            }
+
+            setTimeout(() => {
+                displayArea.className = 'display-area';
+                currentIndex++;
+                loadQuestion();
+            }, 1500);
+        }
+
+        function resetUnscramble() {
+            isAnswered = false;
+            unscrambleWords.forEach(w => w.placed = false);
+            unscrambleSlots.forEach(s => { s.filled = false;
+                s.word = null; });
+            selectedWordIndex = null;
+            updateSlots();
+            updateWordBank();
+            displayArea.className = 'display-area';
+        }
+
+        // ================================================================
+        // WIN SCREEN
+        // ================================================================
+
+        function showWin() {
+            playArea.style.display = 'none';
+            winScreen.style.display = 'block';
+            winScreen.classList.add('show');
+            finalScoreText.textContent = `Score: ${score}`;
+            progressFill.style.width = '100%';
+            launchConfetti();
+            launchHearts();
+            setTimeout(launchHearts, 500);
+            setTimeout(launchConfetti, 1000);
+        }
+
+        // ================================================================
+        // INIT
+        // ================================================================
+
+        function init() {
+            // Make functions globally accessible for onclick
+            window.selectWord = selectWord;
+            window.switchMode = switchMode;
+
+            // Start with quiz mode
+            currentMode = 'mc';
+            currentIndex = 0;
+            score = 0;
+            loadQuestion();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Keyboard support for restart
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                if (winScreen.classList.contains('show')) {
+                    location.reload();
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

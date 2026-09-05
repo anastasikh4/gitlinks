@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌟 Starlight Quest: Full Short Answers Practice</title>
+  <style>
+    body { font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; background: #e0f2fe; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+    .quiz-card { background: white; width: 100%; max-width: 500px; padding: 30px; border-radius: 30px; border: 6px solid #38bdf8; box-shadow: 0 12px 0 #0284c7; text-align: center; }
+    .mascot { font-size: 3.5rem; margin-bottom: 10px; }
+    h1 { font-size: 1.8rem; color: #0284c7; margin: 0 0 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .question-container { display: none; }
+    .question-container.active { display: block; }
+    .prompt { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; color: #1e293b; line-height: 1.4; }
+    .scrambled-words { color: #475569; font-size: 1.1rem; background: #f1f5f9; padding: 10px; border-radius: 10px; border: 2px dashed #cbd5e1; display: inline-block; margin-top: 5px; font-family: monospace; font-weight: bold; }
+    .options { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn { background: #f0f9ff; border: 3px solid #7dd3fc; border-radius: 16px; padding: 14px; font-size: 1.15rem; font-weight: 700; color: #0369a1; cursor: pointer; transition: 0.1s; text-align: center; }
+    .option-btn:hover:not(:disabled) { background: #bae6fd; }
+    .option-btn.correct { background: #4def8d !important; border-color: #22c55e !important; color: #14532d !important; }
+    .option-btn.wrong { background: #fecaca !important; border-color: #ef4444 !important; color: #7f1d1d !important; }
+    .progress { font-size: 0.95rem; color: #94a3b8; margin-top: 15px; font-weight: bold; }
+    #result-screen { display: none; }
+    .confetti { font-size: 3rem; }
+  </style>
+</head>
+<body>
+
+<div class="quiz-card">
+  <h1>UNSCRAMBLE & ANSWERS</h1>
+
+  <!-- QUESTION 1: MONKEY QUESTION -->
+  <div id="q1" class="question-container active">
+    <div class="mascot">🐒🌳</div>
+    <div class="prompt">Unscramble the question for Picture 1:<br>
+      <div class="scrambled-words">climbing / Is / tree? / the / up / monkey</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(1, true, this)">Is the monkey climbing up the tree?</button>
+      <button class="option-btn" onclick="checkAnswer(1, false, this)">Is climbing up the tree the monkey?</button>
+    </div>
+    <div class="progress">Question 1 of 9</div>
+  </div>
+
+  <!-- QUESTION 2: MONKEY POSITIVE -->
+  <div id="q2" class="question-container">
+    <div class="mascot">🐒🌳✅</div>
+    <div class="prompt">Unscramble the POSITIVE short answer:<br>
+      <div class="scrambled-words">it / Yes / is .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(2, false, this)">Yes, is it.</button>
+      <button class="option-btn" onclick="checkAnswer(2, true, this)">Yes, it is.</button>
+    </div>
+    <div class="progress">Question 2 of 9</div>
+  </div>
+
+  <!-- QUESTION 3: MONKEY NEGATIVE -->
+  <div id="q3" class="question-container">
+    <div class="mascot">🐒🌳❌</div>
+    <div class="prompt">Unscramble the NEGATIVE short answer:<br>
+      <div class="scrambled-words">isn't / it / No .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(3, true, this)">No, it isn't.</button>
+      <button class="option-btn" onclick="checkAnswer(3, false, this)">No, isn't it.</button>
+    </div>
+    <div class="progress">Question 3 of 9</div>
+  </div>
+
+  <!-- QUESTION 4: BOYS QUESTION -->
+  <div id="q4" class="question-container">
+    <div class="mascot">👦👦⚽</div>
+    <div class="prompt">Unscramble the question for Picture 2:<br>
+      <div class="scrambled-words">playing / basketball? / boys / Are / the</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(4, false, this)">Are playing basketball the boys?</button>
+      <button class="option-btn" onclick="checkAnswer(4, true, this)">Are the boys playing basketball?</button>
+    </div>
+    <div class="progress">Question 4 of 9</div>
+  </div>
+
+  <!-- QUESTION 5: BOYS POSITIVE -->
+  <div id="q5" class="question-container">
+    <div class="mascot">👦👦⚽✅</div>
+    <div class="prompt">Unscramble the POSITIVE short answer:<br>
+      <div class="scrambled-words">they / Yes / are .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(5, true, this)">Yes, they are.</button>
+      <button class="option-btn" onclick="checkAnswer(5, false, this)">Yes, are they.</button>
+    </div>
+    <div class="progress">Question 5 of 9</div>
+  </div>
+
+  <!-- QUESTION 6: BOYS NEGATIVE -->
+  <div id="q6" class="question-container">
+    <div class="mascot">👦👦⚽❌</div>
+    <div class="prompt">Unscramble the NEGATIVE short answer:<br>
+      <div class="scrambled-words">aren't / they / No .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(6, true, this)">No, they aren't.</button>
+      <button class="option-btn" onclick="checkAnswer(6, false, this)">No, aren't they.</button>
+    </div>
+    <div class="progress">Question 6 of 9</div>
+  </div>
+
+  <!-- QUESTION 7: GIRL QUESTION -->
+  <div id="q7" class="question-container">
+    <div class="mascot">👧🍦</div>
+    <div class="prompt">Unscramble the question for Picture 4:<br>
+      <div class="scrambled-words">ice / an / girl / eating / Is / cream? / the</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(7, false, this)">Is the girl an ice cream eating?</button>
+      <button class="option-btn" onclick="checkAnswer(7, true, this)">Is the girl eating an ice cream?</button>
+    </div>
+    <div class="progress">Question 7 of 9</div>
+  </div>
+
+  <!-- QUESTION 8: GIRL POSITIVE -->
+  <div id="q8" class="question-container">
+    <div class="mascot">👧🍦✅</div>
+    <div class="prompt">Unscramble the POSITIVE short answer:<br>
+      <div class="scrambled-words">she / Yes / is .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(8, true, this)">Yes, she is.</button>
+      <button class="option-btn" onclick="checkAnswer(8, false, this)">Yes, is she.</button>
+    </div>
+    <div class="progress">Question 8 of 9</div>
+  </div>
+
+  <!-- QUESTION 9: GIRL NEGATIVE -->
+  <div id="q9" class="question-container">
+    <div class="mascot">👧🍦❌</div>
+    <div class="prompt">Unscramble the NEGATIVE short answer:<br>
+      <div class="scrambled-words">isn't / she / No .</div>
+    </div>
+    <div class="options">
+      <button class="option-btn" onclick="checkAnswer(9, true, this)">No, she isn't.</button>
+      <button class="option-btn" onclick="checkAnswer(9, false, this)">No, isn't she.</button>
+    </div>
+    <div class="progress">Question 9 of 9</div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen">
+    <div class="confetti">🏆🎉✨</div>
+    <h2 style="color:#0284c7; margin-bottom:10px;">EXCELLENT!</h2>
+    <p style="font-weight:bold; color:#475569;">You mastered Questions, Positive, and Negative short answers!</p>
+    <button class="option-btn" onclick="location.reload()" style="background:#fef3c7; border-color:#f59e0b; margin-top:20px; width: 100%;">Play Again?</button>
+  </div>
+</div>
+
+<script>
+  function checkAnswer(currentNum, isCorrect, btnElement) {
+    const container = document.getElementById('q' + currentNum);
+    const buttons = container.querySelectorAll('.option-btn');
+    buttons.forEach(btn => btn.disabled = true);
+
+    if (isCorrect) {
+      btnElement.classList.add('correct');
+      setTimeout(() => {
+        next(currentNum);
+      }, 700);
+    } else {
+      btnElement.classList.add('wrong');
+      setTimeout(() => {
+        btnElement.classList.remove('wrong');
+        buttons.forEach(btn => btn.disabled = false);
+      }, 900);
+    }
+  }
+
+  function next(currentNum) {
+    document.getElementById('q' + currentNum).classList.remove('active');
+    if (currentNum < 9) {
+      document.getElementById('q' + (currentNum + 1)).classList.add('active');
+    } else {
+      document.querySelector('h1').style.display = 'none';
+      document.getElementById('result-screen').style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>

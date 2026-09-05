@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight Academy: Present Continuous Edition</title>
+    <style>
+        :root {
+            --hero-blue: #2e86de;
+            --hero-red: #ee5253;
+            --hero-yellow: #feca57;
+            --comic-black: #222f3e;
+            --success: #1dd1a1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--hero-blue);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            overflow: hidden;
+            position: relative;
+            padding: 16px;
+        }
+
+        #academy-card {
+            background-color: white;
+            width: 95%;
+            max-width: 550px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--hero-yellow);
+            position: relative;
+            z-index: 10;
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 4px solid var(--comic-black);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+        }
+
+        .lvl-badge {
+            background: var(--hero-red);
+            color: white;
+            padding: 5px 15px;
+            display: inline-block;
+            transform: rotate(-2deg);
+            font-size: 0.9rem;
+            border: 3px solid var(--comic-black);
+            text-transform: uppercase;
+        }
+
+        .score-display {
+            margin: 10px 0;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        /* LEVEL 0: MEMORY CARD MATCH */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .card {
+            height: 130px;
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: 0.5s;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #333;
+            border-radius: 10px;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .card-front {
+            background: var(--comic-black);
+            color: var(--hero-yellow);
+            font-size: 2rem;
+        }
+
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            padding: 5px;
+        }
+
+        .card-back span {
+            font-size: 2.5rem;
+        }
+
+        .card-back b {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-top: 5px;
+            line-height: 1.1;
+            display: block;
+        }
+
+        .card.matched {
+            opacity: 0.6;
+            pointer-events: none;
+            transform: rotateY(180deg);
+        }
+
+        /* LEVEL 1: IS / ARE TRIALS */
+        .trial-zone {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            color: var(--comic-black);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .hero-btn {
+            background: var(--hero-yellow);
+            border: 3px solid var(--comic-black);
+            padding: 16px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.1s;
+            color: var(--comic-black);
+            box-shadow: 0 4px 0 var(--comic-black);
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .hero-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .hero-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .hero-btn.correct-btn {
+            background: var(--success) !important;
+            color: white;
+        }
+
+        .hero-btn.wrong-btn {
+            background: var(--hero-red) !important;
+            color: white;
+        }
+
+        /* LEVEL 2: DIALOGUE GAPS */
+        .chat-bubble {
+            background: #fdfdfd;
+            border: 3px solid var(--comic-black);
+            border-radius: 15px;
+            padding: 18px 16px;
+            margin: 15px 0;
+            font-size: 1.25rem;
+            text-align: left;
+            line-height: 2;
+            min-height: 80px;
+        }
+
+        .gap {
+            font-weight: bold;
+            color: var(--hero-blue);
+            border-bottom: 3px dashed var(--hero-blue);
+            padding: 0 10px;
+            min-width: 80px;
+            display: inline-block;
+            text-align: center;
+            background: #f0f4f8;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .gap.filled {
+            border-bottom-color: var(--success);
+            color: var(--success);
+            background: #e8f8f0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: #eee;
+            border: 2px solid #333;
+            margin-top: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        /* WIN SCREEN */
+        #win {
+            text-align: center;
+            padding: 20px 0;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #win h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+        }
+
+        #win h2 {
+            font-size: 2rem;
+            color: var(--hero-blue);
+            margin-bottom: 10px;
+        }
+
+        #win p {
+            font-size: 1.1rem;
+            margin: 10px 0 20px;
+            color: #555;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: white;
+            border: 3px solid var(--comic-black);
+            padding: 16px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.1s;
+            box-shadow: 0 4px 0 var(--comic-black);
+            font-family: 'Arial Black', sans-serif;
+            width: 100%;
+        }
+
+        .btn-restart:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Heart particles */
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            animation: burst 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burst {
+            0% {
+                transform: translate(0, 0) scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(1.4) rotate(var(--rot));
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 520px) {
+            #academy-card {
+                padding: 16px;
+                box-shadow: 8px 8px 0px var(--hero-yellow);
+            }
+
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .card {
+                height: 100px;
+            }
+
+            .card-back span {
+                font-size: 2rem;
+            }
+
+            .card-back b {
+                font-size: 0.7rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+                min-height: 60px;
+            }
+
+            .chat-bubble {
+                font-size: 1rem;
+                padding: 14px 12px;
+            }
+
+            .hero-btn {
+                font-size: 1rem;
+                padding: 14px;
+            }
+
+            #win h1 {
+                font-size: 2.5rem;
+            }
+
+            #win h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .card {
+                height: 80px;
+            }
+
+            .card-back span {
+                font-size: 1.5rem;
+            }
+
+            .card-front {
+                font-size: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1rem;
+            }
+
+            .chat-bubble {
+                font-size: 0.9rem;
+            }
+
+            .gap {
+                min-width: 50px;
+                padding: 0 6px;
+                font-size: 0.9rem;
+            }
+
+            .hero-btn {
+                font-size: 0.85rem;
+                padding: 12px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--hero-blue);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="academy-card">
+        <div class="header">
+            <div id="lvl-tag" class="lvl-badge">LEVEL 0: SCANNING</div>
+            <div class="score-display">⭐ SUPER POINTS: <span id="score">0</span></div>
+        </div>
+
+        <!-- LEVEL 0: MEMORY MATCH -->
+        <div id="lvl0" class="screen">
+            <p style="text-align:center; font-size: 1.1rem; margin-bottom: 15px;">Match the Clothes & Chores Actions!</p>
+            <div id="memory-grid" class="memory-grid"></div>
+        </div>
+
+        <!-- LEVEL 1: IS / ARE TRIALS -->
+        <div id="lvl1" class="screen hidden">
+            <div class="trial-zone">
+                <p style="font-size: 0.85rem; color: #777; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">⚡ Pick the correct grammar link:</p>
+                <div id="q-sentence" class="question-text">Loading sentence...</div>
+                <div class="btn-grid">
+                    <button class="hero-btn" id="btn-choice-0" onclick="checkL1('is', this)">IS</button>
+                    <button class="hero-btn" id="btn-choice-1" onclick="checkL1('are', this)">ARE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEVEL 2: STORY GAPS -->
+        <div id="lvl2" class="screen hidden">
+            <p style="text-align:center; font-size: 1.1rem; margin-bottom: 10px;">📝 Complete the Action Sentence!</p>
+            <div class="chat-bubble" id="l2-sentence-box">
+                Loading...
+            </div>
+            <div id="l2-btns" class="btn-grid" style="margin-top:20px;"></div>
+        </div>
+
+        <!-- WIN SCREEN -->
+        <div id="win" class="hidden">
+            <h1>⚡🏆⚡</h1>
+            <h2>HUB GRADUATE!</h2>
+            <p>You completely mastered affirmative and negative Present Continuous actions!</p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: var(--hero-blue);">⭐ <span id="final-score">0</span> points</p>
+            <button class="btn-restart" onclick="location.reload()">🔄 START RE-TRAINING</button>
+        </div>
+
+        <div class="progress-bar">
+            <div id="fill"></div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // DATA — based on Starlight 2, Present Continuous
+        // ================================================================
+
+        // Memory Match data: 3 pairs (Draw, Rain, Jump)
+        const memData = [
+            { w: "Draw", e: "🎨", id: 1 },
+            { w: "Rain", e: "🌧️", id: 2 },
+            { w: "Jump", e: "🐸", id: 3 }
+        ];
+
+        // Level 1: Is / Are trials (5 questions)
+        const trials = [
+            { s: "Look at picture 2! She ______ drawing a picture. 🎨", correctAns: "is" },
+            { s: "Look at picture 4! Two frogs ______ jumping over the fence. 🐸", correctAns: "are" },
+            { s: "Look outside! It ______ raining at the moment. 🌧️", correctAns: "is" },
+            { s: "Look at picture 5! He ______ playing football. ⚽", correctAns: "is" },
+            { s: "Look at picture 6! We ______ wearing lovely dresses. 👗", correctAns: "are" }
+        ];
+
+        // Level 2: Gap-fill with affirmative + negative (2 questions)
+        const level2Data = [{
+            text: 'Look! - We <span class="gap" id="gap1">____</span> wearing jeans 👖. + We are wearing <span class="gap" id="gap2">____</span> 👗.',
+            answers: ["are not", "dresses"],
+            options: ["are", "are not", "dresses", "jeans"]
+        }, {
+            text: 'Look at Katie! + She <span class="gap" id="gap1">____</span> reading 📖. - She is not <span class="gap" id="gap2">____</span> 🎨.',
+            answers: ["is", "drawing"],
+            options: ["is", "is not", "drawing", "flying"]
+        }];
+
+        // ================================================================
+        // STATE
+        // ================================================================
+
+        let currentLvl = 0; // 0, 1, 2
+        let currentIdx = 0; // for level 1 trials
+        let l2QuestionIdx = 0; // for level 2 questions
+        let l2Step = 0; // 0 or 1 for gap1/gap2
+        let score = 0;
+
+        // Memory match state
+        let flipped = [];
+        let matches = 0;
+        let isProcessing = false;
+
+        // DOM refs
+        const lvlTag = document.getElementById('lvl-tag');
+        const scoreDisplay = document.getElementById('score');
+        const fill = document.getElementById('fill');
+        const winScreen = document.getElementById('win');
+        const finalScore = document.getElementById('final-score');
+
+        // ================================================================
+        // HEART FIREWORKS
+        // ================================================================
+
+        function launchHearts() {
+            const heartEmojis = ["❤️", "💖", "💝", "💕", "💘", "✨", "🌟"];
+            const count = 28;
+            const originX = window.innerWidth / 2;
+            const originY = window.innerHeight / 2;
+
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+
+                heart.style.left = `${originX}px`;
+                heart.style.top = `${originY}px`;
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * 200;
+                const targetX = Math.cos(angle) * distance;
+                const targetY = Math.sin(angle) * distance - 60;
+                const rotation = Math.random() * 90 - 45;
+
+                heart.style.setProperty('--tx', `${targetX}px`);
+                heart.style.setProperty('--ty', `${targetY}px`);
+                heart.style.setProperty('--rot', `${rotation}deg`);
+
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 900);
+            }
+        }
+
+        // ================================================================
+        // PROGRESS
+        // ================================================================
+
+        function updateProgress() {
+            const totalSteps = 3; // 3 levels
+            let progress = 0;
+
+            if (currentLvl === 0) {
+                progress = (matches / 3) * 0.33;
+            } else if (currentLvl === 1) {
+                progress = 0.33 + (currentIdx / trials.length) * 0.33;
+            } else if (currentLvl === 2) {
+                progress = 0.66 + (l2QuestionIdx / level2Data.length) * 0.33;
+            } else if (currentLvl >= 3) {
+                progress = 1;
+            }
+
+            fill.style.width = Math.min(progress * 100, 100) + '%';
+        }
+
+        // ================================================================
+        // LEVEL 0: MEMORY MATCH
+        // ================================================================
+
+        function loadL0() {
+            lvlTag.textContent = 'LEVEL 0: SCANNING';
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            flipped = [];
+            matches = 0;
+            isProcessing = false;
+
+            const cards = shuffleArray([...memData, ...memData]);
+
+            cards.forEach((item, index) => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.dataset.id = item.id;
+                el.dataset.index = index;
+                el.innerHTML = `
+                    <div class="card-face card-front">?</div>
+                    <div class="card-face card-back">
+                        <span>${item.e}</span>
+                        <b>${item.w}</b>
+                    </div>
+                `;
+                el.addEventListener('click', () => handleCardClick(el, item.id));
+                grid.appendChild(el);
+            });
+        }
+
+        function handleCardClick(el, id) {
+            if (isProcessing) return;
+            if (el.classList.contains('flipped')) return;
+            if (el.classList.contains('matched')) return;
+            if (flipped.length >= 2) return;
+
+            el.classList.add('flipped');
+            flipped.push({ el, id });
+
+            if (flipped.length === 2) {
+                isProcessing = true;
+                const [first, second] = flipped;
+
+                if (first.id === second.id) {
+                    // Match!
+                    matches++;
+                    first.el.classList.add('matched');
+                    second.el.classList.add('matched');
+                    score += 100;
+                    scoreDisplay.textContent = score;
+                    flipped = [];
+                    isProcessing = false;
+                    updateProgress();
+
+                    if (matches === 3) {
+                        launchHearts();
+                        setTimeout(() => {
+                            nextLevel();
+                        }, 1000);
+                    }
+                } else {
+                    // No match
+                    setTimeout(() => {
+                        first.el.classList.remove('flipped');
+                        second.el.classList.remove('flipped');
+                        flipped = [];
+                        isProcessing = false;
+                    }, 700);
+                }
+            }
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ================================================================
+        // LEVEL 1: IS / ARE TRIALS
+        // ================================================================
+
+        function loadL1() {
+            lvlTag.textContent = 'LEVEL 1: AUXILIARY CHASE';
+            document.getElementById('q-sentence').innerHTML = trials[currentIdx].s;
+
+            // Reset buttons
+            const btns = document.querySelectorAll('#lvl1 .hero-btn');
+            btns.forEach(b => {
+                b.disabled = false;
+                b.className = 'hero-btn';
+                b.style.background = '';
+            });
+        }
+
+        function checkL1(selected, btn) {
+            const correct = trials[currentIdx].correctAns;
+            const allBtns = document.querySelectorAll('#lvl1 .hero-btn');
+
+            if (selected === correct) {
+                allBtns.forEach(b => b.disabled = true);
+                btn.classList.add('correct-btn');
+                score += 200;
+                scoreDisplay.textContent = score;
+                launchHearts();
+
+                setTimeout(() => {
+                    btn.classList.remove('correct-btn');
+                    allBtns.forEach(b => b.disabled = false);
+                    currentIdx++;
+                    if (currentIdx >= trials.length) {
+                        nextLevel();
+                    } else {
+                        loadL1();
+                        updateProgress();
+                    }
+                }, 800);
+            } else {
+                btn.classList.add('wrong-btn');
+                setTimeout(() => {
+                    btn.classList.remove('wrong-btn');
+                }, 500);
+            }
+        }
+
+        // ================================================================
+        // LEVEL 2: STORY GAPS
+        // ================================================================
+
+        function loadL2() {
+            lvlTag.textContent = 'LEVEL 2: STORY MERGE';
+            l2Step = 0;
+
+            const q = level2Data[l2QuestionIdx];
+            document.getElementById('l2-sentence-box').innerHTML = q.text;
+
+            // Reset gaps
+            document.querySelectorAll('#l2-sentence-box .gap').forEach(el => {
+                el.textContent = '____';
+                el.className = 'gap';
+            });
+
+            const btnBox = document.getElementById('l2-btns');
+            btnBox.innerHTML = '';
+
+            const shuffledOpts = shuffleArray([...q.options]);
+            shuffledOpts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'hero-btn';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => handleL2Choice(opt, btn));
+                btnBox.appendChild(btn);
+            });
+        }
+
+        function handleL2Choice(value, btn) {
+            const q = level2Data[l2QuestionIdx];
+            const allBtns = document.querySelectorAll('#l2-btns .hero-btn');
+
+            if (value === q.answers[l2Step]) {
+                // Correct!
+                btn.classList.add('correct-btn');
+                btn.disabled = true;
+
+                // Fill the gap
+                const gapId = 'gap' + (l2Step + 1);
+                const gapEl = document.getElementById(gapId);
+                if (gapEl) {
+                    gapEl.textContent = value;
+                    gapEl.className = 'gap filled';
+                }
+
+                l2Step++;
+                score += 300;
+                scoreDisplay.textContent = score;
+
+                if (l2Step === 2) {
+                    // Both gaps filled - level complete!
+                    allBtns.forEach(b => b.disabled = true);
+                    launchHearts();
+
+                    setTimeout(() => {
+                        l2QuestionIdx++;
+                        if (l2QuestionIdx < level2Data.length) {
+                            loadL2();
+                            updateProgress();
+                        } else {
+                            nextLevel();
+                        }
+                    }, 1000);
+                }
+            } else {
+                // Wrong
+                btn.classList.add('wrong-btn');
+                setTimeout(() => {
+                    btn.classList.remove('wrong-btn');
+                }, 500);
+            }
+        }
+
+        // ================================================================
+        // LEVEL NAVIGATION
+        // ================================================================
+
+        function nextLevel() {
+            // Hide current level
+            document.getElementById('lvl' + currentLvl).classList.add('hidden');
+
+            currentLvl++;
+
+            if (currentLvl <= 2) {
+                document.getElementById('lvl' + currentLvl).classList.remove('hidden');
+
+                if (currentLvl === 1) {
+                    currentIdx = 0;
+                    loadL1();
+                } else if (currentLvl === 2) {
+                    l2QuestionIdx = 0;
+                    loadL2();
+                }
+                updateProgress();
+            } else {
+                // All levels complete!
+                showWin();
+            }
+        }
+
+        function showWin() {
+            lvlTag.textContent = '🎉 ACADEMY COMPLETED 🎉';
+            document.getElementById('win').classList.remove('hidden');
+            finalScore.textContent = score;
+            fill.style.width = '100%';
+            launchHearts();
+            setTimeout(launchHearts, 500);
+        }
+
+        // ================================================================
+        // INIT
+        // ================================================================
+
+        function init() {
+            // Show level 0
+            document.getElementById('lvl0').classList.remove('hidden');
+            document.getElementById('lvl1').classList.add('hidden');
+            document.getElementById('lvl2').classList.add('hidden');
+            document.getElementById('win').classList.add('hidden');
+
+            currentLvl = 0;
+            currentIdx = 0;
+            l2QuestionIdx = 0;
+            l2Step = 0;
+            score = 0;
+            matches = 0;
+            flipped = [];
+            isProcessing = false;
+
+            scoreDisplay.textContent = '0';
+            fill.style.width = '0%';
+
+            loadL0();
+            updateProgress();
+        }
+
+        // Start the game
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+
+</body>
+</html>

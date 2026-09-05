@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blox Academy: Negative Present Continuous</title>
+    <style>
+        :root {
+            --rbx-blue: #00a2ff;
+            --rbx-green: #00e676;
+            --rbx-red: #ff5252;
+            --rbx-dark: #393b3d;
+            --rbx-bg: #63b3ff;
+            --rbx-silver: #bdc3c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--rbx-bg);
+            background-image: radial-gradient(#ffffff 15%, transparent 15%);
+            background-size: 40px 40px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            align-items: center;
+        }
+
+        .game-wrapper {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            border-bottom: 8px solid var(--rbx-silver);
+            padding: 25px;
+            position: relative;
+            text-align: center;
+            animation: zoomIn 0.4s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            background: var(--rbx-dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .hud span { display: flex; align-items: center; gap: 6px; }
+
+        .img-box {
+            width: 280px;
+            height: 200px;
+            margin: 15px auto;
+            border-radius: 12px;
+            border: 5px solid var(--rbx-silver);
+            background: #f0f4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .img-box.correct-flash { border-color: var(--rbx-green); }
+        .img-box.wrong-flash { border-color: var(--rbx-red); }
+
+        .question-text {
+            font-size: 1.5rem;
+            color: #333;
+            margin: 12px 0 8px;
+            line-height: 1.5;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .question-text .blank {
+            display: inline-block;
+            min-width: 120px;
+            border-bottom: 4px solid var(--rbx-blue);
+            padding: 0 10px;
+            color: var(--rbx-blue);
+            font-weight: 900;
+            background: #e3f2fd;
+            border-radius: 4px 4px 0 0;
+        }
+        .question-text .blank.filled-correct {
+            border-bottom-color: var(--rbx-green);
+            color: var(--rbx-green);
+            background: #e8f5e9;
+        }
+
+        .feedback {
+            font-size: 24px;
+            height: 44px;
+            margin: 10px 0;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .feedback.correct { color: var(--rbx-green); }
+        .feedback.wrong { color: var(--rbx-red); }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .btn-grid button {
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            background: var(--rbx-blue);
+            color: white;
+            border-bottom: 5px solid #0076bb;
+            transition: 0.1s;
+            font-family: 'Arial Black', sans-serif;
+        }
+        .btn-grid button:hover:not(:disabled) { background: #33b5ff; transform: scale(1.02); }
+        .btn-grid button:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 2px; }
+        .btn-grid button:disabled { opacity: 0.6; cursor: default; transform: none; }
+        .btn-grid button.correct-btn { background: var(--rbx-green); border-bottom-color: #00a354; }
+        .btn-grid button.wrong-btn { background: var(--rbx-red); border-bottom-color: #b33939; }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 22px;
+            overflow: hidden;
+            border: 2px solid #ddd;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--rbx-green);
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        #win-screen {
+            display: none;
+            animation: zoomIn 0.5s ease-out;
+            padding: 20px 0;
+        }
+        #win-screen h2 {
+            font-size: 42px;
+            color: var(--rbx-green);
+            margin-bottom: 6px;
+        }
+        #win-screen .trophy { font-size: 72px; }
+        #win-screen .final-score {
+            font-size: 28px;
+            color: var(--rbx-dark);
+            background: #f5f5f5;
+            padding: 8px 30px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 12px 0 20px;
+        }
+        #win-screen button {
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            background: var(--rbx-green);
+            color: white;
+            border-bottom: 5px solid #00a354;
+            font-family: 'Arial Black', sans-serif;
+            transition: 0.1s;
+        }
+        #win-screen button:hover { transform: scale(1.03); }
+        #win-screen button:active { transform: translateY(3px); border-bottom-width: 2px; }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            animation: shoot 0.8s ease-out forwards;
+            z-index: 100;
+        }
+        @keyframes shoot {
+            0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) rotate(400deg) scale(0.4); opacity: 0; }
+        }
+
+        @media (max-width: 520px) {
+            .game-wrapper { padding: 16px; }
+            .question-text { font-size: 1.2rem; min-height: 60px; }
+            .img-box { width: 200px; height: 150px; }
+            .btn-grid button { font-size: 0.95rem; padding: 14px; }
+            .hud { font-size: 0.9rem; padding: 10px 14px; }
+            .feedback { font-size: 20px; height: 36px; }
+            #win-screen h2 { font-size: 30px; }
+        }
+        @media (max-width: 400px) {
+            .question-text { font-size: 1rem; }
+            .btn-grid { grid-template-columns: 1fr; gap: 10px; }
+            .img-box { width: 160px; height: 120px; }
+            .btn-grid button { font-size: 0.9rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-wrapper" id="stage">
+    <h1 style="color: #333; margin-top:0; font-size: 1.5rem;">🏆 BLOX ACADEMY: NEGATIVE PC</h1>
+    <div class="hud">
+        <span>🎯 STAGE: <span id="q-num">1</span>/12</span>
+        <span>⭐ ROBUX: <span id="score">0</span></span>
+    </div>
+
+    <div id="game-content">
+        <div class="question-text" id="question-text">Loading...</div>
+
+        <!-- ==========================================================
+             ЗДЕСЬ БУДЕТ КАРТИНКА (автоматически подставляется из массива)
+             ========================================================== -->
+        <div class="img-box" id="img-box"></div>
+
+        <div class="feedback" id="feedback"></div>
+        <div class="btn-grid" id="options"></div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div id="win-screen">
+        <div class="trophy">🏆</div>
+        <h2>GG! NEGATIVE MASTER!</h2>
+        <p style="font-size: 1.1rem; color: #555;">You crushed all stages!</p>
+        <div class="final-score">⭐ <span id="final-score">0</span> ROBUX</div>
+        <br>
+        <button onclick="location.reload()">🔄 PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // ⬇️⬇️⬇️  СЮДА ВСТАВЛЯЙТЕ ССЫЛКИ НА ВАШИ КАРТИНКИ  ⬇️⬇️⬇️
+    // ================================================================
+
+    const missionData = [
+        {
+            q: 'He <span class="blank" id="blank1">______</span> swimming in the pool right now.',
+            img: 'https://static.vecteezy.com/system/resources/previews/037/468/747/non_2x/ai-generated-businessman-sitting-on-chair-free-png.png',   // 👈 замените на вашу ссылку
+            options: ['is swimming', 'isn\'t swimming'],
+            ans: 'isn\'t swimming'
+        },
+        {
+            q: 'They <span class="blank" id="blank1">______</span> playing football at the moment.',
+            img: 'https://avatars.dzeninfra.ru/get-zen_doc/1909279/pub_5ea1770fe8af1c5b9d6af57f_5ea1777e88edb84e60bfd925/scale_1200',
+            options: ['are playing', 'aren\'t playing'],
+            ans: 'aren\'t playing'
+        },
+        {
+            q: 'She <span class="blank" id="blank1">______</span> reading a book now.',
+            img: 'https://s3.envato.com/files/aa9ad64e-fa52-493e-b775-0dc764396108/inline_image_preview.jpg',
+            options: ['is reading', 'isn\'t reading'],
+            ans: 'is reading'
+        },
+        {
+            q: 'We <span class="blank" id="blank1">______</span> watching TV right now.',
+            img: 'https://avatars.mds.yandex.net/i?id=6806fd75505289492e2fa873b809c358_l-12501487-images-thumbs&n=13',
+            options: ['are watching', 'aren\'t watching'],
+            ans: 'aren\'t watching'
+        },
+        {
+            q: 'The cat <span class="blank" id="blank1">______</span> sleeping on the bed.',
+            img: 'https://i.pinimg.com/originals/6b/22/1a/6b221afd304784587e8a50aeaf6a66b1.jpg',
+            options: ['is sleeping', 'isn\'t sleeping'],
+            ans: 'isn\'t sleeping'
+        },
+        {
+            q: 'I <span class="blank" id="blank1">______</span> eating pizza at the moment.',
+            img: 'https://media.istockphoto.com/id/522306064/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%BC%D0%B8%D0%BB%D1%8B%D0%B9-%D0%BC%D0%B0%D0%BB%D0%B5%D0%BD%D1%8C%D0%BA%D0%B8%D0%B9-%D0%BC%D0%B0%D0%BB%D1%8C%D1%87%D0%B8%D0%BA-%D0%B5%D1%81%D1%82-%D0%BF%D0%B8%D1%86%D1%86%D0%B0.jpg?s=612x612&w=0&k=20&c=E37WVccutgQXEvqixZnI9sjDh1jbdu4Ksi-RaUhw4f4=',
+            options: ['am eating', 'am not eating'],
+            ans: 'am eating'
+        },
+        {
+            q: 'The boys <span class="blank" id="blank1">______</span> listening to the music.',
+            img: 'https://thumbs.dreamstime.com/b/brothers-listening-to-music-8300625.jpg',
+            options: ['are listening', 'aren\'t listening'],
+            ans: 'aren\'t listening'
+        },
+        {
+            q: 'My brother <span class="blank" id="blank1">______</span> playing video games now.',
+            img: 'https://media.istockphoto.com/id/1056866508/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%BC%D0%B0%D0%BB%D0%B5%D0%BD%D1%8C%D0%BA%D0%B8%D0%B9-%D0%BC%D0%B0%D0%BB%D1%8C%D1%87%D0%B8%D0%BA-%D0%B4%D0%BE%D1%88%D0%BA%D0%BE%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B2%D0%BE%D0%B7%D1%80%D0%B0%D1%81%D1%82%D0%B0-%D1%81%D0%BF%D0%B8%D1%82-%D0%B2-%D0%BF%D0%BE%D1%81%D1%82%D0%B5%D0%BB%D0%B8-%D1%81-%D0%BA%D1%80%D0%B0%D1%81%D0%BE%D1%87%D0%BD%D0%BE%D0%B9-%D0%BB%D0%B0%D0%BC%D0%BF%D0%BE%D0%B9.jpg?s=612x612&w=0&k=20&c=Xo_gxK4T87L7jgta_1E6WsZSk2f5el4BEdmTo1jcU-o=',
+            options: ['is playing', 'isn\'t playing'],
+            ans: 'isn\'t playing'
+        },
+        {
+            q: 'The birds <span class="blank" id="blank1">______</span> flying  today.',
+            img: 'https://i.pinimg.com/originals/8a/80/90/8a8090e3a37c7cad382c4c64f0cc0394.jpg?nii=t',
+            options: ['are flying', 'aren\'t flying'],
+            ans: 'are flying'
+        },
+        {
+            q: 'She <span class="blank" id="blank1">______</span> wearing jeans today.',
+            img: 'https://images2.novochag.ru/upload/img_cache/a95/a951e493094655f045d4171f58aa632c_cropped_510x764.webp',
+            options: ['is wearing', 'isn\'t wearing'],
+            ans: 'isn wearing'
+        },
+        {
+            q: 'We <span class="blank" id="blank1">______</span> going in the park.',
+            img: 'https://media.istockphoto.com/id/1499675532/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D0%B0-%D0%B4%D1%80%D1%83%D0%B7%D0%B5%D0%B9-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D0%B8%D1%82-%D1%83%D0%B6%D0%B8%D0%BD.jpg?s=612x612&w=0&k=20&c=ryfmRUzZE_3s2XZkvNqw_gOk_KXNH8lF-nTT9v4Iy5E=',
+            options: ['are going', 'aren\'t going'],
+            ans: 'aren\'t going'
+        },
+        {
+            q: 'He <span class="blank" id="blank1">______</span> doing his homework right now.',
+            img: 'https://img.championat.com/W3QEn7QbK9gluk7MGQu5zg86JYqksrmOY8x4b82r7bg/p()/i/o/i/16550405491829248235.jpg',
+            options: ['is doing', 'isn\'t doing'],
+            ans: 'isn\'t doing'
+        }
+    ];
+
+    // ================================================================
+    //  ИГРОВОЙ ДВИЖОК (НЕ ТРОГАЙТЕ)
+    // ================================================================
+
+    let score = 0;
+    let currentIdx = 0;
+    let isAnswered = false;
+
+    const qNum = document.getElementById('q-num');
+    const scoreDisplay = document.getElementById('score');
+    const questionText = document.getElementById('question-text');
+    const imgBox = document.getElementById('img-box');
+    const feedback = document.getElementById('feedback');
+    const optionsBox = document.getElementById('options');
+    const progressFill = document.getElementById('progress-fill');
+    const finalScore = document.getElementById('final-score');
+    const gameContent = document.getElementById('game-content');
+    const winScreen = document.getElementById('win-screen');
+
+    function launchParticles() {
+        const stage = document.getElementById('stage');
+        const colors = ['#00a2ff', '#00e676', '#ff5252', '#fdd835', '#9c27b0', '#ff6f00'];
+        for (let i = 0; i < 22; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.left = '50%';
+            p.style.top = '45%';
+            p.style.setProperty('--x', (Math.random() - 0.5) * 500 + 'px');
+            p.style.setProperty('--y', (Math.random() - 0.5) * 500 + 'px');
+            stage.appendChild(p);
+            setTimeout(() => p.remove(), 800);
+        }
+    }
+
+    function loadQuestion() {
+        const data = missionData[currentIdx];
+        if (!data) { showWin(); return; }
+
+        isAnswered = false;
+        qNum.textContent = currentIdx + 1;
+        scoreDisplay.textContent = score;
+        questionText.innerHTML = data.q;
+
+        // Показываем картинку
+        if (data.img) {
+            imgBox.innerHTML = `<img src="${data.img}" alt="picture">`;
+        } else {
+            imgBox.innerHTML = `<span style="font-size:80px; color:#999;">🖼️</span>`;
+        }
+        imgBox.className = 'img-box';
+
+        feedback.textContent = '';
+        feedback.className = 'feedback';
+
+        const shuffled = [...data.options].sort(() => Math.random() - 0.5);
+        optionsBox.innerHTML = '';
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.textContent = opt;
+            btn.addEventListener('click', () => handleAnswer(opt, btn, data));
+            optionsBox.appendChild(btn);
+        });
+
+        const pct = Math.round((currentIdx / missionData.length) * 100);
+        progressFill.style.width = pct + '%';
+    }
+
+    function handleAnswer(choice, btn, data) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const allBtns = document.querySelectorAll('#options button');
+        allBtns.forEach(b => b.disabled = true);
+
+        const isCorrect = choice === data.ans;
+
+        if (isCorrect) {
+            btn.classList.add('correct-btn');
+            imgBox.classList.add('correct-flash');
+            feedback.textContent = '✅ CLEARED! +10 ROBUX';
+            feedback.className = 'feedback correct';
+            score += 10;
+            scoreDisplay.textContent = score;
+            launchParticles();
+
+            const blank = document.querySelector('.blank');
+            if (blank) {
+                blank.textContent = choice;
+                blank.classList.add('filled-correct');
+            }
+
+            setTimeout(() => {
+                currentIdx++;
+                loadQuestion();
+            }, 1000);
+
+        } else {
+            btn.classList.add('wrong-btn');
+            imgBox.classList.add('wrong-flash');
+            feedback.textContent = '❌ OOF! TRY AGAIN';
+            feedback.className = 'feedback wrong';
+
+            allBtns.forEach(b => {
+                if (b.textContent === data.ans) {
+                    b.classList.add('correct-btn');
+                }
+            });
+
+            setTimeout(() => {
+                imgBox.className = 'img-box';
+                feedback.className = 'feedback';
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('correct-btn', 'wrong-btn');
+                });
+                isAnswered = false;
+            }, 1500);
+        }
+    }
+
+    function showWin() {
+        gameContent.style.display = 'none';
+        winScreen.style.display = 'block';
+        finalScore.textContent = score;
+        progressFill.style.width = '100%';
+        launchParticles();
+        setTimeout(launchParticles, 400);
+        setTimeout(launchParticles, 800);
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
