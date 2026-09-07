@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Present Simple vs Present Continuous Quiz</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --success: #2ecc71;
+            --error: #ff4757;
+            --bg: #f0f4f8;
+            --orange: #f39c12;
+        }
+        * { box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; padding: 20px; min-height: 100vh; margin: 0; }
+
+        .quiz-container {
+            background: white;
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 6px solid #ffcc00;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            background: #f1f2f6;
+            padding: 12px 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .dialogue-box {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 2;
+            border: 3px solid #e9ecef;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .dialogue-box .speaker {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .dialogue-box .blank {
+            display: inline-block;
+            min-width: 140px;
+            border-bottom: 3px dashed var(--primary);
+            margin: 0 4px;
+            padding: 0 6px;
+            color: var(--primary);
+            font-weight: 700;
+            background: #eef2ff;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .option-btn {
+            background: white;
+            padding: 16px 12px;
+            border: 3px solid #ddd;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #ccc;
+            transition: 0.08s linear;
+            color: #2d2a24;
+            touch-action: manipulation;
+        }
+        .option-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
+        .option-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: translateY(4px); box-shadow: none; }
+        .option-btn.correct { background: var(--success) !important; border-color: #27ae60 !important; color: white !important; box-shadow: 0 4px 0 #27ae60 !important; }
+        .option-btn.wrong { background: var(--error) !important; border-color: #c0392b !important; color: white !important; box-shadow: 0 4px 0 #c0392b !important; }
+
+        .feedback { margin-top: 15px; font-size: 1.6rem; font-weight: bold; min-height: 50px; }
+        .next-btn { display: none; background: var(--success); color: white; padding: 15px 40px; border: none; border-radius: 50px; font-size: 1.4rem; cursor: pointer; margin: 10px auto 0; box-shadow: 0 4px 0 #27ae60; width: 100%; max-width: 300px; }
+        .next-btn:hover { opacity: 0.9; }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        /* Сердечки салюта */
+        .heart-particle {
+            position: absolute;
+            font-size: 28px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 5;
+            animation: burst 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes burst {
+            0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.4) rotate(var(--rot)); opacity: 0; }
+        }
+
+        @media (max-width: 500px) {
+            .options-grid { grid-template-columns: 1fr; }
+            .option-btn { font-size: 1rem; padding: 14px; }
+            .dialogue-box { font-size: 1rem; padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="hud">
+        <span>📝 Gap <span id="cur-gap">1</span> / 7</span>
+        <span>⭐ Score: <span id="score">0</span></span>
+    </div>
+
+    <div class="dialogue-box" id="dialogueBox"></div>
+
+    <div class="options-grid" id="optionsGrid"></div>
+
+    <div class="feedback" id="feedback"></div>
+    <button id="next-btn" class="next-btn" onclick="nextGap()">NEXT ➔</button>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // DATA — Dialogue with 7 gaps (gap 1 is already given as example)
+    // ================================================================
+    const gaps = [
+        {
+            gapNumber: 2,
+            textBefore: 'Harry: I ',
+            textAfter: ' (set) the table for dinner. Why ',
+            correct: 'am setting',
+            options: ['am setting', 'set'],
+            hint: 'Present Continuous for action happening now'
+        },
+        {
+            gapNumber: 3,
+            textBefore: 'Why ',
+            textAfter: ' (you / ask)?',
+            correct: 'are you asking',
+            options: ['are you asking', 'do you ask'],
+            hint: 'Present Continuous for question about current action'
+        },
+        {
+            gapNumber: 4,
+            textBefore: 'Emma: I ',
+            textAfter: ' (need) some help with tidying my room.',
+            correct: 'need',
+            options: ['need', 'am needing'],
+            hint: 'Stative verb — use Present Simple'
+        },
+        {
+            gapNumber: 5,
+            textBefore: 'I ',
+            textAfter: ' (not like) doing it on my own.',
+            correct: 'don\'t like',
+            options: ['don\'t like', 'am not liking'],
+            hint: 'Stative verb — use Present Simple'
+        },
+        {
+            gapNumber: 6,
+            textBefore: 'Harry: What about George? ',
+            textAfter: ' (he / do) any work now? Can he help me?',
+            correct: 'Is he doing',
+            options: ['Is he doing', 'Does he do'],
+            hint: 'Present Continuous for action happening now'
+        },
+        {
+            gapNumber: 7,
+            textBefore: 'Harry: George ',
+            textAfter: ' (hate) chores too!',
+            correct: 'hates',
+            options: ['hates', 'is hating'],
+            hint: 'Stative verb — use Present Simple'
+        },
+        {
+            gapNumber: 8,
+            textBefore: 'He ',
+            textAfter: ' (not like) tidying or vacuuming or ...',
+            correct: 'doesn\'t like',
+            options: ['doesn\'t like', 'isn\'t liking'],
+            hint: 'Stative verb — use Present Simple'
+        }
+    ];
+
+    // Full dialogue template with placeholders
+    const dialogueTemplate =
+        'Emma: Hi, Harry. What <span class="blank" id="gap1">are you doing</span> (you / do)?<br>' +
+        'Harry: I <span class="blank" id="gap2">____</span> (set) the table for dinner. Why <span class="blank" id="gap3">____</span> (you / ask)?<br>' +
+        'Emma: I <span class="blank" id="gap4">____</span> (need) some help with tidying my room. I <span class="blank" id="gap5">____</span> (not like) doing it on my own. Please!<br>' +
+        'Harry: I’ve got my own chores, thanks!<br>' +
+        'Emma: What about George? <span class="blank" id="gap6">____</span> (he / do) any work now? Can he help me?<br>' +
+        'Harry: George <span class="blank" id="gap7">____</span> (hate) chores too! He <span class="blank" id="gap8">____</span> (not like) tidying or vacuuming or ...<br>' +
+        'Emma: OK. Never mind.';
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let currentIndex = 0; // 0..6
+    let score = 0;
+    let isAnswered = false;
+    let userAnswers = {}; // store filled answers to display later
+
+    const dialogueBox = document.getElementById('dialogueBox');
+    const optionsGrid = document.getElementById('optionsGrid');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next-btn');
+    const progressFill = document.getElementById('progressFill');
+    const scoreDisplay = document.getElementById('score');
+    const curGapSpan = document.getElementById('cur-gap');
+
+    // ================================================================
+    // RENDER DIALOGUE WITH CURRENT BLANK HIGHLIGHTED
+    // ================================================================
+    function renderDialogue() {
+        // Start with template and replace each blank with either filled answer or placeholder
+        let html = dialogueTemplate;
+
+        // Replace all blanks with current filled answers or ____
+        for (let i = 0; i < gaps.length; i++) {
+            const gapId = 'gap' + (i + 2); // gap2 to gap8
+            const answer = userAnswers[gapId] || '____';
+            const placeholder = `<span class="blank" id="${gapId}">${answer}</span>`;
+            // We need to replace the specific span - but we can use a regex to find the span with that id
+            // Simpler: we'll rebuild from scratch using the template and replace placeholders.
+        }
+
+        // Easier: we'll dynamically build the dialogue string with current answers.
+        let parts = [
+            'Emma: Hi, Harry. What <span class="blank" id="gap1">are you doing</span> (you / do)?<br>',
+            'Harry: I <span class="blank" id="gap2">' + (userAnswers['gap2'] || '____') + '</span> (set) the table for dinner. Why <span class="blank" id="gap3">' + (userAnswers['gap3'] || '____') + '</span> (you / ask)?<br>',
+            'Emma: I <span class="blank" id="gap4">' + (userAnswers['gap4'] || '____') + '</span> (need) some help with tidying my room. I <span class="blank" id="gap5">' + (userAnswers['gap5'] || '____') + '</span> (not like) doing it on my own. Please!<br>',
+            'Harry: I’ve got my own chores, thanks!<br>',
+            'Emma: What about George? <span class="blank" id="gap6">' + (userAnswers['gap6'] || '____') + '</span> (he / do) any work now? Can he help me?<br>',
+            'Harry: George <span class="blank" id="gap7">' + (userAnswers['gap7'] || '____') + '</span> (hate) chores too! He <span class="blank" id="gap8">' + (userAnswers['gap8'] || '____') + '</span> (not like) tidying or vacuuming or ...<br>',
+            'Emma: OK. Never mind.'
+        ];
+        dialogueBox.innerHTML = parts.join('');
+
+        // Highlight the current gap with a different style
+        const currentGapId = 'gap' + (currentIndex + 2);
+        const currentSpan = document.getElementById(currentGapId);
+        if (currentSpan) {
+            currentSpan.style.borderBottomColor = '#ff6b6b';
+            currentSpan.style.background = '#fff0f0';
+        }
+    }
+
+    // ================================================================
+    // LOAD CURRENT GAP
+    // ================================================================
+    function loadGap() {
+        const gap = gaps[currentIndex];
+        if (!gap) {
+            showWin();
+            return;
+        }
+
+        isAnswered = false;
+        feedback.textContent = '';
+        feedback.style.color = '#333';
+        nextBtn.style.display = 'none';
+
+        // Update progress
+        const progress = (currentIndex / gaps.length) * 100;
+        progressFill.style.width = progress + '%';
+        curGapSpan.textContent = currentIndex + 1;
+        scoreDisplay.textContent = score;
+
+        // Render dialogue with current filled answers
+        renderDialogue();
+
+        // Show options
+        optionsGrid.innerHTML = '';
+        const shuffled = shuffleArray([...gap.options]);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.dataset.correct = (opt === gap.correct) ? 'true' : 'false';
+            btn.onclick = () => handleAnswer(btn, gap);
+            optionsGrid.appendChild(btn);
+        });
+    }
+
+    // ================================================================
+    // HANDLE ANSWER
+    // ================================================================
+    function handleAnswer(btn, gap) {
+        if (isAnswered) return;
+
+        const isCorrect = btn.dataset.correct === 'true';
+        const allBtns = document.querySelectorAll('.option-btn');
+
+        if (isCorrect) {
+            isAnswered = true;
+            btn.classList.add('correct');
+            feedback.textContent = '✅ Correct!';
+            feedback.style.color = 'var(--success)';
+            nextBtn.style.display = 'inline-block';
+            allBtns.forEach(b => b.disabled = true);
+
+            // Save answer
+            const gapId = 'gap' + (currentIndex + 2);
+            userAnswers[gapId] = gap.correct;
+
+            score += 100;
+            scoreDisplay.textContent = score;
+            launchHearts();
+
+            // Update dialogue to show filled blank
+            renderDialogue();
+
+        } else {
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            feedback.textContent = '❌ Try again!';
+            feedback.style.color = 'var(--error)';
+            // Allow other attempts
+        }
+    }
+
+    // ================================================================
+    // NEXT GAP
+    // ================================================================
+    function nextGap() {
+        currentIndex++;
+        if (currentIndex < gaps.length) {
+            loadGap();
+        } else {
+            showWin();
+        }
+    }
+
+    // ================================================================
+    // WIN SCREEN
+    // ================================================================
+    function showWin() {
+        document.querySelector('.quiz-container').innerHTML = `
+            <h1 style="font-size:4rem; margin:0;">🏆</h1>
+            <h2 style="color:var(--primary); font-size:2rem; margin:10px 0;">Grammar Master!</h2>
+            <p style="font-size:1.2rem; font-weight:bold; color:#555;">You completed the dialogue!</p>
+            <p style="font-size:1.5rem; font-weight:bold; color:var(--primary);">Score: ${score} XP</p>
+            <button class="option-btn" onclick="location.reload()" style="background:var(--primary); color:white; border:none; padding:15px 30px; margin-top:20px; width:100%; max-width:300px; box-shadow:0 4px 0 #4834d4;">PLAY AGAIN 🔄</button>
+        `;
+        setTimeout(launchHearts, 300);
+        setTimeout(launchHearts, 700);
+    }
+
+    // ================================================================
+    // HEART FIREWORKS
+    // ================================================================
+    function launchHearts() {
+        const heartEmojis = ["❤️", "💖", "💝", "💕", "💘"];
+        const count = 22;
+        const originX = window.innerWidth / 2;
+        const originY = window.innerHeight / 2;
+
+        for (let i = 0; i < count; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerText = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+            heart.style.left = `${originX}px`;
+            heart.style.top = `${originY}px`;
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 140 + Math.random() * 180;
+            const targetX = Math.cos(angle) * distance;
+            const targetY = Math.sin(angle) * distance;
+            const rotation = Math.random() * 90 - 45;
+
+            heart.style.setProperty('--tx', `${targetX}px`);
+            heart.style.setProperty('--ty', `${targetY}px`);
+            heart.style.setProperty('--rot', `${rotation}deg`);
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 800);
+        }
+    }
+
+    // ================================================================
+    // UTILITY
+    // ================================================================
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // ================================================================
+    // INIT
+    // ================================================================
+    loadGap();
+</script>
+
+</body>
+</html>
