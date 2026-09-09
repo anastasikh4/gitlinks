@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учим английский: Части тела</title>
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --error: #ff4b4b;
+            --text: #4b4b4b;
+            --gray: #e5e5e5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 0px var(--gray);
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--gray);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        h1 { font-size: 22px; color: var(--text); margin-bottom: 20px; }
+        .level-container { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+
+        /* Level 1: Matching */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .card {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.1s;
+        }
+
+        .card.selected { border-color: var(--secondary); background: #ddf4ff; }
+        .card.matched { visibility: hidden; }
+
+        /* Level 2 & 3: Choice */
+        .big-emoji { font-size: 80px; margin: 20px 0; }
+        .btn-grid { display: grid; gap: 10px; }
+        .option-btn {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 15px;
+            background: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .correct { background: #d7ffb8 !important; border-color: var(--primary) !important; color: var(--primary-dark); }
+        .wrong { background: #ffdfe0 !important; border-color: var(--error) !important; color: var(--error); animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .audio-icon {
+            font-size: 50px;
+            cursor: pointer;
+            background: var(--secondary);
+            color: white;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            margin: 20px auto;
+            border-bottom: 5px solid #1899d6;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <h1 id="theme-title">Части тела · Body Parts</h1>
+
+    <!-- Level 1 -->
+    <div id="level1" class="level-container active">
+        <p>Сопоставь слово и картинку:</p>
+        <div id="card-grid" class="grid"></div>
+    </div>
+
+    <!-- Level 2 -->
+    <div id="level2" class="level-container">
+        <p>Что это за часть тела?</p>
+        <div id="l2-emoji" class="big-emoji"></div>
+        <div id="l2-options" class="btn-grid"></div>
+    </div>
+
+    <!-- Level 3 -->
+    <div id="level3" class="level-container">
+        <p>Послушай и выбери правильную картинку:</p>
+        <div class="audio-icon" onclick="playCurrentWord()">🔊</div>
+        <div id="l3-options" class="grid" style="margin-top:20px"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="level-container">
+        <div class="big-emoji">🏆</div>
+        <h2>Отличная работа!</h2>
+        <p id="final-score"></p>
+        <button class="option-btn" style="width:100%; background: var(--primary); color:white" onclick="location.reload()">Начать заново</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  НОВЫЕ ДАННЫЕ — ЧАСТИ ТЕЛА (голова — 👦)
+    // ================================================================
+
+    // Level 1: 7 пар (слово + эмодзи)
+    const level1Data = [
+        { text: 'head', match: 'head' }, { text: '👦', match: 'head' },
+        { text: 'tummy', match: 'tummy' }, { text: '🤰', match: 'tummy' },
+        { text: 'leg', match: 'leg' }, { text: '🦵', match: 'leg' },
+        { text: 'arm', match: 'arm' }, { text: '💪', match: 'arm' },
+        { text: 'foot', match: 'foot' }, { text: '🦶', match: 'foot' },
+        { text: 'hand', match: 'hand' }, { text: '✋', match: 'hand' },
+        { text: 'body', match: 'body' }, { text: '🧍', match: 'body' }
+    ];
+
+    // Level 2: 5 вопросов (эмодзи → правильное слово)
+    const questions2 = [
+        { emoji: '👦', correct: 'head', options: ['head', 'tummy', 'foot', 'arm'] },
+        { emoji: '🦵', correct: 'leg', options: ['leg', 'hand', 'body', 'head'] },
+        { emoji: '✋', correct: 'hand', options: ['hand', 'arm', 'foot', 'tummy'] },
+        { emoji: '💪', correct: 'arm', options: ['arm', 'leg', 'head', 'hand'] },
+        { emoji: '🦶', correct: 'foot', options: ['foot', 'tummy', 'leg', 'body'] }
+    ];
+
+    // Level 3: слова для аудирования + их эмодзи
+    const targetWords3 = ['head', 'tummy', 'leg', 'arm'];
+    const wordEmojiMap = {
+        'head': '👦',
+        'tummy': '🤰',
+        'leg': '🦵',
+        'arm': '💪',
+        'foot': '🦶',
+        'hand': '✋',
+        'body': '🧍'
+    };
+
+    // ================================================================
+    //  ЛОГИКА ИГРЫ
+    // ================================================================
+
+    let currentLevel = 1;
+    let selectedCards = [];
+    let l2Idx = 0;
+    let l3Idx = 0;
+
+    // --- Level 1: Matching ---
+    function initL1() {
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        level1Data.sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerText = item.text;
+            div.onclick = () => handleCardClick(div, item);
+            grid.appendChild(div);
+        });
+    }
+
+    function handleCardClick(div, item) {
+        if (div.classList.contains('matched') || selectedCards.includes(div)) return;
+        div.classList.add('selected');
+        selectedCards.push({div, item});
+
+        if (selectedCards.length === 2) {
+            if (selectedCards[0].item.match === selectedCards[1].item.match) {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.div.classList.add('matched'));
+                    selectedCards = [];
+                    checkL1End();
+                }, 400);
+            } else {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.div.classList.remove('selected'));
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+    }
+
+    function checkL1End() {
+        if (document.querySelectorAll('.card.matched').length === level1Data.length) {
+            goToLevel(2);
+        }
+    }
+
+    // --- Level 2: Multiple Choice ---
+    function initL2() {
+        const q = questions2[l2Idx];
+        document.getElementById('l2-emoji').innerText = q.emoji;
+        const optionsDiv = document.getElementById('l2-options');
+        optionsDiv.innerHTML = '';
+        q.options.sort(() => Math.random() - 0.5).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (opt === q.correct) {
+                    btn.classList.add('correct');
+                    setTimeout(() => {
+                        l2Idx++;
+                        if (l2Idx < questions2.length) initL2();
+                        else goToLevel(3);
+                    }, 800);
+                } else {
+                    btn.classList.add('wrong');
+                }
+            };
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    // --- Level 3: Listening ---
+    function initL3() {
+        const currentWord = targetWords3[l3Idx];
+        const optionsDiv = document.getElementById('l3-options');
+        optionsDiv.innerHTML = '';
+
+        // Перемешиваем все слова для вариантов
+        const shuffledWords = [...targetWords3].sort(() => Math.random() - 0.5);
+        shuffledWords.forEach(word => {
+            const btn = document.createElement('div');
+            btn.className = 'card';
+            btn.style.fontSize = '40px';
+            btn.innerText = wordEmojiMap[word] || '❓';
+            btn.onclick = () => {
+                if (word === targetWords3[l3Idx]) {
+                    btn.classList.add('correct');
+                    setTimeout(() => {
+                        l3Idx++;
+                        if (l3Idx < targetWords3.length) initL3();
+                        else goToLevel('result');
+                    }, 800);
+                } else {
+                    btn.classList.add('wrong');
+                }
+            };
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function playCurrentWord() {
+        const word = targetWords3[l3Idx];
+        const msg = new SpeechSynthesisUtterance(word);
+        msg.lang = 'en-US';
+        msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // --- Navigation ---
+    function goToLevel(num) {
+        document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+        if (num === 'result') {
+            document.getElementById('result').classList.add('active');
+            document.getElementById('progress-fill').style.width = '100%';
+            document.getElementById('final-score').innerText = 'Ты прошёл все уровни! 🎉';
+        } else {
+            document.getElementById('level' + num).classList.add('active');
+            const progress = ((num - 1) / 3) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            if (num === 2) initL2();
+            if (num === 3) initL3();
+        }
+    }
+
+    // --- Start ---
+    initL1();
+</script>
+
+</body>
+</html>
