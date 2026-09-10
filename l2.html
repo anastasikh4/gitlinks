@@ -457,41 +457,55 @@
       </section>
     </div>
 
-    <!-- ПРАВАЯ КОЛОНКА (Калькулятор, липкий при скролле) -->
-    <aside class="h-fit rounded-2xl border border-white/10 bg-[#0a0d16]/90 p-4 xl:sticky xl:top-[13.5rem]">
-      <h2 class="mb-3 text-sm font-semibold text-white">Калькулятор</h2>
-      <div id="calcDisplay" class="mb-3 min-h-[52px] rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-right font-mono text-lg text-emerald-200">0</div>
-      <div class="mb-3 grid grid-cols-2 gap-2">
-        <button type="button" id="insIncome" class="rounded-xl bg-emerald-500/15 px-2 py-2 text-[11px] font-semibold text-emerald-200">📥 Доход</button>
-        <button type="button" id="insExp" class="rounded-xl bg-amber-500/15 px-2 py-2 text-[11px] font-semibold text-amber-200">📥 Расходы</button>
-      </div>
-      <div class="mb-2 grid grid-cols-4 gap-1.5 text-[11px]">
-        <button type="button" class="calc-btn" data-mem="mc">MC</button>
-        <button type="button" class="calc-btn" data-mem="mr">MR</button>
-        <button type="button" class="calc-btn" data-mem="mplus">M+</button>
-        <button type="button" class="calc-btn calc-op" data-op="%">%</button>
-      </div>
-      <div class="grid grid-cols-4 gap-1.5">
-        <button type="button" class="calc-btn" data-act="clear">C</button>
-        <button type="button" class="calc-btn" data-act="del">⌫</button>
-        <button type="button" class="calc-btn calc-op" data-op="/">÷</button>
-        <button type="button" class="calc-btn calc-op" data-op="*">×</button>
-        <button type="button" class="calc-btn" data-op="7">7</button>
-        <button type="button" class="calc-btn" data-op="8">8</button>
-        <button type="button" class="calc-btn" data-op="9">9</button>
-        <button type="button" class="calc-btn calc-op" data-op="-">−</button>
-        <button type="button" class="calc-btn" data-op="4">4</button>
-        <button type="button" class="calc-btn" data-op="5">5</button>
-        <button type="button" class="calc-btn" data-op="6">6</button>
-        <button type="button" class="calc-btn calc-op" data-op="+">+</button>
-        <button type="button" class="calc-btn" data-op="1">1</button>
-        <button type="button" class="calc-btn" data-op="2">2</button>
-        <button type="button" class="calc-btn" data-op="3">3</button>
-        <button type="button" class="calc-btn row-span-2 bg-emerald-500/30 text-emerald-100" data-act="eq">=</button>
-        <button type="button" class="calc-btn col-span-2" data-op="0">0</button>
-        <button type="button" class="calc-btn" data-op=".">.</button>
-      </div>
-    </aside>
+  <!-- ОБЩИЙ РОДИТЕЛЬСКИЙ КОНТЕЙНЕР (Сетка, которая держит левую часть и калькулятор вместе) -->
+<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
+  
+  <!-- ЛЕВАЯ КОЛОНКА (Сюда вставляйте ваши блоки дней, трекеров, списков и т.д.) -->
+  <div class="space-y-5">
+    <!-- Здесь ваш контент левой части страницы -->
+    <div class="p-4 rounded-2xl bg-white/5 border border-white/10 text-white">
+      Основной контент страницы (Левая колонка — занимает 2/3)
+    </div>
+  </div>
+
+  <!-- ПРАВАЯ КОЛОНКА (Калькулятор, липкий при скролле — занимает 1/3) -->
+  <aside class="h-fit rounded-2xl border border-white/10 bg-[#0a0d16]/90 p-4 xl:sticky xl:top-[13.5rem] w-full">
+    <h2 class="mb-3 text-sm font-semibold text-white">Калькулятор</h2>
+    <div id="calcDisplay" class="mb-3 min-h-[52px] rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-right font-mono text-lg text-emerald-200">0</div>
+    <div class="mb-3 grid grid-cols-2 gap-2">
+      <button type="button" id="insIncome" class="rounded-xl bg-emerald-500/15 px-2 py-2 text-[11px] font-semibold text-emerald-200">📥 Доход</button>
+      <button type="button" id="insExp" class="rounded-xl bg-amber-500/15 px-2 py-2 text-[11px] font-semibold text-amber-200">📥 Расходы</button>
+    </div>
+    <div class="mb-2 grid grid-cols-4 gap-1.5 text-[11px]">
+      <button type="button" class="calc-btn" data-mem="mc">MC</button>
+      <button type="button" class="calc-btn" data-mem="mr">MR</button>
+      <button type="button" class="calc-btn" data-mem="mplus">M+</button>
+      <button type="button" class="calc-btn calc-op" data-op="%">%</button>
+    </div>
+    <div class="grid grid-cols-4 gap-1.5">
+      <button type="button" class="calc-btn" data-act="clear">C</button>
+      <button type="button" class="calc-btn" data-act="del">⌫</button>
+      <button type="button" class="calc-btn calc-op" data-op="/">÷</button>
+      <button type="button" class="calc-btn calc-op" data-op="*">×</button>
+      <button type="button" class="calc-btn" data-op="7">7</button>
+      <button type="button" class="calc-btn" data-op="8">8</button>
+      <button type="button" class="calc-btn" data-op="9">9</button>
+      <button type="button" class="calc-btn calc-op" data-op="-">−</button>
+      <button type="button" class="calc-btn" data-op="4">4</button>
+      <button type="button" class="calc-btn" data-op="5">5</button>
+      <button type="button" class="calc-btn" data-op="6">6</button>
+      <button type="button" class="calc-btn calc-op" data-op="+">+</button>
+      <button type="button" class="calc-btn" data-op="1">1</button>
+      <button type="button" class="calc-btn" data-op="2">2</button>
+      <button type="button" class="calc-btn" data-op="3">3</button>
+      <button type="button" class="calc-btn row-span-2 bg-emerald-500/30 text-emerald-100" data-act="eq">=</button>
+      <button type="button" class="calc-btn col-span-2" data-op="0">0</button>
+      <button type="button" class="calc-btn" data-op=".">.</button>
+    </div>
+  </aside>
+
+</div> <!-- Конец общего контейнера сетки -->
+
 
   </div> <!-- /сетка двух колонок -->
 </div> <!-- /#finTracker -->
