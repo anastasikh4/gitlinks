@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Prix Review: The Story Quest</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --autumn-orange: #34495e;
+            --deep-red: #e74c3c;
+            --forest-dark: #1e272e;
+            --paper: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--forest-dark);
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .story-card {
+            background: var(--paper);
+            max-width: 850px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 5px solid var(--autumn-orange);
+            position: relative;
+        }
+
+        h1 {
+            font-family: 'Bangers', cursive;
+            font-size: 3.5rem;
+            color: var(--deep-red);
+            text-align: center;
+            letter-spacing: 3px;
+            margin-top: 0;
+            text-shadow: 2px 2px 0px #bdc3c7;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 35px;
+        }
+
+        .img-item {
+            width: 100%;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            border: 2px solid var(--forest-dark);
+            position: relative;
+        }
+
+        .time-label {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .story-content {
+            font-size: 26px;
+            line-height: 2.2;
+            text-align: justify;
+        }
+
+        .gap-container {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+        }
+
+        select {
+            font-family: 'Raleway', sans-serif;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--deep-red);
+            background: transparent;
+            border: none;
+            border-bottom: 3px dashed var(--autumn-orange);
+            cursor: pointer;
+            padding: 0 5px;
+            appearance: none;
+            outline: none;
+            text-align: center;
+            width: 180px;
+        }
+
+        select:hover {
+            background: rgba(52, 73, 94, 0.1);
+        }
+
+        .check-btn {
+            display: block;
+            margin: 40px auto 0;
+            background: var(--deep-red);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #922b21;
+            transition: 0.1s;
+        }
+
+        .check-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #922b21;
+        }
+    </style>
+</head>
+<body>
+
+<div class="story-card">
+    <h1>GRAND PRIX STORY QUEST</h1>
+
+    <div class="image-gallery">
+        <div class="img-item" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2010_Malaysian_GP_opening_lap.jpg/1280px-2010_Malaysian_GP_opening_lap.jpg');"><span class="time-label">11:30</span></div>
+        <div class="img-item" style="background-image: url('https://i.pinimg.com/474x/44/d8/22/44d822b3e3e7ceddc8fca4d940288e4a.jpg?nii=t');"><span class="time-label">11:00</span></div>
+        <div class="img-item" style="background-image: url('https://img.championat.com/s/1200x630/news/big/y/f/maks-ferstappen-pyatyj-god-podryad-priznan-luchshim-gonschikom-goda-po-versii-autosport_17690744281261989624.jpg');"><span class="time-label">12:00</span></div>
+        <div class="img-item" style="background-image: url('https://c.f1news.ru/gallery/2026/gp/belgium/1807/XPB_1426493_1200px.jpg');"><span class="time-label">12:45</span></div>
+    </div>
+
+    <div class="story-content">
+        The race weekend was full of action.  Did the drivers listen to news updates at half past eleven?
+        <div class="gap-container">
+            <select id="q1">
+                <option value="">[Choose...]</option>
+                <option value="correct">No, they didn't</option>
+                <option value="wrong">No, they weren't</option>
+            </select>
+        </div> 
+        They drove on the track. 
+        Later, did the reporter have headphones at eleven o'clock to listen to news?
+        <div class="gap-container">
+            <select id="q2">
+                <option value="">[Choose...]</option>
+                <option value="wrong">No, he didn't</option>
+                <option value="correct">Yes, he did</option>
+            </select>
+        </div> 
+        
+        At half past eleven did the cars park inside the garage?
+        <div class="gap-container">
+            <select id="q3">
+                <option value="">[Choose...]</option>
+                <option value="correct">No, they weren't</option>
+                <option value="wrong">No, they didn't</option>
+            </select>
+        </div> 
+        They were driving more. 
+        At twelve o'clock in the afternoon was Max a champion? 
+        <div class="gap-container">
+            <select id="q4">
+                <option value="">[Choose...]</option>
+                <option value="wrong">No, he didn't</option>
+                <option value="correct">Yes, he was</option>
+            </select>
+        </div> 
+       
+        Did he have a winner cup at half past twelve? 
+        <div class="gap-container">
+            <select id="q5">
+                <option value="">[Choose...]</option>
+                <option value="correct">No, they didn't</option>
+                <option value="wrong">No, he didn't</option>
+            </select>
+        </div>. 
+        Finally, after, did they sit down on the red sofa at fifteen to one? 
+        <div class="gap-container">
+            <select id="q6">
+                <option value="">[Choose...]</option>
+                <option value="wrong">No, he didn't</option>
+                <option value="correct">Yes, they did</option>
+            </select>
+        </div> 
+   
+    </div>
+
+    <button class="check-btn" onclick="checkAnswers()">FINISH STORY</button>
+</div>
+
+<script>
+    function checkAnswers() {
+        let score = 0;
+        for(let i=1; i<=6; i++) {
+            let val = document.getElementById('q' + i).value;
+            if(val === 'correct') score++;
+        }
+        
+        if(score === 6) {
+            alert("✨ PERFECT! You completed the whole racing story correctly!");
+        } else {
+            alert("You have " + score + " / 6 correct. Check the timelines and text keys and try again!");
+        }
+    }
+</script>
+
+</body>
+</html>
