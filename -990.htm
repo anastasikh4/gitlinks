@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mona & Missy: Reading Challenge</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-dark-green: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-red: #ff4b4b;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-sizing: border-box;
+        }
+
+        .progress-bg {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--duo-gray);
+            border-radius: 20px;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--duo-green);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-container {
+            width: 70%; /* Kept 70% layout restriction */
+            max-width: 500px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .question-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .character-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bubble {
+            border: 2px solid var(--duo-gray);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 18px;
+            position: relative;
+            background: white;
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .bubble::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid var(--duo-gray);
+        }
+
+        .emoji-display { font-size: 50px; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-card {
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            background: white;
+            text-align: center;
+        }
+
+        .option-card:hover { background-color: #fcfcfc; }
+        .option-card:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+        .correct { background-color: #d7ffb8 !important; border-color: var(--duo-green) !important; color: var(--duo-dark-green) !important; }
+        .wrong { background-color: #ffdfe0 !important; border-color: var(--duo-red) !important; color: var(--duo-red) !important; animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+
+        #result-screen { display: none; text-align: center; }
+        .btn-restart { background: var(--duo-blue); color: white; border: none; border-bottom: 4px solid #1899d6; padding: 15px 40px; border-radius: 15px; font-size: 18px; font-weight: 800; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div style="font-size: 24px; color: #afafaf; cursor: pointer;" onclick="location.reload()">✕</div>
+        <div class="progress-bg"><div id="progress-fill"></div></div>
+    </div>
+
+    <div class="quiz-container">
+        <div id="game-ui">
+            <div class="question-title" id="type-title">Complete the Text!</div>
+            
+            <div class="character-row">
+                <div class="emoji-display" id="current-emoji">👧🏾</div>
+                <div class="bubble" id="current-prompt">Loading puzzle...</div>
+            </div>
+
+            <div class="options-grid" id="options-box"></div>
+        </div>
+
+        <div id="result-screen">
+            <div style="font-size: 80px;">🐾</div>
+            <h1>Lesson Completed!</h1>
+            <p id="score-text"></p>
+            <button class="btn-restart" onclick="location.reload()">RESTART</button>
+        </div>
+    </div>
+
+    <script>
+        const missionData = [
+            { type: "Name Check", emoji: "👧🏾", prompt: "Hi! My name's 1) _______.", options: ["Mona", "Harry", "Lee"], correct: "Mona" },
+            { type: "Age Check", emoji: "🎂 9", prompt: "I'm 2) _______ years old.", options: ["nine", "ten", "nice"], correct: "nine" },
+            { type: "Pet Check", emoji: "🐶", prompt: "This is my dog girl, ______.", options: ["Tom", "Missy", "Max"], correct: "Missy" },
+            { type: "Color Check", emoji: "🐶", prompt: "Missy is 3) _______ and orange.", options: ["brown", "blue", "white"], correct: "brown" },
+            { type: "Affection Check", emoji: "❤️", prompt: "Complete the sentence: I ______ my dog!", options: ["have", "go", "like"], correct: "like" }
+        ];
+
+        let idx = 0;
+        let score = 0;
+
+        function loadTask() {
+            const item = missionData[idx];
+            document.getElementById('type-title').innerText = item.type;
+            document.getElementById('current-emoji').innerText = item.emoji;
+            document.getElementById('current-prompt').innerText = item.prompt;
+            
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+            
+            item.options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option-card';
+                btn.innerText = opt;
+                btn.onclick = () => check(btn, opt);
+                box.appendChild(btn);
+            });
+            updateUI();
+        }
+
+        function check(btn, choice) {
+            const correct = missionData[idx].correct;
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(c => c.style.pointerEvents = 'none');
+
+            if (choice === correct) {
+                btn.classList.add('correct');
+                score++;
+                setTimeout(next, 800);
+            } else {
+                btn.classList.add('wrong');
+                cards.forEach(c => { if(c.innerText === correct) c.classList.add('correct'); });
+                setTimeout(next, 1500);
+            }
+        }
+
+        function next() {
+            idx++;
+            if (idx < missionData.length) loadTask();
+            else finish();
+        }
+
+        function updateUI() {
+            document.getElementById('progress-fill').style.width = (idx / missionData.length) * 100 + '%';
+        }
+
+        function finish() {
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('score-text').innerText = `You correctly filled ${score} out of ${missionData.length} gaps!`;
+        }
+
+        loadTask();
+    </script>
+</body>
+</html>

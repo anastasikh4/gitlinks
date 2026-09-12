@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEAVES GAME: What Color?</title>
+    <style>
+        :root {
+            --cart-blue: #e67e22; /* Warm autumn orange */
+            --apple-red: #d63031;
+            --cheese-gold: #f1c40f;
+            --leaf-green: #27ae60;
+            --bg-color: #fce4d6;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Comic Neue', 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 500px;
+            background: #fff;
+            border-radius: 40px;
+            border: 8px solid var(--cart-blue);
+            box-shadow: 0 15px 0px #d35400;
+            padding: 30px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .score-pill { background: var(--cheese-gold); padding: 5px 20px; border-radius: 20px; border: 3px solid #2d3436; font-weight: bold; font-size: 1.2rem; }
+        .tag { background: var(--leaf-green); color: white; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+
+        .display-area {
+            background: #fdfcf0;
+            height: 180px;
+            border-radius: 30px;
+            border: 4px dashed var(--cart-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .item-emoji { font-size: 55px; margin-bottom: 10px; }
+        .sentence { font-size: 22px; font-weight: 700; color: #2d3436; line-height: 1.4; }
+        .highlight { color: var(--cart-blue); background: #fef5e7; padding: 0 8px; border-radius: 5px; border-bottom: 3px solid; }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn-choice {
+            background: white;
+            border: 4px solid #2d3436;
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #2d3436;
+            transition: 0.1s;
+        }
+
+        .btn-choice:active { transform: translateY(3px); box-shadow: none; }
+        .btn-0 { border-color: #2980b9; color: #2980b9; }
+        .btn-1 { border-color: #e67e22; color: #e67e22; }
+
+        #progress-bar { width: 100%; height: 12px; background: #eee; border-radius: 10px; margin-top: 25px; border: 2px solid #ccc; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--leaf-green); transition: 0.4s; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div class="tag" id="level-tag">Autumn Colors Challenge</div>
+            <div class="score-pill">🍁 <span id="score-val">0</span></div>
+        </div>
+
+        <div class="display-area">
+            <div class="item-emoji" id="emoji-box">🍁</div>
+            <div class="sentence" id="sentence-box">This leaf is <span class="highlight">?</span>.</div>
+        </div>
+
+        <div class="btn-grid" id="btn-container">
+            <button class="btn-choice btn-0" id="btn-0" onclick="check(0)"></button>
+            <button class="btn-choice btn-1" id="btn-1" onclick="check(1)"></button>
+        </div>
+
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="win-screen">
+        <h1 style="color: var(--leaf-green); font-size: 40px;">COLOR MASTER! 🌟</h1>
+        <p>You know all the autumn colors perfectly!</p>
+        <div style="font-size: 60px; margin: 20px;">❤️💛💙💚🧡💜🖤🤍</div>
+        <button class="btn-choice" onclick="location.reload()" style="width:100%">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let current = 0;
+
+    const missions = [
+        { s: "This  is ...", opt: ["red", "green"], ans: 0, emo: "🍁", hint: "Look closely! It is red like a tomato. ❤️" },
+        { s: "This is ...", opt: ["blue", "yellow"], ans: 1, emo: "💛", hint: "This leaf is yellow like the bright sun. 💛" },
+        { s: "This  is ...", opt: ["blue", "orange"], ans: 0, emo: "💙", hint: "Wait, this leaf turned blue like the sky! 💙" },
+        { s: "This  is ...", opt: ["black", "green"], ans: 1, emo: "🍃", hint: "Fresh summer leaf! It is green. 💚" },
+        { s: "This  is ...", opt: ["orange", "white"], ans: 0, emo: "🍊", hint: "It is bright orange like a pumpkin! 🧡" },
+        { s: "This  is ...", opt: ["red", "purple"], ans: 1, emo: "🍇", hint: "A beautiful purple leaf. 💜" },
+        { s: "This  is ...", opt: ["black", "yellow"], ans: 0, emo: "⚫", hint: "Dark shadow leaf! It is black. 🖤" },
+        { s: "This  is ...", opt: ["orange", "white"], ans: 1, emo: "🏳️", hint: "Empty clean canvas leaf! It is white. 🤍" }
+    ];
+
+    function loadMission() {
+        const m = missions[current];
+        document.getElementById('emoji-box').innerText = m.emo;
+        document.getElementById('sentence-box').innerHTML = m.s.replace("...", "<span class='highlight'>?</span>");
+        document.getElementById('btn-0').innerText = m.opt[0];
+        document.getElementById('btn-1').innerText = m.opt[1];
+        document.getElementById('progress-fill').style.width = (current / missions.length * 100) + '%';
+    }
+
+    function check(choice) {
+        if (choice === missions[current].ans) {
+            score += 10;
+            current++;
+            document.getElementById('score-val').innerText = score;
+            if (current < missions.length) {
+                loadMission();
+            } else {
+                showWin();
+            }
+        } else {
+            const card = document.getElementById('game-card');
+            card.style.borderColor = "#d63031";
+            setTimeout(() => card.style.borderColor = "#e67e22", 500);
+            alert(missions[current].hint);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-area').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+        document.getElementById('progress-fill').style.width = '100%';
+    }
+
+    loadMission();
+</script>
+</body>
+</html>

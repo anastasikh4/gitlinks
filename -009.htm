@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rainbow Song: Singing Challenge</title>
+    <style>
+        :root {
+            --sky-blue: #ff7675; /* Soft pastel red from rainbow */
+            --ocean-blue: #2980b9; /* For the correct answers */
+            --apple-red: #e74c3c;
+            --grass-green: #2ecc71;
+            --text-dark: #2c3e50;
+            --rainbow-purple: #9b59b6;
+        }
+
+        body {
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            background: #f7f1e3;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- RAINBOW LYRICS MATRIX TABLE --- */
+        .reference-table {
+            background: white;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 4px solid var(--rainbow-purple);
+        }
+
+        .reference-table th {
+            background: var(--rainbow-purple);
+            color: white;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        .reference-table td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #eee;
+            font-size: 1rem;
+        }
+
+        .name-cell { font-weight: bold; text-align: left !important; background: #f9f9f9; }
+        .color-me { color: var(--apple-red); font-weight: bold; }
+        .color-you { color: var(--grass-green); font-weight: bold; }
+
+        /* --- THE GAME FRAME STYLE --- */
+        #game-frame {
+            background: #ffffff;
+            width: 95%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 35px;
+            text-align: center;
+            border: 6px solid var(--rainbow-purple);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .level-badge { background: #f3e5f5; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: var(--rainbow-purple); }
+        .score-badge { background: #fff176; color: #f57f17; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+
+        .hero-emoji { font-size: 4rem; margin: 10px 0; }
+        
+        .sentence-box {
+            background: #fff9e6;
+            padding: 25px;
+            border-radius: 25px;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            border: 3px dashed #ffd54f;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 90px;
+            border-bottom: 3px solid var(--ocean-blue);
+            color: var(--ocean-blue);
+            font-weight: 900;
+        }
+
+        .options { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .option-btn {
+            background: white;
+            border: 3px solid #eee;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .option-btn:hover { border-color: var(--rainbow-purple); background: #fbf5ff; }
+        .option-btn.correct { background: var(--grass-green) !important; color: white; }
+        .option-btn.wrong { background: var(--apple-red) !important; color: white; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--rainbow-purple); margin-top: 0;">🌈 Rainbow Song Matrix</h2>
+    
+    <table class="reference-table">
+        <thead>
+            <tr>
+                     <h2> Hello purple, hello blue,
+Red for me and green for you!
+Hello orange, yellow too,
+Red for me and green for you!</h2>
+            </tr>
+        </thead>
+        <tbody>
+  
+<h3>Goodbye purple, goodbye blue,
+Red for me and green for you!
+Goodbye orange, yellow too,
+Red for me and green for you!</h3>
+        </tbody>
+    </table>
+
+    <div id="game-frame">
+        <div id="play-screen">
+            <div class="header">
+                <div class="level-badge">Verse <span id="lvl-num">1</span>/4</div>
+                <div class="score-badge">Stars: <span id="score">0</span></div>
+            </div>
+
+            <div id="char-display" style="font-size: 1.5rem; font-weight: bold; color: var(--rainbow-purple);">Verse 1</div>
+            <div class="hero-emoji" id="hero">🌈</div>
+            <div class="sentence-box" id="sentence"></div>
+            <div class="options" id="options"></div>
+        </div>
+
+        <div id="win-screen">
+            <h1 style="color: var(--grass-green);">✨ Spectacular Singing! ✨</h1>
+            <p style="font-size: 1.2rem;">You completed the entire Rainbow Song!</p>
+            <button onclick="location.reload()" style="padding:15px 35px; border-radius:30px; cursor:pointer; background: var(--rainbow-purple); color:white; border:none; font-weight:bold; font-size: 1.1rem;">Play Again</button>
+        </div>
+    </div>
+
+<script>
+    const missions = [
+        {
+            name: "Verse 1", hero: "👋",
+            text: "Hello purple, hello blue. <span class='gap' id='g1'>___</span> for me and <span class='gap' id='g2'>___</span> for you!",
+            answers: ["Red", "green"],
+            options: ["Red", "green", "Blue", "purple"]
+        },
+        {
+            name: "Verse 2", hero: "🌈",
+            text: "Hello orange, yellow <span class='gap' id='g1'>___</span>. Red for me and green for <span class='gap' id='g2'>___</span>!",
+            answers: ["too", "you"],
+            options: ["too", "you", "two", "me"]
+        },
+        {
+            name: "Verse 3", hero: "🏃‍♂️",
+            text: "<span class='gap' id='g1'>___</span> purple, goodbye blue. Red for <span class='gap' id='g2'>___</span> and green for you!",
+            answers: ["Goodbye", "me"],
+            options: ["Hello", "Goodbye", "me", "you"]
+        },
+        {
+            name: "Verse 4", hero: "✨",
+            text: "Goodbye orange, yellow too. <span class='gap' id='g1'>___</span> for me and green for <span class='gap' id='g2'>___</span>!",
+            answers: ["Red", "you"],
+            options: ["Red", "Green", "you", "me"]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentStep = 0; // Tracks gap 1 vs gap 2 within the current level
+    let score = 0;
+
+    function loadLevel() {
+        if (currentLevel >= missions.length) {
+            showWin();
+            return;
+        }
+        
+        currentStep = 0;
+        const m = missions[currentLevel];
+        document.getElementById('lvl-num').innerText = currentLevel + 1;
+        document.getElementById('char-display').innerText = m.name;
+        document.getElementById('hero').innerText = m.hero;
+        document.getElementById('sentence').innerHTML = m.text;
+        
+        renderOptions();
+    }
+
+    function renderOptions() {
+        const m = missions[currentLevel];
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        
+        m.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleChoice(btn, opt);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function handleChoice(btn, selectedOption) {
+        const m = missions[currentLevel];
+        const targetAnswer = m.answers[currentStep];
+
+        if (selectedOption === targetAnswer) {
+            btn.classList.add('correct');
+            score += 10;
+            document.getElementById('score').innerText = score;
+            
+            // Fill the hidden text gap
+            currentStep++;
+            const gapId = 'g' + currentStep;
+            document.getElementById(gapId).innerText = selectedOption;
+
+            // Check if all gaps in current verse are filled
+            if (currentStep >= m.answers.length) {
+                setTimeout(() => {
+                    currentLevel++;
+                    loadLevel();
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    renderOptions();
+                }, 800);
+            }
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+            }, 600);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+    }
+
+    // Run game engine initialization
+    loadLevel();
+</script>
+</body>
+</html>

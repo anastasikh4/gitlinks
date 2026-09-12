@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superhero Numbers & Plurals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .game-container {
+            background: linear-gradient(145deg, #1e1e30, #252542);
+            border: 3px solid #f39c12;
+            border-radius: 25px;
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.4), 0 20px 60px rgba(0,0,0,0.5);
+            padding: 35px;
+            max-width: 520px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #3498db, #e74c3c);
+            background-size: 200% 100%;
+            animation: powerLine 3s linear infinite;
+        }
+        
+        @keyframes powerLine {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        
+        .stage-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stage-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #2c2c4a;
+            border: 2px solid #444;
+            transition: all 0.3s;
+        }
+        
+        .stage-dot.active {
+            background: radial-gradient(circle, #f39c12, #e67e22);
+            border-color: #f39c12;
+            box-shadow: 0 0 15px #f39c12;
+            transform: scale(1.3);
+        }
+        
+        .stage-dot.completed {
+            background: radial-gradient(circle, #2ecc71, #27ae60);
+            border-color: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #f39c12;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            text-shadow: 0 0 20px rgba(243, 156, 18, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        h2 {
+            text-align: center;
+            color: #ecf0f1;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            font-weight: normal;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: #2c2c4a;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e74c3c, #f39c12, #3498db);
+            background-size: 200% 100%;
+            animation: progressGlow 2s linear infinite;
+            transition: width 0.5s ease;
+            border-radius: 6px;
+        }
+        
+        @keyframes progressGlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        
+        .hero-badge {
+            text-align: center;
+            font-size: 4.5em;
+            margin-bottom: 15px;
+            animation: heroFloat 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(243, 156, 18, 0.5);
+        }
+        
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+        
+        .question-area {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .question-text {
+            font-size: 2.8em;
+            color: #ecf0f1;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+        
+        .question-hint {
+            font-size: 1.15em;
+            color: #bdc3c7;
+            font-style: italic;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-btn {
+            padding: 18px 30px;
+            font-size: 1.25em;
+            border: 3px solid #3498db;
+            background: linear-gradient(145deg, #2c2c4a, #1e1e30);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #ecf0f1;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .option-btn:hover {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border-color: #3498db;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .option-btn.correct {
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
+            border-color: #2ecc71;
+            color: white;
+            animation: heroPower 0.6s ease;
+        }
+        
+        .option-btn.wrong {
+            background: linear-gradient(145deg, #c0392b, #e74c3c);
+            border-color: #e74c3c;
+            color: white;
+            animation: villainShake 0.5s ease;
+        }
+        
+        @keyframes heroPower {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); box-shadow: 0 0 30px #2ecc71; }
+            100% { transform: scale(1); box-shadow: 0 0 20px #2ecc71; }
+        }
+        
+        @keyframes villainShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        
+        .score-display {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .score-number {
+            color: #f39c12;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
+        }
+        
+        .win-screen {
+            text-align: center;
+            display: none;
+        }
+        
+        .win-screen h2 {
+            color: #f39c12;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(243, 156, 18, 0.7);
+            text-transform: uppercase;
+            animation: heroTitle 1s ease infinite;
+        }
+        
+        @keyframes heroTitle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .win-screen p {
+            color: #bdc3c7;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .play-again-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #f39c12 50%, #3498db 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        .play-again-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 10px 35px rgba(231, 76, 60, 0.6);
+        }
+        
+        .feedback {
+            font-size: 1.5em;
+            margin: 18px 0;
+            min-height: 35px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .feedback.correct {
+            color: #2ecc71;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
+        }
+        
+        .feedback.wrong {
+            color: #e74c3c;
+            text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+        }
+        
+        .power-text {
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="stage-indicator">
+            <div class="stage-dot" id="dot1"></div>
+            <div class="stage-dot" id="dot2"></div>
+        </div>
+        
+        <h1>🦸‍♂️ Super Learning 🦸‍♀️</h1>
+        <h2 id="stageTitle">Stage 1: Numbers Quest</h2>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="gameArea">
+            <div class="question-area">
+                <div class="hero-badge" id="heroBadge">⚡</div>
+                <div class="question-text" id="questionText">10</div>
+                <div class="question-hint" id="questionHint">What is this number in words?</div>
+            </div>
+            
+            <div class="options-container" id="optionsContainer"></div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="score-display">
+                Power Level: <span class="score-number" id="score">0</span> / <span id="total">10</span>
+            </div>
+        </div>
+        
+        <div class="win-screen" id="winScreen">
+            <div class="hero-badge">🏆</div>
+            <h2>Superhero Status!</h2>
+            <p>You've mastered Numbers & Plurals!<br>You're a true learning hero!</p>
+            <button class="play-again-btn" onclick="startGame()">⚡ New Mission ⚡</button>
+        </div>
+    </div>
+    
+    <script>
+        // Numbers data
+        const numbers = [
+            { num: 10, word: 'ten' },
+            { num: 11, word: 'eleven' },
+            { num: 12, word: 'twelve' },
+            { num: 13, word: 'thirteen' },
+            { num: 14, word: 'fourteen' },
+            { num: 15, word: 'fifteen' },
+            { num: 16, word: 'sixteen' },
+            { num: 17, word: 'seventeen' },
+            { num: 18, word: 'eighteen' },
+            { num: 19, word: 'nineteen' },
+            { num: 20, word: 'twenty' }
+        ];
+        
+        // Plurals data - only s, es, and ies rules
+        const plurals = [
+            { singular: 'cat', plural: 'cats', rule: 's' },
+            { singular: 'dog', plural: 'dogs', rule: 's' },
+            { singular: 'book', plural: 'books', rule: 's' },
+            { singular: 'star', plural: 'stars', rule: 's' },
+            { singular: 'car', plural: 'cars', rule: 's' },
+            { singular: 'box', plural: 'boxes', rule: 'es' },
+            { singular: 'bus', plural: 'buses', rule: 'es' },
+            { singular: 'wish', plural: 'wishes', rule: 'es' },
+            { singular: 'bench', plural: 'benches', rule: 'es' },
+            { singular: 'dish', plural: 'dishes', rule: 'es' },
+            { singular: 'baby', plural: 'babies', rule: 'ies' },
+            { singular: 'city', plural: 'cities', rule: 'ies' },
+            { singular: 'party', plural: 'parties', rule: 'ies' },
+            { singular: 'story', plural: 'stories', rule: 'ies' },
+            { singular: 'candy', plural: 'candies', rule: 'ies' }
+        ];
+        
+        const heroBadges = ['🦸‍♂️', '🦸‍♀️', '⚡', '🌟', '💥', '🔥'];
+        
+        let currentStage = 1;
+        let currentQuestion = 0;
+        let score = 0;
+        let questionsPerStage = 7;
+        let currentQuestions = [];
+        let currentNumberData = null;
+        let currentPluralData = null;
+        
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function updateProgress() {
+            const progress = ((currentQuestion) / questionsPerStage) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        function updateDots() {
+            document.getElementById('dot1').className = currentStage === 1 ? 'stage-dot active' : 'stage-dot completed';
+            document.getElementById('dot2').className = currentStage === 2 ? 'stage-dot active' : 
+                (currentStage > 2 ? 'stage-dot completed' : 'stage-dot');
+        }
+        
+        function startGame() {
+            currentStage = 1;
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('winScreen').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+            setupStage();
+        }
+        
+        function setupStage() {
+            updateDots();
+            updateProgress();
+            
+            if (currentStage === 1) {
+                document.getElementById('stageTitle').textContent = '🦸 Stage 1: Numbers Quest';
+                currentQuestions = shuffleArray([...numbers]).slice(0, questionsPerStage);
+            } else if (currentStage === 2) {
+                document.getElementById('stageTitle').textContent = '🦸 Stage 2: Numbers + Plurals';
+                // Generate combined questions
+                const numberPool = shuffleArray([...numbers]);
+                const pluralPool = shuffleArray([...plurals]);
+                currentQuestions = [];
+                for (let i = 0; i < questionsPerStage; i++) {
+                    currentQuestions.push({
+                        number: numberPool[i % numberPool.length],
+                        plural: pluralPool[i % pluralPool.length]
+                    });
+                }
+            }
+            
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            if (currentQuestion >= questionsPerStage) {
+                if (currentStage === 1) {
+                    currentStage = 2;
+                    currentQuestion = 0;
+                    setupStage();
+                    return;
+                } else {
+                    showWin();
+                    return;
+                }
+            }
+            
+            updateProgress();
+            
+            const badgeIdx = currentQuestion % heroBadges.length;
+            document.getElementById('heroBadge').textContent = heroBadges[badgeIdx];
+            
+            if (currentStage === 1) {
+                // Numbers stage - just match the number to word
+                const q = currentQuestions[currentQuestion];
+                
+                document.getElementById('questionText').textContent = q.num;
+                document.getElementById('questionHint').textContent = 'What is this number in words?';
+                
+                const correctAnswer = q.word;
+                const wrongAnswers = shuffleArray(
+                    numbers.filter(n => n.word !== correctAnswer).map(n => n.word)
+                ).slice(0, 2);
+                
+                const options = shuffleArray([correctAnswer, ...wrongAnswers]);
+                displayOptions(options, correctAnswer);
+            } else {
+                // Stage 2: Number + Plural combined - show full answers with numbers
+                const q = currentQuestions[currentQuestion];
+                const num = q.number;
+                const plural = q.plural;
+                
+                // Show the prompt using the number
+                document.getElementById('questionText').textContent = `${num.num} × ${plural.singular}`;
+                document.getElementById('questionHint').textContent = 'Choose the correct answer:';
+                
+                const wordNum = num.word; // e.g., "twelve"
+                const singular = plural.singular;
+                const correctPlural = plural.plural;
+                
+                // Correct answer includes number word
+                const correctAnswer = `${wordNum} ${correctPlural}`;
+                
+                // Generate 2 wrong plural forms
+                let wrongPlural1, wrongPlural2;
+                
+                if (plural.rule === 's') {
+                    wrongPlural1 = singular + 'es';
+                    wrongPlural2 = singular + 'ies';
+                } else if (plural.rule === 'es') {
+                    wrongPlural1 = singular + 's';
+                    wrongPlural2 = singular + 'ies';
+                } else { // ies
+                    wrongPlural1 = singular + 's';
+                    wrongPlural2 = singular + 'es';
+                }
+                
+                // Wrong answers also include number word with wrong plural
+                const wrongAnswers = [
+                    `${wordNum} ${wrongPlural1}`,
+                    `${wordNum} ${wrongPlural2}`
+                ];
+                
+                const options = shuffleArray([correctAnswer, ...wrongAnswers]);
+                displayOptions(options, correctAnswer);
+            }
+            
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('score').textContent = score;
+            document.getElementById('total').textContent = questionsPerStage * 2;
+        }
+        
+        function displayOptions(options, correctAnswer) {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, correctAnswer, btn);
+                container.appendChild(btn);
+            });
+        }
+        
+        function checkAnswer(selected, correct, btn) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.style.pointerEvents = 'none');
+            
+            const feedback = document.getElementById('feedback');
+            
+            if (selected === correct) {
+                btn.classList.add('correct');
+                feedback.textContent = '⭐ Super! ⭐';
+                feedback.className = 'feedback correct';
+                score++;
+                document.getElementById('score').textContent = score;
+            } else {
+                btn.classList.add('wrong');
+                feedback.textContent = `The answer was: ${correct}`;
+                feedback.className = 'feedback wrong';
+                
+                buttons.forEach(b => {
+                    if (b.textContent === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+            
+            setTimeout(() => {
+                currentQuestion++;
+                showQuestion();
+            }, 1500);
+        }
+        
+        function showWin() {
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            document.getElementById('progressFill').style.width = '100%';
+        }
+        
+        // Start game on load
+        startGame();
+    </script>
+</body>
+</html>
