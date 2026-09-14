@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Grammar & Vocabulary Quest 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #4a00e0 0%, #8e2de2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 750px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 5px solid #FFD700;
+            margin-bottom: 25px;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #FFD700; font-size: 2em; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        .story-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1em;
+            color: #333;
+            border-left: 5px solid #8e2de2;
+        }
+
+        .question-text { font-size: 1.3em; color: #2c3e50; margin-bottom: 20px; font-weight: bold; }
+        .options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+        .btn {
+            padding: 14px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: left;
+            color: #2c3e50;
+            font-family: inherit;
+        }
+        .btn:hover:not(.disabled) { border-color: #8e2de2; background: #f3e8ff; transform: translateY(-2px); }
+        .btn.correct { background: #2ecc71 !important; border-color: #27ae60 !important; color: white; }
+        .btn.wrong { background: #e74c3c !important; border-color: #c0392b !important; color: white; }
+        .btn.disabled { pointer-events: none; opacity: 0.6; }
+
+        .progress-bar {
+            width: 100%; height: 12px; background: rgba(255,255,255,0.2);
+            border-radius: 6px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #FFD700; width: 0%; transition: 0.4s; }
+
+        .section-title {
+            color: #4a00e0;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            border-bottom: 3px dashed #FFD700;
+            padding-bottom: 8px;
+        }
+
+        .word-bank {
+            background: #fff9e6;
+            border: 2px dashed #ffb300;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            color: #b7791f;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+            line-height: 1.8;
+        }
+
+        .summary-paragraph {
+            font-size: 1.15em;
+            line-height: 2.6;
+            color: #2c3e50;
+            text-align: justify;
+        }
+
+        .summary-paragraph select {
+            padding: 5px 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: 2px solid #8e2de2;
+            border-radius: 8px;
+            background: #fdfcff;
+            color: #4a00e0;
+            outline: none;
+            cursor: pointer;
+            margin: 0 4px;
+            font-family: inherit;
+        }
+
+        .summary-paragraph select.correct-select {
+            border-color: #2ecc71;
+            background: #e8f8ee;
+            color: #1a6a3a;
+        }
+
+        .summary-paragraph select.wrong-select {
+            border-color: #e74c3c;
+            background: #fde8e8;
+            color: #a03333;
+        }
+
+        .check-all-btn {
+            background: #8e2de2;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-bottom: 4px solid #4a00e0;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            margin-top: 25px;
+            font-family: inherit;
+        }
+        .check-all-btn:hover { background: #7a1fa2; transform: translateY(-2px); }
+        .check-all-btn:active { border-bottom-width: 0; transform: translateY(2px); }
+
+        .score-banner {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2ecc71;
+            text-align: center;
+            display: none;
+            padding: 15px;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
+
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; }
+
+        .hidden-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .hidden-section.revealed {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress-counter {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 20px 16px; }
+            .title { font-size: 1.5em; }
+            .section-title { font-size: 1.3em; }
+            .btn { font-size: 0.95em; padding: 12px; }
+            .summary-paragraph { font-size: 1em; }
+            .summary-paragraph select { font-size: 0.85em; padding: 3px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- ============================================================
+         EXERCISE 1: TENSE CHALLENGE (7 SENTENCES)
+    ============================================================ -->
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">⚡ Exercise 1: Tense Challenge</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+            <div class="progress-counter" id="counterText">1 / 7</div>
+        </div>
+
+        <div class="card">
+            <div id="contextSection" class="story-box">
+                Loading context...
+            </div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         EXERCISE 1 COMPLETION SCREEN
+    ============================================================ -->
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆✨💪</div>
+        <h1 style="color: #4a00e0; font-size: 2.2em;">EXERCISE 1 COMPLETE!</h1>
+        <p style="font-size: 1.2em; margin: 15px 0; color: #555;">
+            Awesome job! Now scroll down to read the story and complete the final challenge.
+        </p>
+    </div>
+
+    <!-- ============================================================
+         READING SECTION (HIDDEN until Exercise 1 is done)
+    ============================================================ -->
+    <div id="readingSection" class="card hidden-section">
+        <h2 class="section-title">📖 Reading Section: Driving Lessons & Lost Keys</h2>
+        <div class="story-box" style="background: #fff; border-left-color: #FFD700; font-size: 1.05em;">
+            <p style="margin-bottom: 12px;">
+                Mark is <strong>learning</strong> to drive. He started two weeks ago, and he
+                <strong>takes</strong> lessons every Tuesday and Thursday. His teacher, Anna, says
+                he is learning <strong>quickly</strong>, but Mark still feels <strong>nervous</strong>.
+            </p>
+            <p style="margin-bottom: 12px;">
+                Mark has a problem. He often <strong>loses</strong> his keys. Last week he lost them
+                again. He has lost his keys three times this month! Anna laughs and says, "Maybe you
+                should keep your keys in one place."
+            </p>
+            <p>
+                This morning, Mark is <strong>looking</strong> for his keys again. He has been looking
+                for twenty minutes. Finally, he <strong>finds</strong> them in his jacket. Now he can
+                go to his driving lesson. He hopes today will be a good day.
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         EXERCISE 2: TEXT SUMMARY (HIDDEN until Exercise 1 is done)
+    ============================================================ -->
+    <div id="exercise2" class="card hidden-section">
+        <h2 class="section-title">✏️ Exercise 2: Text Summary Challenge</h2>
+        <p style="font-style: italic; color: #4a5a6a; margin-bottom: 15px; font-size: 0.95em;">
+            Read the summary paragraph below and choose the correct word from the drop-down menu
+            based on the story of Mark and his driving lessons. Level: A2+.
+        </p>
+
+        <div class="word-bank">
+            <strong>Word Bank:</strong> learning &bull; finds &bull; quickly &bull; nervous &bull; loses &bull; looking &bull; takes
+        </div>
+
+        <div id="vocabForm" class="summary-paragraph">
+            Mark is
+            <select data-ans="learning">
+                <option value="">-- select --</option>
+                <option value="learning">learning</option>
+                <option value="looking">looking</option>
+                <option value="loses">loses</option>
+                <option value="takes">takes</option>
+            </select>
+            to drive. Every week he
+            <select data-ans="takes">
+                <option value="">-- select --</option>
+                <option value="takes">takes</option>
+                <option value="finds">finds</option>
+                <option value="loses">loses</option>
+                <option value="learning">learning</option>
+            </select>
+            two lessons with his teacher Anna. She says Mark is learning
+            <select data-ans="quickly">
+                <option value="">-- select --</option>
+                <option value="quickly">quickly</option>
+                <option value="nervous">nervous</option>
+                <option value="looking">looking</option>
+                <option value="finds">finds</option>
+            </select>
+            , but he still feels
+            <select data-ans="nervous">
+                <option value="">-- select --</option>
+                <option value="nervous">nervous</option>
+                <option value="learning">learning</option>
+                <option value="takes">takes</option>
+                <option value="loses">loses</option>
+            </select>
+            before every lesson. Mark has one big problem: he often
+            <select data-ans="loses">
+                <option value="">-- select --</option>
+                <option value="loses">loses</option>
+                <option value="finds">finds</option>
+                <option value="looking">looking</option>
+                <option value="quickly">quickly</option>
+            </select>
+            his keys. This morning, he is
+            <select data-ans="looking">
+                <option value="">-- select --</option>
+                <option value="looking">looking</option>
+                <option value="learning">learning</option>
+                <option value="takes">takes</option>
+                <option value="nervous">nervous</option>
+            </select>
+            for them again. After twenty minutes, he finally
+            <select data-ans="finds">
+                <option value="">-- select --</option>
+                <option value="finds">finds</option>
+                <option value="loses">loses</option>
+                <option value="quickly">quickly</option>
+                <option value="learning">learning</option>
+            </select>
+            them in his jacket. Now Mark can go to his driving lesson.
+        </div>
+
+        <button class="check-all-btn" onclick="checkVocab()">CHECK SUMMARY ANSWERS</button>
+        <div class="score-banner" id="scoreBanner"></div>
+    </div>
+
+</div>
+
+<script>
+    // ================================================================
+    // EXERCISE 1: 7 GRAMMAR QUESTIONS (based on driving & keys)
+    // ================================================================
+    const questions = [
+        {
+            context: "A: Can you drive?\nB: I ________ (learn). I ________ (take) lessons for two weeks now.",
+            a: ["am learning / have been taking", "learn / take", "am learning / am taking"],
+            c: "am learning / have been taking"
+        },
+        {
+            context: "A: Oh no! I ________ (lose) my keys again.",
+            a: ["have lost", "am losing", "lose"],
+            c: "have lost"
+        },
+        {
+            context: "Mark ________ (look) for his keys right now.",
+            a: ["looks", "is looking", "look"],
+            c: "is looking"
+        },
+        {
+            context: "He ________ (look) for his keys for twenty minutes.",
+            a: ["has been looking", "is looking", "looks"],
+            c: "has been looking"
+        },
+        {
+            context: "Mark ________ (take) driving lessons every Tuesday and Thursday.",
+            a: ["takes", "is taking", "take"],
+            c: "takes"
+        },
+        {
+            context: "This week he ________ (have) three driving lessons.",
+            a: ["has had", "is having", "has"],
+            c: "has had"
+        },
+        {
+            context: "Anna ________ (teach) Mark how to drive since the beginning of the month.",
+            a: ["has been teaching", "is teaching", "teaches"],
+            c: "has been teaching"
+        }
+    ];
+
+    let current = 0;
+
+    // ================================================================
+    // LOAD QUESTION
+    // ================================================================
+    function load() {
+        if (current >= questions.length) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            revealHiddenSections();
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('contextSection').innerHTML = data.context.replace(/\n/g, '<br>');
+        document.getElementById('qText').innerText = `Choose the correct option for item ${current + 1}:`;
+        document.getElementById('counterText').innerText = `${current + 1} / ${questions.length}`;
+
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+
+        const shuffledOptions = [...data.a].sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    // ================================================================
+    // CHECK ANSWER
+    // ================================================================
+    function check(choice, btn) {
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (choice === questions[current].c) {
+            btn.classList.add('correct');
+            setTimeout(() => {
+                current++;
+                load();
+            }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText === questions[current].c) {
+                    b.classList.add('correct');
+                }
+            });
+            setTimeout(() => {
+                current++;
+                load();
+            }, 1800);
+        }
+    }
+
+    // ================================================================
+    // REVEAL HIDDEN SECTIONS AFTER EXERCISE 1
+    // ================================================================
+    function revealHiddenSections() {
+        setTimeout(() => {
+            const reading = document.getElementById('readingSection');
+            const ex2 = document.getElementById('exercise2');
+
+            reading.classList.add('revealed');
+
+            setTimeout(() => {
+                ex2.classList.add('revealed');
+                reading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 400);
+        }, 500);
+    }
+
+    // ================================================================
+    // EXERCISE 2: VOCABULARY VERIFICATION
+    // ================================================================
+    function checkVocab() {
+        const selects = document.querySelectorAll('#vocabForm select');
+        let correctCount = 0;
+
+        selects.forEach(select => {
+            const expected = select.getAttribute('data-ans');
+            select.classList.remove('correct-select', 'wrong-select');
+
+            if (select.value === expected) {
+                select.classList.add('correct-select');
+                correctCount++;
+            } else {
+                select.classList.add('wrong-select');
+            }
+        });
+
+        const banner = document.getElementById('scoreBanner');
+        banner.style.display = 'block';
+        banner.innerText = `🔄 Checked! Result: ${correctCount} / ${selects.length} gaps filled correctly.`;
+
+        if (correctCount === selects.length) {
+            banner.style.color = '#2ecc71';
+            banner.innerText = `🌟 Perfect! All ${selects.length} gaps filled correctly!`;
+        } else if (correctCount >= selects.length * 0.6) {
+            banner.style.color = '#f39c12';
+        } else {
+            banner.style.color = '#e74c3c';
+        }
+    }
+
+    // ================================================================
+    // INIT
+    // ================================================================
+    load();
+</script>
+
+</body>
+</html>
