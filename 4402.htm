@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Worksheet — Verb To Be & Pronouns</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #eef2f7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1f2937;
+  }
+
+  body {
+    padding: 22px 16px 60px;
+    min-height: 100vh;
+  }
+
+  .worksheet {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .worksheet-header {
+    text-align: center;
+    margin-bottom: 26px;
+  }
+
+  .worksheet-header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #1e3a8a;
+    margin: 0 0 8px;
+    letter-spacing: -0.4px;
+  }
+
+  .worksheet-header p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .exercise-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px 24px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(30, 58, 138, 0.07);
+    border: 1px solid #e2e8f0;
+    animation: cardIn 0.35s ease;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .exercise-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .ex-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: #1CB0F6;
+    color: #ffffff;
+    border-radius: 9px;
+    font-weight: 900;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 0 #0e8ec7;
+  }
+
+  .ex-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e3a8a;
+    line-height: 1.3;
+  }
+
+  .exercise-instruction {
+    font-size: 13.5px;
+    color: #64748b;
+    margin: 0 0 16px 40px;
+    line-height: 1.5;
+  }
+
+  .exercise-items {
+    margin-bottom: 8px;
+  }
+
+  .exercise-item {
+    padding: 10px 0;
+    font-size: 15.5px;
+    line-height: 2.2;
+    color: #334155;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .exercise-item + .exercise-item {
+    border-top: 1px dashed #f1f5f9;
+  }
+
+  /* ===== Variant buttons ===== */
+  .variants-container {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  .variant-btn {
+    background: #ffffff;
+    border: 2px solid #cbd5e1;
+    border-bottom: 3px solid #94a3b8;
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.08s, background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+    line-height: 1.3;
+  }
+
+  .variant-btn:hover { background: #f8fafc; }
+  .variant-btn:active:not(.disabled) { transform: translateY(2px); border-bottom-width: 1px; }
+
+  .variant-btn.selected {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    border-bottom-color: #2563eb;
+    color: #1e3a8a;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  }
+
+  .variant-btn.correct-answer {
+    background: #d7ffb8;
+    border-color: #58CC02;
+    border-bottom-color: #46A302;
+    color: #58A700;
+  }
+
+  .variant-btn.wrong-answer {
+    background: #ffdfe0;
+    border-color: #FF4B4B;
+    border-bottom-color: #CC0000;
+    color: #EA2B2B;
+  }
+
+  .variant-btn.disabled { pointer-events: none; opacity: 0.85; }
+
+  /* ===== Dropdown (select) ===== */
+  .answer-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: #ffffff url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8L0 0h12z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    background-size: 10px;
+    border: 2px solid #cbd5e1;
+    border-bottom: 3px solid #94a3b8;
+    border-radius: 10px;
+    padding: 6px 32px 6px 12px;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #1f2937;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+    min-width: 90px;
+    vertical-align: middle;
+    margin: 0 2px;
+  }
+
+  .answer-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+
+  .answer-select.selected-ok {
+    background-color: #d7ffb8;
+    border-color: #58CC02;
+    border-bottom-color: #46A302;
+    color: #58A700;
+  }
+
+  .answer-select.selected-wrong {
+    background-color: #ffdfe0;
+    border-color: #FF4B4B;
+    border-bottom-color: #CC0000;
+    color: #EA2B2B;
+  }
+
+  .answer-select:disabled {
+    cursor: default;
+    opacity: 0.9;
+  }
+
+  /* ===== Footer ===== */
+  .exercise-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 16px;
+    margin-top: 10px;
+  }
+
+  .btn-check {
+    background: #58CC02;
+    color: #ffffff;
+    border: none;
+    border-bottom: 4px solid #46A302;
+    border-radius: 13px;
+    padding: 11px 30px;
+    font-size: 15px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    transition: transform 0.1s, border-bottom-width 0.1s, background 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn-check:hover { background: #61d80a; }
+  .btn-check:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+  .btn-reset {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-bottom: 4px solid #cbd5e1;
+    border-radius: 13px;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.1s, border-bottom-width 0.1s;
+  }
+
+  .btn-reset:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+  .exercise-result {
+    font-size: 15px;
+    font-weight: 900;
+    margin-left: auto;
+  }
+
+  .exercise-result.all-correct { color: #58A700; }
+  .exercise-result.some-wrong { color: #EA2B2B; }
+
+  @media (max-width: 600px) {
+    body { padding: 14px 10px 50px; }
+    .exercise-card { padding: 18px 15px 16px; border-radius: 15px; }
+    .exercise-instruction { margin-left: 0; font-size: 13px; }
+    .ex-title { font-size: 16px; }
+    .ex-number { width: 27px; height: 27px; font-size: 14px; }
+    .exercise-item { font-size: 14.5px; line-height: 2; padding: 8px 0; }
+    .variant-btn { font-size: 13px; padding: 5px 10px; }
+    .answer-select { font-size: 13.5px; padding: 5px 28px 5px 10px; min-width: 75px; }
+    .btn-check { padding: 10px 22px; font-size: 14px; }
+    .btn-reset { padding: 10px 16px; font-size: 13px; }
+    .exercise-result { font-size: 14px; margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="worksheet">
+  <div class="worksheet-header">
+    <h1>Verb To Be & Pronouns — Interactive Worksheet</h1>
+    <p>Выберите правильный вариант в каждом пропуске и нажмите <b>Check</b>.<br>В задании 2 — выпадающие списки, в остальных — кнопки. Варианты перемешиваются.</p>
+  </div>
+
+  <div id="worksheet"></div>
+</div>
+
+<script>
+  /* =====================================================
+     DATA
+     type: "buttons" — варианты как кнопки (по умолчанию)
+     type: "select"  — выпадающий список
+  ===================================================== */
+  const EXERCISES = [
+    {
+      id: 1,
+      title: "Fill in the correct subject",
+      instruction: "Выберите правильное местоимение.",
+      type: "buttons",
+      items: [
+        { parts: [
+          {t:"1. Tony "}, {in:true, variants:["he","she","it"], ans:["he"]}
+        ]},
+        { parts: [
+          {t:"2. Laura "}, {in:true, variants:["she","he","it"], ans:["she"]}
+        ]},
+        { parts: [
+          {t:"3. Mary "}, {in:true, variants:["she","he","it"], ans:["she"]}
+        ]},
+        { parts: [
+          {t:"4. book "}, {in:true, variants:["it","he","she"], ans:["it"]}
+        ]},
+        { parts: [
+          {t:"5. pencils "}, {in:true, variants:["they","it","he"], ans:["they"]}
+        ]},
+        { parts: [
+          {t:"6. Bill & you "}, {in:true, variants:["you","we","they"], ans:["you","we"]}
+        ]}
+      ]
+    },
+    {
+      id: 2,
+      title: "Fill in the correct form of the verb to be.",
+      instruction: "Выберите am / is / are из выпадающего списка.",
+      type: "select",
+      items: [
+        { parts: [
+          {t:"1. A: "}, {in:true, variants:["are","is","am"], ans:["are"], placeholder:"..."}, {t:" you from Spain?"},
+          {br:true},
+          {t:"B: No, I "}, {in:true, variants:["am not","is not","are not"], ans:["am not"], placeholder:"..."}, {t:". I "},
+          {in:true, variants:["am","is","are"], ans:["am"], placeholder:"..."}, {t:" from Portugal."}
+        ]},
+        { parts: [
+          {t:"2. A: "}, {in:true, variants:["is","are","am"], ans:["is"], placeholder:"..."}, {t:" Leyla from Turkey?"},
+          {br:true},
+          {t:"B: Yes, she "}, {in:true, variants:["is","are","am"], ans:["is"], placeholder:"..."}, {t:"."}
+        ]},
+        { parts: [
+          {t:"3. A: "}, {in:true, variants:["are","is","am"], ans:["are"], placeholder:"..."}, {t:" they 15 years old?"},
+          {br:true},
+          {t:"B: Yes, they "}, {in:true, variants:["are","is","am"], ans:["are"], placeholder:"..."}, {t:"."}
+        ]}
+      ]
+    },
+    {
+      id: 3,
+      title: "Answer the questions.",
+      instruction: "Выберите правильный ответ. Пример: Are you Brazilian? — No, I'm not.",
+      type: "buttons",
+      items: [
+        { parts: [
+          {t:"1. Are you Brazilian? "},
+          {in:true, variants:["No, I'm not","Yes, I am","Yes, I'm not"], ans:["No, I'm not"]}
+        ]},
+        { parts: [
+          {t:"2. Are you 6 years old? "},
+          {in:true, variants:["No, I'm not","Yes, I am","Yes, I'm not"], ans:["No, I'm not"]}
+        ]},
+        { parts: [
+          {t:"3. Is your house big? "},
+          {in:true, variants:["Yes, it is","No, it isn't","Yes, I am"], ans:["Yes, it is"]}
+        ]},
+        { parts: [
+          {t:"4. Is your surname Emery? "},
+          {in:true, variants:["No, it isn't","Yes, it is","No, I'm not"], ans:["No, it isn't"]}
+        ]},
+        { parts: [
+          {t:"5. Are your friends nice? "},
+          {in:true, variants:["Yes, they are","No, they aren't","Yes, it is"], ans:["Yes, they are"]}
+        ]}
+      ]
+    },
+    {
+      id: 4,
+      title: "Write full sentences.",
+      instruction: "Выберите правильное полное предложение. Пример: my name / John → My name is John.",
+      type: "buttons",
+      items: [
+        { parts: [
+          {t:"1. my name / John → "},
+          {in:true, variants:["My name is John","My name are John","My name John is"], ans:["My name is John"]}
+        ]},
+        { parts: [
+          {t:"2. Edinburgh / the capital of England → "},
+          {in:true, variants:["Edinburgh isn't the capital of England","Edinburgh is the capital of England","Edinburgh are the capital of England"], ans:["Edinburgh isn't the capital of England"]}
+        ]},
+        { parts: [
+          {t:"3. Moscow / the Russian capital → "},
+          {in:true, variants:["Moscow is the Russian capital","Moscow are the Russian capital","Moscow isn't the Russian capital"], ans:["Moscow is the Russian capital"]}
+        ]},
+        { parts: [
+          {t:"4. Matryoshka dolls / from Russia → "},
+          {in:true, variants:["Matryoshka dolls are from Russia","Matryoshka dolls is from Russia","Matryoshka dolls isn't from Russia"], ans:["Matryoshka dolls are from Russia"]}
+        ]},
+        { parts: [
+          {t:"5. Apples / blue → "},
+          {in:true, variants:["Apples aren't blue","Apples are blue","Apples isn't blue"], ans:["Apples aren't blue"]}
+        ]}
+      ]
+    },
+    {
+      id: 5,
+      title: "Rewrite the sentences in the negative.",
+      instruction: "Выберите отрицательную форму. Пример: Eat the ice-cream. → Don't eat the ice-cream!",
+      type: "buttons",
+      items: [
+        { parts: [
+          {t:"1. Eat the ice-cream. → "},
+          {in:true, variants:["Don't eat the ice-cream","Eat not the ice-cream","Not eat the ice-cream"], ans:["Don't eat the ice-cream"]}
+        ]},
+        { parts: [
+          {t:"2. Sit down. → "},
+          {in:true, variants:["Don't sit down","Sit not down","Not sit down"], ans:["Don't sit down"]}
+        ]},
+        { parts: [
+          {t:"3. Look outside. → "},
+          {in:true, variants:["Don't look outside","Look not outside","Not look outside"], ans:["Don't look outside"]}
+        ]},
+        { parts: [
+          {t:"4. Change seats. → "},
+          {in:true, variants:["Don't change seats","Change not seats","Not change seats"], ans:["Don't change seats"]}
+        ]},
+        { parts: [
+          {t:"5. Raise your hand. → "},
+          {in:true, variants:["Don't raise your hand","Raise not your hand","Not raise your hand"], ans:["Don't raise your hand"]}
+        ]}
+      ]
+    }
+  ];
+
+  /* =====================================================
+     UTILS
+  ===================================================== */
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function normalize(s) {
+    return (s || "").toLowerCase()
+      .replace(/[’‘`´]/g, "'")
+      .replace(/[.,!?;:]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/i'm/g, "i am")
+      .replace(/(\w+)'re/g, "$1 are")
+      .replace(/(\w+)'s/g, "$1 is")
+      .replace(/don't/g, "do not")
+      .replace(/doesn't/g, "does not")
+      .replace(/isn't/g, "is not")
+      .replace(/aren't/g, "are not");
+  }
+
+  /* =====================================================
+     RENDER
+  ===================================================== */
+  function renderWorksheet() {
+    const container = document.getElementById('worksheet');
+
+    EXERCISES.forEach(ex => {
+      const card = document.createElement('div');
+      card.className = 'exercise-card';
+      card.dataset.ex = ex.id;
+
+      const header = document.createElement('div');
+      header.className = 'exercise-header';
+      const num = document.createElement('span');
+      num.className = 'ex-number';
+      num.textContent = ex.id;
+      const title = document.createElement('span');
+      title.className = 'ex-title';
+      title.textContent = ex.title;
+      header.appendChild(num);
+      header.appendChild(title);
+      card.appendChild(header);
+
+      const instr = document.createElement('div');
+      instr.className = 'exercise-instruction';
+      instr.textContent = ex.instruction;
+      card.appendChild(instr);
+
+      const itemsDiv = document.createElement('div');
+      itemsDiv.className = 'exercise-items';
+
+      ex.items.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'exercise-item';
+
+        item.parts.forEach(p => {
+          if (p.br) {
+            itemDiv.appendChild(document.createElement('br'));
+          } else if (p.in) {
+            if (ex.type === 'select') {
+              // === Выпадающий список ===
+              const sel = document.createElement('select');
+              sel.className = 'answer-select';
+              sel.dataset.answers = JSON.stringify(p.ans);
+
+              const shuffled = shuffle(p.variants);
+              sel.dataset.variants = JSON.stringify(shuffled);
+
+              // placeholder option
+              const ph = document.createElement('option');
+              ph.value = '';
+              ph.textContent = p.placeholder || '—';
+              ph.disabled = true;
+              ph.selected = true;
+              sel.appendChild(ph);
+
+              shuffled.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v;
+                opt.textContent = v;
+                sel.appendChild(opt);
+              });
+
+              sel.addEventListener('change', () => {
+                // убрать выделение при смене
+                if (!sel.disabled) {
+                  sel.classList.remove('selected-ok', 'selected-wrong');
+                }
+              });
+
+              itemDiv.appendChild(sel);
+            } else {
+              // === Кнопки-варианты ===
+              const vContainer = document.createElement('span');
+              vContainer.className = 'variants-container';
+              vContainer.dataset.answers = JSON.stringify(p.ans);
+
+              const shuffled = shuffle(p.variants);
+              vContainer.dataset.variants = JSON.stringify(shuffled);
+
+              shuffled.forEach(v => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'variant-btn';
+                btn.textContent = v;
+                btn.dataset.value = v;
+                btn.addEventListener('click', () => selectVariant(btn));
+                vContainer.appendChild(btn);
+              });
+
+              itemDiv.appendChild(vContainer);
+            }
+          } else {
+            itemDiv.appendChild(document.createTextNode(p.t));
+          }
+        });
+
+        itemsDiv.appendChild(itemDiv);
+      });
+
+      card.appendChild(itemsDiv);
+
+      const footer = document.createElement('div');
+      footer.className = 'exercise-footer';
+
+      const checkBtn = document.createElement('button');
+      checkBtn.className = 'btn-check';
+      checkBtn.textContent = 'Check';
+      checkBtn.addEventListener('click', () => checkExercise(ex.id));
+
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'btn-reset';
+      resetBtn.textContent = 'Reset';
+      resetBtn.addEventListener('click', () => resetExercise(ex.id));
+
+      const resultSpan = document.createElement('span');
+      resultSpan.className = 'exercise-result';
+      resultSpan.id = 'result-' + ex.id;
+
+      footer.appendChild(checkBtn);
+      footer.appendChild(resetBtn);
+      footer.appendChild(resultSpan);
+
+      card.appendChild(footer);
+
+      container.appendChild(card);
+    });
+  }
+
+  /* =====================================================
+     SELECT VARIANT
+  ===================================================== */
+  function selectVariant(btn) {
+    if (btn.classList.contains('disabled')) return;
+    const container = btn.closest('.variants-container');
+    container.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+
+  /* =====================================================
+     CHECK
+  ===================================================== */
+  function checkExercise(exId) {
+    const card = document.querySelector(`[data-ex="${exId}"]`);
+    const ex = EXERCISES.find(e => e.id === exId);
+    const total = ex.items.reduce((acc, item) => {
+      return acc + item.parts.filter(p => p.in).length;
+    }, 0);
+    let correctCount = 0;
+
+    if (ex.type === 'select') {
+      // === Проверка выпадающих списков ===
+      card.querySelectorAll('.answer-select').forEach(sel => {
+        const accepted = JSON.parse(sel.dataset.answers).map(normalize);
+        const val = normalize(sel.value);
+        const isCorrect = val !== '' && accepted.includes(val);
+
+        sel.classList.remove('selected-ok', 'selected-wrong');
+        if (isCorrect) {
+          correctCount++;
+          sel.classList.add('selected-ok');
+        } else {
+          sel.classList.add('selected-wrong');
+          // показать правильный ответ в подсказке через title
+          const correctRaw = JSON.parse(sel.dataset.answers)[0];
+          sel.title = 'Правильный ответ: ' + correctRaw;
+        }
+        sel.disabled = true;
+      });
+    } else {
+      // === Проверка кнопок ===
+      card.querySelectorAll('.variants-container').forEach(cont => {
+        const selectedBtn = cont.querySelector('.variant-btn.selected');
+        const accepted = JSON.parse(cont.dataset.answers).map(normalize);
+        const selectedVal = selectedBtn ? normalize(selectedBtn.dataset.value) : '';
+        const isCorrect = selectedVal !== '' && accepted.includes(selectedVal);
+
+        cont.querySelectorAll('.variant-btn').forEach(b => {
+          b.classList.remove('correct-answer', 'wrong-answer');
+        });
+
+        if (isCorrect) {
+          correctCount++;
+          if (selectedBtn) selectedBtn.classList.add('correct-answer');
+        } else {
+          if (selectedBtn) selectedBtn.classList.add('wrong-answer');
+          cont.querySelectorAll('.variant-btn').forEach(b => {
+            const val = normalize(b.dataset.value);
+            if (accepted.includes(val)) {
+              b.classList.add('correct-answer');
+            }
+          });
+        }
+
+        cont.querySelectorAll('.variant-btn').forEach(b => b.classList.add('disabled'));
+      });
+    }
+
+    const resultSpan = document.getElementById('result-' + exId);
+    if (correctCount === total) {
+      resultSpan.textContent = `✓ ${correctCount}/${total} — отлично!`;
+      resultSpan.className = 'exercise-result all-correct';
+    } else {
+      resultSpan.textContent = `${correctCount}/${total} правильно`;
+      resultSpan.className = 'exercise-result some-wrong';
+    }
+  }
+
+  /* =====================================================
+     RESET
+  ===================================================== */
+  function resetExercise(exId) {
+    const card = document.querySelector(`[data-ex="${exId}"]`);
+    const ex = EXERCISES.find(e => e.id === exId);
+
+    if (ex.type === 'select') {
+      card.querySelectorAll('.answer-select').forEach(sel => {
+        sel.selectedIndex = 0;
+        sel.classList.remove('selected-ok', 'selected-wrong');
+        sel.disabled = false;
+        sel.title = '';
+      });
+    } else {
+      card.querySelectorAll('.variants-container').forEach(cont => {
+        cont.querySelectorAll('.variant-btn').forEach(b => {
+          b.classList.remove('selected', 'correct-answer', 'wrong-answer', 'disabled');
+        });
+      });
+    }
+
+    const resultSpan = document.getElementById('result-' + exId);
+    resultSpan.textContent = '';
+    resultSpan.className = 'exercise-result';
+  }
+
+  /* =====================================================
+     INIT
+  ===================================================== */
+  renderWorksheet();
+</script>
+
+</body>
+</html>
