@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wordwall: Prepositions of Place</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --ww-blue: #1e3799;
+            --ww-pink: #eb3b5a;
+            --ww-yellow: #f7b731;
+            --ww-green: #20bf6b;
+            --text-dark: #2f3542;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #1e3799 0%, #0c2461 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 8px solid var(--ww-yellow);
+            border-radius: 40px;
+            padding: 40px;
+            box-shadow: 0 20px 0px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 900;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: var(--ww-yellow);
+        }
+
+        .question-box {
+            background: white;
+            color: var(--text-dark);
+            padding: 30px;
+            border-radius: 20px;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.1);
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .option-btn {
+            background: white;
+            color: var(--ww-blue);
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 0px #cfd9df;
+            font-family: 'Raleway';
+        }
+
+        .option-btn:hover {
+            transform: scale(1.02);
+            background: var(--ww-yellow);
+            color: white;
+        }
+
+        /* Feedback Colors */
+        .correct-anim { background: var(--ww-green) !important; color: white !important; box-shadow: 0 4px 0px #1a9c58 !important; }
+        .wrong-anim { background: var(--ww-pink) !important; color: white !important; box-shadow: 0 4px 0px #c0392b !important; }
+
+        .feedback-overlay {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: 900;
+            min-height: 40px;
+        }
+
+        .next-btn {
+            margin-top: 30px;
+            background: var(--ww-pink);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: 900;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 6px 0px #a52a41;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="progress-header">
+        <span id="q-category">GRAMMAR</span>
+        <span id="q-number">1 / 6</span>
+    </div>
+
+    <div class="question-box" id="q-text">
+        Loading...
+    </div>
+
+    <div class="options-grid" id="options">
+        <!-- Buttons injected here -->
+    </div>
+
+    <div id="feedback" class="feedback-overlay"></div>
+    <button id="next-btn" class="next-btn" onclick="loadQuestion()">NEXT QUESTION</button>
+</div>
+
+<script>
+    const quizData = [
+        { cat: "PREPOSITIONS", q: "There is a bed ________ the bedroom.", options: ["in", "on", "opposite", "next to"], correct: "in" },
+        { cat: "PREPOSITIONS", q: "The desk is ________ the bed.", options: ["next to", "in", "between", "on"], correct: "next to" },
+        { cat: "PREPOSITIONS", q: "The fridge is ________ the cooker.", options: ["opposite", "in", "on", "between"], correct: "opposite" },
+        { cat: "PREPOSITIONS", q: "The computer is ________ the desk.", options: ["on", "in", "between", "opposite"], correct: "on" },
+        { cat: "PREPOSITIONS", q: "The bathroom is ________ the bedroom and the dining room.", options: ["between", "next to", "behind", "in"], correct: "between" },
+        { cat: "PREPOSITIONS", q: "The cat is ________ the sofa.", options: ["behind", "between", "in", "opposite"], correct: "behind" }
+    ];
+
+    let currentQ = 0;
+
+    function loadQuestion() {
+        if (currentQ >= quizData.length) {
+            showFinal();
+            return;
+        }
+        
+        const data = quizData[currentQ];
+        document.getElementById('q-category').innerText = data.cat;
+        document.getElementById('q-number').innerText = `${currentQ + 1} / ${quizData.length}`;
+        document.getElementById('q-text').innerText = data.q;
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('next-btn').style.display = "none";
+
+        const optionsBox = document.getElementById('options');
+        optionsBox.innerHTML = "";
+        
+        // Shuffle choices dynamic grid
+        [...data.options].sort(() => Math.random() - 0.5).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, btn) {
+        const correct = quizData[currentQ].correct;
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (choice === correct) {
+            btn.classList.add('correct-anim');
+            document.getElementById('feedback').innerHTML = "🌟 EXCELLENT!";
+        } else {
+            btn.classList.add('wrong-anim');
+            document.getElementById('feedback').innerHTML = `The correct answer is: <strong>${correct}</strong>`;
+            allBtns.forEach(b => { if(b.innerText === correct) b.classList.add('correct-anim'); });
+        }
+        
+        document.getElementById('next-btn').style.display = "inline-block";
+        currentQ++;
+    }
+
+    function showFinal() {
+        document.querySelector('.game-container').innerHTML = `
+            <h1 style="font-family:'Fredoka'; font-size: 70px; color:var(--ww-yellow)">MISSION COMPLETE!</h1>
+            <p style="font-size: 28px; margin-top: 10px;">You know all the prepositions of place!</p>
+            <button class="option-btn" style="width:300px; background:var(--ww-pink); color:white; margin-top:30px; box-shadow: 0 6px 0px #a52a41;" onclick="location.reload()">PLAY AGAIN</button>
+        `;
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

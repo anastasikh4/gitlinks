@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📅 Calendar Mission: Months & Days 📅</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 15px;
+        }
+
+        .app {
+            max-width: 720px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            padding: 32px;
+            border-radius: 40px;
+            border: 8px solid #0284c7;
+            box-shadow: 0 15px 0 #0369a1;
+            text-align: center;
+            position: relative;
+        }
+
+        .score-box {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #0369a1;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 12px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            width: 0%;
+            transition: width 0.4s;
+        }
+
+        /* ============================================================
+           MONTHS CALENDAR — STATIC, NO HIGHLIGHTING
+        ============================================================ */
+        .calendar-months {
+            background: #ffffff;
+            border: 3px solid #0284c7;
+            border-radius: 22px;
+            padding: 18px 20px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 6px 0 #bae6fd;
+        }
+
+        .calendar-months h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            color: #0369a1;
+            margin-bottom: 14px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .months-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        @media (max-width: 400px) {
+            .months-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .month-card {
+            background: #f0f9ff;
+            border: 2px solid #7dd3fc;
+            border-radius: 12px;
+            padding: 12px 4px;
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            color: #0369a1;
+            transition: all 0.25s ease;
+            box-shadow: 0 3px 0 #bae6fd;
+            cursor: default;
+            font-size: 14px;
+        }
+
+        .month-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 0 #7dd3fc;
+        }
+
+        /* ============================================================
+           QUESTION AREA
+        ============================================================ */
+        .visual {
+            font-size: 4rem;
+            margin-bottom: 14px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .prompt {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #0f172a;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            background: #f0f9ff;
+            border: 3px solid #7dd3fc;
+            border-radius: 20px;
+            padding: 16px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0369a1;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #e0f2fe;
+            transform: translateY(-3px);
+        }
+
+        .btn.correct {
+            background: #4def8d !important;
+            border-color: #22c55e !important;
+            color: #14532d !important;
+        }
+
+        .btn.wrong {
+            background: #fecaca !important;
+            border-color: #ef4444 !important;
+            color: #7f1d1d !important;
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        #winScreen { display: none; }
+
+        @media (max-width: 500px) {
+            .card { padding: 20px 16px; border-width: 6px; border-radius: 28px; }
+            .visual { font-size: 3rem; }
+            .prompt { font-size: 1.1rem; }
+            .btn { font-size: 1rem; padding: 13px; }
+            .month-card { font-size: 12px; padding: 10px 2px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="card" id="quizCard">
+
+        <!-- ===== GAME PLAY ===== -->
+        <div id="gamePlay">
+            <div class="score-box">Calendar Score: <span id="scoreText">0</span></div>
+            <div class="progress-container">
+                <div class="progress-fill" id="pFill"></div>
+            </div>
+
+            <!-- ============================================================
+                 MONTHS CALENDAR — STATIC, NO HIGHLIGHTING
+            ============================================================ -->
+            <div class="calendar-months">
+                <h3>📅 Months of the Year</h3>
+                <div class="months-grid" id="monthsGrid">
+                    <div class="month-card">January</div>
+                    <div class="month-card">February</div>
+                    <div class="month-card">March</div>
+                    <div class="month-card">April</div>
+                    <div class="month-card">May</div>
+                    <div class="month-card">June</div>
+                    <div class="month-card">July</div>
+                    <div class="month-card">August</div>
+                    <div class="month-card">September</div>
+                    <div class="month-card">October</div>
+                    <div class="month-card">November</div>
+                    <div class="month-card">December</div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 EXERCISE
+            ============================================================ -->
+            <span class="visual" id="visualBox">📅</span>
+            <div class="prompt" id="promptText">Loading...</div>
+            <div class="options" id="optionsBox"></div>
+        </div>
+
+        <!-- ===== WIN SCREEN ===== -->
+        <div id="winScreen">
+            <span class="visual">🏆📆</span>
+            <h2 style="font-size: 2.2rem; color: #0369a1; margin-bottom: 15px;">
+                MISSION ACCOMPLISHED!
+            </h2>
+            <p id="finalScore" style="font-size: 1.2rem; color: #64748b; margin-bottom: 25px;"></p>
+            <button class="btn" onclick="location.reload()" style="width: 100%;">
+                RESTART MISSION
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // QUESTIONS
+    // ================================================================
+    const questions = [
+        { v: "🌱🌸", q: "Which is the fourth month of the year?", a: ["March", "April", "May"], c: "April" },
+        { v: "☀️🏖️", q: "Which is the seventh month of the year?", a: ["August", "June", "July"], c: "July" },
+        { v: "🍁🎒", q: "Which is the ninth month of the year?", a: ["September", "October", "November"], c: "September" },
+        { v: "☀️🍦", q: "Which is the sixth month of the year?", a: ["July", "June", "May"], c: "June" },
+        { v: "🎃🍂", q: "Which is the tenth month of the year?", a: ["October", "December", "November"], c: "October" },
+        { v: "🌱🌦️", q: "Which is the third month of the year?", a: ["January", "February", "March"], c: "March" },
+        { v: "❄️🧣", q: "Which is the second month of the year?", a: ["February", "January", "March"], c: "February" },
+        { v: "❄️🎉", q: "Which is the first month of the year?", a: ["December", "January", "February"], c: "January" },
+        { v: "🍂🧣", q: "Which is the eleventh month of the year?", a: ["September", "November", "December"], c: "November" },
+        { v: "🌸🌷", q: "Which is the fifth month of the year?", a: ["June", "April", "May"], c: "May" },
+        { v: "☀️🍉", q: "Which is the eighth month of the year?", a: ["July", "August", "September"], c: "August" },
+        { v: "❄️🎄", q: "Which is the twelfth month of the year?", a: ["November", "January", "December"], c: "December" },
+        { v: "📆▶️", q: "Monday, _________ , Wednesday...", a: ["Thursday", "Tuesday", "Friday"], c: "Tuesday" },
+        { v: "📆▶️", q: "Monday, Tuesday, _________...", a: ["Wednesday", "Thursday", "Friday"], c: "Wednesday" },
+        { v: "📆▶️", q: "Thursday, _________ , Saturday...", a: ["Friday", "Sunday", "Wednesday"], c: "Friday" },
+        { v: "📆🔚", q: "What is the missing final day: Saturday, _________?", a: ["Monday", "Friday", "Sunday"], c: "Sunday" }
+    ];
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let current = 0;
+    let score = 0;
+
+    // ================================================================
+    // SHUFFLE HELPER
+    // ================================================================
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // ================================================================
+    // LOAD QUESTION
+    // ================================================================
+    function loadQuestion() {
+        if (current >= questions.length) {
+            showWinScreen();
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('visualBox').innerText = data.v;
+        document.getElementById('promptText').innerText = data.q;
+
+        const box = document.getElementById('optionsBox');
+        box.innerHTML = '';
+
+        const shuffledOptions = shuffleArray([...data.a]);
+
+        shuffledOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => verify(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    // ================================================================
+    // VERIFY ANSWER
+    // ================================================================
+    function verify(choice, btnElement) {
+        const data = questions[current];
+        const buttons = document.querySelectorAll('#optionsBox .btn');
+        buttons.forEach(b => b.disabled = true);
+
+        if (choice === data.c) {
+            btnElement.classList.add('correct');
+            score += 100;
+            document.getElementById('scoreText').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(10);
+
+            setTimeout(() => {
+                current++;
+                loadQuestion();
+            }, 800);
+        } else {
+            btnElement.classList.add('wrong');
+
+            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+
+            buttons.forEach(b => {
+                if (b.innerText === data.c) {
+                    b.classList.add('correct');
+                }
+            });
+
+            setTimeout(() => {
+                current++;
+                loadQuestion();
+            }, 1500);
+        }
+    }
+
+    // ================================================================
+    // WIN SCREEN
+    // ================================================================
+    function showWinScreen() {
+        document.getElementById('gamePlay').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+        document.getElementById('pFill').style.width = '100%';
+
+        const maxScore = questions.length * 100;
+        const pct = Math.round((score / maxScore) * 100);
+
+        let message = '';
+        if (pct === 100) {
+            message = `Perfect! You earned ${score} points. You know all the months and days perfectly! 🏆`;
+        } else if (pct >= 70) {
+            message = `Great job! You earned ${score} points. Keep practising! 🌟`;
+        } else if (pct >= 40) {
+            message = `Good try! You earned ${score} points. Review the months and days. 💪`;
+        } else {
+            message = `You earned ${score} points. Try again — you'll do better! 📚`;
+        }
+
+        document.getElementById('finalScore').innerText = message;
+    }
+
+    // ================================================================
+    // INIT
+    // ================================================================
+    loadQuestion();
+</script>
+
+</body>
+</html>
