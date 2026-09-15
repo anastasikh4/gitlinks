@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Test: Disasters & Escape</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #e3f2fd;
+        padding: 20px;
+    }
+    .quiz-container {
+        max-width: 700px;
+        margin: auto;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    h1 {
+        color: #0d47a1;
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 3px solid #64b5f6;
+        padding-bottom: 10px;
+    }
+    .question {
+        margin-bottom: 15px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #0d47a1;
+    }
+    .options {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 30px;
+    }
+    .options li {
+        margin-bottom: 10px;
+        padding: 12px 18px;
+        background: #e3f2fd;
+        border: 2px solid #bbdefb;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .options li:hover {
+        background: #bbdefb;
+        border-color: #64b5f6;
+    }
+    .correct {
+        background: #4caf50 !important;
+        color: white;
+        border-color: #388e3c !important;
+    }
+    .wrong {
+        background: #ef5350 !important;
+        color: white;
+        border-color: #c62828 !important;
+    }
+    .answered {
+        pointer-events: none;
+    }
+    #result-box {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        background: #0d47a1;
+        color: white;
+        border-radius: 10px;
+        font-size: 1.5rem;
+    }
+    button {
+        width: 100%;
+        padding: 15px;
+        background: #0d47a1;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>🌪️ Vocabulary Test: Disasters & Escape</h1>
+    <div id="quiz"></div>
+    <div id="result-box">Your score: <span id="score">0</span>/<span id="total">12</span></div>
+    <button onclick="location.reload()">Reset Test</button>
+</div>
+
+<script>
+    // ================================================================
+    // DATA — 12 questions with the checked vocabulary words
+    // ================================================================
+    const questions = [
+        {
+            sentence: "The earthquake was ______, destroying many buildings.",
+            options: ["devastating", "courageous", "remote"],
+            correct: "devastating"
+        },
+        {
+            sentence: "The temperature in the desert can ______ 50 degrees Celsius.",
+            options: ["exceed", "sacrifice", "struggle"],
+            correct: "exceed"
+        },
+        {
+            sentence: "After the tornado, there was ______ everywhere on the streets.",
+            options: ["debris", "exhaustion", "sacrifice"],
+            correct: "debris"
+        },
+        {
+            sentence: "The firefighter was very ______ when he saved the child from the burning house.",
+            options: ["courageous", "delirious", "desperate"],
+            correct: "courageous"
+        },
+        {
+            sentence: "The survivors had to ______ for their lives in the freezing water.",
+            options: ["struggle", "sacrifice", "sweep away"],
+            correct: "struggle"
+        },
+        {
+            sentence: "The giant wave can ______ houses and cars in seconds.",
+            options: ["sweep away", "exceed", "live life to the fullest"],
+            correct: "sweep away"
+        },
+        {
+            sentence: "They got lost in a ______ area with no roads or people.",
+            options: ["remote", "devastating", "courageous"],
+            correct: "remote"
+        },
+        {
+            sentence: "The mother had to ______ her own dreams to take care of her children.",
+            options: ["sacrifice", "struggle", "sweep away"],
+            correct: "sacrifice"
+        },
+        {
+            sentence: "After running the marathon, he collapsed from ______.",
+            options: ["exhaustion", "debris", "sacrifice"],
+            correct: "exhaustion"
+        },
+        {
+            sentence: "The sick man was ______ and didn't know where he was.",
+            options: ["delirious", "desperate", "remote"],
+            correct: "delirious"
+        },
+        {
+            sentence: "After surviving the accident, she decided to ______ and enjoy every moment.",
+            options: ["live life to the fullest", "exceed", "struggle"],
+            correct: "live life to the fullest"
+        },
+        {
+            sentence: "The refugees were ______ for food and water.",
+            options: ["desperate", "courageous", "remote"],
+            correct: "desperate"
+        }
+    ];
+
+    // ================================================================
+    // SHUFFLE HELPER
+    // ================================================================
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let score = 0;
+    let totalAnswered = 0;
+
+    // Shuffle the questions
+    const shuffledQuestions = shuffle(questions);
+    const totalQuestions = shuffledQuestions.length;
+
+    document.getElementById('total').textContent = totalQuestions;
+
+    // ================================================================
+    // RENDER QUIZ
+    // ================================================================
+    const quizContainer = document.getElementById('quiz');
+
+    shuffledQuestions.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+        questionDiv.textContent = (index + 1) + '. ' + q.sentence;
+
+        const ul = document.createElement('ul');
+        ul.className = 'options';
+
+        // Shuffle the options for each question
+        const shuffledOptions = shuffle(q.options);
+
+        shuffledOptions.forEach(opt => {
+            const li = document.createElement('li');
+            li.textContent = opt;
+            li.onclick = () => check(li, q.correct);
+            ul.appendChild(li);
+        });
+
+        quizContainer.appendChild(questionDiv);
+        quizContainer.appendChild(ul);
+    });
+
+    // ================================================================
+    // CHECK ANSWER
+    // ================================================================
+    function check(el, correctAnswer) {
+        const parent = el.parentElement;
+        if (parent.classList.contains('answered')) return;
+
+        if (el.textContent === correctAnswer) {
+            el.classList.add('correct');
+            score++;
+        } else {
+            el.classList.add('wrong');
+            Array.from(parent.children).forEach(child => {
+                if (child.textContent === correctAnswer) {
+                    child.classList.add('correct');
+                }
+            });
+        }
+
+        parent.classList.add('answered');
+        totalAnswered++;
+
+        if (totalAnswered === totalQuestions) {
+            const res = document.getElementById('result-box');
+            res.style.display = 'block';
+            document.getElementById('score').innerText = score;
+        }
+    }
+</script>
+
+</body>
+</html>
