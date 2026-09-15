@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Quest: Did You Know? 🎨</title>
+    <style>
+        :root {
+            --red: #e53935;
+            --blue: #1e88e5;
+            --green: #43a047;
+            --yellow: #fdd835;
+            --purple: #8e24aa;
+            --orange: #fb8c00;
+            --pink: #ec407a;
+            --text: #2c3e50;
+            --text-ru: #7a6f66;
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe0f0 50%, #e0f7fa 100%);
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(255, 200, 100, 0.4) 0%, transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(150, 220, 255, 0.4) 0%, transparent 30%),
+                radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 2px);
+            background-size: auto, auto, 34px 34px;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: var(--purple);
+            text-shadow: 3px 3px 0 rgba(255, 200, 100, 0.6);
+            margin: 0 0 6px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--text-ru);
+            font-style: italic;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .game-ui {
+            background: #ffffff;
+            color: var(--purple);
+            padding: 12px 28px;
+            border-radius: 50px;
+            border: 3px solid var(--purple);
+            box-shadow: 0 5px 0 rgba(142, 36, 170, 0.3);
+            margin-bottom: 20px;
+            font-size: 19px;
+            font-weight: bold;
+            display: flex;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 560px;
+            padding: 24px 22px 26px;
+            border-radius: 24px;
+            text-align: center;
+            border: 4px solid var(--purple);
+            box-shadow: 8px 8px 0 rgba(142, 36, 170, 0.25);
+        }
+
+        .image-container {
+            width: 100%;
+            height: 180px;
+            background: #f9f7ff;
+            border-radius: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 90px;
+            border: 3px dashed #d1c4e9;
+        }
+
+        .sentence {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 14px 0 6px;
+            min-height: 30px;
+            color: var(--text);
+        }
+
+        .sentence-ru {
+            font-size: 15px;
+            color: var(--text-ru);
+            font-style: italic;
+            margin-bottom: 16px;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        /* ===== FACT BOX ===== */
+        .fact-box {
+            background: #fff9e6;
+            border: 3px dashed var(--yellow);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin: 14px 0;
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .fact-box .fact-en {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .fact-box .fact-ru {
+            color: var(--text-ru);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .fact-box .color-word {
+            padding: 1px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+        }
+
+        .fact-box .c-red    { color: var(--red);    background: #ffebee; }
+        .fact-box .c-blue   { color: var(--blue);   background: #e3f2fd; }
+        .fact-box .c-green  { color: var(--green);  background: #e8f5e9; }
+        .fact-box .c-yellow { color: #b58900;       background: #fffde7; }
+        .fact-box .c-purple { color: var(--purple); background: #f3e5f5; }
+
+        /* ===== BUTTONS ===== */
+        .options {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 14px 22px;
+            font-size: 18px;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            color: white;
+            transition: 0.15s;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-family: inherit;
+            letter-spacing: 0.4px;
+        }
+
+        .btn-choice {
+            background: var(--blue);
+            box-shadow: 0 5px 0 #1565c0;
+            min-width: 130px;
+        }
+        .btn-choice:hover:not(:disabled) { transform: translateY(-2px); }
+        .btn-choice:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #1565c0;
+        }
+
+        .btn-letter {
+            background: var(--orange);
+            box-shadow: 0 4px 0 #e65100;
+            margin: 5px;
+            min-width: 48px;
+            font-size: 22px;
+        }
+        .btn-letter:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn:disabled {
+            background: #cfcfcf;
+            box-shadow: none;
+            cursor: default;
+            transform: none;
+        }
+
+        .scramble-slots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 18px 0 12px;
+            min-height: 50px;
+            flex-wrap: wrap;
+        }
+
+        .slot {
+            width: 44px;
+            height: 44px;
+            border-bottom: 4px solid var(--purple);
+            font-size: 26px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            color: var(--purple);
+        }
+
+        .hidden { display: none !important; }
+
+        .win-screen { font-size: 32px; color: var(--purple); }
+
+        .badge {
+            background: var(--purple);
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            margin-bottom: 14px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+            font-weight: bold;
+        }
+
+        .badge.spell {
+            background: var(--orange);
+        }
+
+        .badge .ru-badge {
+            font-style: italic;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-left: 6px;
+            font-size: 13px;
+        }
+
+        .reset-btn {
+            background: #95a5a6;
+            box-shadow: 0 4px 0 #6b7677;
+            margin-top: 16px;
+            font-size: 14px;
+            padding: 10px 18px;
+        }
+
+        .win-card { text-align: center; }
+
+        .win-card .trophy {
+            font-size: 80px;
+            margin: 10px 0;
+        }
+
+        .win-card p {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .win-card .ru {
+            color: var(--text-ru);
+            font-style: italic;
+            font-size: 15px;
+        }
+
+        .play-again-btn {
+            background: var(--green);
+            box-shadow: 0 5px 0 #2e7d32;
+            margin-top: 20px;
+            padding: 14px 40px;
+            font-size: 17px;
+        }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 20px; }
+            .sentence { font-size: 18px; }
+            .image-container { height: 140px; font-size: 70px; }
+            .btn { font-size: 15px; padding: 12px 16px; }
+            .btn-letter { min-width: 40px; font-size: 18px; }
+            .slot { width: 36px; height: 36px; font-size: 22px; }
+            .game-ui { font-size: 16px; padding: 10px 20px; gap: 14px; }
+            .fact-box { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎨 Color Quest: Did You Know? 🎨</h1>
+<p class="subtitle">Learn the colours and fun facts · Учи цвета и интересные факты</p>
+
+<div class="game-ui">
+    💎 <span id="score">0</span> &nbsp;|&nbsp; Task: <span id="current">1</span> / 10
+</div>
+
+<!-- ===== GAME CARD ===== -->
+<div class="card" id="game-card">
+    <div id="mission-badge" class="badge">MISSION 1: CHOOSE <span class="ru-badge">· ВЫБЕРИ</span></div>
+    <div class="image-container" id="img-box">🔴</div>
+    <div class="sentence" id="task-text">What colour is this?</div>
+    <div class="sentence-ru" id="task-ru">Какого это цвета?</div>
+
+    <!-- FACT BOX (only shown on choice mode) -->
+    <div class="fact-box" id="fact-box">
+        <div class="fact-en" id="fact-en"></div>
+        <div class="fact-ru" id="fact-ru"></div>
+    </div>
+
+    <!-- CHOICE MODE -->
+    <div id="choice-mode" class="options"></div>
+
+    <!-- SCRAMBLE MODE -->
+    <div id="scramble-mode" class="hidden">
+        <div class="scramble-slots" id="slots"></div>
+        <div class="options" id="letters-box"></div>
+        <button class="btn reset-btn" onclick="resetWord()">RESET · СБРОСИТЬ</button>
+    </div>
+</div>
+
+<!-- ===== FINAL SCREEN ===== -->
+<div id="finish" class="hidden">
+    <div class="card win-card">
+        <h1 class="win-screen">🏆 WELL DONE!</h1>
+        <p><strong>You are a colour master!</strong></p>
+        <p class="ru">Ты настоящий мастер цветов!</p>
+        <div class="trophy">👑🌈💎</div>
+        <p>Your score: <strong id="finalScore">0</strong> 💎</p>
+        <p class="ru">Твой счёт</p>
+        <button class="btn play-again-btn" onclick="location.reload()">
+            PLAY AGAIN · ИГРАТЬ СНОВА
+        </button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // STATE
+    // ================================================================
+    let score = 0;
+    let step = 0;
+    let currentGuess = "";
+
+    // ================================================================
+    // LEVEL 1 — CHOICE (5 questions from the "Did You Know?" text)
+    // ================================================================
+    const choiceData = [
+        {
+            en: "What colour is the cape?",
+            ru: "Какого цвета плащ?",
+            img: "🟥",
+            a: "red",
+            options: ["red", "blue", "green"],
+            factEn: 'The colour <span class="color-word c-red">red</span> doesn\'t make bulls angry. Bulls cannot see colours!',
+            factRu: 'Красный цвет не злит быков. Быки вообще не различают цвета!'
+        },
+        {
+            en: "What colour can owls see?",
+            ru: "Какой цвет видят совы?",
+            img: "🦉",
+            a: "blue",
+            options: ["blue", "red", "purple"],
+            factEn: 'Owls are the only birds that can see the colour <span class="color-word c-blue">blue</span>.',
+            factRu: 'Совы — единственные птицы, которые видят синий цвет.'
+        },
+        {
+            en: "What is the national colour of Ireland?",
+            ru: "Какой национальный цвет Ирландии?",
+            img: "🇮🇪",
+            a: "green",
+            options: ["green", "yellow", "red"],
+            factEn: '<span class="color-word c-green">Green</span> is the national colour of Ireland.',
+            factRu: 'Зелёный — национальный цвет Ирландии.'
+        },
+        {
+            en: "What colour means 'beautiful' in Russia?",
+            ru: "Какой цвет значит «красивый» в России?",
+            img: "🇷🇺",
+            a: "red",
+            options: ["red", "blue", "green"],
+            factEn: 'In Russia, <span class="color-word c-red">red</span> means beautiful.',
+            factRu: 'В России красный означает «красивый».'
+        },
+        {
+            en: "What colour do kings and queens wear?",
+            ru: "Какой цвет носят короли и королевы?",
+            img: "👑",
+            a: "purple",
+            options: ["purple", "yellow", "green"],
+            factEn: '<span class="color-word c-purple">Purple</span> is the colour for kings and queens.',
+            factRu: 'Фиолетовый — цвет королей и королев.'
+        }
+    ];
+
+    // ================================================================
+    // LEVEL 2 — SCRAMBLE (5 simple colour words)
+    // ================================================================
+    const scrambleWords = [
+        { word: "red",    img: "🟥", ru: "красный" },
+        { word: "blue",   img: "🟦", ru: "синий" },
+        { word: "green",  img: "🟩", ru: "зелёный" },
+        { word: "yellow", img: "🟨", ru: "жёлтый" },
+        { word: "purple", img: "🟪", ru: "фиолетовый" }
+    ];
+
+    // ================================================================
+    // MAIN UPDATE
+    // ================================================================
+    function update() {
+        document.getElementById('current').innerText = step + 1;
+
+        if (step < 5) {
+            renderChoiceMode();
+        } else if (step < 10) {
+            renderScrambleMode();
+        } else {
+            document.getElementById('game-card').classList.add('hidden');
+            document.getElementById('finish').classList.remove('hidden');
+            document.getElementById('finalScore').innerText = score;
+        }
+    }
+
+    // ================================================================
+    // CHOICE MODE
+    // ================================================================
+    function renderChoiceMode() {
+        const item = choiceData[step];
+
+        document.getElementById('mission-badge').innerHTML =
+            'MISSION 1: CHOOSE <span class="ru-badge">· ВЫБЕРИ</span>';
+        document.getElementById('mission-badge').className = "badge";
+
+        document.getElementById('task-text').innerText = item.en;
+        document.getElementById('task-ru').innerText = item.ru;
+        document.getElementById('task-ru').style.color = "#7a6f66";
+
+        document.getElementById('img-box').innerText = item.img;
+
+        // Show fact box
+        document.getElementById('fact-box').classList.remove('hidden');
+        document.getElementById('fact-en').innerHTML = item.factEn;
+        document.getElementById('fact-ru').innerText = item.factRu;
+
+        // Toggle panels
+        document.getElementById('choice-mode').classList.remove('hidden');
+        document.getElementById('scramble-mode').classList.add('hidden');
+
+        const box = document.getElementById('choice-mode');
+        box.innerHTML = '';
+
+        // Shuffle options
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-choice';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (opt === item.a) {
+                    btn.style.background = "#43a047";
+                    btn.style.boxShadow = "0 5px 0 #2e7d32";
+                    nextStep();
+                } else {
+                    btn.style.background = "#e53935";
+                    btn.style.boxShadow = "0 5px 0 #b71c1c";
+                    btn.disabled = true;
+                    document.getElementById('task-ru').innerText =
+                        "❌ Try again! · Попробуй снова!";
+                    document.getElementById('task-ru').style.color = "#e53935";
+                    setTimeout(() => {
+                        document.getElementById('task-ru').style.color = "#7a6f66";
+                        document.getElementById('task-ru').innerText = item.ru;
+                    }, 1200);
+                }
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // ================================================================
+    // SCRAMBLE MODE
+    // ================================================================
+    function renderScrambleMode() {
+        const item = scrambleWords[step - 5];
+
+        document.getElementById('mission-badge').innerHTML =
+            'MISSION 2: SPELL IT <span class="ru-badge">· СОСТАВЬ СЛОВО</span>';
+        document.getElementById('mission-badge').className = "badge spell";
+
+        document.getElementById('task-text').innerText = "Unscramble the word:";
+        document.getElementById('task-ru').innerText =
+            "Собери слово · " + item.ru;
+
+        document.getElementById('img-box').innerText = item.img;
+
+        // Hide fact box during scramble
+        document.getElementById('fact-box').classList.add('hidden');
+
+        // Toggle panels
+        document.getElementById('choice-mode').classList.add('hidden');
+        document.getElementById('scramble-mode').classList.remove('hidden');
+
+        currentGuess = "";
+        renderSlots(item.word);
+        renderLetters(item.word);
+    }
+
+    function renderSlots(word) {
+        const box = document.getElementById('slots');
+        box.innerHTML = '';
+        for (let i = 0; i < word.length; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.id = 'slot-' + i;
+            box.appendChild(slot);
+        }
+    }
+
+    function renderLetters(word) {
+        const box = document.getElementById('letters-box');
+        box.innerHTML = '';
+        const letters = word.split('').sort(() => Math.random() - 0.5);
+
+        letters.forEach((char) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-letter';
+            btn.innerText = char;
+            btn.onclick = () => addLetter(char, btn, word);
+            box.appendChild(btn);
+        });
+    }
+
+    function addLetter(char, btn, targetWord) {
+        const nextSlot = document.getElementById('slot-' + currentGuess.length);
+        if (nextSlot) {
+            nextSlot.innerText = char;
+            currentGuess += char;
+            btn.disabled = true;
+        }
+
+        if (currentGuess.length === targetWord.length) {
+            if (currentGuess === targetWord) {
+                btn.style.background = "#43a047";
+                setTimeout(nextStep, 500);
+            } else {
+                document.getElementById('task-ru').innerText =
+                    "❌ Wrong spelling! · Неправильно!";
+                document.getElementById('task-ru').style.color = "#e53935";
+                setTimeout(() => {
+                    document.getElementById('task-ru').style.color = "#7a6f66";
+                    resetWord();
+                }, 1000);
+            }
+        }
+    }
+
+    function resetWord() {
+        if (step < 5) return;
+        currentGuess = "";
+        const targetWord = scrambleWords[step - 5].word;
+        renderSlots(targetWord);
+        renderLetters(targetWord);
+        document.getElementById('task-ru').style.color = "#7a6f66";
+        document.getElementById('task-ru').innerText =
+            "Собери слово · " + scrambleWords[step - 5].ru;
+    }
+
+    // ================================================================
+    // NEXT STEP
+    // ================================================================
+    function nextStep() {
+        score += 10;
+        document.getElementById('score').innerText = score;
+        step++;
+        setTimeout(update, 400);
+    }
+
+    // ================================================================
+    // LAUNCH
+    // ================================================================
+    update();
+</script>
+
+</body>
+</html>

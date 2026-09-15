@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zootopia Identity &amp; Dialogue Quiz 🦊🐰</title>
+    <style>
+        :root {
+            --sky-blue: #0284c7;
+            --spring-mint: #f0fdf4;
+            --cherry-pink: #ff9900;
+            --leaf-green: #22c55e;
+            --sun-yellow: #fff9db;
+            --bark: #1e293b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--bark);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .garden-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 35px;
+            border: 10px solid var(--cherry-pink);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--cherry-pink);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .progress-container {
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--leaf-green);
+            width: 0%;
+            border-radius: 10px;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stats { display: flex; justify-content: space-between; font-weight: bold; font-size: 1.1em; }
+        
+        .quiz-area { padding: 30px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .emoji-vibe { font-size: 4em; margin-bottom: 15px; display: block; }
+        
+        #question-text { font-size: 1.4em; font-weight: 700; margin-bottom: 25px; color: #1e3c72; line-height: 1.4; }
+        .btn-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
+        button {
+            padding: 18px;
+            border: 3px solid var(--cherry-pink);
+            border-radius: 50px;
+            background: var(--sun-yellow);
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--bark);
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        button:hover:not(:disabled) {
+            background: var(--sky-blue);
+            color: white;
+            transform: scale(1.02);
+            border-color: var(--sky-blue);
+        }
+        button:disabled { cursor: default; }
+        #victory { display: none; padding: 50px 40px; text-align: center; }
+
+        @media (max-width: 500px) {
+            .garden-card { border-width: 6px; border-radius: 25px; }
+            .quiz-area { padding: 20px 18px; }
+            #question-text { font-size: 1.15em; }
+            button { padding: 14px; font-size: 1em; }
+            .emoji-vibe { font-size: 3em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="garden-card">
+    <div class="header">
+        <div class="stats">
+            <span id="rank-text">🦊 Zootopia Cadet</span>
+            <span id="q-count">1 / 10</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="quiz-content" class="quiz-area">
+        <span id="current-emoji" class="emoji-vibe">🆔</span>
+        <h2 id="question-text">Loading identity files...</h2>
+        <div id="options-container" class="btn-grid"></div>
+    </div>
+
+    <div id="victory">
+        <span class="emoji-vibe">🦊🐰🏅</span>
+        <h1 style="color: #ff9900; font-size: 2.5em; margin-bottom: 10px;">QUIZ COMPLETED!</h1>
+        <p style="font-size: 1.2em; color: #64748b; margin-bottom: 30px;">
+            You mastered all the randomized identity questions perfectly.
+        </p>
+        <button onclick="location.reload()" style="width:100%">Restart Quest 🔄</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // DATA: 10 Fact Groups, 3 Random Variants each (A, B, C)
+    // ================================================================
+    const masterData = [
+        { // Group 1: Judy's Identity
+            variants: [
+                { q: " What's her name?", opt: ["Her name is Judy.", "Her name is Nick."], ans: 0, em: "🐰🆔" },
+                { q: "How old is she?", opt: ["She's nineteen.", "She's eighteen."], ans: 1, em: "🎂🐰18" },
+                { q: "Name: ______ , Age: 18.", opt: ["Judy", "Twenty"], ans: 0, em: "📝🔍" }
+            ]
+        },
+        { // Group 2: Nick's Identity
+            variants: [
+                { q: "What's his name?", opt: ["His name is Judy.", "His name is Nick."], ans: 1, em: "🦊" },
+                { q: "How old is he?", opt: ["He's nineteen.", "He's twenty."], ans: 0, em: "19🦊" },
+                { q: "Name: Nick, Age: ______", opt: ["Russia", "Nineteen"], ans: 1, em: "📊🦊" }
+            ]
+        },
+        { // Group 3: Flash's Identity
+            variants: [
+                { q: "What's his name?", opt: ["His name is Flash.", "His name is Mona."], ans: 0, em: "🦥" },
+                { q: "How old is he?", opt: ["He's twenty.", "He's eighteen."], ans: 0, em: "20🦥" },
+                { q: "Who is twenty years old?", opt: ["Flash", "Cat"], ans: 0, em: "🦥🔍" }
+            ]
+        },
+        { // Group 4: Fru Fru's Identity
+            variants: [
+                { q: "What's her name?", opt: ["Her name is Flash.", "Her name is Fru Fru."], ans: 1, em: "🐭" },
+                { q: "How old is she?", opt: ["She's eighteen.", "She's twenty."], ans: 0, em: "18🐭" },
+                { q: "What are the girls' names?", opt: ["Judy and Fru Fru", "Nick and Flash"], ans: 0, em: "👥📊" }
+            ]
+        },
+        { // Group 5: "How old are you?"
+            variants: [
+                { q: "'How old are you?'</em> → ________", opt: ["I'm 20.", "She's 16."], ans: 0, em: "🗣️🎂" },
+                { q:"'How old are you?',", opt: ["My name's Judy.", "I'm 20."], ans: 1, em: "💬❓" },
+                { q: "A: How old are you?<br>B: ________", opt: ["I'm 20.", "They're pens."], ans: 0, em: "🤝🔊" }
+            ]
+        },
+        { // Group 6: "How old is she?"
+            variants: [
+                { q: "'How old is she?'</em> → ________", opt: ["She's 16.", "My cat is 6."], ans: 0, em: "👧🎂" },
+                { q: "A girl", opt: ["How old is she? → She's 16.", "How old is he? → His name's Nick."], ans: 0, em: "🔍👧" },
+                { q: " How old is she?<br>B: ________", opt: ["They're pens.", "She's 16."], ans: 1, em: "💬✨" }
+            ]
+        },
+        { // Group 7: "What's your name?"
+            variants: [
+                { q: "What's your name?'</em> → ________", opt: ["My name's Judy.", "They're pens."], ans: 0, em: "🗣️📛" },
+                { q: "'What's your name?'", opt: ["My name's Judy.", "I'm 20."], ans: 0, em: "💬📛" },
+                { q: "<br>A: What's your name?<br>B: ________", opt: ["She's 16.", "My name's Judy."], ans: 1, em: "🤝✨" }
+            ]
+        },
+        { // Group 8: "What are they?"
+            variants: [
+                { q: "<br><em>'What are they?'</em> → ________", opt: ["They're pens.", "My name's Judy."], ans: 0, em: "🔀✒️" },
+                { q: " 'What are they?',:", opt: ["They're pens.", "She's 16."], ans: 0, em: "❓✒️" },
+                { q: "<br>A: What are they?<br>B: ________", opt: ["I'm 20.", "They're pens."], ans: 1, em: "💬🖋️" }
+            ]
+        },
+        { // Group 9: "How old is your pet?"
+            variants: [
+                { q: "'How old is your pet?'</em> → ________", opt: ["She's 16.", "My cat is 6."], ans: 1, em: "🐱🎂" },
+                { q: "How old is your pet?", opt: ["My cat is 6.", "My name's Judy."], ans: 0, em: "🐶📊" },
+                { q: "A: How old is your pet?<br>B: ________", opt: ["My cat is 6.", "They're pens."], ans: 0, em: "💬🐾" }
+            ]
+        },
+        { // Group 10: Grammar Summary
+            variants: [
+                { q: "Boy'_____ is 19 years old.' (for Nick)", opt: ["He", "She"], ans: 0, em: "🦊" },
+                { q: "Girl '_____ is 18 years old.' (for Judy)", opt: ["He", "She"], ans: 1, em: "🐰" },
+                { q: "'What _____ they?'", opt: ["is", "are"], ans: 1, em: "?" }
+            ]
+        }
+    ];
+
+    // ================================================================
+    // STATE
+    // ================================================================
+    let currentQuestionIndex = 0;
+    let selectedVariants = [];
+
+    // ================================================================
+    // INIT QUIZ
+    // ================================================================
+    function initQuiz() {
+        // Pick 1 random variant out of 3 for each of the 10 groups
+        selectedVariants = masterData.map(group => {
+            const randomIndex = Math.floor(Math.random() * group.variants.length);
+            return group.variants[randomIndex];
+        });
+        // Shuffle the 10 questions
+        selectedVariants.sort(() => Math.random() - 0.5);
+        showQuestion();
+    }
+
+    // ================================================================
+    // SHOW QUESTION
+    // ================================================================
+    function showQuestion() {
+        if (currentQuestionIndex >= selectedVariants.length) {
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('victory').style.display = 'block';
+            document.getElementById('progress-bar').style.width = '100%';
+            return;
+        }
+
+        const currentData = selectedVariants[currentQuestionIndex];
+
+        // Update stats and progress
+        document.getElementById('q-count').innerText = `${currentQuestionIndex + 1} / ${selectedVariants.length}`;
+        document.getElementById('progress-bar').style.width = (currentQuestionIndex / selectedVariants.length) * 100 + '%';
+
+        // Dynamic rank shift
+        const rankText = document.getElementById('rank-text');
+        if (currentQuestionIndex >= 7) rankText.innerText = "👮 Zootopia Officer";
+        else if (currentQuestionIndex >= 4) rankText.innerText = "🐾 Junior Agent";
+        else rankText.innerText = "🦊 Zootopia Cadet";
+
+        // Display question content
+        document.getElementById('current-emoji').innerHTML = currentData.em;
+        document.getElementById('question-text').innerHTML = currentData.q;
+
+        // Build option buttons
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+
+        currentData.opt.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.innerHTML = option;
+            btn.onclick = () => checkAnswer(index, currentData.ans);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    // ================================================================
+    // CHECK ANSWER
+    // ================================================================
+    function checkAnswer(selectedIndex, correctIndex) {
+        const buttons = document.querySelectorAll('#options-container button');
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === correctIndex) {
+            // CORRECT
+            buttons[selectedIndex].style.background = '#22c55e';
+            buttons[selectedIndex].style.color = 'white';
+            buttons[selectedIndex].style.borderColor = '#22c55e';
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                showQuestion();
+            }, 800);
+        } else {
+            // WRONG
+            buttons[selectedIndex].style.background = '#ff4757';
+            buttons[selectedIndex].style.color = 'white';
+            buttons[selectedIndex].style.borderColor = '#ff4757';
+
+            // Highlight correct answer
+            buttons[correctIndex].style.background = '#22c55e';
+            buttons[correctIndex].style.color = 'white';
+            buttons[correctIndex].style.borderColor = '#22c55e';
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                showQuestion();
+            }, 1600);
+        }
+    }
+
+    // ================================================================
+    // LAUNCH
+    // ================================================================
+    initQuiz();
+</script>
+
+</body>
+</html>
