@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everyday English & Grammar Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bubble-blue: #3498db;
+            --bubble-green: #2ecc71;
+            --bubble-yellow: #f1c40f;
+            --bubble-red: #e74c3c;
+            --text-dark: #2c3e50;
+            --purple: #8e44ad;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        #game-frame {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 0px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 5px solid var(--text-dark);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 900;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .xp-badge {
+            background: var(--bubble-yellow);
+            padding: 2px 12px;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            font-size: 0.8rem;
+        }
+
+        .timer-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+            width: 100%;
+            transition: width 0.25s linear;
+        }
+
+        .dialogue-area {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            min-height: 170px;
+            border: 3px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-line {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            border: 2px solid #eee;
+            color: var(--text-dark);
+            line-height: 1.4;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .chat-line:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .chat-line b {
+            color: var(--bubble-blue);
+            margin-right: 8px;
+        }
+
+        .chat-line.grammar-prompt b {
+            color: var(--purple);
+        }
+
+        .chat-line u {
+            color: var(--bubble-green);
+            text-decoration: none;
+            border-bottom: 3px solid var(--bubble-green);
+            padding: 0 4px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid var(--text-dark);
+            padding: 14px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-dark);
+            transition: 0.1s;
+            text-align: left;
+            color: var(--text-dark);
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            background: #fdfdfd;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 var(--text-dark);
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .correct {
+            border-color: var(--bubble-green) !important;
+            color: var(--bubble-green) !important;
+            background: #e8f8f5 !important;
+        }
+
+        .wrong {
+            border-color: var(--bubble-red) !important;
+            color: var(--bubble-red) !important;
+            background: #fde8e8 !important;
+            animation: shake 0.35s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #win-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        #win-screen h2 {
+            color: var(--bubble-green);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .final-xp {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            background: var(--bubble-yellow);
+            display: inline-block;
+            padding: 6px 24px;
+            border-radius: 40px;
+            border: 3px solid var(--text-dark);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <span id="round-title">ROUND 1: EVERYDAY ENGLISH 🗨️</span>
+            <span>TASK <span id="lvl-num">1</span> / <span id="total-lvls">6</span></span>
+        </div>
+
+        <div class="header" style="justify-content:center; margin-bottom:8px;">
+            <span class="xp-badge">⭐ XP: <span id="xp-value">0</span></span>
+        </div>
+
+        <div class="timer-bar-bg">
+            <div class="timer-bar-fill" id="timer-fill"></div>
+        </div>
+
+        <div class="dialogue-area" id="chat-box"></div>
+
+        <div class="options-grid" id="options-box"></div>
+    </div>
+
+    <div id="win-screen">
+        <h2>QUEST COMPLETED! 🏆</h2>
+        <p style="font-weight:bold; font-size:1.1rem; color:var(--text-dark);">Amazing! You've mastered all conversational and grammar rules perfectly!</p>
+        <div class="final-xp">⭐ Total XP: <span id="final-xp-value">0</span></div>
+        <div style="font-size: 5rem; margin: 15px 0;">📅⏰🛋️🔥</div>
+        <button class="option-btn" style="text-align:center; width: 100%; margin-top:20px;" onclick="location.reload()">REPLAY QUEST</button>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       ROUND 1 — EVERYDAY ENGLISH
+       ============================================================ */
+    const round1Levels = [
+        {
+            sequence: [
+                { speaker: "Question", text: "What's your favourite day of the week?", type: "chat" },
+                { speaker: "Response", text: "Saturday!", type: "chat" }
+            ],
+            decoys: ["It's Bill's.", "A quarter past one."]
+        },
+        {
+            sequence: [
+                { speaker: "Question", text: "How old are you?", type: "chat" },
+                { speaker: "Response", text: "I'm twelve.", type: "chat" }
+            ],
+            decoys: ["It's on 13th May.", "Saturday!"]
+        },
+        {
+            sequence: [
+                { speaker: "Question", text: "What's the time please?", type: "chat" },
+                { speaker: "Response", text: "A quarter past one.", type: "chat" }
+            ],
+            decoys: ["It's 25th August.", "On the coffee table, please."]
+        },
+        {
+            sequence: [
+                { speaker: "Question", text: "When's your birthday?", type: "chat" },
+                { speaker: "Response", text: "It's on 13th May.", type: "chat" }
+            ],
+            decoys: ["I'm twelve.", "It's Bill's."]
+        },
+        {
+            sequence: [
+                { speaker: "Question", text: "Where do you want the lamp?", type: "chat" },
+                { speaker: "Response", text: "On the coffee table, please.", type: "chat" }
+            ],
+            decoys: ["A quarter past one.", "It's 25th August."]
+        },
+        {
+            sequence: [
+                { speaker: "Question", text: "What's the date today?", type: "chat" },
+                { speaker: "Response", text: "It's 25th August.", type: "chat" }
+            ],
+            decoys: ["It's on 13th May.", "Saturday!"]
+        }
+    ];
+
+    /* ============================================================
+       ROUND 2 — GRAMMAR MISSION (some / any / a / an)
+       ============================================================ */
+    const round2Levels = [
+        {
+            sequence: [
+                { speaker: "Grammar", text: "There is ________ fireplace in the living room", type: "grammar" },
+                { speaker: "Sentence", text: "There is ________ fireplace in the living room.", type: "chat" }
+            ],
+            correctOption: "a",
+            choices: ["a", "an", "any"]
+        },
+        {
+            sequence: [
+                { speaker: "Grammar", text: "There are ________ cushions on the sofa.", type: "grammar" },
+                { speaker: "Sentence", text: "There are ________ cushions on the sofa.", type: "chat" }
+            ],
+            correctOption: "some",
+            choices: ["some", "any", "a"]
+        },
+        {
+            sequence: [
+                { speaker: "Grammar", text: "There aren't ________ paintings on the wall.", type: "grammar" },
+                { speaker: "Sentence", text: "There aren't ________ paintings on the wall.", type: "chat" }
+            ],
+            correctOption: "any",
+            choices: ["any", "some", "an"]
+        },
+        {
+            sequence: [
+                { speaker: "Grammar", text: "There's ________ armchair opposite the coffee table.", type: "grammar" },
+                { speaker: "Sentence", text: "There's ________ armchair opposite the coffee table.", type: "chat" }
+            ],
+            correctOption: "an",
+            choices: ["an", "a", "some"]
+        },
+        {
+            sequence: [
+                { speaker: "Grammar", text: "There aren't ________ chairs in the dining room.", type: "grammar" },
+                { speaker: "Sentence", text: "There aren't ________ chairs in the dining room.", type: "chat" }
+            ],
+            correctOption: "any",
+            choices: ["any", "a", "some"]
+        }
+    ];
+
+    /* ============================================================
+       GAME STATE
+       ============================================================ */
+    let currentRound = 1;
+    let currentLvl = 0;
+    let currentStep = 0;
+    let xp = 0;
+
+    /* ============================================================
+       TIMER
+       ============================================================ */
+    let timerInterval = null;
+    let timeLeft = 15;
+    const TIME_LIMIT = 15;
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timeLeft = TIME_LIMIT;
+        const fill = document.getElementById('timer-fill');
+        if (!fill) return;
+        fill.style.width = '100%';
+
+        timerInterval = setInterval(() => {
+            timeLeft -= 0.25;
+            if (timeLeft < 0) timeLeft = 0;
+            fill.style.width = (timeLeft / TIME_LIMIT * 100) + '%';
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                // Time's up — disable all buttons and reveal correct
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(b => b.classList.add('disabled'));
+                const activeLevels = currentRound === 1 ? round1Levels : round2Levels;
+                const lvl = activeLevels[currentLvl];
+                const correctText = currentRound === 1 ? lvl.sequence[1].text : lvl.correctOption;
+                buttons.forEach(b => {
+                    if (b.dataset.value === correctText) b.classList.add('correct');
+                });
+                // Move on after a short pause
+                setTimeout(() => {
+                    advanceLevel(activeLevels, correctText, true);
+                }, 900);
+            }
+        }, 250);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+    }
+
+    /* ============================================================
+       RENDER GAME
+       ============================================================ */
+    function loadGame() {
+        const isRound1 = (currentRound === 1);
+        const activeLevels = isRound1 ? round1Levels : round2Levels;
+        const lvl = activeLevels[currentLvl];
+
+        // Update header
+        document.getElementById('round-title').innerText = isRound1
+            ? "ROUND 1: EVERYDAY ENGLISH 🗨️"
+            : "ROUND 2: GRAMMAR MISSION 🏠";
+        document.getElementById('lvl-num').innerText = currentLvl + 1;
+        document.getElementById('total-lvls').innerText = activeLevels.length;
+        document.getElementById('xp-value').innerText = xp;
+
+        // Clear chat box for new level
+        if (currentStep === 0) {
+            document.getElementById('chat-box').innerHTML = '';
+            addChatLine(lvl.sequence[0].speaker, lvl.sequence[0].text, lvl.sequence[0].type);
+        }
+
+        // Build options
+        const optBox = document.getElementById('options-box');
+        optBox.innerHTML = '';
+
+        let choices = [];
+        if (isRound1) {
+            // Correct answer is the RESPONSE (index 1), decoys are wrong
+            const correctOption = lvl.sequence[1].text;
+            choices = [correctOption, ...lvl.decoys];
+        } else {
+            choices = [...lvl.choices];
+        }
+
+        // Shuffle choices
+        choices = shuffleArray(choices);
+
+        choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.dataset.value = choice;
+            btn.innerText = isRound1 ? "👉 " + choice : "✨ " + choice;
+            btn.onclick = () => checkChoice(choice, btn);
+            optBox.appendChild(btn);
+        });
+
+        // Start timer for this level
+        startTimer();
+    }
+
+    /* ============================================================
+       HELPERS
+       ============================================================ */
+    function shuffleArray(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function addChatLine(name, msg, type) {
+        const chatBox = document.getElementById('chat-box');
+        const div = document.createElement('div');
+        div.className = 'chat-line' + (type === 'grammar' ? ' grammar-prompt' : '');
+        div.innerHTML = `<b>${name}:</b> ${msg}`;
+        chatBox.appendChild(div);
+    }
+
+    /* ============================================================
+       CHECK ANSWER
+       ============================================================ */
+    function checkChoice(val, btn) {
+        const isRound1 = (currentRound === 1);
+        const activeLevels = isRound1 ? round1Levels : round2Levels;
+        const lvl = activeLevels[currentLvl];
+        const correctText = isRound1 ? lvl.sequence[1].text : lvl.correctOption;
+
+        if (val === correctText) {
+            stopTimer();
+            // Award XP (more for quick answers)
+            const bonus = Math.max(0, Math.round(timeLeft / 3));
+            xp += 10 + bonus;
+            document.getElementById('xp-value').innerText = xp;
+
+            // Disable all buttons & mark correct
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(b => b.classList.add('disabled'));
+            btn.classList.add('correct');
+
+            if (isRound1) {
+                // Show the response in the chat
+                addChatLine(lvl.sequence[1].speaker, val, "chat");
+            } else {
+                // Show the completed sentence
+                const filledSentence = lvl.sequence[1].text.replace("________", `<u>${val}</u>`);
+                document.getElementById('chat-box').innerHTML = '';
+                addChatLine("Correct Sentence", filledSentence, "chat");
+            }
+
+            // Advance
+            setTimeout(() => advanceLevel(activeLevels, correctText, false), 900);
+        } else {
+            // Wrong answer — shake and disable just this button
+            btn.classList.add('wrong');
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                btn.classList.add('disabled');
+            }, 500);
+        }
+    }
+
+    /* ============================================================
+       ADVANCE TO NEXT LEVEL / ROUND
+       ============================================================ */
+    function advanceLevel(activeLevels, correctText, wasTimeout) {
+        currentLvl++;
+        currentStep = 0;
+
+        if (currentLvl < activeLevels.length) {
+            loadGame();
+        } else {
+            if (currentRound === 1) {
+                // Switch to Round 2
+                setTimeout(() => {
+                    currentRound = 2;
+                    currentLvl = 0;
+                    currentStep = 0;
+                    loadGame();
+                }, 700);
+            } else {
+                // End of the entire quest
+                stopTimer();
+                setTimeout(showWin, 600);
+            }
+        }
+    }
+
+    /* ============================================================
+       WIN SCREEN
+       ============================================================ */
+    function showWin() {
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+        document.getElementById('final-xp-value').innerText = xp;
+    }
+
+    /* ============================================================
+       START
+       ============================================================ */
+    loadGame();
+</script>
+</body>
+</html>

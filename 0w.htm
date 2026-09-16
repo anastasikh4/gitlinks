@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 7: Places & Everyday English Quiz</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f4f8; padding: 20px; color: #1e293b; }
+        .quiz-container { max-width: 750px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 5px solid #3b82f6; }
+        h1 { color: #1d4ed8; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #64748b; font-weight: 600; margin-bottom: 25px; }
+        .reading-section { background: #eff6ff; border-left: 5px solid #3b82f6; padding: 15px; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5; color: #1e3a8a; }
+        .question-item { margin-bottom: 20px; padding: 15px; border-bottom: 1px solid #e2e8f0; }
+        .question-text { font-weight: bold; display: block; margin-bottom: 10px; color: #0f172a; }
+        .options { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (max-width: 550px) { .options { grid-template-columns: 1fr; } }
+        .option-btn { background: #fff; border: 2px solid #cbd5e1; padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; text-align: left; font-size: 15px; font-weight: 600; color: #334155; }
+        .option-btn:hover { background: #f8fafc; border-color: #3b82f6; }
+        .correct { background: #10b981 !important; color: white !important; border-color: #059669 !important; }
+        .wrong { background: #ef4444 !important; color: white !important; border-color: #dc2626 !important; }
+        .disabled { pointer-events: none; }
+        #final-score { display: none; text-align: center; font-size: 1.5rem; color: #1d4ed8; margin-top: 20px; padding: 20px; background: #f8fafc; border-radius: 10px; font-weight: bold; }
+        button.reset { display: block; width: 200px; margin: 20px auto; padding: 12px; background: #1d4ed8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button.reset:hover { background: #1e40af; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>🗺️ Town Guide Challenge</h1>
+    <div class="subtitle">Vocabulary & Everyday Conversational English</div>
+    
+    <div class="reading-section">
+        <strong>Text</strong><br>
+       Welcome to a new town! It is a beautiful neighborhood. You can visit many places to buy food, medicine, or enjoy entertainment. If you need some money, you can look around and ask a person, "Is there a bank near here?"If you like to read books, you can also ask, "How far is the library?" This helps you to find a way. Walking in a new town is fun!
+    </div>
+
+    <div id="quiz-content">
+        <!-- Vocabulary: Places on the map -->
+        <div class="question-item">
+            <span class="question-text">1. Where do you go to buy fresh bread, cakes, and pastries?</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">Butcher's</button>
+                <button class="option-btn" onclick="check(this, 1)">Baker's</button>
+                <button class="option-btn" onclick="check(this, 2)">Chemist's</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">2. If you need to pick up a morning newspaper or a magazine, visit the...</span>
+            <div class="options" data-ans="2">
+                <button class="option-btn" onclick="check(this, 0)">Greengrocer's</button>
+                <button class="option-btn" onclick="check(this, 1)">Post office</button>
+                <button class="option-btn" onclick="check(this, 2)">Newsagent's</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">3. Where can you find a large collection of books to read or borrow?</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">Library</button>
+                <button class="option-btn" onclick="check(this, 1)">Theatre</button>
+                <button class="option-btn" onclick="check(this, 2)">Supermarket</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">4. A place with a pool where you go to exercise or practice your strokes is a...</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">Sports centre</button>
+                <button class="option-btn" onclick="check(this, 1)">Swimming pool</button>
+                <button class="option-btn" onclick="check(this, 2)">Cinema</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">5. Where do you go to catch a flight and travel to another country?</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">Airport</button>
+                <button class="option-btn" onclick="check(this, 1)">Hotel</button>
+                <button class="option-btn" onclick="check(this, 2)">Station</button>
+            </div>
+        </div>
+
+        <!-- Everyday English Matchings -->
+        <div class="question-item">
+            <span class="question-text">6. "Excuse me, is there a bank near here?"</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">It's about a three-minute walk.</button>
+                <button class="option-btn" onclick="check(this, 1)">There's one right next to the post office.</button>
+                <button class="option-btn" onclick="check(this, 2)">Take it easy!</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">7. "Excuse me, what's the time, please?"</span>
+            <div class="options" data-ans="2">
+                <button class="option-btn" onclick="check(this, 0)">It's fantastic!</button>
+                <button class="option-btn" onclick="check(this, 1)">Please! Hurry! It's really heavy.</button>
+                <button class="option-btn" onclick="check(this, 2)">It's twenty to three.</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">8. "Excuse me, how far is the library from here?"</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">It's about a three-minute walk.</button>
+                <button class="option-btn" onclick="check(this, 1)">There's one right next to the post office.</button>
+                <button class="option-btn" onclick="check(this, 2)">It's twenty to three.</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">9. "Can I give you a hand with that sofa?"</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">Take it easy!</button>
+                <button class="option-btn" onclick="check(this, 1)">Please! Hurry! It's really heavy.</button>
+                <button class="option-btn" onclick="check(this, 2)">It's fantastic!</button>
+            </div>
+        </div>
+
+        <div class="question-item">
+            <span class="question-text">10. "Let me show you around my new flat."</span>
+            <div class="options" data-ans="2">
+                <button class="option-btn" onclick="check(this, 0)">Take it easy!</button>
+                <button class="option-btn" onclick="check(this, 1)">There's one right next to the post office.</button>
+                <button class="option-btn" onclick="check(this, 2)">It's fantastic!</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="final-score">Your Score: <span id="points">0</span> / 10</div>
+    <button class="reset" onclick="location.reload()">Restart Quiz</button>
+</div>
+
+<script>
+    let score = 0;
+    let completed = 0;
+
+    function check(btn, idx) {
+        const parent = btn.parentElement;
+        if (parent.classList.contains('disabled')) return;
+
+        const correctIdx = parseInt(parent.getAttribute('data-ans'));
+        if (idx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            parent.children[correctIdx].classList.add('correct');
+        }
+
+        parent.classList.add('disabled');
+        completed++;
+        
+        if (completed === 10) {
+            document.getElementById('final-score').style.display = 'block';
+            document.getElementById('points').innerText = score;
+        }
+    }
+</script>
+
+</body>
+</html>
