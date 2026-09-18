@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMONG US: TWO-STEP ARTICLE QUEST</title>
+    <style>
+        :root {
+            --crew-blue: #225ee1;
+            --imp-red: #ea0606;
+            --task-green: #39fd32;
+            --ship-dark: #0d121a;
+            --white: #ffffff;
+            --btn-gray: #4e5d6a;
+        }
+
+        body {
+            background-color: var(--ship-dark);
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--white);
+            overflow: hidden;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 520px;
+            background: #1e2732;
+            border-radius: 15px;
+            border: 4px solid #3f484e;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .task-status { color: var(--task-green); font-weight: bold; font-family: monospace; border: 1px solid var(--task-green); padding: 5px 10px; }
+
+        .display-area {
+            background: #283341;
+            min-height: 180px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px solid #3f484e;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sentence-text { font-size: 1.4rem; margin-bottom: 20px; line-height: 1.6; font-weight: bold; }
+        .sentence-text span.active-gap { color: #ff9100; text-decoration: underline; }
+        
+        .word-builder { 
+            background: #000; 
+            padding: 12px; 
+            border-radius: 8px; 
+            min-height: 45px; 
+            font-size: 1.8rem; 
+            letter-spacing: 5px; 
+            color: var(--task-green);
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .letter-grid { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; min-height: 60px; }
+
+        .btn-letter {
+            background: var(--crew-blue);
+            border: none;
+            border-bottom: 4px solid #163da1;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-letter:active { transform: translateY(2px); border-bottom: 2px solid #163da1; }
+        
+        .controls { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-control { flex: 1; padding: 12px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 1rem; }
+        .reset-btn { background: var(--imp-red); color: white; }
+
+        #total-progress { width: 100%; height: 20px; background: #000; border: 1px solid #3f484e; border-radius: 5px; margin-top: 25px; overflow: hidden; }
+        #progress-fill { width: 0%; height: 100%; background: var(--task-green); transition: 0.4s; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div style="font-weight: bold; letter-spacing: 1px;">DOUBLE SABOTAGE!</div>
+            <div class="task-status">ROOM: <span id="done-count">1</span>/5</div>
+        </div>
+
+        <div class="display-area">
+            <div class="sentence-text" id="sentence-box">Loading...</div>
+            <div class="word-builder" id="user-word"></div>
+        </div>
+
+        <div class="letter-grid" id="letter-box"></div>
+        
+        <div class="controls">
+            <button class="btn-control reset-btn" onclick="resetWord()">Clear ❌</button>
+        </div>
+
+        <div id="total-progress"><div id="progress-fill"></div></div>
+    </div>
+
+    <div id="win-screen">
+        <h1 style="color: var(--task-green); font-size: 36px; margin-bottom: 10px;">REACTOR FIXED! 🚀</h1>
+        <p style="font-size: 1.2rem;">You mastered advanced paired article links perfectly!</p>
+        <button class="btn-letter" onclick="location.reload()" style="width:100%; background: var(--task-green); border-bottom-color: #27ae60; margin-top: 25px;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let currentTask = 0;
+    let currentStep = 1; // 1 = first gap, 2 = second gap
+    let typedWord = "";
+    
+    // Каждое задание теперь объединяет два связанных предложения (A/An -> The)
+    const tasks = [
+        { 
+            q1: "I see (1)_____ dog.", ans1: "A", 
+            q2: "(2)_____ dog is angry.", ans2: "THE", 
+            icon: "🐶" 
+        },
+        { 
+            q1: "She has (1)_____ apple.", ans1: "AN", 
+            q2: "(2)_____ apple is red.", ans2: "THE", 
+            icon: "🍎" 
+        },
+        { 
+            q1: "There is (1)_____ book.", ans1: "A", 
+            q2: "(2)_____ book is big.", ans2: "THE", 
+            icon: "📖" 
+        },
+        { 
+            q1: "He buys (1)_____ orange.", ans1: "AN", 
+            q2: "(2)_____ orange is sweet.", ans2: "THE", 
+            icon: "🍊" 
+        },
+        { 
+            q1: "We find (1)_____ box.", ans1: "A", 
+            q2: "(2)_____ box is heavy.", ans2: "THE", 
+            icon: "📦" 
+        }
+    ];
+
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function loadTask() {
+        const t = tasks[currentTask];
+        typedWord = "";
+        document.getElementById('user-word').innerText = "";
+        document.getElementById('done-count').innerText = currentTask + 1;
+        
+        let sentenceHTML = `<span style="font-size: 3rem; display:block; margin-bottom:10px;">${t.icon}</span>`;
+        
+        if (currentStep === 1) {
+            sentenceHTML += `<p><span class="active-gap">_____(1)</span> dog.</p><p style="opacity:0.3;">_____(2) dog is angry.</p>`;
+            sentenceHTML = sentenceHTML.replace("dog", t.q1.split("_____ ")[1]);
+            sentenceHTML = sentenceHTML.replace("dog is angry", t.q2.replace("(2)_____ ", ""));
+        } else {
+            sentenceHTML += `<p style="color:var(--task-green);">${t.q1.replace("(1)_____", t.ans1)}</p><p><span class="active-gap">_____(2)</span> ${t.q2.replace("(2)_____ ", "")}</p>`;
+        }
+        
+        document.getElementById('sentence-box').innerHTML = sentenceHTML;
+        
+        const letterBox = document.getElementById('letter-box');
+        letterBox.innerHTML = '';
+        
+        const currentAns = currentStep === 1 ? t.ans1 : t.ans2;
+        const letters = shuffle(currentAns.split(''));
+        
+        letters.forEach(char => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-letter';
+            btn.innerText = char;
+            btn.onclick = () => addLetter(char, btn);
+            letterBox.appendChild(btn);
+        });
+
+        document.getElementById('progress-fill').style.width = (((currentTask * 2) + (currentStep - 1)) / (tasks.length * 2) * 100) + '%';
+    }
+
+    function addLetter(char, btn) {
+        typedWord += char;
+        document.getElementById('user-word').innerText = typedWord;
+        btn.style.visibility = "hidden";
+        
+        const t = tasks[currentTask];
+        const currentAns = currentStep === 1 ? t.ans1 : t.ans2;
+        
+        if (typedWord.length === currentAns.length) {
+            if (typedWord === currentAns) {
+                if (currentStep === 1) {
+                    setTimeout(() => {
+                        currentStep = 2;
+                        loadTask();
+                    }, 500);
+                } else {
+                    setTimeout(nextLevel, 500);
+                }
+            } else {
+                document.getElementById('user-word').style.color = 'var(--imp-red)';
+                setTimeout(() => {
+                    document.getElementById('user-word').style.color = 'var(--task-green)';
+                    resetWord();
+                }, 600);
+            }
+        }
+    }
+
+    function resetWord() {
+        typedWord = "";
+        document.getElementById('user-word').innerText = "";
+        const buttons = document.querySelectorAll('.btn-letter');
+        buttons.forEach(b => b.style.visibility = "visible");
+    }
+
+    function nextLevel() {
+        currentTask++;
+        currentStep = 1;
+        if (currentTask < tasks.length) {
+            loadTask();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            showWin();
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-area').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+    }
+
+    loadTask();
+</script>
+</body>
+</html>

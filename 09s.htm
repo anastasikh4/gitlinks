@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starter Unit: What's This? Puzzle Lab</title>
+    <style>
+        :root {
+            --sky-blue: #3498db;
+            --ocean-blue: #2980b9; 
+            --apple-red: #e74c3c;
+            --grass-green: #2ecc71;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            background: #e0f7fa;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* --- THE VOCABULARY REFERENCE TABLE --- */
+        .reference-table {
+            background: white;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 650px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 4px solid var(--sky-blue);
+        }
+
+        .reference-table th {
+            background: var(--sky-blue);
+            color: white;
+            padding: 10px;
+            font-size: 1rem;
+        }
+
+        .reference-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #eee;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .name-cell { font-weight: bold; text-align: left !important; background: #f9f9f9; color: var(--text-dark); }
+
+        /* --- THE GAME STYLE --- */
+        #game-frame {
+            background: #ffffff;
+            width: 95%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 35px;
+            text-align: center;
+            border: 6px solid var(--sky-blue);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .level-badge { background: #e1f5fe; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: var(--sky-blue); }
+        .score-badge { background: #fff176; color: #f57f17; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+
+        .hero-emoji { font-size: 5rem; margin: 10px 0; }
+        
+        .sentence-box {
+            background: #fff9e6;
+            padding: 25px;
+            border-radius: 25px;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            border: 3px dashed #ffd54f;
+            color: var(--text-dark);
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 90px;
+            border-bottom: 3px solid var(--ocean-blue);
+            color: var(--ocean-blue);
+            font-weight: 900;
+        }
+
+        .options { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .option-btn {
+            background: white;
+            border: 3px solid #eee;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .option-btn:hover:not(.disabled) { border-color: var(--sky-blue); background: #f1f9ff; }
+        .option-btn.correct { background: var(--grass-green) !important; color: white !important; border-color: var(--grass-green) !important; }
+        .option-btn.wrong { background: var(--apple-red) !important; color: white !important; border-color: var(--apple-red) !important; }
+        .option-btn.disabled { opacity: 0.6; cursor: not-allowed; }
+
+        #win-screen { display: none; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--ocean-blue); margin-top: 0;">📋 Picture Dictionary</h2>
+    
+    <table class="reference-table">
+        <thead>
+            <tr>
+                <th>Word Link</th>
+                <th>Object</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- One row per object, with both arrows (no words "this"/"that") -->
+            <tr>
+                <td style="line-height: 1.8;">
+             
+                    <span style="font-size: 1.6rem;">⇢</span>
+                </td>
+                <td>👝</td>
+            </tr>
+            <tr>
+                <td style="line-height: 1.8;">
+  
+                    <span style="font-size: 1.6rem;">--------></span>
+                </td>
+                <td>📏</td>
+            </tr>
+            <tr>
+                <td style="line-height: 1.8;">
+       
+                    <span style="font-size: 1.6rem;">---------></span>
+                </td>
+                <td>☂️</td>
+            </tr>
+            <tr>
+                <td style="line-height: 1.8;">
+  
+                    <span style="font-size: 1.6rem;">⇢</span>
+                </td>
+                <td>🍎</td>
+            </tr>
+            <tr>
+                <td style="line-height: 1.8;">
+ 
+                    <span style="font-size: 1.6rem;">⇢</span>
+                </td>
+                <td>🛩️</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="game-frame">
+        <div id="play-screen">
+            <div class="header">
+                <div class="level-badge">Puzzle <span id="lvl-num">1</span>/5</div>
+                <div class="score-badge">Stars: <span id="score">0</span></div>
+            </div>
+
+            <div id="char-display" style="font-size: 1.5rem; font-weight: bold; color: var(--sky-blue);">Find the words!</div>
+            <div class="hero-emoji" id="hero">👝</div>
+            <div class="sentence-box" id="sentence"></div>
+            <div class="options" id="options"></div>
+        </div>
+
+        <div id="win-screen">
+            <h1 style="color: var(--grass-green);">✨ Marvellous! ✨</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dark);">You completed all the missing puzzle pairs perfectly!</p>
+            <button onclick="location.reload()" style="padding:15px 35px; border-radius:30px; cursor:pointer; background: var(--sky-blue); color:white; border:none; font-weight:bold; font-size: 1.1rem; box-shadow: 0 4px 0 var(--ocean-blue);">Play Again</button>
+        </div>
+    </div>
+
+<script>
+    // Раунды полностью адаптированы под картинку (Вопросы-пазлы 1-5) 
+    // Каждый пункт содержит по 2 связанных шага (A/An -> The / This -> Object)
+    const missions = [
+        {
+            name: "Puzzle 1", hero: "👝",
+            steps: [
+                { text: "What's <span class='gap' id='g1'>___</span>?<br>It's a pencil case.", ans: "this", options: ["this", "that", "is", "are"] },
+                { text: "What's this?<br>It's <span class='gap' id='g2'>___</span> pencil case.", ans: "a", options: ["a", "an", "the", "two"] }
+            ]
+        },
+        {
+            name: "Puzzle 2", hero: "📏",
+            steps: [
+                { text: "What's <span class='gap' id='g1'>___</span>?<br>It's a ruler.", ans: "that", options: ["that", "they", "an", "is"] },
+                { text: "What's that?<br>It's a <span class='gap' id='g2'>___</span>.", ans: "ruler", options: ["ruler", "rubber", "sharpener", "book"] }
+            ]
+        },
+        {
+            name: "Puzzle 3", hero: "☂️",
+            steps: [
+                { text: "What's <span class='gap' id='g1'>___</span>?<br>It's an umbrella.", ans: "that", options: ["that", "these", "it", "are"] },
+                { text: "What's that?<br>It's <span class='gap' id='g2'>___</span> umbrella.", ans: "an", options: ["a", "an", "the", "three"] }
+            ]
+        },
+        {
+            name: "Puzzle 4", hero: "🍎",
+            steps: [
+                { text: "What's <span class='gap' id='g1'>___</span>?<br>It's an apple.", ans: "this", options: ["this", "that", "is", "they"] },
+                { text: "What's this?<br>It's <span class='gap' id='g2'>___</span> apple.", ans: "an", options: ["a", "an", "the", "four"] }
+            ]
+        },
+        {
+            name: "Puzzle 5", hero: "🛩️",
+            steps: [
+                { text: "What's <span class='gap' id='g1'>___</span>?<br>It's an aeroplane.", ans: "this", options: ["this", "these", "am", "are"] },
+                { text: "What's this?<br>It's <span class='gap' id='g2'>___</span> aeroplane.", ans: "an", options: ["a", "an", "the", "five"] }
+            ]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentStep = 0;
+    let score = 0;
+
+    function loadLevel() {
+        if (currentLevel >= missions.length) {
+            document.getElementById('play-screen').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+            return;
+        }
+
+        const m = missions[currentLevel];
+        const stepData = m.steps[currentStep];
+        
+        document.getElementById('lvl-num').innerText = currentLevel + 1;
+        document.getElementById('char-display').innerText = m.name;
+        document.getElementById('hero').innerText = m.hero;
+        document.getElementById('sentence').innerHTML = stepData.text;
+        
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        
+        // Перемешивание вариантов ответов
+        const shuffledOptions = [...stepData.options].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleChoice(btn, opt, stepData.ans);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function handleChoice(btn, selected, correct) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score += 10;
+            document.getElementById('score').innerText = score;
+            
+            setTimeout(() => {
+                if (currentStep === 0) {
+                    currentStep = 1;
+                    loadLevel();
+                } else {
+                    currentLevel++;
+                    currentStep = 0;
+                    loadLevel();
+                }
+            }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText === correct) {
+                    b.classList.add('correct');
+                }
+            });
+
+            setTimeout(() => {
+                buttons.forEach(b => b.classList.remove('disabled', 'wrong', 'correct'));
+            }, 1200);
+        }
+    }
+
+    loadLevel();
+</script>
+</body>
+</html>
