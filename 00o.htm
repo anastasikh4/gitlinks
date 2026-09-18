@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dante's 7-Stage Data Scan Lab</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --combat-red: #d32f2f;
+            --terminal-green: #00ff41;
+            --hud-bg: #0c0c0c;
+            --metal: #bdc3c7;
+            --gold: #ffd700;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: #000; color: var(--metal); padding: 20px; }
+        .hud-container { max-width: 800px; margin: 0 auto; border: 4px solid var(--combat-red); background: var(--hud-bg); padding: 25px; border-radius: 10px; box-shadow: inset 0 0 15px var(--combat-red); }
+        
+        /* Progress Bar */
+        .progress-container { background: #222; border: 2px solid var(--metal); height: 20px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; }
+        #progress-fill { height: 100%; width: 0%; background: var(--terminal-green); transition: 0.5s ease; box-shadow: 0 0 10px var(--terminal-green); }
+
+        h1 { font-family: 'Press Start 2P', cursive; color: var(--combat-red); font-size: 1rem; text-align: center; margin-bottom: 25px; line-height: 1.5; }
+        .mission-panel { border: 2px solid #333; margin-bottom: 25px; padding: 20px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); }
+        .mission-img { width: 100%; height: 280px; object-fit: cover; border: 1px solid var(--metal); margin-bottom: 15px; border-radius: 6px; }
+        .question-block { margin-bottom: 15px; }
+        .question-block:last-child { margin-bottom: 0; }
+        .question-text { font-weight: bold; margin-bottom: 10px; color: var(--terminal-green); font-size: 0.95rem; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .opt-btn {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: var(--metal);
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        .opt-btn:hover:not(.disabled) { background: #262626; border-color: var(--terminal-green); }
+
+        .opt-btn.correct { background: var(--terminal-green) !important; color: #000 !important; font-weight: bold; border-color: var(--terminal-green) !important; }
+        .opt-btn.incorrect { background: var(--combat-red) !important; color: #fff !important; animation: shake 0.3s; border-color: var(--combat-red) !important; }
+        .disabled { pointer-events: none; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .badge-slot { text-align: center; font-family: 'Press Start 2P'; font-size: 0.7rem; color: var(--gold); margin-top: 20px; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+<div class="hud-container">
+    <h1>[ MISSION: 7-STAGE DATA SCAN ]</h1>
+
+    <div class="progress-container">
+        <div id="progress-fill"></div>
+    </div>
+
+    <!-- MISSION 1: PAST TENSE -->
+    <div class="mission-panel">
+        <img src="https://i.pinimg.com/originals/85/7d/e8/857de8fd18fbbd9a0045f518abfd812a.jpg" class="mission-img" alt="Past scene">
+        <div class="question-block">
+            <p class="question-text">1. Yesterday there ____ three formula cars prepared in the garage zone area.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 1)">A) was</button>
+                <button class="opt-btn" onclick="check(this, true, 1)">B) were</button>
+            </div>
+        </div>
+        <div class="question-block" style="margin-top:15px;">
+            <p class="question-text">2. Complete the past description: Yesterday at quarter past twelve, all the cars ____ inside.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 2)">A) were</button>
+                <button class="opt-btn" onclick="check(this, false, 2)">B) are</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION 2: FUTURE TENSE -->
+    <div class="mission-panel">
+        <img src="https://ur2h9smi.turpal.com/media/hzbtAMF8A5NFvAU7ZSE3PzfZIXlBfAysA70WBZET.webp" class="mission-img" alt="Future scene">
+        <div class="question-block">
+            <p class="question-text">3. Tomorrow the driver ____ walk near the tracking grid checkpoint.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 3)">A) won't</button>
+                <button class="opt-btn" onclick="check(this, true, 3)">B) will</button>
+            </div>
+        </div>
+        <div class="question-block" style="margin-top:15px;">
+            <p class="question-text">4. The team ____ stay inside next to the garage.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 4)">A) won't</button>
+                <button class="opt-btn" onclick="check(this, false, 4)">B) will</button>
+            </div>
+        </div>
+        <div class="question-block" style="margin-top:15px;">
+            <p class="question-text">5. Tomorrow at twenty to six, the car ____ be  opposite the garage.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 5)">A) are</button>
+                <button class="opt-btn" onclick="check(this, true, 5)">B) will</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION 3: PRESENT TENSE -->
+    <div class="mission-panel">
+        <img src="https://avatars.mds.yandex.net/i?id=24be3ddfe830d357e1a22c58b2d7fc9fc7e1fd1d-10132637-images-thumbs&n=13" class="mission-img" alt="Present scene">
+        <div class="question-block">
+            <p class="question-text">6. He usually ____ many beautiful yellow flowers behind and in front of him.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 6)">A) seeing</button>
+                <button class="opt-btn" onclick="check(this, true, 6)">B) sees</button>
+            </div>
+        </div>
+        <div class="question-block" style="margin-top:15px;">
+            <p class="question-text">7. Look behind! At half past three, the driver ____ watching the flowers everywhere.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 7)">A) are</button>
+                <button class="opt-btn" onclick="check(this, true, 7)">B) is</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-slot">STATUS: <span id="rank">INITIATE</span></div>
+</div>
+
+<script>
+    let correctCount = 0;
+    const answeredQuestions = new Set();
+
+    function check(btn, isCorrect, qId) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('.opt-btn');
+        
+        if (isCorrect) {
+            btn.classList.add('correct');
+            buttons.forEach(b => b.classList.add('disabled'));
+            if (!answeredQuestions.has(qId)) {
+                answeredQuestions.add(qId);
+                correctCount++;
+                updateProgress();
+            }
+        } else {
+            btn.classList.add('incorrect');
+            setTimeout(() => {
+                btn.classList.remove('incorrect');
+            }, 500);
+        }
+    }
+
+    function updateProgress() {
+        const progress = (correctCount / 7) * 100;
+        document.getElementById('progress-fill').style.width = progress + "%";
+        
+        if (correctCount === 7) {
+            document.getElementById('rank').innerText = "ELITE COMMANDER";
+        } else if (correctCount >= 4) {
+            document.getElementById('rank').innerText = "VETERAN AGENT";
+        }
+    }
+</script>
+
+</body>
+</html>

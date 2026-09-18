@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn English: Days at the Track</title>
+    <style>
+        :root {
+            --primary: #ff8700;
+            --primary-dark: #cc6000;
+            --secondary: #1cb0f6;
+            --error: #ff4b4b;
+            --text: #1e293b;
+            --gray: #e2e8f0;
+            --navy: #0b1426;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 10px 0px var(--gray);
+            text-align: center;
+            border: 2px solid var(--gray);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--gray);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        h1 { font-size: 24px; color: var(--navy); margin-bottom: 10px; font-weight: 800; }
+        .subtitle { color: #64748b; font-size: 14px; margin-bottom: 20px; font-weight: 600; }
+        .level-container { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .card {
+            padding: 20px 10px;
+            border: 2px solid var(--gray);
+            border-bottom: 5px solid var(--gray);
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.1s;
+            background: #f8fafc;
+            color: var(--navy);
+        }
+
+        .card.selected { border-color: var(--secondary); background: #e0f2fe; color: #0369a1; }
+        .card.matched { opacity: 0.3; cursor: default; background: #f1f5f9; border-bottom-width: 2px; }
+
+        .visual-hint { font-size: 70px; margin: 15px 0; }
+        .btn-grid { display: grid; gap: 12px; }
+        .option-btn {
+            padding: 16px;
+            border: 2px solid var(--gray);
+            border-bottom: 5px solid var(--gray);
+            border-radius: 16px;
+            background: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            text-align: left;
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .option-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+        .correct { background: #d7ffb8 !important; border-color: var(--primary) !important; color: var(--primary-dark) !important; }
+        .wrong { background: #ffdfe0 !important; border-color: var(--error) !important; color: var(--error) !important; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <h1 id="theme-title">Calendar at the Race Track</h1>
+    <div class="subtitle">Days of the Week &amp; Race Telemetry</div>
+
+    <!-- Level 1: Matching prepositions -->
+    <div id="level1" class="level-container active">
+        <p style="font-weight: 600; margin-bottom: 15px;">
+            Match the pairs:<br>
+            <strong>in + the morning · at + half past two · on + Thursday · under + table</strong><br>
+            <span style="font-size:14px; color:#64748b;">(4 pairs — 4 cars)</span>
+        </p>
+        <div id="card-grid" class="grid"></div>
+    </div>
+
+    <!-- Level 2 -->
+    <div id="level2" class="level-container">
+        <p style="font-weight: 600; margin-bottom: 15px;">Build the correct telemetry report:</p>
+        <div id="l2-emoji" class="visual-hint">🏎️</div>
+        <div id="l2-options" class="btn-grid"></div>
+    </div>
+
+    <!-- Level 3 -->
+    <div id="level3" class="level-container">
+        <p style="font-weight: 600; margin-bottom: 15px;">Read the radio message and find the correct day:</p>
+        <div id="l3-text-prompt" style="font-size: 18px; font-weight: bold; color: var(--navy); background: #f8fafc; padding: 20px; border-radius: 16px; border: 2px dashed var(--secondary); margin-bottom: 20px;"></div>
+        <div id="l3-options" class="grid"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="level-container">
+        <div class="visual-hint">🏆</div>
+        <h2 style="color: var(--navy); font-weight: 800;">Race Finished!</h2>
+        <p id="final-score" style="font-weight: 600; color: #475569;"></p>
+        <button class="option-btn" style="width:100%; background: var(--primary); color:white; text-align:center; border-color: var(--primary-dark);" onclick="location.reload()">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // --- DATA ---
+
+    // Level 1: 4 pairs (4 cars) — prepositions + phrases
+    const level1Data = [
+        { text: 'in', match: 'p1' },
+        { text: 'the morning', match: 'p1' },
+
+        { text: 'at', match: 'p2' },
+        { text: 'half past two', match: 'p2' },
+
+        { text: 'on', match: 'p3' },
+        { text: 'Thursday', match: 'p3' },
+
+        { text: 'under', match: 'p4' },
+        { text: 'table', match: 'p4' }
+    ];
+
+    // Level 2
+    const questions2 = [
+        { hint: '📅 MON', correct: 'Monday is the first day', options: ['Monday is the first day', 'Monday is a relax day.', 'Monday is a party day.'] },
+        { hint: '🏆 FRI', correct: 'He won a cup on Friday afternoon.', options: ['He won a cup on Friday afternoon.', 'He won a cup at Friday.', 'He won a cup in Friday.'] },
+        { hint: '🏎️ SAT', correct: 'He went on the track on Saturday afternoon.', options: ['He drove on the track on Saturday afternoon.', 'He drive on the track on Monday.', 'He drove on Sunday.'] },
+        { hint: '📰 TUE', correct: 'They sometimes read newspapers on Tuesdays at work.', options: ['They sometimes read newspapers on Tuesdays at work.', 'They usually works with cars on Tuesdays.', 'Tuesdays are for Halloween.'] }
+    ];
+
+    // Level 3
+    const questions3 = [
+        { sentence: "The mechanics need to examine the engine and the car in the flat on ______.", correct: "Friday", options: ["November", "Friday", "Two o'clock", "Table"] },
+        { sentence: "He usually works with his engineers on _______.", correct: "Monday", options: ["Monday", "Night", "Evening", "Week"] },
+        { sentence: "They sometimes read newspapers at________.", correct: "half past two", options: ["Monday", "Friday", "half past two", "September"] }
+    ];
+
+    // --- LOGIC ---
+    let selectedCards = [];
+    let l2Idx = 0;
+    let l3Idx = 0;
+
+    function initL1() {
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        [...level1Data].sort(() => Math.random() - 0.5).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerText = item.text;
+            div.onclick = () => handleCardClick(div, item);
+            grid.appendChild(div);
+        });
+        updateProgressBar(0);
+    }
+
+    function handleCardClick(div, item) {
+        if (div.classList.contains('matched') || selectedCards.some(c => c.div === div)) return;
+        div.classList.add('selected');
+        selectedCards.push({ div, item });
+
+        if (selectedCards.length === 2) {
+            if (selectedCards[0].item.match === selectedCards[1].item.match) {
+                setTimeout(() => {
+                    selectedCards.forEach(c => {
+                        c.div.classList.remove('selected');
+                        c.div.classList.add('matched');
+                        c.div.onclick = null;
+                    });
+                    selectedCards = [];
+                    checkL1End();
+                }, 400);
+            } else {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.div.classList.remove('selected'));
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+    }
+
+    function checkL1End() {
+        const matched = document.querySelectorAll('.card.matched').length;
+        updateProgressBar((matched / level1Data.length) * 33);
+        if (matched === level1Data.length) {
+            setTimeout(() => goToLevel(2), 500);
+        }
+    }
+
+    function initL2() {
+        const q = questions2[l2Idx];
+        document.getElementById('l2-emoji').innerText = q.hint;
+        const optionsDiv = document.getElementById('l2-options');
+        optionsDiv.innerHTML = '';
+
+        [...q.options].sort(() => Math.random() - 0.5).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const allBtns = optionsDiv.querySelectorAll('.option-btn');
+                allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+                if (opt === q.correct) {
+                    btn.classList.add('correct');
+                    setTimeout(() => {
+                        l2Idx++;
+                        updateProgressBar(33 + (l2Idx / questions2.length) * 33);
+                        if (l2Idx < questions2.length) initL2();
+                        else goToLevel(3);
+                    }, 1000);
+                } else {
+                    btn.classList.add('wrong');
+                    allBtns.forEach(b => {
+                        if (b.innerText === q.correct) b.classList.add('correct');
+                    });
+                    setTimeout(() => {
+                        l2Idx++;
+                        updateProgressBar(33 + (l2Idx / questions2.length) * 33);
+                        if (l2Idx < questions2.length) initL2();
+                        else goToLevel(3);
+                    }, 1800);
+                }
+            };
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function initL3() {
+        const q = questions3[l3Idx];
+        document.getElementById('l3-text-prompt').innerText = q.sentence;
+        const optionsDiv = document.getElementById('l3-options');
+        optionsDiv.innerHTML = '';
+
+        [...q.options].sort(() => Math.random() - 0.5).forEach(opt => {
+            const btn = document.createElement('div');
+            btn.className = 'card';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const allCards = optionsDiv.querySelectorAll('.card');
+                allCards.forEach(c => c.style.pointerEvents = 'none');
+
+                if (opt === q.correct) {
+                    btn.classList.add('selected');
+                    btn.style.borderColor = 'var(--primary)';
+                    btn.style.background = '#d7ffb8';
+                    setTimeout(() => {
+                        l3Idx++;
+                        updateProgressBar(66 + (l3Idx / questions3.length) * 34);
+                        if (l3Idx < questions3.length) initL3();
+                        else showFinalResults();
+                    }, 1000);
+                } else {
+                    btn.style.borderColor = 'var(--error)';
+                    btn.style.background = '#ffdfe0';
+                    allCards.forEach(c => {
+                        if (c.innerText === q.correct) {
+                            c.style.borderColor = 'var(--primary)';
+                            c.style.background = '#d7ffb8';
+                        }
+                    });
+                    setTimeout(() => {
+                        l3Idx++;
+                        updateProgressBar(66 + (l3Idx / questions3.length) * 34);
+                        if (l3Idx < questions3.length) initL3();
+                        else showFinalResults();
+                    }, 1800);
+                }
+            };
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function goToLevel(lvl) {
+        document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+        if (lvl === 2) {
+            document.getElementById('theme-title').innerText = "Building Reports";
+            document.getElementById('level2').classList.add('active');
+            initL2();
+        } else if (lvl === 3) {
+            document.getElementById('theme-title').innerText = "Radio Analysis";
+            document.getElementById('level3').classList.add('active');
+            initL3();
+        }
+    }
+
+    function updateProgressBar(percentage) {
+        document.getElementById('progress-fill').style.width = percentage + '%';
+    }
+
+    function showFinalResults() {
+        document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+        document.getElementById('theme-title').style.display = "none";
+        document.querySelector('.subtitle').style.display = "none";
+        document.getElementById('result').classList.add('active');
+        document.getElementById('final-score').innerText = "All checkpoints passed! You are great at the track schedule.";
+        updateProgressBar(100);
+    }
+
+    initL1();
+</script>
+</body>
+</html>

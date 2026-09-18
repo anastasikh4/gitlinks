@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MISSION: RACE TRACK SENTENCE BUILDER</title>
+    <style>
+        :root {
+            /* Colors sampled from Racing / McLaren & Red Bull paddock color codes */
+            --neon-orange: #ff8700;
+            --deep-navy: #0b1426;
+            --cyber-blue: #00d4ff;
+            --panel-bg: rgba(11, 20, 38, 0.95);
+            --text-glow: #e2e8f0;
+            --correct-green: #10b981;
+            --wrong-red: #ef4444;
+        }
+
+        body { 
+            font-family: 'Segoe UI', -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #0b1426 0%, #050a14 100%);
+            color: var(--text-glow); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0;
+            padding: 20px;
+        }
+
+        .scanner-card { 
+            background: var(--panel-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 3px solid var(--neon-orange); 
+            max-width: 800px; 
+            width: 100%;
+            box-shadow: 0 0 30px rgba(255,135,0,0.2);
+        }
+
+        .hud-top { 
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.9rem; font-weight: bold; color: var(--cyber-blue);
+            border-bottom: 2px solid var(--neon-orange); margin-bottom: 25px; padding-bottom: 10px;
+            text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .hud-top .phase { color: var(--neon-orange); }
+
+        /* Grid Layout for Rows matching the image structure */
+        .racing-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+            align-items: center;
+            background: rgba(255,255,255,0.02);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 650px) {
+            .racing-row { grid-template-columns: 1fr; }
+        }
+
+        .row-img { 
+            width: 100%; border-radius: 8px; 
+            border: 2px solid var(--cyber-blue);
+            box-shadow: 0 0 15px rgba(0,212,255,0.2);
+            object-fit: cover;
+            height: 120px;
+        }
+
+        .sentence-constructor {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .sub-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sign-badge {
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+
+        .select-box {
+            background: #1e293b;
+            color: #fff;
+            border: 2px solid var(--cyber-blue);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        .select-box:focus { 
+            border-color: var(--neon-orange); 
+            box-shadow: 0 0 10px var(--neon-orange); 
+        }
+
+        /* Result Verification Elements */
+        .btn-execute { 
+            background: linear-gradient(45deg, var(--neon-orange), #ff6a00); 
+            color: #fff; border: none; 
+            padding: 16px 30px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; width: 100%; letter-spacing: 2px; 
+            font-size: 1.1rem; transition: 0.3s; border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(255,135,0,0.3);
+            margin-top: 15px;
+        }
+
+        .btn-execute:hover { 
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        #status-report { 
+            margin-top: 25px; text-align: center; font-weight: bold; 
+            color: #fff; display: none; 
+            padding: 20px; border-radius: 12px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="scanner-card">
+    <div class="hud-top">
+        <span>Paddock Grammar Analyzer</span>
+        <span>Status: <span class="phase">A2-B1 Target Sync</span></span>
+    </div>
+
+    <!-- ROW 1: McLAREN PADDOCK (Present Continuous vs Present Simple) -->
+    <div class="racing-row">
+        <img src="https://cdn-3.motorsport.com/images/amp/YMdpnqL2/s6/gianpiero-lambiase-red-bull-ra.jpg" class="row-img" alt="McLaren Paddock team talking">
+        <div class="sentence-constructor">
+            <div class="sub-row">
+                <span class="sign-badge">+</span>
+                <span>They are</span>
+                <select class="select-box" id="r1-pos1">
+                    <option value="">-- select --</option>
+                    <option value="sitting">sitting</option>
+                    <option value="stading">stading</option>
+                </select>
+                <span>next</span>
+                <select class="select-box" id="r1-pos2">
+                    <option value="">-- select --</option>
+                    <option value="to a">to a</option>
+                    <option value="under">under</option>
+                </select>
+                <span>worker's desk</span>
+            </div>
+            <div class="sub-row">
+                <span class="sign-badge">-</span>
+                <span>They aren't</span>
+                <select class="select-box" id="r1-neg1">
+                    <option value="">-- select --</option>
+                    <option value="sitting">sitting</option>
+                    <option value="stading">stading</option>
+                </select>
+                <select class="select-box" id="r1-neg2">
+                    <option value="">-- select --</option>
+                    <option value="under">under</option>
+                    <option value="the trees">next to</option>
+                </select>
+                <span>the people right now.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 2: MAX VERSTAPPEN KARTING (Past Simple: There was/were vs didn't) -->
+    <div class="racing-row">
+        <img src="https://imageio.forbes.com/specials-images/imageserve/66d76d3ae4a538b642fe9480/0x0.jpg?format=jpg&amp;height=600&amp;width=1200&amp;fit=bounds" class="row-img" alt="Max Verstappen kart racing">
+        <div class="sentence-constructor">
+            <div class="sub-row">
+                <span class="sign-badge">+</span>
+                <span>Yesterday there were</span>
+                <select class="select-box" id="r2-pos1">
+                    <option value="">-- select --</option>
+                    <option value="many people">many people</option>
+                    <option value="look behind">look behind</option>
+                </select>
+                <select class="select-box" id="r2-pos2">
+                    <option value="">-- select --</option>
+                    <option value="behind Max">behind Max</option>
+                    <option value="look behind">look behind</option>
+                </select>
+                <span>watching.</span>
+            </div>
+            <div class="sub-row">
+                <span class="sign-badge">-</span>
+                <span>Max didn't</span>
+                <select class="select-box" id="r2-neg1">
+                    <option value="">-- select --</option>
+                    <option value="look behind">look behind</option>
+                    <option value="behind Max">behind Max</option>
+                </select>
+                <span>but in front of him.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROW 3: MONACO TRACK FLATS (Future Simple: Will vs Won't) -->
+    <div class="racing-row">
+        <img src="https://avatars.mds.yandex.net/i?id=1c99004a5210a40ad37c9ce6f7a25aeea07f45aa-16891649-images-thumbs&n=13" class="row-img" alt="Monaco grand prix block of flats track corner">
+        <div class="sentence-constructor">
+            <div class="sub-row">
+                <span class="sign-badge">+</span>
+                <span>Tomorrow a driver</span>
+                <select class="select-box" id="r3-pos1">
+                    <option value="">-- select --</option>
+                    <option value="will be">will be</option>
+                    <option value="won't">won't</option>
+                </select>
+                <select class="select-box" id="r3-pos2">
+                    <option value="">-- select --</option>
+                    <option value="opposite">next to</option>
+                    <option value="stay outside">stay outside</option>
+                </select>
+                <span>the block of flats.</span>
+            </div>
+            <div class="sub-row">
+                <span class="sign-badge">-</span>
+                <span>A driver won't</span>
+                <select class="select-box" id="r3-neg1">
+                    <option value="">-- select --</option>
+                    <option value="stay outside">stay outside</option>
+                    <option value="will be">will be</option>
+                </select>
+                <select class="select-box" id="r3-neg2">
+                    <option value="">-- select --</option>
+                    <option value="next to the garage">next to the garage</option>
+                    <option value="opposite">opposite</option>
+                </select>
+                <span>long.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Control Switch Console -->
+    <button class="btn-execute" onclick="validateCircuitTrack()">Verify Syntax telemetry</button>
+    <div id="status-report">Report window panel ready...</div>
+</div>
+
+<script>
+    function validateCircuitTrack() {
+        // Collect exact structural answer combinations
+        const checks = {
+            r1p1: document.getElementById('r1-pos1').value === 'sitting',
+            r1p2: document.getElementById('r1-pos2').value === 'to a',
+            r1n1: document.getElementById('r1-neg1').value === 'stading',
+            r1n2: document.getElementById('r1-neg2').value === 'under',
+            r2p1: document.getElementById('r2-pos1').value === 'many people',
+            r2p2: document.getElementById('r2-pos2').value === 'behind Max',
+            r2n1: document.getElementById('r2-neg1').value === 'look behind',
+            r3p1: document.getElementById('r3-pos1').value === 'will be',
+            r3p2: document.getElementById('r3-pos2').value === 'opposite',
+            r3n1: document.getElementById('r3-neg1').value === 'stay outside',
+            r3n2: document.getElementById('r3-neg2').value === 'next to the garage'
+        };
+
+        // Color coding loops for selector paths
+        Object.keys(checks).forEach(key => {
+            let elId = '';
+            if(key === 'r1p1') elId = 'r1-pos1';
+            if(key === 'r1p2') elId = 'r1-pos2';
+            if(key === 'r1n1') elId = 'r1-neg1';
+            if(key === 'r1n2') elId = 'r1-neg2';
+            if(key === 'r2p1') elId = 'r2-pos1';
+            if(key === 'r2p2') elId = 'r2-pos2';
+            if(key === 'r2n1') elId = 'r2-neg1';
+            if(key === 'r3p1') elId = 'r3-pos1';
+            if(key === 'r3p2') elId = 'r3-pos2';
+            if(key === 'r3n1') elId = 'r3-neg1';
+            if(key === 'r3n2') elId = 'r3-neg2';
+
+            const el = document.getElementById(elId);
+            if(checks[key]) {
+                el.style.borderColor = 'var(--correct-green)';
+                el.style.background = 'rgba(16,185,129,0.1)';
+            } else {
+                el.style.borderColor = 'var(--wrong-red)';
+                el.style.background = 'rgba(239,68,68,0.1)';
+            }
+        });
+
+        // Compute total correct combinations
+        const totalCorrect = Object.values(checks).filter(Boolean).length;
+        const report = document.getElementById('status-report');
+        report.style.display = 'block';
+
+        if(totalCorrect === 11) {
+            report.style.background = 'rgba(16,185,129,0.2)';
+            report.style.borderColor = 'var(--correct-green)';
+            report.innerText = '🏁 LAP COMPLETED PERFECTLY! Telemetry is green (11/11).';
+        } else {
+            report.style.background = 'rgba(239,68,68,0.2)';
+            report.style.borderColor = 'var(--wrong-red)';
+            report.innerText = `⚠️ CHECK DEFECTS FOUND. System matched ${totalCorrect} / 11 lines accurately.`;
+        }
+    }
+</script>
+</body>
+</html>
