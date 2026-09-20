@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Desk Detective: The Case of the Missing Supplies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #f4e7d3;
+            --ink: #2c3e50;
+            --folder: #d35400;
+            --green: #27ae60;
+            --red: #c0392b;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            background-color: #2c3e50;
+            color: var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background: #1a252f;
+            display: flex;
+            align-items: center;
+            border-bottom: 3px solid var(--folder);
+            box-sizing: border-box;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            height: 12px;
+            background: #34495e;
+            border-radius: 6px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--folder);
+            transition: width 0.4s ease;
+        }
+
+        .badge {
+            font-family: 'Special Elite', cursive;
+            color: #f1c40f;
+            font-size: 14px;
+        }
+
+        main {
+            width: 90%;
+            max-width: 500px;
+            background: var(--paper);
+            margin: 20px;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.3);
+            position: relative;
+            min-height: 450px;
+            box-sizing: border-box;
+        }
+
+        main::before {
+            content: "CONFIDENTIAL";
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border: 3px solid #e74c3c;
+            color: #e74c3c;
+            padding: 5px;
+            font-family: 'Special Elite', cursive;
+            transform: rotate(12deg);
+            opacity: 0.25;
+            font-size: 12px;
+        }
+
+        .instruction {
+            font-family: 'Special Elite', cursive;
+            text-transform: uppercase;
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #7f8c8d;
+            letter-spacing: 1px;
+        }
+
+        .question-box {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            color: #1a252f;
+        }
+
+        .question-box em {
+            color: #8e44ad;
+            font-style: normal;
+            font-weight: 800;
+        }
+
+        .clue-image {
+            font-size: 70px;
+            text-align: center;
+            display: block;
+            margin: 15px 0 25px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .evidence-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .evidence-item {
+            background: rgba(255,255,255,0.65);
+            border: 2px dashed #95a5a6;
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            text-align: left;
+            font-size: 16px;
+            transition: all 0.2s;
+            color: #2c3e50;
+            font-family: inherit;
+        }
+
+        .evidence-item:hover {
+            background: white;
+            border-style: solid;
+            border-color: var(--folder);
+            transform: translateY(-1px);
+        }
+
+        .correct {
+            background: #dff9fb !important;
+            border-color: var(--green) !important;
+            color: var(--green) !important;
+            border-style: solid !important;
+        }
+
+        .wrong {
+            background: #ffeaa7 !important;
+            border-color: var(--red) !important;
+            color: var(--red) !important;
+            border-style: solid !important;
+        }
+
+        .disabled {
+            pointer-events: none;
+        }
+
+        #case-status {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 25px;
+            display: none;
+            justify-content: center;
+            background: #1a252f;
+            color: white;
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .status-btn {
+            background: var(--folder);
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-weight: 800;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Special Elite', cursive;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+
+        .status-btn:hover {
+            background: #e67e22;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">AGENT ID: M-12</div>
+    <div class="progress-container"><div id="progress-fill"></div></div>
+    <div id="step-count" style="color:white; font-size:13px; font-weight: bold;">1/12</div>
+</header>
+
+<main id="case-file">
+    <!-- Automated Questions Injected Here -->
+</main>
+
+<div id="case-status">
+    <div style="max-width:500px; width:100%; display:flex; justify-content:space-between; align-items:center; gap:15px;">
+        <span id="feedback-txt" style="font-weight: 800; font-size: 15px; letter-spacing: 0.5px; flex:1;">Analyzing intelligence...</span>
+        <button class="status-btn" onclick="nextClue()">NEXT CLUE &gt;&gt;</button>
+    </div>
+</div>
+
+<script>
+    /* ======================================================
+       12 CASE FILES
+       ====================================================== */
+    const caseData = [
+        // Block 1: School objects
+        { q: "What's this?", a: "pencil case", options: ["pencil case", "pencil sharpener", "notebook", "coloured pencil"], icon: "👝" },
+        { q: " 'bindefkchairbeerdcpock'", a: "chair", options: ["chair", "sharpener", "scissors", "sandwich"], icon: "?" },
+        { q: "What's this?", a: "scissors", options: ["pencil", "scissors", "ruler", "rubber"], icon: "✂️" },
+
+        // Block 2: Articles a/an
+        { q: "What this?", a: "an apple", options: ["a apple", "an apple", "six apple"], icon: "🍎" },
+        { q: "What this?", a: "an egg", options: ["a egg", "an egg", "two egg"], icon: "🥚" },
+        { q: "What this?", a: "a sandwich", options: ["a sandwich", "an sandwich", "two sandwiches"], icon: "🥪" },
+
+        // Block 3: There is / There are
+        { q: "<br><em>'There are ________ sofas in the room.'</em>", a: "two", options: ["a", "an", "two"], icon: "🛋🛋️" },
+        { q: "'We have got two ________.'</em>", a: "oranges", options: ["orange", "oranges", "orangs"], icon: "🍊🍊" },
+        { q: "'________ new schoolboards in the school room.'</em>", a: "They're", options: ["It's", "They're", "There is"], icon: "️?" },
+
+        // Block 4: Roles (Teacher vs Student)
+        { q: "_____ says: <br><em>'Open your books at page 14.'</em>", a: "Teacher (T)", options: ["Teacher (T)", "Student (S)"], icon: "👨‍🏫" },
+        { q: "_____ says: <br><em>'Can you repeat that, please?'</em>", a: "Student (S)", options: ["Teacher (T)", "Student (S)"], icon: "🧑‍🎓" },
+
+        // Block 5: Dialogue logic
+        { q: "<br><em>'Yes, Tom. How can I help?'</em>", a: "Can you repeat that, please?", options: ["How are you?", "Can you repeat that, please?", "It's not a chair."], icon: "💬" }
+    ];
+
+    let currentIdx = 0;
+    let answered = false;
+    let scoreXp = 0;
+
+    /* ======================================================
+       LOAD CLUE
+       ====================================================== */
+    function loadClue() {
+        answered = false;
+
+        const clue = caseData[currentIdx];
+        const container = document.getElementById('case-file');
+        document.getElementById('case-status').style.display = 'none';
+        document.getElementById('step-count').innerText = (currentIdx + 1) + '/' + caseData.length;
+
+        // Shuffle options
+        const shuffledOptions = [...clue.options].sort(() => Math.random() - 0.5);
+
+        let html = '';
+        html += '<div class="instruction">Telemetry Evidence Scan</div>';
+        html += '<div class="clue-image">' + clue.icon + '</div>';
+        html += '<div class="question-box">' + clue.q + '</div>';
+        html += '<div class="evidence-list">';
+
+        shuffledOptions.forEach(opt => {
+            html += '<div class="evidence-item" onclick="analyzeEvidence(\'' + opt.replace(/'/g, "\\'") + '\', this)">👉 ' + opt + '</div>';
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    /* ======================================================
+       ANALYZE ANSWER
+       ====================================================== */
+    function analyzeEvidence(val, el) {
+        if (answered) return;
+        answered = true;
+
+        const correct = caseData[currentIdx].a;
+        const status = document.getElementById('case-status');
+        const txt = document.getElementById('feedback-txt');
+        const items = document.querySelectorAll('.evidence-item');
+
+        items.forEach(item => item.classList.add('disabled'));
+
+        if (val === correct) {
+            el.classList.add('correct');
+            scoreXp += 100;
+            txt.innerText = 'CRITERIA VERIFIED! ✅ (+100 XP · Total: ' + scoreXp + ')';
+            status.style.background = '#27ae60';
+        } else {
+            el.classList.add('wrong');
+            txt.innerText = 'LOGIC FAULT! TARGET WAS: ' + correct.toUpperCase();
+            status.style.background = '#c0392b';
+
+            // Highlight correct answer for feedback
+            items.forEach(item => {
+                if (item.innerText.indexOf(correct) !== -1) {
+                    item.classList.add('correct');
+                }
+            });
+        }
+
+        status.style.display = 'flex';
+        document.getElementById('progress-fill').style.width = ((currentIdx + 1) / caseData.length * 100) + '%';
+    }
+
+    /* ======================================================
+       NEXT CLUE
+       ====================================================== */
+    function nextClue() {
+        currentIdx++;
+
+        if (currentIdx < caseData.length) {
+            loadClue();
+        } else {
+            document.getElementById('case-file').innerHTML =
+                '<div style="text-align:center; padding: 20px 0;">' +
+                    '<span style="font-size:90px; display:block; margin-bottom:10px;">🌟</span>' +
+                    '<h1 style="font-family:\'Special Elite\'; color: var(--folder); margin-bottom:15px;">CASE FILE SEALED</h1>' +
+                    '<p style="font-size:18px; font-weight:bold; line-height:1.6; color:#2c3e50;">' +
+                        'All 12 structural syntax modules analyzed. You have successfully resolved the classroom lab case parameters!' +
+                    '</p>' +
+                    '<p style="font-size:20px; font-weight:800; color:var(--green); margin-top:15px;">' +
+                        '⭐ Final Score: ' + scoreXp + ' XP' +
+                    '</p>' +
+                    '<button class="status-btn" style="width:100%; margin-top:25px; padding:15px;" onclick="location.reload()">' +
+                        'RE-OPEN SYSTEM CASE' +
+                    '</button>' +
+                '</div>';
+
+            document.getElementById('case-status').style.display = 'none';
+            document.getElementById('progress-fill').style.width = '100%';
+        }
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    loadClue();
+</script>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Game: Profile Lab (A2-)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #58cc02;
+            --dark-green: #46a302;
+            --blue: #1cb0f6;
+            --gray: #e5e5e5;
+            --text: #4b4b4b;
+            --yellow: #ffc800;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            color: var(--text);
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            gap: 14px;
+        }
+        .progress-bar {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #fill {
+            width: 0%;
+            height: 100%;
+            background: var(--green);
+            border-radius: 10px;
+            transition: width 0.4s;
+        }
+        .score {
+            font-weight: 800;
+            color: var(--yellow);
+            background: #fff9e0;
+            padding: 4px 14px;
+            border-radius: 40px;
+            border: 2px solid var(--yellow);
+            font-size: 14px;
+        }
+        main {
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #94a3b8;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        @media (min-width: 480px) {
+            .grid { grid-template-columns: 1fr 1fr; }
+        }
+        .card {
+            background: white;
+            border: 2px solid var(--gray);
+            border-bottom: 5px solid var(--gray);
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-family: inherit;
+            text-align: center;
+            line-height: 1.4;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 66px;
+        }
+        .card:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .card.selected {
+            background: #e0f2fe;
+            border-color: #7dd3fc;
+            color: #0369a1;
+        }
+        .card.correct {
+            background: #d7ffb8;
+            border-color: #58cc02;
+            color: #14532d;
+            border-bottom-width: 2px;
+        }
+        .card.emoji {
+            font-size: 36px;
+        }
+        .card.word-card {
+            font-size: 18px;
+            text-align: left;
+            padding-left: 22px;
+        }
+        .card.def-card {
+            font-size: 14px;
+            text-align: left;
+            padding: 16px 18px;
+            font-weight: 700;
+        }
+        .scenario-box {
+            font-size: 19px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+            border: 3px dashed var(--blue);
+            line-height: 1.6;
+            color: #1e293b;
+        }
+        .scenario-box em {
+            color: #0369a1;
+            font-style: normal;
+        }
+        .scenario-box .blank {
+            color: var(--blue);
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+        #feedback {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            background: #d7ffb8;
+            border-top: 2px solid #58cc02;
+        }
+        .next-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--dark-green);
+            padding: 12px 50px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        .next-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+        .listen-btn {
+            width: 100%;
+            margin-bottom: 22px;
+            text-align: center;
+            font-size: 20px;
+            background: #e0f2fe;
+            border: 3px solid #7dd3fc;
+            color: #0369a1;
+            padding: 22px;
+            cursor: pointer;
+            border-radius: 16px;
+            font-family: inherit;
+            font-weight: 800;
+            border-bottom-width: 5px;
+        }
+        .listen-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .win-screen { text-align: center; padding: 30px 20px; }
+        .win-screen .trophy { font-size: 80px; }
+        .win-screen h2 {
+            color: var(--dark-green);
+            font-size: 28px;
+            margin: 15px 0 10px;
+        }
+        .win-screen p {
+            color: #64748b;
+            font-weight: 700;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+    <div class="score">⭐ <span id="stars">0</span></div>
+</header>
+
+<main>
+    <h1 id="title">My Profile Lab</h1>
+    <div class="subtitle" id="subtitle">Let's practice English!</div>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">CONTINUE ▶</button>
+</div>
+
+<script>
+    /* ======================================================
+       LEVEL 1 — MATCH WORD ↔ SHORT DEFINITION
+       6 pairs. Simple A2- definitions.
+       ====================================================== */
+    const level1Data = [
+        { id: 1, text: 'computers', type: 'word' },
+        { id: 1, text: 'Machines for work and games', type: 'def' },
+
+        { id: 2, text: 'cupcakes', type: 'word' },
+        { id: 2, text: 'Small sweet cakes', type: 'def' },
+
+        { id: 3, text: 'Maths', type: 'word' },
+        { id: 3, text: 'School subject with numbers', type: 'def' },
+
+        { id: 4, text: 'skateboarding', type: 'word' },
+        { id: 4, text: 'Sport on a board with wheels', type: 'def' },
+
+        { id: 5, text: 'Spain', type: 'word' },
+        { id: 5, text: 'Country in Europe', type: 'def' },
+
+        { id: 6, text: 'hobby', type: 'word' },
+        { id: 6, text: 'Thing you like to do', type: 'def' }
+    ];
+
+    /* ======================================================
+       LEVEL 2 — GRAMMAR (mixed A2- topics)
+       Present Simple / have got / can / plural / a-an / there is
+       ====================================================== */
+    const questions2 = [
+        {
+            scenario: "Look at Lucas' profile:<br><em>'My name <span class='blank'>___</span> Lucas.'</em>",
+            correct: "is",
+            options: ["am", "is", "are", "be"]
+        },
+        {
+            scenario: "Lucas is from Spain:<br><em>'I <span class='blank'>___</span> from Spain.'</em>",
+            correct: "am",
+            options: ["is", "am", "are", "be"]
+        },
+        {
+            scenario: "Look at his hobbies:<br><em>'My hobbies <span class='blank'>___</span> music and Maths.'</em>",
+            correct: "are",
+            options: ["is", "am", "are", "be"]
+        },
+        {
+            scenario: "His sister Emma:<br><em>'She <span class='blank'>___</span> got two cats.'</em>",
+            correct: "has",
+            options: ["have", "has", "is", "are"]
+        },
+        {
+            scenario: "Emma's hobby:<br><em>'She <span class='blank'>___</span> dance very well.'</em>",
+            correct: "can",
+            options: ["can", "is", "are", "has"]
+        },
+        {
+            scenario: "Count the sweets:<br><em>'There <span class='blank'>___</span> three cupcakes on the table.'</em>",
+            correct: "are",
+            options: ["is", "are", "am", "be"]
+        },
+        {
+            scenario: "Describe the picture:<br><em>'I have got <span class='blank'>___</span> apple.'</em>",
+            correct: "an",
+            options: ["a", "an", "the", "two"]
+        },
+        {
+            scenario: "Talk about habits:<br><em>'Lucas <span class='blank'>___</span> to school every day.'</em>",
+            correct: "goes",
+            options: ["go", "goes", "going", "went"]
+        }
+    ];
+
+    /* ======================================================
+       LEVEL 3 — LISTENING (short full sentences)
+       Identify the key word/picture from the audio.
+       ====================================================== */
+    const targetSentences3 = [
+        {
+            audio: "I have got two sisters.",
+            correct: "2️⃣ Sisters",
+            choices: ["1️⃣ Brother", "2️⃣ Sisters", "3️⃣ Cousins", "0️⃣ Pets"]
+        },
+        {
+            audio: "Lucas is from Spain.",
+            correct: "🇪🇸 Spain",
+            choices: ["🇬🇧 The UK", "🇪🇸 Spain", "🇺🇸 The USA", "🇫🇷 France"]
+        },
+        {
+            audio: "My favourite hobby is skateboarding.",
+            correct: "🛹 Skateboarding",
+            choices: ["🎵 Music", "📐 Maths", "🛹 Skateboarding", "💻 Computers"]
+        },
+        {
+            audio: "She goes to school every day.",
+            correct: "🏫 School",
+            choices: ["🏠 Home", "🏫 School", "🏞 Park", "🏪 Shop"]
+        },
+        {
+            audio: "I can play the guitar.",
+            correct: "🎸 Guitar",
+            choices: ["🎸 Guitar", "🎹 Piano", "🥁 Drums", "🎻 Violin"]
+        }
+    ];
+
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    let stars = 0;
+
+    /* ======================================================
+       INIT
+       ====================================================== */
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "Match the Word and the Meaning";
+            document.getElementById('subtitle').innerText = "Tap a word, then tap its meaning";
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            [...level1Data]
+                .sort(() => Math.random() - 0.5)
+                .forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card ' + (item.type === 'word' ? 'word-card' : 'def-card');
+                    card.innerHTML = item.text;
+                    card.onclick = () => selectLevel1(item, card);
+                    grid.appendChild(card);
+                });
+
+            area.appendChild(grid);
+        }
+
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "Choose the Correct Word";
+            document.getElementById('subtitle').innerText = "Read the sentence and pick the right answer";
+
+            const q = questions2[subStep];
+
+            area.innerHTML = `<div class="scenario-box">${q.scenario}</div>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn);
+                grid.appendChild(btn);
+            });
+
+            area.appendChild(grid);
+        }
+
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "Listen and Choose";
+            document.getElementById('subtitle').innerText = "Tap the speaker, then pick the correct answer";
+
+            const stage = targetSentences3[subStep];
+
+            area.innerHTML = `
+                <button class="listen-btn"
+                        onclick="speak('${stage.audio.replace(/'/g, "\\'")}')">
+                    🔊 LISTEN AGAIN
+                </button>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            [...stage.choices]
+                .sort(() => Math.random() - 0.5)
+                .forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.className = 'card';
+                    btn.innerText = choice;
+                    btn.onclick = () => checkLevel3(choice, btn);
+                    grid.appendChild(btn);
+                });
+
+            area.appendChild(grid);
+
+            setTimeout(() => speak(stage.audio), 350);
+        }
+    }
+
+    /* ======================================================
+       LEVEL 1 — MATCH
+       ====================================================== */
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(c => c.card === card)) return;
+
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const [first, second] = selectedCards;
+            const sameId = first.item.id === second.item.id;
+            const differentType = first.item.type !== second.item.type;
+
+            if (sameId && differentType) {
+                selectedCards.forEach(c => {
+                    c.card.classList.remove('selected');
+                    c.card.classList.add('correct');
+                });
+                selectedCards = [];
+                stars += 10;
+                updateStars();
+
+                if (document.querySelectorAll('.card.correct').length === level1Data.length) {
+                    showNext();
+                }
+            } else {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.card.classList.remove('selected'));
+                    selectedCards = [];
+                }, 500);
+            }
+        }
+    }
+
+    /* ======================================================
+       LEVEL 2 — GRAMMAR
+       ====================================================== */
+    function checkLevel2(choice, btn) {
+        const allBtns = document.querySelectorAll('.card');
+        if (choice === questions2[subStep].correct) {
+            btn.classList.add('correct');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+            stars += 10;
+            updateStars();
+            showNext();
+        } else {
+            btn.style.borderColor = '#ff4b4b';
+            btn.style.background = '#fef2f2';
+            btn.style.color = '#991b1b';
+        }
+    }
+
+    /* ======================================================
+       LEVEL 3 — LISTENING
+       ====================================================== */
+    function checkLevel3(choice, btn) {
+        const allBtns = document.querySelectorAll('.card');
+        const correctAns = targetSentences3[subStep].correct;
+
+        if (choice === correctAns) {
+            btn.classList.add('correct');
+            allBtns.forEach(b => b.style.pointerEvents = 'none');
+            stars += 10;
+            updateStars();
+            showNext();
+        } else {
+            btn.style.borderColor = '#ff4b4b';
+            btn.style.background = '#fef2f2';
+            btn.style.color = '#991b1b';
+        }
+    }
+
+    /* ======================================================
+       STARS + PROGRESS
+       ====================================================== */
+    function updateStars() {
+        document.getElementById('stars').innerText = stars;
+    }
+
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+
+        const totalSteps = 1 + questions2.length + targetSentences3.length;
+        let currentProgress;
+
+        if (currentLevel === 1) {
+            currentProgress = 1;
+        } else if (currentLevel === 2) {
+            currentProgress = 1 + subStep + 1;
+        } else {
+            currentProgress = 1 + questions2.length + subStep + 1;
+        }
+
+        document.getElementById('fill').style.width =
+            (currentProgress / totalSteps * 100) + '%';
+    }
+
+    /* ======================================================
+       NEXT STEP
+       ====================================================== */
+    function nextStep() {
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) {
+                currentLevel = 3;
+                subStep = 0;
+            }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= targetSentences3.length) {
+                finishGame();
+                return;
+            }
+        }
+
+        initLevel();
+    }
+
+    function finishGame() {
+        document.getElementById('game-area').innerHTML = `
+            <div class="win-screen">
+                <div class="trophy">🏆</div>
+                <h2>Excellent Work!</h2>
+                <p>You earned ${stars} stars! ⭐</p>
+                <button class="next-btn" style="margin-top:20px;" onclick="location.reload()">PLAY AGAIN</button>
+            </div>`;
+        document.getElementById('title').innerText = "Mission Complete";
+        document.getElementById('subtitle').innerText = "You finished all levels!";
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('fill').style.width = '100%';
+    }
+
+    /* ======================================================
+       TEXT-TO-SPEECH
+       ====================================================== */
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    initLevel();
+</script>
+</body>
+</html>

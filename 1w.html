@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superdug's Vocabulary &amp; Number Quest — Challenge Mode</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bubble-blue: #3498db;
+            --bubble-green: #2ecc71;
+            --bubble-yellow: #f1c40f;
+            --bubble-red: #e74c3c;
+            --text-dark: #2c3e50;
+            --purple: #8e44ad;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        #game-frame {
+            background: #fff;
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 0px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 5px solid var(--text-dark);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 900;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .xp-badge {
+            background: var(--bubble-yellow);
+            padding: 2px 12px;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            font-size: 0.8rem;
+        }
+
+        .timer-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+            width: 100%;
+            transition: width 60s linear;
+        }
+
+        .dialogue-area {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            border: 3px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-line {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #eee;
+            color: var(--text-dark);
+            line-height: 1.4;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .chat-line:last-child { margin-bottom: 0; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .chat-line b {
+            color: var(--bubble-blue);
+            margin-right: 8px;
+        }
+
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .chip {
+            background: #dfe6e9;
+            border: 2px solid var(--text-dark);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid var(--text-dark);
+            padding: 14px 18px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-dark);
+            transition: 0.1s;
+            text-align: left;
+            color: var(--text-dark);
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            background: #fdfdfd;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 var(--text-dark);
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .correct {
+            border-color: var(--bubble-green) !important;
+            color: var(--bubble-green) !important;
+            background: #e8f8f5 !important;
+        }
+
+        .wrong {
+            border-color: var(--bubble-red) !important;
+            color: var(--bubble-red) !important;
+            background: #fde8e8 !important;
+            animation: shake 0.35s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #win-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        #win-screen h2 {
+            color: var(--bubble-green);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .final-xp {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            background: var(--bubble-yellow);
+            display: inline-block;
+            padding: 6px 24px;
+            border-radius: 40px;
+            border: 3px solid var(--text-dark);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <span id="round-title">ROUND 1: WORD ORDER 🧩</span>
+            <span>TASK <span id="lvl-num">1</span> / <span id="total-lvls">3</span></span>
+        </div>
+
+        <div class="header" style="justify-content:center; margin-bottom:8px;">
+            <span class="xp-badge">⭐ XP: <span id="xp-value">0</span></span>
+        </div>
+
+        <div class="timer-bar-bg">
+            <div class="timer-bar-fill" id="timer-fill"></div>
+        </div>
+
+        <div class="dialogue-area" id="chat-box"></div>
+
+        <div class="options-grid" id="options-box"></div>
+    </div>
+
+    <div id="win-screen">
+        <h2>CHALLENGE COMPLETE! 🏆</h2>
+        <p style="font-weight:bold; font-size:1.1rem; color:var(--text-dark);">
+            Impressive! You mastered word order, numbers, and advanced colours!
+        </p>
+        <div class="final-xp">⭐ Total XP: <span id="final-xp-value">0</span></div>
+        <div style="font-size: 5rem; margin: 15px 0;">🐶🐱🔢🎨</div>
+        <button class="option-btn" style="text-align:center; width: 100%; margin-top:20px;" onclick="location.reload()">
+            REPLAY CHALLENGE
+        </button>
+    </div>
+</div>
+
+<script>
+    /* ======================================================
+       ROUND 1 — WORD ORDER (only chips shown, no scrambled line)
+       ====================================================== */
+    const round1Levels = [
+        {
+            chips: ["a", "superhero", "is", "He", "clever", "very", "."],
+            correct: "He is a very clever superhero.",
+            options: [
+                "He is a very clever superhero.",
+                "He a superhero is very clever.",
+                "Very clever he is a superhero."
+            ]
+        },
+        {
+            chips: ["likes", "Dug", "to", "help", "Kit", "every", "day", "."],
+            correct: "Dug likes to help Kit every day.",
+            options: [
+                "Dug likes to help Kit every day.",
+                "Dug likes to Kit help every day.",
+                "Every day Dug likes to help Kit."
+            ]
+        },
+        {
+            chips: ["doesn't", "eat", "Dug", "fish", ",", "he", "eats", "meat", "."],
+            correct: "Dug doesn't eat fish, he eats meat.",
+            options: [
+                "Dug doesn't eat fish, he eats meat.",
+                "Dug he eats meat, doesn't eat fish.",
+                "He eats meat, doesn't Dug eat fish."
+            ]
+        }
+    ];
+
+    /* ======================================================
+       ROUND 2 — NUMBERS
+       ====================================================== */
+    const round2Levels = [
+        { q: "What number is: 'ninety-four'?", correct: "94", options: ["49", "94", "84"] },
+        { q: "What number is: 'seventy-seven'?", correct: "77", options: ["67", "77", "87"] },
+        { q: "What number is: 'eighteen'?", correct: "18", options: ["18", "80", "81"] },
+        { q: "How do you spell 47?", correct: "forty-seven", options: ["fourteen-seven", "forty-seven", "seventy-four"] },
+        { q: "How do you spell 82?", correct: "eighty-two", options: ["eight-two", "eighty-two", "twenty-eight"] },
+        { q: "What number is: 'one hundred'?", correct: "100", options: ["10", "100", "1000"] },
+        { q: "How do you spell 33?", correct: "thirty-three", options: ["thirty-three", "thirteen-three", "three-thirty"] }
+    ];
+
+    /* ======================================================
+       ROUND 3 — COLOURS
+       ====================================================== */
+    const round3Levels = [
+        { q: "Identify the colour: 🟠", correct: "orange", options: ["orange", "red", "yellow"] },
+        { q: "Identify the colour: 🟡", correct: "yellow", options: ["gold", "yellow", "orange"] },
+        { q: "Identify the colour: ⚫", correct: "black", options: ["grey", "brown", "black"] },
+        { q: "Identify the colour: ⚪", correct: "white", options: ["silver", "white", "grey"] },
+        { q: "Which word is NOT a colour?", correct: "chair", options: ["pink", "chair", "violet"] },
+        { q: "is / car / My / red / very / .", correct: "My car is very red.", options: ["My car is very red.", "Very red my car is.", "Red is my very car."] },
+        { q: "The sky is ___.", correct: "blue", options: ["blue", "brown", "black"] }
+    ];
+
+    let currentRound = 1;
+    let currentLvl = 0;
+    let scoreXp = 0;
+    let timerInterval;
+
+    /* ======================================================
+       TIMER — 60 seconds per question
+       ====================================================== */
+    function startTimer() {
+        const fill = document.getElementById('timer-fill');
+        fill.style.transition = 'none';
+        fill.style.width = '100%';
+
+        setTimeout(() => {
+            fill.style.transition = 'width 60s linear';
+            fill.style.width = '0%';
+        }, 50);
+
+        clearTimeout(timerInterval);
+        timerInterval = setTimeout(() => {
+            handleTimeout();
+        }, 60000);
+    }
+
+    function handleTimeout() {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        const activeLevels = getActiveLevels();
+        const correctText = activeLevels[currentLvl].correct;
+
+        buttons.forEach(b => {
+            if (b.innerText.includes(correctText)) b.classList.add('wrong');
+        });
+
+        setTimeout(nextLevel, 1500);
+    }
+
+    /* ======================================================
+       HELPERS
+       ====================================================== */
+    function getActiveLevels() {
+        if (currentRound === 1) return round1Levels;
+        if (currentRound === 2) return round2Levels;
+        return round3Levels;
+    }
+
+    /* ======================================================
+       LOAD LEVEL
+       ====================================================== */
+    function loadGame() {
+        startTimer();
+
+        const activeLevels = getActiveLevels();
+        const lvl = activeLevels[currentLvl];
+
+        if (currentRound === 1) {
+            document.getElementById('round-title').innerText = "ROUND 1: WORD ORDER 🧩";
+        } else if (currentRound === 2) {
+            document.getElementById('round-title').innerText = "ROUND 2: NUMBERS 🔢";
+        } else {
+            document.getElementById('round-title').innerText = "ROUND 3: COLOURS 🎨";
+        }
+
+        document.getElementById('lvl-num').innerText = currentLvl + 1;
+        document.getElementById('total-lvls').innerText = activeLevels.length;
+        document.getElementById('xp-value').innerText = scoreXp;
+
+        const chatBox = document.getElementById('chat-box');
+
+        let chatContent = '';
+
+        if (lvl.chips) {
+            // Only show the word chips, no scrambled line
+            chatContent = '<div class="chip-row">' +
+                lvl.chips.map(c => `<span class="chip">${c}</span>`).join('') +
+                '</div>';
+        } else {
+            // Show the prompt line (for numbers, colours, and Round 3 word-order)
+            chatContent = `<div class="chat-line"><span>${lvl.q}</span></div>`;
+        }
+
+        chatBox.innerHTML = chatContent;
+
+        const optBox = document.getElementById('options-box');
+        optBox.innerHTML = '';
+
+        const choices = [...lvl.options].sort(() => Math.random() - 0.5);
+
+        choices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = "👉 " + choice;
+            btn.onclick = () => checkChoice(choice, btn);
+            optBox.appendChild(btn);
+        });
+    }
+
+    /* ======================================================
+       CHECK CHOICE
+       ====================================================== */
+    function checkChoice(val, btn) {
+        clearTimeout(timerInterval);
+
+        const activeLevels = getActiveLevels();
+        const lvl = activeLevels[currentLvl];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (val === lvl.correct) {
+            btn.classList.add('correct');
+            scoreXp += 100;
+            document.getElementById('xp-value').innerText = scoreXp;
+            setTimeout(nextLevel, 900);
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText.includes(lvl.correct)) b.classList.add('correct');
+            });
+            setTimeout(nextLevel, 1800);
+        }
+    }
+
+    /* ======================================================
+       NEXT LEVEL / NEXT ROUND
+       ====================================================== */
+    function nextLevel() {
+        const activeLevels = getActiveLevels();
+        currentLvl++;
+
+        if (currentLvl < activeLevels.length) {
+            loadGame();
+        } else {
+            if (currentRound === 1) {
+                currentRound = 2;
+                currentLvl = 0;
+                loadGame();
+            } else if (currentRound === 2) {
+                currentRound = 3;
+                currentLvl = 0;
+                loadGame();
+            } else {
+                clearTimeout(timerInterval);
+                document.getElementById('play-screen').style.display = 'none';
+                document.getElementById('win-screen').style.display = 'block';
+                document.getElementById('final-xp-value').innerText = scoreXp;
+            }
+        }
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    loadGame();
+</script>
+</body>
+</html>
