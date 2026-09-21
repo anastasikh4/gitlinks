@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Lab: Will vs Going To Quest 🌟</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sky-blue: #3498db;
+            --sun-yellow: #feca57;
+            --text-dark: #2c3e50;
+            --grass-green: #2ecc71;
+            --apple-red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Nunito', 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .bg-cloud {
+            position: fixed;
+            background: white;
+            border-radius: 50px;
+            opacity: 0.5;
+            animation: move linear infinite;
+            z-index: 0;
+        }
+        @keyframes move {
+            from { left: -150px; }
+            to { left: 100%; }
+        }
+
+        #game-frame {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 95%;
+            max-width: 680px;
+            padding: 25px;
+            border-radius: 40px;
+            text-align: center;
+            border: 6px solid var(--sky-blue);
+            z-index: 1;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .level-badge {
+            background: #e1f5fe;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: var(--sky-blue);
+        }
+
+        .score-badge {
+            background: var(--sun-yellow);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .stage-badge {
+            background: #f0abfc;
+            color: #6b21a8;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            display: inline-block;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-emoji {
+            font-size: 4.5rem;
+            animation: float 3s ease-in-out infinite;
+            margin: 6px 0;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .sentence-box {
+            background: #fff9e6;
+            padding: 25px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            line-height: 1.9;
+            border: 3px dashed #ffd54f;
+            color: var(--text-dark);
+            text-align: left;
+        }
+
+        .sentence-box strong {
+            color: var(--sky-blue);
+        }
+
+        /* ===== READING TEXT ===== */
+        .reading-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--sky-blue);
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .reading-text {
+            background: #f0f9ff;
+            border: 3px solid #bae6fd;
+            border-radius: 22px;
+            padding: 22px 24px;
+            font-size: 1.12rem;
+            line-height: 2.1;
+            color: var(--text-dark);
+            text-align: left;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .reading-text.compact {
+            background: #ecfdf5;
+            border-color: #6ee7b7;
+            font-size: 1.02rem;
+            line-height: 1.9;
+            padding: 18px 20px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .reading-text .gap {
+            background: #fff;
+            border-bottom: 4px solid var(--sky-blue);
+            padding: 2px 12px;
+            border-radius: 10px;
+            display: inline-block;
+            min-width: 80px;
+            font-weight: bold;
+            color: var(--sky-blue);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .reading-text .gap.current {
+            background: #fff9c4;
+            border-bottom-color: #f59e0b;
+            color: #b45309;
+            animation: pulseGap 1.4s ease-in-out infinite;
+        }
+
+        .reading-text .gap.filled {
+            background: #e8f8f5;
+            border-bottom-color: var(--grass-green);
+            color: #1e8449;
+        }
+
+        @keyframes pulseGap {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+        }
+
+        /* ===== QUESTION ===== */
+        .question-counter {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            background: #fff9e6;
+            padding: 22px;
+            border-radius: 22px;
+            font-size: 1.22rem;
+            line-height: 1.6;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-align: left;
+            margin-bottom: 20px;
+            border: 3px dashed #ffd54f;
+        }
+
+        .reference-label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #0f766e;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== OPTIONS ===== */
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        @media (max-width: 480px) {
+            .options { grid-template-columns: 1fr; }
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #eee;
+            padding: 14px 20px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #ccc;
+            font-family: inherit;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            border-color: var(--sky-blue);
+            background: #f1f9ff;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: none;
+        }
+
+        .option-btn.correct {
+            background: var(--grass-green) !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #27ae60 !important;
+            border-color: #27ae60 !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--apple-red) !important;
+            color: white !important;
+            box-shadow: 0 5px 0 #c0392b !important;
+            border-color: #c0392b !important;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--sun-yellow);
+            width: 0%;
+            transition: 0.3s;
+        }
+
+        .reset-btn {
+            margin-top: 15px;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+            color: #64748b;
+        }
+
+        #win-screen { display: none; }
+
+        .win-emoji {
+            font-size: 5rem;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-cloud" style="width:80px; height:35px; top:15%; animation-duration: 18s;"></div>
+<div class="bg-cloud" style="width:120px; height:50px; top:45%; animation-duration: 22s;"></div>
+<div class="bg-cloud" style="width:100px; height:40px; top:75%; animation-duration: 25s;"></div>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="stage-badge" id="stage-badge">Stage 1 · Dialogue</div>
+
+        <div class="header">
+            <div class="level-badge">🌟 <span id="counter">1</span>/<span id="total">5</span></div>
+            <div class="score-badge">⭐ Stars: <span id="score">0</span></div>
+        </div>
+
+        <div class="hero-emoji" id="hero">🤖</div>
+
+        <div id="content-area"></div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <button class="reset-btn" onclick="resetGame()">🔄 Restart Quiz</button>
+    </div>
+
+    <div id="win-screen">
+        <div class="win-emoji">🏆🎉🛸⚡</div>
+        <h2 style="color: var(--sky-blue); font-size: 2.2rem; margin: 10px 0;">Grammar Master!</h2>
+        <p style="font-size: 1.2rem; color: #475569; font-weight: bold;">You perfectly understand intentions, plans, and predictions!</p>
+        <button class="reset-btn" onclick="resetGame()" style="background: var(--sun-yellow); color: #d35400; border: none; padding: 12px 35px; font-size: 1.2rem; box-shadow: 0 4px 0 #f39c12;">🌟 Play Again</button>
+    </div>
+</div>
+
+<script>
+    /* ======================================================
+       STAGE 1 — Dialogue (5 missions)
+       ====================================================== */
+    const dialogueMissions = [
+        {
+            hero: "🗣️",
+            text: "<strong>A:</strong> Look! Pat's here.<br><strong>B:</strong> Oh! I <span class='gap' id='g1'>____</span> go and talk to her.",
+            answer: "will",
+            options: ["will", "am going to", "is going to", "won't"]
+        },
+        {
+            hero: "📅",
+            text: "<strong>A:</strong> What are your plans for Saturday night?<br><strong>B:</strong> We <span class='gap' id='g1'>____</span> invite some people over for dinner. Would you like to come?",
+            answer: "are going to",
+            options: ["will", "are going to", "is going to", "shall"]
+        },
+        {
+            hero: "🧩",
+            text: "<strong>A:</strong> I'm afraid I can't solve this problem.<br><strong>B:</strong> Don't worry. I <span class='gap' id='g1'>____</span> help you.",
+            answer: "will",
+            options: ["will", "am going to", "are going to", "not"]
+        },
+        {
+            hero: "📞",
+            text: "<strong>A:</strong> The phone is ringing.<br><strong>B:</strong> I <span class='gap' id='g1'>____</span> get it.",
+            answer: "will",
+            options: ["will", "am going to", "was going to", "do"]
+        },
+        {
+            hero: "🦷",
+            text: "<strong>A:</strong> Are you still in pain?<br><strong>B:</strong> Yes. I <span class='gap' id='g1'>____</span> see the dentist today.",
+            answer: "am going to",
+            options: ["will", "am going to", "is going to", "won't"]
+        }
+    ];
+
+    /* ======================================================
+       STAGE 2A — Reading Text (6 gaps)
+       ====================================================== */
+    const readingTitle = "📖 Sarah's Weekend Plans";
+    const readingParts = [
+        "My name is Sarah. This weekend, I ",
+        " visit my grandmother. She lives in the countryside. My brother Tom ",
+        " come with me. We ",
+        " take the train at 8 AM. I think the weather ",
+        " be sunny. My grandmother ",
+        " cook her famous apple pie. I'm sure we ",
+        " have a great time."
+    ];
+
+    const readingGaps = [
+        { answer: "am going to", options: ["am going to", "will", "is going to", "go to"] },
+        { answer: "is going to", options: ["is going to", "will", "are going to", "goes to"] },
+        { answer: "are going to", options: ["are going to", "will", "is going to", "go to"] },
+        { answer: "will",         options: ["will", "am going to", "is going to", "would"] },
+        { answer: "is going to", options: ["is going to", "will", "are going to", "goes to"] },
+        { answer: "will",         options: ["will", "am going to", "are going to", "would"] }
+    ];
+
+    /* ======================================================
+       STAGE 2B — ABCD Comprehension (4 questions)
+       ====================================================== */
+    const abcdQuestions = [
+        {
+            hero: "🏡",
+            q: "Where does Sarah's grandmother live?",
+            answer: "In the countryside",
+            options: ["In the city", "In the countryside", "By the sea", "In the mountains"]
+        },
+        {
+            hero: "🚂",
+            q: "How are Sarah and Tom going to travel?",
+            answer: "By train",
+            options: ["By car", "By bus", "By train", "By plane"]
+        },
+        {
+            hero: "☀️",
+            q: "What does Sarah think about the weather?",
+            answer: "It will be sunny",
+            options: ["It will rain", "It will be sunny", "It will snow", "It will be cloudy"]
+        },
+        {
+            hero: "🥧",
+            q: "What is grandmother going to cook?",
+            answer: "Apple pie",
+            options: ["Pizza", "Apple pie", "Cake", "Soup"]
+        }
+    ];
+
+    /* ======================================================
+       STATE
+       ====================================================== */
+    let mode = 'dialogue';
+    let dialogueIndex = 0;
+    let readingIndex = 0;
+    let readingFilled = [];
+    let questionIndex = 0;
+    let score = 0;
+    let waiting = false;
+
+    const playScreen = document.getElementById('play-screen');
+    const winScreen = document.getElementById('win-screen');
+    const stageBadge = document.getElementById('stage-badge');
+    const counterEl = document.getElementById('counter');
+    const totalEl = document.getElementById('total');
+    const scoreSpan = document.getElementById('score');
+    const heroEl = document.getElementById('hero');
+    const contentArea = document.getElementById('content-area');
+    const progressFill = document.getElementById('progress');
+
+    /* ======================================================
+       INIT
+       ====================================================== */
+    function initGame() {
+        dialogueIndex = 0;
+        readingIndex = 0;
+        readingFilled = [];
+        questionIndex = 0;
+        score = 0;
+        mode = 'dialogue';
+        scoreSpan.innerText = score;
+        loadCurrent();
+    }
+
+    function loadCurrent() {
+        if (mode === 'dialogue') return loadDialogue();
+        if (mode === 'reading') return loadReading();
+        if (mode === 'questions') return loadQuestion();
+        return showWinScreen();
+    }
+
+    function updateProgress(current, total) {
+        const pct = (current / total) * 100;
+        progressFill.style.width = pct + '%';
+    }
+
+    /* ======================================================
+       STAGE 1 — DIALOGUE
+       ====================================================== */
+    function loadDialogue() {
+        if (dialogueIndex >= dialogueMissions.length) {
+            mode = 'reading';
+            readingIndex = 0;
+            readingFilled = [];
+            return loadReading();
+        }
+
+        waiting = false;
+        const m = dialogueMissions[dialogueIndex];
+
+        stageBadge.innerText = "Stage 1 · Dialogue";
+        counterEl.innerText = dialogueIndex + 1;
+        totalEl.innerText = dialogueMissions.length;
+        heroEl.innerText = m.hero;
+
+        updateProgress(dialogueIndex, dialogueMissions.length);
+
+        contentArea.innerHTML = `
+            <div class="sentence-box">${m.text}</div>
+            <div class="options" id="options"></div>
+        `;
+
+        renderOptions(m.options, (val, btn) => handleDialogueChoice(val, btn, m));
+    }
+
+    function handleDialogueChoice(val, btn, m) {
+        if (waiting) return;
+
+        if (val === m.answer) {
+            waiting = true;
+            btn.classList.add('correct');
+            score += 10;
+            scoreSpan.innerText = score;
+
+            const gapEl = document.getElementById('g1');
+            if (gapEl) {
+                gapEl.innerText = m.answer;
+                gapEl.style.background = '#e8f8f5';
+                gapEl.style.color = '#1e8449';
+            }
+
+            setTimeout(() => {
+                dialogueIndex++;
+                loadDialogue();
+            }, 1000);
+        } else {
+            waiting = true;
+            btn.classList.add('wrong');
+            highlightCorrect(m.answer);
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                clearHighlights();
+                waiting = false;
+            }, 1400);
+        }
+    }
+
+    /* ======================================================
+       STAGE 2A — READING
+       ====================================================== */
+    function loadReading() {
+        if (readingIndex >= readingGaps.length) {
+            mode = 'questions';
+            questionIndex = 0;
+            return loadQuestion();
+        }
+
+        waiting = false;
+
+        stageBadge.innerText = "Stage 2 · Reading";
+        counterEl.innerText = readingIndex + 1;
+        totalEl.innerText = readingGaps.length;
+        heroEl.innerText = "📖";
+
+        updateProgress(readingIndex, readingGaps.length);
+
+        contentArea.innerHTML = `
+            <div class="reading-title">${readingTitle}</div>
+            <div class="reading-text">${renderReadingText(false)}</div>
+            <div class="question-counter">Fill gap ${readingIndex + 1} of ${readingGaps.length}</div>
+            <div class="options" id="options"></div>
+        `;
+
+        const currentGap = readingGaps[readingIndex];
+        renderOptions(currentGap.options, (val, btn) =>
+            handleReadingChoice(val, btn, currentGap)
+        );
+    }
+
+    function renderReadingText(compact) {
+        let html = '';
+        for (let i = 0; i < readingGaps.length; i++) {
+            html += readingParts[i];
+
+            if (readingFilled[i]) {
+                html += `<span class="gap filled">${readingFilled[i]}</span>`;
+            } else if (!compact && i === readingIndex) {
+                html += `<span class="gap current">____</span>`;
+            } else {
+                html += `<span class="gap">____</span>`;
+            }
+        }
+        html += readingParts[readingParts.length - 1];
+        return html;
+    }
+
+    function handleReadingChoice(val, btn, gap) {
+        if (waiting) return;
+
+        if (val === gap.answer) {
+            waiting = true;
+            btn.classList.add('correct');
+            score += 10;
+            scoreSpan.innerText = score;
+
+            readingFilled[readingIndex] = gap.answer;
+
+            setTimeout(() => {
+                readingIndex++;
+                loadReading();
+            }, 1000);
+        } else {
+            waiting = true;
+            btn.classList.add('wrong');
+            highlightCorrect(gap.answer);
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                clearHighlights();
+                waiting = false;
+            }, 1400);
+        }
+    }
+
+    /* ======================================================
+       STAGE 2B — ABCD COMPREHENSION (with full reading text above)
+       ====================================================== */
+    function loadQuestion() {
+        if (questionIndex >= abcdQuestions.length) {
+            mode = 'win';
+            return showWinScreen();
+        }
+
+        waiting = false;
+        const q = abcdQuestions[questionIndex];
+
+        stageBadge.innerText = "Stage 2 · Comprehension";
+        counterEl.innerText = questionIndex + 1;
+        totalEl.innerText = abcdQuestions.length;
+        heroEl.innerText = q.hero;
+
+        updateProgress(questionIndex, abcdQuestions.length);
+
+        contentArea.innerHTML = `
+            <div class="reference-label">📖 Read the text again:</div>
+            <div class="reading-text compact">${renderReadingText(true)}</div>
+            <div class="question-counter">Question ${questionIndex + 1} of ${abcdQuestions.length}</div>
+            <div class="question-text">${q.q}</div>
+            <div class="options" id="options"></div>
+        `;
+
+        renderOptions(q.options, (val, btn) => handleQuestionChoice(val, btn, q));
+    }
+
+    function handleQuestionChoice(val, btn, q) {
+        if (waiting) return;
+
+        if (val === q.answer) {
+            waiting = true;
+            btn.classList.add('correct');
+            score += 10;
+            scoreSpan.innerText = score;
+
+            setTimeout(() => {
+                questionIndex++;
+                loadQuestion();
+            }, 1000);
+        } else {
+            waiting = true;
+            btn.classList.add('wrong');
+            highlightCorrect(q.answer);
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                clearHighlights();
+                waiting = false;
+            }, 1400);
+        }
+    }
+
+    /* ======================================================
+       HELPERS
+       ====================================================== */
+    function renderOptions(optionsArr, onClick) {
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        const shuffled = [...optionsArr].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => onClick(opt, btn);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function highlightCorrect(answer) {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => {
+            if (b.innerText === answer) b.classList.add('correct');
+        });
+    }
+
+    function clearHighlights() {
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.remove('correct'));
+    }
+
+    /* ======================================================
+       WIN / RESET
+       ====================================================== */
+    function showWinScreen() {
+        playScreen.style.display = 'none';
+        winScreen.style.display = 'block';
+        progressFill.style.width = '100%';
+    }
+
+    function resetGame() {
+        winScreen.style.display = 'none';
+        playScreen.style.display = 'block';
+        initGame();
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    initGame();
+</script>
+</body>
+</html>

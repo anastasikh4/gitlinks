@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Mission: Interactive Worksheet song00</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-blue: #3498db;
+      --bubble-green: #2ecc71;
+      --bubble-yellow: #f1c40f;
+      --bubble-red: #e74c3c;
+      --text-dark: #2c3e50;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #game-frame {
+      background: #fff;
+      width: 100%;
+      max-width: 650px;
+      padding: 35px;
+      border-radius: 40px;
+      box-shadow: 0 15px 0px rgba(0,0,0,0.15);
+      border: 5px solid var(--text-dark);
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-family: 'Fredoka', sans-serif;
+      color: var(--primary-blue);
+      font-size: 2.2rem;
+      margin: 0 0 10px 0;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 25px;
+    }
+
+    .audio-card {
+      background: #f1f2f6;
+      border: 3px dashed var(--primary-blue);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 35px;
+    }
+
+    .audio-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+    }
+
+    .section-title {
+      font-family: 'Fredoka', sans-serif;
+      color: var(--text-dark);
+      font-size: 1.4rem;
+      text-align: left;
+      margin: 25px 0 15px;
+      border-bottom: 3px dashed #e2e8f0;
+      padding-bottom: 5px;
+    }
+
+    .question-block {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .prompt {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-dark);
+      line-height: 1.4;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-label {
+      background: white;
+      border: 3px solid var(--text-dark);
+      padding: 12px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--text-dark);
+      transition: 0.1s;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+    }
+
+    .option-label:hover {
+      background: #fdfdfd;
+      transform: translateY(-1px);
+      box-shadow: 0 5px 0 var(--text-dark);
+    }
+
+    .option-label:has(input:checked) {
+      background: #e0f2fe;
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 0 var(--primary-blue);
+    }
+
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-blue);
+      cursor: pointer;
+    }
+
+    .option-label.correct-status {
+      border-color: var(--bubble-green) !important;
+      color: var(--bubble-green) !important;
+      background: #e8f8f5 !important;
+      box-shadow: 0 4px 0 var(--bubble-green) !important;
+    }
+
+    .option-label.wrong-status {
+      border-color: var(--bubble-red) !important;
+      color: var(--bubble-red) !important;
+      background: #fde8e8 !important;
+      box-shadow: 0 4px 0 var(--bubble-red) !important;
+    }
+
+    .action-row {
+      margin-top: 35px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn-submit {
+      background: var(--bubble-green);
+      color: white;
+      border: 3px solid var(--text-dark);
+      border-bottom: 7px solid var(--text-dark);
+      padding: 16px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Fredoka', sans-serif;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .btn-submit:active {
+      transform: translateY(3px);
+      border-bottom-width: 3px;
+    }
+
+    .btn-reset {
+      background: #f1f5f9;
+      color: #64748b;
+      border: 3px solid var(--text-dark);
+      border-bottom: 7px solid var(--text-dark);
+      padding: 12px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      border-radius: 20px;
+      cursor: pointer;
+      font-family: 'Fredoka', sans-serif;
+      letter-spacing: 1px;
+    }
+
+    .btn-reset:active {
+      transform: translateY(3px);
+      border-bottom-width: 3px;
+    }
+
+    #score-report {
+      display: none;
+      background: var(--bubble-yellow);
+      border: 3px solid var(--text-dark);
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #b45309;
+      animation: popIn 0.4s ease;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="game-frame">
+  <h1>LISTENING WORKSHEET 📑</h1>
+  <div class="subtitle">All items active &middot; Auto telemetry check</div>
+
+  <!-- Audio Link Node -->
+  <div class="audio-card">
+    <div class="audio-title">🔊 Audio Track Input: song00.mp3</div>
+    <audio id="mission-audio" controls src="https://githubusercontent.com"></audio>
+  </div>
+
+  <form id="worksheet-form" onsubmit="evaluateWorksheet(event)">
+
+    <!-- PART 1: TRUE OR FALSE (variant order mixed) -->
+    <div class="section-title">Part 1: True or False</div>
+
+    <div class="question-block" data-correct="False">
+      <div class="prompt">1. The speaker's brother was very quiet and calm in the morning.</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q1" value="False" required> False</label>
+        <label class="option-label"><input type="radio" name="q1" value="True"> True</label>
+      </div>
+    </div>
+
+    <div class="question-block" data-correct="True">
+      <div class="prompt">2. The speaker found a creative photo frame while cleaning a table.</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q2" value="True" required> True</label>
+        <label class="option-label"><input type="radio" name="q2" value="False"> False</label>
+      </div>
+    </div>
+
+    <div class="question-block" data-correct="False">
+      <div class="prompt">3. The friends sat down on the comfortable grass at the park.</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q3" value="False" required> False</label>
+        <label class="option-label"><input type="radio" name="q3" value="True"> True</label>
+      </div>
+    </div>
+
+    <!-- PART 2: MULTIPLE CHOICE (variants mixed) -->
+    <div class="section-title">Part 2: Multiple Choice</div>
+
+    <div class="question-block" data-correct="A red jacket">
+      <div class="prompt">4. What item did the speaker pick up to look stylish before leaving?</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q4" value="A black hat" required> A black hat</label>
+        <label class="option-label"><input type="radio" name="q4" value="A red jacket"> A red jacket</label>
+        <label class="option-label"><input type="radio" name="q4" value="A blue notebook"> A blue notebook</label>
+      </div>
+    </div>
+
+    <div class="question-block" data-correct="A huge balloon">
+      <div class="prompt">5. What was the friend holding when the speaker saw her?</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q5" value="A large book" required> A large book</label>
+        <label class="option-label"><input type="radio" name="q5" value="A small dog"> A small dog</label>
+        <label class="option-label"><input type="radio" name="q5" value="A huge balloon"> A huge balloon</label>
+      </div>
+    </div>
+
+    <div class="question-block" data-correct="To a café">
+      <div class="prompt">6. Where did the friends go to talk about their school days?</div>
+      <div class="options-grid">
+        <label class="option-label"><input type="radio" name="q6" value="To the library" required> To the library</label>
+        <label class="option-label"><input type="radio" name="q6" value="To a café"> To a café</label>
+        <label class="option-label"><input type="radio" name="q6" value="To the cinema"> To the cinema</label>
+      </div>
+    </div>
+
+    <!-- Action Trigger Row -->
+    <div class="action-row">
+      <button type="submit" class="btn-submit" id="submit-btn">CHECK MY ANSWERS ✔️</button>
+      <button type="button" class="btn-reset" onclick="resetWorksheet()">🔄 CLEAR ALL ANSWERS</button>
+      <div id="score-report"></div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  function evaluateWorksheet(event) {
+    event.preventDefault();
+
+    const blocks = document.querySelectorAll('.question-block');
+    let finalScore = 0;
+    const pointsPerQuestion = 100;
+
+    blocks.forEach((block) => {
+      const correctAnswer = block.getAttribute('data-correct');
+      const selectedInput = block.querySelector('input[type="radio"]:checked');
+      const labels = block.querySelectorAll('.option-label');
+
+      labels.forEach(label => label.classList.remove('correct-status', 'wrong-status'));
+
+      if (selectedInput) {
+        const userChoice = selectedInput.value;
+
+        if (userChoice === correctAnswer) {
+          finalScore += pointsPerQuestion;
+          selectedInput.parentElement.classList.add('correct-status');
+        } else {
+          selectedInput.parentElement.classList.add('wrong-status');
+          labels.forEach(label => {
+            if (label.innerText.trim() === correctAnswer) {
+              label.classList.add('correct-status');
+            }
+          });
+        }
+      }
+    });
+
+    const maxScore = blocks.length * pointsPerQuestion;
+
+    const reportBox = document.getElementById('score-report');
+    reportBox.style.display = 'block';
+    reportBox.innerHTML = `
+      🏁 Results: ${finalScore} / ${maxScore} Points!<br>
+      <span style="font-size:0.95rem; font-weight:600; color:#78350f; display:block; margin-top:5px;">
+        Correct answers are highlighted in green on your worksheet.
+      </span>
+    `;
+
+    reportBox.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function resetWorksheet() {
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.checked = false;
+    });
+
+    document.querySelectorAll('.option-label').forEach(label => {
+      label.classList.remove('correct-status', 'wrong-status');
+    });
+
+    const reportBox = document.getElementById('score-report');
+    reportBox.style.display = 'none';
+    reportBox.innerHTML = '';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
