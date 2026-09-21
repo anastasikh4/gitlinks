@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Training Ground: Expanded Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #58cc02;
+            --dark-green: #46a302;
+            --blue: #1cb0f6;
+            --gray: #e5e5e5;
+            --text: #4b4b4b;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #fill {
+            width: 0%;
+            height: 100%;
+            background: var(--green);
+            border-radius: 10px;
+            transition: width 0.4s;
+        }
+
+        main {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-family: inherit;
+            color: var(--text);
+        }
+
+        .card:active {
+            transform: translateY(2px);
+        }
+
+        .card.selected {
+            background: #ddf4ff;
+            border-color: #84d8ff;
+            color: var(--blue);
+        }
+
+        .card.correct {
+            background: #d7ffb8;
+            border-color: #58cc02;
+            color: #58a700;
+        }
+
+        .card.wrong {
+            background: #ffdfe0;
+            border-color: #ff4b4b;
+            color: #d33131;
+        }
+
+        #feedback {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            display: none;
+            justify-content: center;
+            background: #d7ffb8;
+            border-top: 2px solid #58cc02;
+        }
+
+        .next-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--dark-green);
+            padding: 12px 40px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .next-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .listen-btn {
+            width: 100%;
+            margin-bottom: 25px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 3px solid #7dd3fc;
+            border-bottom: 5px solid #7dd3fc;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        .listen-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">Обучающая игра: Неправильные глаголы</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">ПРОДОЛЖИТЬ</button>
+</div>
+
+<script>
+    /* ======================================================
+       LEVEL 1 — Matching V1 ↔ Russian translation (6 pairs)
+       ====================================================== */
+    const level1Data = [
+        { id: 1, text: 'bring', type: 'v1' },
+        { id: 1, text: 'приносить', type: 'ru' },
+
+        { id: 2, text: 'burn', type: 'v1' },
+        { id: 2, text: 'гореть', type: 'ru' },
+
+        { id: 3, text: 'burst', type: 'v1' },
+        { id: 3, text: 'взрывать(ся)', type: 'ru' },
+
+        { id: 4, text: 'can', type: 'v1' },
+        { id: 4, text: 'мочь; уметь', type: 'ru' },
+
+        { id: 5, text: 'buy', type: 'v1' },
+        { id: 5, text: 'покупать', type: 'ru' },
+
+        { id: 6, text: 'build', type: 'v1' },
+        { id: 6, text: 'строить', type: 'ru' }
+    ];
+
+    /* ======================================================
+       LEVEL 2 — Multiple Choice: V2 forms (8 questions)
+       ====================================================== */
+    const questions2 = [
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "become":',
+            correct: 'became',
+            options: ['become', 'became', 'began', 'brought']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "blow":',
+            correct: 'blew',
+            options: ['blowed', 'blown', 'blew', 'bit']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "build":',
+            correct: 'built',
+            options: ['builded', 'built', 'broke', 'burnt']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "say":',
+            correct: 'said',
+            options: ['said', 'sayed', 'say', 'saided']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "go":',
+            correct: 'went',
+            options: ['goed', 'gone', 'went', 'want']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "do":',
+            correct: 'did',
+            options: ['doed', 'done', 'did', 'dead']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "drink":',
+            correct: 'drank',
+            options: ['drinked', 'drunk', 'drank', 'dronk']
+        },
+        {
+            prompt: 'Укажите форму V2 (Past Simple) от глагола "fly":',
+            correct: 'flew',
+            options: ['flied', 'flown', 'flew', 'flew']
+        }
+    ];
+
+    /* ======================================================
+       LEVEL 3 — Listening: V3 forms (8 questions)
+       ====================================================== */
+    const targetWords3 = ['broken', 'bought', 'begun', 'flown', 'done', 'gone', 'said', 'drunk'];
+
+    const wordTranslationMap = {
+        'broken': 'Сломанный (V3)',
+        'bought': 'Купленный (V3)',
+        'begun':  'Начатый (V3)',
+        'flown':  'Улетевший (V3)',
+        'done':   'Сделанный (V3)',
+        'gone':   'Ушедший (V3)',
+        'said':   'Сказанный (V3)',
+        'drunk':  'Выпитый (V3)'
+    };
+
+    /* ======================================================
+       STATE
+       ====================================================== */
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    const totalQuestionsCount = 1 + questions2.length + targetWords3.length;
+
+    /* ======================================================
+       INIT LEVEL
+       ====================================================== */
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "Найди пары (V1 + перевод)";
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            [...level1Data].sort(() => Math.random() - 0.5).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+
+            area.appendChild(grid);
+        }
+
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText =
+                `Выбери форму Past Simple (V2) [Шаг ${subStep + 1} из ${questions2.length}]`;
+
+            const q = questions2[subStep];
+            area.innerHTML = `<div style="font-size: 20px; margin-bottom: 25px; font-weight: bold; line-height: 1.4;">${q.prompt}</div>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            [...q.options].sort(() => Math.random() - 0.5).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn);
+                grid.appendChild(btn);
+            });
+
+            area.appendChild(grid);
+        }
+
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText =
+                `Послушай и выбери третью форму (V3) [Шаг ${subStep + 1} из ${targetWords3.length}]`;
+
+            const word = targetWords3[subStep];
+            area.innerHTML = `<button class="listen-btn" onclick="speak('${word}')">🔊 ПОСЛУШАТЬ ГЛАГОЛ</button>`;
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            Object.keys(wordTranslationMap).sort(() => Math.random() - 0.5).forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = key;
+                btn.onclick = () => checkLevel3(key, btn);
+                grid.appendChild(btn);
+            });
+
+            area.appendChild(grid);
+
+            setTimeout(() => speak(word), 350);
+        }
+    }
+
+    /* ======================================================
+       LEVEL 1 — MATCHING
+       ====================================================== */
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(c => c.card === card)) return;
+
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const [first, second] = selectedCards;
+
+            if (first.item.id === second.item.id && first.item.type !== second.item.type) {
+                selectedCards.forEach(c => {
+                    c.card.classList.remove('selected');
+                    c.card.classList.add('correct');
+                });
+                selectedCards = [];
+
+                if (document.querySelectorAll('.card.correct').length === level1Data.length) {
+                    showNext();
+                }
+            } else {
+                setTimeout(() => {
+                    selectedCards.forEach(c => c.card.classList.remove('selected'));
+                    selectedCards = [];
+                }, 500);
+            }
+        }
+    }
+
+    /* ======================================================
+       LEVEL 2 — MULTIPLE CHOICE (V2)
+       ====================================================== */
+    function checkLevel2(choice, btn) {
+        const buttons = document.querySelectorAll('.card');
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        if (choice === questions2[subStep].correct) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText === questions2[subStep].correct) b.classList.add('correct');
+            });
+        }
+
+        showNext();
+    }
+
+    /* ======================================================
+       LEVEL 3 — LISTENING (V3)
+       ====================================================== */
+    function checkLevel3(choice, btn) {
+        const buttons = document.querySelectorAll('.card');
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        const correctWord = targetWords3[subStep];
+
+        if (choice === correctWord) {
+            btn.classList.add('correct');
+        } else {
+            btn.classList.add('wrong');
+            buttons.forEach(b => {
+                if (b.innerText === correctWord) b.classList.add('correct');
+            });
+        }
+
+        showNext();
+    }
+
+    /* ======================================================
+       PROGRESS
+       ====================================================== */
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+
+        let currentProgress;
+        if (currentLevel === 1) {
+            currentProgress = 1;
+        } else if (currentLevel === 2) {
+            currentProgress = 1 + subStep + 1;
+        } else {
+            currentProgress = 1 + questions2.length + subStep + 1;
+        }
+
+        document.getElementById('fill').style.width =
+            (currentProgress / totalQuestionsCount * 100) + '%';
+    }
+
+    /* ======================================================
+       NEXT STEP
+       ====================================================== */
+    function nextStep() {
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) {
+                currentLevel = 3;
+                subStep = 0;
+            }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= targetWords3.length) {
+                document.getElementById('game-area').innerHTML =
+                    "<h2 style='color:#58a700; line-height:1.5;'>Превосходно! Ты освоил расширенную группу неправильных глаголов из 17 заданий! 🎉</h2>";
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('fill').style.width = '100%';
+                return;
+            }
+        }
+
+        initLevel();
+    }
+
+    /* ======================================================
+       TEXT-TO-SPEECH
+       ====================================================== */
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    initLevel();
+</script>
+</body>
+</html>

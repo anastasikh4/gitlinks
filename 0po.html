@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Master Quest — Find Both Forms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bubble-blue: #3498db;
+            --bubble-green: #2ecc71;
+            --bubble-yellow: #f1c40f;
+            --bubble-red: #e74c3c;
+            --text-dark: #2c3e50;
+            --purple: #8e44ad;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        #game-frame {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 15px 0px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 5px solid var(--text-dark);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 900;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .xp-badge {
+            background: var(--bubble-yellow);
+            padding: 2px 12px;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            font-size: 0.8rem;
+        }
+
+        .timer-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 40px;
+            border: 2px solid var(--text-dark);
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .timer-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+            width: 100%;
+            transition: width 60s linear;
+        }
+
+        .dialogue-area {
+            background: #f1f2f6;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            border: 3px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .chat-line {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #eee;
+            color: var(--text-dark);
+            line-height: 1.4;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .chat-line:last-child { margin-bottom: 0; }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .chat-line .verb {
+            color: var(--purple);
+            font-weight: 900;
+            padding: 0 4px;
+        }
+
+        .hint-line {
+            font-size: 0.85rem;
+            color: var(--purple);
+            font-weight: 800;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid var(--text-dark);
+            padding: 14px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--text-dark);
+            transition: 0.1s;
+            text-align: left;
+            color: var(--text-dark);
+            font-family: 'Raleway', sans-serif;
+        }
+
+        .option-btn:hover:not(.disabled):not(.correct):not(.wrong) {
+            background: #fdfdfd;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 var(--text-dark);
+        }
+
+        .option-btn:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .correct {
+            border-color: var(--bubble-green) !important;
+            color: var(--bubble-green) !important;
+            background: #e8f8f5 !important;
+            box-shadow: 0 4px 0 var(--bubble-green) !important;
+        }
+
+        .wrong {
+            border-color: var(--bubble-red) !important;
+            color: var(--bubble-red) !important;
+            background: #fde8e8 !important;
+            box-shadow: 0 4px 0 var(--bubble-red) !important;
+            animation: shake 0.35s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.85;
+        }
+
+        #win-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        #win-screen h2 {
+            color: var(--bubble-green);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .final-xp {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--text-dark);
+            background: var(--bubble-yellow);
+            display: inline-block;
+            padding: 6px 24px;
+            border-radius: 40px;
+            border: 3px solid var(--text-dark);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <span id="round-title">IRREGULAR VERBS 🎯</span>
+            <span>TASK <span id="lvl-num">1</span> / <span id="total-lvls">13</span></span>
+        </div>
+
+        <div class="header" style="justify-content:center; margin-bottom:8px;">
+            <span class="xp-badge">⭐ XP: <span id="xp-value">0</span></span>
+        </div>
+
+        <div class="timer-bar-bg">
+            <div class="timer-bar-fill" id="timer-fill"></div>
+        </div>
+
+        <div class="dialogue-area" id="chat-box"></div>
+
+        <div class="options-grid" id="options-box"></div>
+    </div>
+
+    <div id="win-screen">
+        <h2>QUEST COMPLETED! 🏆</h2>
+        <p style="font-weight:bold; font-size:1.1rem; color:var(--text-dark);">
+            Amazing! You found BOTH forms of every irregular verb from the list!
+        </p>
+        <div class="final-xp">⭐ Total XP: <span id="final-xp-value">0</span></div>
+        <div style="font-size: 5rem; margin: 15px 0;">📚✏️🧠🌟</div>
+        <button class="option-btn" style="text-align:center; width: 100%; margin-top:20px;" onclick="location.reload()">
+            REPLAY QUEST
+        </button>
+    </div>
+</div>
+
+<script>
+    /* ======================================================
+       13 IRREGULAR VERBS — from the photo only
+       Each question: find BOTH V2 and V3 forms.
+       ====================================================== */
+    const missions = [
+        { verb: "be",     correct: ["was/were", "been"],     fake: ["beed", "be-be"] },
+        { verb: "bear",   correct: ["bore",     "born(e)"],  fake: ["beared", "borned"] },
+        { verb: "beat",   correct: ["beat",     "beaten"],   fake: ["beated", "beated"] },
+        { verb: "become", correct: ["became",   "become"],   fake: ["becomed", "becomen"] },
+        { verb: "begin",  correct: ["began",    "begun"],    fake: ["beginned", "begined"] },
+        { verb: "bite",   correct: ["bit",      "bitten"],   fake: ["bited", "bitten"] },
+        { verb: "blow",   correct: ["blew",     "blown"],    fake: ["blowed", "blewed"] },
+        { verb: "break",  correct: ["broke",    "broken"],   fake: ["breaked", "broked"] },
+        { verb: "bring",  correct: ["brought",  "brought"],  fake: ["bringed", "brang"] },
+        { verb: "build",  correct: ["built",    "built"],    fake: ["builded", "builten"] },
+        { verb: "burn",   correct: ["burnt",    "burned"],   fake: ["burnned", "burnted"] },
+        { verb: "burst",  correct: ["burst",    "burst"],    fake: ["bursted", "burstted"] },
+        { verb: "buy",    correct: ["bought",   "bought"],   fake: ["buyed", "boughten"] }
+    ];
+
+    let currentLvl = 0;
+    let scoreXp = 0;
+    let timerTimeout;
+    let foundCorrect = [];
+    let answered = false;
+
+    /* ======================================================
+       TIMER — 60 seconds per question
+       ====================================================== */
+    function startTimer() {
+        const fill = document.getElementById('timer-fill');
+        fill.style.transition = 'none';
+        fill.style.width = '100%';
+
+        setTimeout(() => {
+            fill.style.transition = 'width 60s linear';
+            fill.style.width = '0%';
+        }, 50);
+
+        clearTimeout(timerTimeout);
+        timerTimeout = setTimeout(() => {
+            handleTimeout();
+        }, 60000);
+    }
+
+    function handleTimeout() {
+        if (answered) return;
+        answered = true;
+
+        const lvl = missions[currentLvl];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        buttons.forEach(b => {
+            const word = b.innerText.replace('👉 ', '').trim();
+            if (lvl.correct.includes(word)) b.classList.add('correct');
+        });
+
+        setTimeout(nextLevel, 1800);
+    }
+
+    /* ======================================================
+       LOAD LEVEL
+       ====================================================== */
+    function loadGame() {
+        foundCorrect = [];
+        answered = false;
+
+        startTimer();
+
+        const lvl = missions[currentLvl];
+
+        document.getElementById('round-title').innerText = "IRREGULAR VERBS 🎯";
+        document.getElementById('lvl-num').innerText = currentLvl + 1;
+        document.getElementById('total-lvls').innerText = missions.length;
+        document.getElementById('xp-value').innerText = scoreXp;
+
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML = `
+            <div class="chat-line">
+                <span>What are the forms of <span class="verb">'${lvl.verb}'</span>?</span>
+            </div>
+            <div class="hint-line">Find BOTH correct forms (V2 and V3)</div>
+        `;
+
+        const optBox = document.getElementById('options-box');
+        optBox.innerHTML = '';
+
+        // Уникальные варианты (если V2 = V3, добавляем один раз)
+        const uniqueCorrect = [...new Set(lvl.correct)];
+        const uniqueFake = [...new Set(lvl.fake)];
+
+        // Всегда показываем 4 кнопки: 2 правильных + 2 неправильных
+        let allOptions = [];
+
+        if (uniqueCorrect.length === 2) {
+            allOptions = [...uniqueCorrect, uniqueFake[0], uniqueFake[1]];
+        } else {
+            // Если V2 и V3 совпадают (beat, bring, build, burst, buy) — берём 1 правильный + 3 неправильных
+            allOptions = [...uniqueCorrect, uniqueFake[0], uniqueFake[1], uniqueFake[2] || uniqueFake[0]];
+        }
+
+        // Перемешать
+        allOptions.sort(() => Math.random() - 0.5);
+
+        allOptions.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = "👉 " + choice;
+            btn.onclick = () => checkChoice(choice, btn);
+            optBox.appendChild(btn);
+        });
+    }
+
+    /* ======================================================
+       CHECK CHOICE
+       ====================================================== */
+    function checkChoice(val, btn) {
+        if (answered) return;
+
+        const lvl = missions[currentLvl];
+        const uniqueCorrect = [...new Set(lvl.correct)];
+
+        // Уже нашли — игнор
+        if (foundCorrect.includes(val)) return;
+
+        if (lvl.correct.includes(val)) {
+            // Правильный вариант
+            btn.classList.add('correct');
+            foundCorrect.push(val);
+
+            // Все правильные найдены — победа
+            if (foundCorrect.length === uniqueCorrect.length) {
+                answered = true;
+                clearTimeout(timerTimeout);
+                scoreXp += 100;
+                document.getElementById('xp-value').innerText = scoreXp;
+                document.querySelectorAll('.option-btn').forEach(b => b.classList.add('disabled'));
+                setTimeout(nextLevel, 1000);
+            }
+        } else {
+            // Неправильный вариант
+            answered = true;
+            clearTimeout(timerTimeout);
+
+            btn.classList.add('wrong');
+
+            // Подсветить все правильные
+            document.querySelectorAll('.option-btn').forEach(b => {
+                const word = b.innerText.replace('👉 ', '').trim();
+                if (lvl.correct.includes(word)) b.classList.add('correct');
+            });
+
+            setTimeout(nextLevel, 1800);
+        }
+    }
+
+    /* ======================================================
+       NEXT LEVEL
+       ====================================================== */
+    function nextLevel() {
+        currentLvl++;
+
+        if (currentLvl < missions.length) {
+            loadGame();
+        } else {
+            clearTimeout(timerTimeout);
+            document.getElementById('play-screen').style.display = 'none';
+            document.getElementById('win-screen').style.display = 'block';
+            document.getElementById('final-xp-value').innerText = scoreXp;
+        }
+    }
+
+    /* ======================================================
+       START
+       ====================================================== */
+    loadGame();
+</script>
+</body>
+</html>

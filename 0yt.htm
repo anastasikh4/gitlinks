@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Past Tense Adventure Quest 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 700px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #FFD700;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #FF8C00; font-size: 2em; margin-bottom: 10px; }
+        
+        .story-box {
+            background: #FFF9E6;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1em;
+            color: #444;
+            border-left: 5px solid #FFD700;
+        }
+
+        .question-text { font-size: 1.4em; color: #2E8B57; margin-bottom: 20px; font-weight: bold; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .btn {
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: #FF8C00; background: #FFF4E6; }
+        .btn.correct { background: #90EE90 !important; border-color: #2E8B57; }
+        .btn.wrong { background: #FFB6C1 !important; border-color: #DC143C; }
+
+        .progress-bar {
+            width: 100%; height: 10px; background: #eee;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.4s; }
+        
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">🏡 Past Tense Quest</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div id="storySection" class="story-box">
+                Yesterday, a strong wind <strong>blew</strong> in our city. My brother <strong>built</strong> a small wooden toy house, but a heavy branch fell and <strong>broke</strong> it. Then, our dog <strong>bit</strong> the toy! After that, we went to the shop. We <strong>bought</strong> some juice and <strong>drank</strong> it in the car. It was an exciting day!
+            </div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆📚🌟🕒</div>
+        <h1 style="color: #FF8C00;">EXCELLENT!</h1>
+        <p style="font-size: 1.3em; margin: 15px 0;">You've mastered these irregular past verbs!</p>
+        <button class="btn" onclick="location.reload()" style="padding: 10px 30px;">Restart</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        // Part I: True/False (Based on the text)
+        { q: "1. A strong wind blew yesterday.", a: ["Yes", "No"], c: "Yes", type: "tf" },
+        { q: "2. The brother bought a toy house.", a: ["Yes", "No"], c: "No", type: "tf" },
+        { q: "3. A heavy branch broke the toy house.", a: ["Yes", "No"], c: "Yes", type: "tf" },
+        { q: "4. The dog bit the toy.", a: ["Yes", "No"], c: "Yes", type: "tf" },
+        { q: "5. They drank juice in the kitchen.", a: ["Yes", "No"], c: "No", type: "tf" },
+        // Part II: Irregular Past Verb Grammar
+        { q: "6. 2nd form of 'become'?", a: ["became", "become"], c: "became", type: "gram" },
+        { q: "7. 2nd form of 'begin'?", a: ["begun", "began"], c: "began", type: "gram" },
+        { q: "8. 2nd form of 'bring'?", a: ["bringed", "brought"], c: "brought", type: "gram" },
+        { q: "9. 2nd form of 'burn'?", a: ["burnt", "burned"], c: "burnt", type: "gram" },
+        { q: "10. 2nd form of 'fly'?", a: ["flied", "flew"], c: "flew", type: "gram" }
+    ];
+
+    let current = 0;
+
+    function load() {
+        if (current >= questions.length) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('qText').innerText = data.q;
+        
+        document.getElementById('storySection').style.display = data.type === "tf" ? "block" : "none";
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        data.a.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        if (choice === questions[current].c) {
+            btn.classList.add('correct');
+            setTimeout(() => { current++; load(); }, 700);
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    load();
+</script>
+
+</body>
+</html>
