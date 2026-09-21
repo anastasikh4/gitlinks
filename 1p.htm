@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Classroom Communication: Asking for Help 🌟</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #eef2f7; padding: 20px; color: #333; }
+        .quiz-container { max-width: 750px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); border-top: 6px solid #4a90e2; }
+        h1 { color: #2c3e50; text-align: center; font-size: 24px; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #7f8c8d; font-size: 14px; margin-bottom: 25px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .reading-section { background: #f0f4f8; border-left: 5px solid #4a90e2; padding: 15px; margin-bottom: 25px; border-radius: 4px; font-size: 0.95rem; line-height: 1.5; color: #34495e; }
+        .question-item { margin-bottom: 25px; padding: 20px; background: #fff; border: 1px solid #e1e8ed; border-radius: 12px; transition: 0.2s; }
+        .question-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .question-text { font-weight: bold; display: block; margin-bottom: 12px; font-size: 16px; color: #2c3e50; }
+        .options { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .option-btn { background: #fff; border: 2px solid #e1e8ed; padding: 12px 15px; border-radius: 10px; cursor: pointer; transition: 0.2s; text-align: left; font-size: 15px; font-family: inherit; font-weight: 500; color: #475569; }
+        .option-btn:hover { background: #f8fafc; border-color: #4a90e2; color: #4a90e2; }
+        .correct { background: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; font-weight: bold; }
+        .wrong { background: #e74c3c !important; color: white !important; border-color: #c0392b !important; }
+        .disabled { pointer-events: none; opacity: 0.8; }
+        #final-score { display: none; text-align: center; font-size: 1.6rem; color: #2ecc71; margin-top: 25px; padding: 20px; background: #f0fdf4; border-radius: 12px; font-weight: bold; border: 2px dashed #2ecc71; }
+        button.reset { display: block; width: 220px; margin: 25px auto 0; padding: 12px; background: #4a90e2; color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: bold; box-shadow: 0 4px 12px rgba(74,144,226,0.3); transition: 0.2s; }
+        button.reset:hover { background: #357abd; transform: translateY(-1px); }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>🤝 Dialogue Master: Offering & Asking for Help</h1>
+    <div class="subtitle">Social Interactions & Requests Lab</div>
+    
+    <div class="reading-section">
+        <strong>Grammar Check:</strong><br>
+       You want to ask politely,say <em>"Can I help you with...?"</em> or <em>"Do you need any help with...?"</em>. To answer, say: <em>"No problem"</em> or <em>"No, thank you"</em> or <em>"I'm sorry, I can't."</em>
+    </div>
+
+    <div id="quiz-content">
+        <!-- Question 1: Unscramble Dialogue 1 -->
+        <div class="question-item">
+            <span class="question-text">1. Choose the correct question:</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">With the dirty dishes can I help you, please?</button>
+                <button class="option-btn" onclick="check(this, 1)">Can I help you with the dirty dishes, please?</button>
+                <button class="option-btn" onclick="check(this, 2)">Please help me can I with the dirty dishes?</button>
+            </div>
+        </div>
+
+        <!-- Question 2: Unscramble Response 1 -->
+        <div class="question-item">
+            <span class="question-text">2. Complete the answer:</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">No problem.</button>
+                <button class="option-btn" onclick="check(this, 1)">Problem no.</button>
+                <button class="option-btn" onclick="check(this, 2)">Not problem.</button>
+            </div>
+        </div>
+
+        <!-- Question 3: Unscramble Dialogue 2 -->
+        <div class="question-item">
+            <span class="question-text">3. Choose the correct question:</span>
+            <div class="options" data-ans="2">
+                <button class="option-btn" onclick="check(this, 0)">You need any help do with the shopping?</button>
+                <button class="option-btn" onclick="check(this, 1)">Do need you any help with the shopping?</button>
+                <button class="option-btn" onclick="check(this, 2)">Do you need any help with the shopping?</button>
+            </div>
+        </div>
+
+        <!-- Question 4: Unscramble Response 2 -->
+        <div class="question-item">
+            <span class="question-text">4. Complete the negative answer:</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">No, thank you, that's fine.</button>
+                <button class="option-btn" onclick="check(this, 1)">No, fine, thank that's you.</button>
+                <button class="option-btn" onclick="check(this, 2)">No, thanks you, fine.</button>
+            </div>
+        </div>
+
+        <!-- Question 5: Unscramble Dialogue 3 -->
+        <div class="question-item">
+            <span class="question-text">5. Choose the correct question:</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">Please help me can you with the washing?</button>
+                <button class="option-btn" onclick="check(this, 1)">Can you help me with the washing, please?</button>
+                <button class="option-btn" onclick="check(this, 2)">Can with the washing you help me, please?</button>
+            </div>
+        </div>
+
+        <!-- Question 6: Unscramble Response 3 -->
+        <div class="question-item">
+            <span class="question-text">6. Complete the negative response :</span>
+            <div class="options" data-ans="2">
+                <button class="option-btn" onclick="check(this, 0)">I'm sorry, right now busy I'm.</button>
+                <button class="option-btn" onclick="check(this, 1)">I'm sorry, I can't. Busy right now I am.</button>
+                <button class="option-btn" onclick="check(this, 2)">I'm sorry, I can't. I'm busy right now.</button>
+            </div>
+        </div>
+
+        <!-- Question 7: Picture Scenario 1 -->
+        <div class="question-item">
+            <span class="question-text">7. Grandma needs help making the bed:</span>
+            <div class="options" data-ans="0">
+                <button class="option-btn" onclick="check(this, 0)">Can you help me with the bed, please?</button>
+                <button class="option-btn" onclick="check(this, 1)">Can I help you with the bed, please?</button>
+                <button class="option-btn" onclick="check(this, 2)">Do you need help with the bed, please?</button>
+            </div>
+        </div>
+
+        <!-- Question 8: Picture Scenario 2 -->
+        <div class="question-item">
+            <span class="question-text">8. Sonia wants to move the armchair:</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">Can you help move the please?</button>
+                <button class="option-btn" onclick="check(this, 1)">Can you help me move the armchair, please?</button>
+                <button class="option-btn" onclick="check(this, 2)">Do you help me move the armchair, please?</button>
+            </div>
+        </div>
+
+        <!-- Question 9: Negative response marker -->
+        <div class="question-item">
+            <span class="question-text">9. Complete Dad's negative answer (X):</span>
+            <div class="options" data-ans="1">
+                <button class="option-btn" onclick="check(this, 0)">No problem.</button>
+                <button class="option-btn" onclick="check(this, 1)">I'm sorry, I can't. I'm busy right now.</button>
+                <button class="option-btn" onclick="check(this, 2)">No, thank you, that's fine.</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="final-score">Your Score: <span id="points">0</span> / 9</div>
+    <button class="reset" onclick="location.reload()">Restart Quiz</button>
+</div>
+
+<script>
+    let score = 0;
+    let completed = 0;
+    const totalQuestions = 9;
+
+    function check(btn, idx) {
+        const parent = btn.parentElement;
+        if (parent.classList.contains('disabled')) return;
+
+        const correctIdx = parseInt(parent.getAttribute('data-ans'));
+        const options = parent.querySelectorAll('.option-btn');
+        
+        options.forEach(b => b.classList.add('disabled'));
+
+        if (idx === correctIdx) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            options[correctIdx].classList.add('correct');
+        }
+
+        parent.classList.add('disabled');
+        completed++;
+        
+        if (completed === totalQuestions) {
+            document.getElementById('final-score').style.display = 'block';
+            document.getElementById('points').innerText = score;
+        }
+    }
+</script>
+
+</body>
+</html>
