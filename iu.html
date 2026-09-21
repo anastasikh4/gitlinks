@@ -54,6 +54,7 @@
       margin-bottom: 25px;
     }
 
+    /* Audio Player Card */
     .audio-card {
       background: #f1f2f6;
       border: 3px dashed var(--primary-blue);
@@ -84,6 +85,7 @@
       padding-bottom: 5px;
     }
 
+    /* Question Card */
     .question-block {
       background: #f8fafc;
       border: 2px solid #e2e8f0;
@@ -227,72 +229,112 @@
   <h1>LISTENING WORKSHEET 📑</h1>
   <div class="subtitle">All items active &middot; Auto telemetry check</div>
 
-  <!-- Audio Link Node -->
+  <!-- ============================================================
+       AUDIO PLAYER
+       Замени ссылку ниже на свой рабочий URL аудиофайла song00.mp3
+       Например:
+       https://USERNAME.github.io/REPOSITORY/song00.mp3
+       или
+       https://raw.githubusercontent.com/USERNAME/REPOSITORY/main/song00.mp3
+       ============================================================ -->
   <div class="audio-card">
     <div class="audio-title">🔊 Audio Track Input: song00.mp3</div>
-    <audio id="mission-audio" controls src="https://githubusercontent.com"></audio>
+    <audio id="mission-audio" controls
+           src="https://USERNAME.github.io/REPOSITORY/song00.mp3">
+      Your browser does not support the audio element.
+    </audio>
   </div>
 
   <form id="worksheet-form" onsubmit="evaluateWorksheet(event)">
 
-    <!-- PART 1: TRUE OR FALSE (variant order mixed) -->
+    <!-- ===================== PART 1: TRUE OR FALSE ===================== -->
     <div class="section-title">Part 1: True or False</div>
 
     <div class="question-block" data-correct="False">
       <div class="prompt">1. The speaker's brother was very quiet and calm in the morning.</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q1" value="False" required> False</label>
-        <label class="option-label"><input type="radio" name="q1" value="True"> True</label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="False" required> False
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q1" value="True"> True
+        </label>
       </div>
     </div>
 
     <div class="question-block" data-correct="True">
       <div class="prompt">2. The speaker found a creative photo frame while cleaning a table.</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q2" value="True" required> True</label>
-        <label class="option-label"><input type="radio" name="q2" value="False"> False</label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="True" required> True
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q2" value="False"> False
+        </label>
       </div>
     </div>
 
     <div class="question-block" data-correct="False">
       <div class="prompt">3. The friends sat down on the comfortable grass at the park.</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q3" value="False" required> False</label>
-        <label class="option-label"><input type="radio" name="q3" value="True"> True</label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="False" required> False
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q3" value="True"> True
+        </label>
       </div>
     </div>
 
-    <!-- PART 2: MULTIPLE CHOICE (variants mixed) -->
+    <!-- ===================== PART 2: MULTIPLE CHOICE ===================== -->
     <div class="section-title">Part 2: Multiple Choice</div>
 
     <div class="question-block" data-correct="A red jacket">
       <div class="prompt">4. What item did the speaker pick up to look stylish before leaving?</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q4" value="A black hat" required> A black hat</label>
-        <label class="option-label"><input type="radio" name="q4" value="A red jacket"> A red jacket</label>
-        <label class="option-label"><input type="radio" name="q4" value="A blue notebook"> A blue notebook</label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="A black hat" required> A black hat
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="A red jacket"> A red jacket
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q4" value="A blue notebook"> A blue notebook
+        </label>
       </div>
     </div>
 
     <div class="question-block" data-correct="A huge balloon">
       <div class="prompt">5. What was the friend holding when the speaker saw her?</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q5" value="A large book" required> A large book</label>
-        <label class="option-label"><input type="radio" name="q5" value="A small dog"> A small dog</label>
-        <label class="option-label"><input type="radio" name="q5" value="A huge balloon"> A huge balloon</label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="A large book" required> A large book
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="A small dog"> A small dog
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q5" value="A huge balloon"> A huge balloon
+        </label>
       </div>
     </div>
 
     <div class="question-block" data-correct="To a café">
       <div class="prompt">6. Where did the friends go to talk about their school days?</div>
       <div class="options-grid">
-        <label class="option-label"><input type="radio" name="q6" value="To the library" required> To the library</label>
-        <label class="option-label"><input type="radio" name="q6" value="To a café"> To a café</label>
-        <label class="option-label"><input type="radio" name="q6" value="To the cinema"> To the cinema</label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="To the library" required> To the library
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="To a café"> To a café
+        </label>
+        <label class="option-label">
+          <input type="radio" name="q6" value="To the cinema"> To the cinema
+        </label>
       </div>
     </div>
 
-    <!-- Action Trigger Row -->
+    <!-- ===================== ACTIONS ===================== -->
     <div class="action-row">
       <button type="submit" class="btn-submit" id="submit-btn">CHECK MY ANSWERS ✔️</button>
       <button type="button" class="btn-reset" onclick="resetWorksheet()">🔄 CLEAR ALL ANSWERS</button>
@@ -303,6 +345,9 @@
 </div>
 
 <script>
+  /* ============================================================
+     ОЦЕНКА ОТВЕТОВ
+     ============================================================ */
   function evaluateWorksheet(event) {
     event.preventDefault();
 
@@ -315,6 +360,7 @@
       const selectedInput = block.querySelector('input[type="radio"]:checked');
       const labels = block.querySelectorAll('.option-label');
 
+      // Очистить предыдущие статусы
       labels.forEach(label => label.classList.remove('correct-status', 'wrong-status'));
 
       if (selectedInput) {
@@ -325,6 +371,7 @@
           selectedInput.parentElement.classList.add('correct-status');
         } else {
           selectedInput.parentElement.classList.add('wrong-status');
+          // Подсветить правильный ответ
           labels.forEach(label => {
             if (label.innerText.trim() === correctAnswer) {
               label.classList.add('correct-status');
@@ -348,6 +395,9 @@
     reportBox.scrollIntoView({ behavior: 'smooth' });
   }
 
+  /* ============================================================
+     СБРОС ВСЕХ ОТВЕТОВ
+     ============================================================ */
   function resetWorksheet() {
     document.querySelectorAll('input[type="radio"]').forEach(input => {
       input.checked = false;
