@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson 12 Quiz - Classroom Commands</title>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #eef6e2;
+            --text-dark: #12312a;
+            --text-green: #0b4f2c;
+            --card-bg: #ffffff;
+            --btn-default: #bfe3ff;
+            --btn-correct: #52b788;
+            --btn-wrong: #ff6b6b;
+            --border-color: #1f3d54;
+            --accent: #ffb703;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--page-bg);
+            background-image: radial-gradient(#cfe3b8 20%, transparent 20%);
+            background-size: 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 4px solid var(--border-color); 
+            box-shadow: 0 10px 0 rgba(31, 61, 84, 0.2); 
+        }
+
+        h1 { color: var(--text-dark); text-align: center; margin-bottom: 10px; }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-green);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .emoji-large { font-size: 2.5rem; margin-right: 10px; vertical-align: middle; }
+
+        .exercise {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .exercise h3 {
+            margin-top: 0;
+            color: var(--text-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-tag {
+            background: #e7f3d6;
+            border: 2px solid var(--border-color);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            padding: 3px 12px;
+            color: var(--text-dark);
+            font-weight: 800;
+        }
+
+        .question {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .question-text { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Interactive Quiz Buttons */
+        input[type="radio"].quiz-radio { display: none; }
+        
+        .quiz-label {
+            padding: 10px 20px;
+            background-color: var(--btn-default);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: 0.2s;
+            margin: 3px;
+            display: inline-block;
+        }
+
+        .quiz-label:hover { filter: brightness(0.92); transform: translateY(-2px); }
+
+        /* Listen button (from the page: Listen, point and repeat) */
+        .say-btn {
+            border: 3px solid var(--border-color);
+            background: #fff3c4;
+            border-radius: 12px;
+            padding: 8px 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 800;
+            transition: 0.2s;
+        }
+        .say-btn:hover { transform: translateY(-2px); background: #ffe89a; }
+
+        /* Feedback Styles */
+        .correct:checked + .quiz-label { 
+            background-color: var(--btn-correct); 
+            color: var(--text-dark); 
+            border-color: var(--text-green);
+            box-shadow: 0 4px 0 rgba(11, 79, 44, 0.3);
+        }
+        .correct:checked + .quiz-label::after { content: " ✓ Correct!"; font-weight: 800; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .wrong:checked + .quiz-label { 
+            background-color: var(--btn-wrong); 
+            color: var(--text-dark); 
+            animation: shake 0.3s;
+            border-color: #c92a2a;
+        }
+        .wrong:checked + .quiz-label::after { content: " ✗ Try again!"; font-weight: 800; }
+
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            background: #fff9c4;
+            border: 3px dashed #ffd700;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .simon-box {
+            text-align: center;
+            padding: 14px 18px;
+            background: #e8f4ff;
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            margin: 15px 0 0;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: var(--accent);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--border-color); }
+
+        .teacher-note {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-green);
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: 2px solid #000; }
+            .quiz-label:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🎨 Classroom Commands Quiz 🎧</h1>
+    <p class="subtitle">Lesson 12 • Grade 2 English • Homework Assignment</p>
+    
+    <div class="score-box">
+        ✨ Click your answers to see if they're correct! ✨
+    </div>
+
+    <!-- ===== EXERCISE 1 : first 5 questions stay the same ===== -->
+    <div class="exercise">
+        <h3>🦋 Vocabulary &amp; Grammar <span class="lesson-tag">Questions 1–5</span></h3>
+        
+        <div class="question">
+            <span class="emoji-large">🐸🐸</span>
+            <span class="question-text">1.Two ...?</span>
+            <input type="radio" name="q1" id="q1a" class="correct quiz-radio"><label for="q1a" class="quiz-label">Frogs</label>
+            <input type="radio" name="q1" id="q1b" class="wrong quiz-radio"><label for="q1b" class="quiz-label">Froges</label>
+            <input type="radio" name="q1" id="q1c" class="wrong quiz-radio"><label for="q1c" class="quiz-label">Frogies</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🦋</span>
+            <span class="question-text">2.One ... ?</span>
+            <input type="radio" name="q2" id="q2a" class="wrong quiz-radio"><label for="q2a" class="quiz-label">Buterfly</label>
+            <input type="radio" name="q2" id="q2b" class="correct quiz-radio"><label for="q2b" class="quiz-label">Butterfly</label>
+            <input type="radio" name="q2" id="q2c" class="wrong quiz-radio"><label for="q2c" class="quiz-label">Butterfli</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🦊🦊</span>
+            <span class="question-text">3. Two ...?</span>
+            <input type="radio" name="q3" id="q3a" class="wrong quiz-radio"><label for="q3a" class="quiz-label">Foxs</label>
+            <input type="radio" name="q3" id="q3b" class="correct quiz-radio"><label for="q3b" class="quiz-label">Foxes</label>
+            <input type="radio" name="q3" id="q3c" class="wrong quiz-radio"><label for="q3c" class="quiz-label">Foxies</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🍒🍒</span>
+            <span class="question-text">4. Two ... ?</span>
+            <input type="radio" name="q4" id="q4a" class="wrong quiz-radio"><label for="q4a" class="quiz-label">Cherrys</label>
+            <input type="radio" name="q4" id="q4b" class="correct quiz-radio"><label for="q4b" class="quiz-label">Cherries</label>
+            <input type="radio" name="q4" id="q4c" class="wrong quiz-radio"><label for="q4c" class="quiz-label">Cherrye</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🦷🦷</span>
+            <span class="question-text">5. Two ... ? (Magic word!)</span>
+            <input type="radio" name="q5" id="q5a" class="wrong quiz-radio"><label for="q5a" class="quiz-label">Tooths</label>
+            <input type="radio" name="q5" id="q5b" class="correct quiz-radio"><label for="q5b" class="quiz-label">Teeth</label>
+            <input type="radio" name="q5" id="q5c" class="wrong quiz-radio"><label for="q5c" class="quiz-label">Teeths</label>
+        </div>
+    </div>
+
+    <!-- ===== EXERCISE 2 : NEW THEME — classroom commands (photo) ===== -->
+    <div class="exercise">
+        <h3>🎧 Classroom Commands <span class="lesson-tag">Questions 6–11</span></h3>
+
+        <div class="question">
+            <span class="emoji-large">🧍</span>
+            <button class="say-btn" type="button" onclick="say('Stand up!')">🔊</button>
+            <span class="question-text">6. The teacher says: →</span>
+            <input type="radio" name="q6" id="q6a" class="correct quiz-radio"><label for="q6a" class="quiz-label">stand up.</label>
+            <input type="radio" name="q6" id="q6b" class="wrong quiz-radio"><label for="q6b" class="quiz-label">sit down.</label>
+            <input type="radio" name="q6" id="q6c" class="wrong quiz-radio"><label for="q6c" class="quiz-label"> sleep.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🪑</span>
+            <button class="say-btn" type="button" onclick="say('Sit down, please!')">🔊</button>
+            <span class="question-text">7. The teacher says:  →</span>
+            <input type="radio" name="q7" id="q7a" class="wrong quiz-radio"><label for="q7a" class="quiz-label">stand up.</label>
+            <input type="radio" name="q7" id="q7b" class="correct quiz-radio"><label for="q7b" class="quiz-label">sit down.</label>
+            <input type="radio" name="q7" id="q7c" class="wrong quiz-radio"><label for="q7c" class="quiz-label">jump.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🤫</span>
+            <button class="say-btn" type="button" onclick="say('Be quiet!')">🔊</button>
+            <span class="question-text">8. The teacher says: →</span>
+            <input type="radio" name="q8" id="q8a" class="wrong quiz-radio"><label for="q8a" class="quiz-label">sing.</label>
+            <input type="radio" name="q8" id="q8b" class="correct quiz-radio"><label for="q8b" class="quiz-label">be quiet.</label>
+            <input type="radio" name="q8" id="q8c" class="wrong quiz-radio"><label for="q8c" class="quiz-label">run.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">👂</span>
+            <button class="say-btn" type="button" onclick="say('Listen!')">🔊</button>
+            <span class="question-text">9. The teacher says:  →</span>
+            <input type="radio" name="q9" id="q9a" class="correct quiz-radio"><label for="q9a" class="quiz-label">listen.</label>
+            <input type="radio" name="q9" id="q9b" class="wrong quiz-radio"><label for="q9b" class="quiz-label">write.</label>
+            <input type="radio" name="q9" id="q9c" class="wrong quiz-radio"><label for="q9c" class="quiz-label">drink.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">📕</span>
+            <button class="say-btn" type="button" onclick="say('Open your book!')">🔊</button>
+            <span class="question-text">10. The teacher says:  →</span>
+            <input type="radio" name="q10" id="q10a" class="wrong quiz-radio"><label for="q10a" class="quiz-label">close the book.</label>
+            <input type="radio" name="q10" id="q10b" class="wrong quiz-radio"><label for="q10b" class="quiz-label">eat the book.</label>
+            <input type="radio" name="q10" id="q10c" class="correct quiz-radio"><label for="q10c" class="quiz-label">open the book.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🖍️</span>
+            <button class="say-btn" type="button" onclick="say('Colour the picture!')">🔊</button>
+            <span class="question-text">11. The teacher says:  →</span>
+            <input type="radio" name="q11" id="q11a" class="wrong quiz-radio"><label for="q11a" class="quiz-label">read the picture.</label>
+            <input type="radio" name="q11" id="q11b" class="correct quiz-radio"><label for="q11b" class="quiz-label">colour the picture.</label>
+            <input type="radio" name="q11" id="q11c" class="wrong quiz-radio"><label for="q11c" class="quiz-label">sit down.</label>
+        </div>
+    </div>
+
+    <!-- ===== EXERCISE 3 : NEW THEME — Simon says game (photo circle) ===== -->
+    <div class="exercise">
+        <h3>🎮 Let’s Play! Simon Says <span class="lesson-tag">Questions 12–14</span></h3>
+
+        <div class="simon-box">
+            💬 Simon says: “Listen!” — We only do the action <strong>when Simon says</strong> it!
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">📖</span>
+            <button class="say-btn" type="button" onclick="say('Simon says, read!')">🔊</button>
+            <span class="question-text">12. Simon says, “...!” →</span>
+            <input type="radio" name="q12" id="q12a" class="wrong quiz-radio"><label for="q12a" class="quiz-label">I don’t read.</label>
+            <input type="radio" name="q12" id="q12b" class="correct quiz-radio"><label for="q12b" class="quiz-label">I read.</label>
+            <input type="radio" name="q12" id="q12c" class="wrong quiz-radio"><label for="q12c" class="quiz-label">I sing.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">✍️</span>
+            <button class="say-btn" type="button" onclick="say('Write!')">🔊</button>
+            <span class="question-text">13. Simon says, “...!” </span>
+            <input type="radio" name="q13" id="q13a" class="correct quiz-radio"><label for="q13a" class="quiz-label">I write.</label>
+            <input type="radio" name="q13" id="q13b" class="wrong quiz-radio"><label for="q13b" class="quiz-label">I listen.</label>
+            <input type="radio" name="q13" id="q13c" class="wrong quiz-radio"><label for="q13c" class="quiz-label">I open my book.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🎤</span>
+            <button class="say-btn" type="button" onclick="say('Simon says, sing!')">🔊</button>
+            <span class="question-text">14. Simon says, “...!” →</span>
+            <input type="radio" name="q14" id="q14a" class="wrong quiz-radio"><label for="q14a" class="quiz-label">I am quiet.</label>
+            <input type="radio" name="q14" id="q14b" class="wrong quiz-radio"><label for="q14b" class="quiz-label">I don’t sing.</label>
+            <input type="radio" name="q14" id="q14c" class="correct quiz-radio"><label for="q14c" class="quiz-label">I sing.</label>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetQuiz()">🔄 Reset Quiz &amp; Try Again</button>
+
+    <div class="teacher-note">
+        <p>📝 <strong>Teacher’s Note:</strong> Well done! Review Lesson 12:<br>
+        • <strong>Classroom commands:</strong> colour · read · be quiet · listen · write · open your book · stand up · sing · sit down<br>
+        • <strong>Simon says:</strong> do the action <em>only</em> when you hear “Simon says…” 🎮<br>
+        • <strong>Plural rules:</strong> most words add -s (frog→frogs); -s, -sh, -ch, -x, -o add -es (fox→foxes);
+        consonant + y → change y to i + es (cherry→cherries); magic words: tooth→teeth, foot→feet ✨</p>
+    </div>
+</div>
+
+<script>
+    function resetQuiz() {
+        const radios = document.querySelectorAll('.quiz-radio');
+        radios.forEach(radio => radio.checked = false);
+
+        const labels = document.querySelectorAll('.quiz-label');
+        labels.forEach(label => {
+            label.style.animation = '';
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Listen, point and repeat — like the headphones task on the page */
+    function say(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; // slow and clear for young learners
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert(text);
+        }
+    }
+</script>
+
+</body>
+</html>

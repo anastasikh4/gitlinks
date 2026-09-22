@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Julia's Favourite Things Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-bg: #fff5f5;
+            --text-dark: #2b2d42;
+            --text-red: #d90429;
+            --card-bg: #ffffff;
+            --btn-default: #ffe3e3;
+            --btn-correct: #52b788;
+            --btn-wrong: #ff6b6b;
+            --border-color: #2b2d42;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--space-bg);
+            background-image: radial-gradient(#ffccd5 20%, transparent 20%);
+            background-size: 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 4px solid var(--border-color); 
+            box-shadow: 0 10px 0 rgba(43, 45, 66, 0.2); 
+        }
+
+        h1 { 
+            color: var(--text-red); 
+            text-align: center; 
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .reading-box {
+            background: #fff5f5;
+            border: 3px dashed var(--text-red);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .reading-box h3 {
+            margin-top: 0;
+            color: var(--text-red);
+        }
+
+        .emoji-large { font-size: 2.2rem; margin-right: 10px; vertical-align: middle; }
+
+        .exercise {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .exercise h3 {
+            color: var(--text-red);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .question-text { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            flex: 1;
+            min-width: 200px;
+        }
+
+        input[type="radio"].quiz-radio { display: none; }
+        
+        .quiz-label {
+            padding: 10px 20px;
+            background-color: var(--btn-default);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: 0.2s;
+            margin: 3px;
+            display: inline-block;
+        }
+
+        .quiz-label:hover { 
+            filter: brightness(0.95); 
+            transform: translateY(-2px);
+        }
+
+        .correct:checked + .quiz-label { 
+            background-color: var(--btn-correct); 
+            color: white; 
+            border-color: #1b4332;
+            box-shadow: 0 4px 0 rgba(27, 67, 50, 0.3);
+        }
+        .correct:checked + .quiz-label::after { content: " ✓ Correct!"; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .wrong:checked + .quiz-label { 
+            background-color: var(--btn-wrong); 
+            color: white; 
+            animation: shake 0.3s;
+            border-color: #a01a58;
+        }
+        .wrong:checked + .quiz-label::after { content: " ✗ Try again!"; }
+
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            background: #fff9c4;
+            border: 3px dashed #ffd700;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #856404;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: #ffb703;
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 var(--border-color);
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: 2px solid #000; }
+            .quiz-label:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Прочитай</h1>
+    <p class="subtitle">Starter Unit • School Objects, Letters &amp; Capitals</p>
+    
+    <div class="score-box">
+        ✨ Read     </div>
+
+    <!-- ============ READING PASSAGE ============ -->
+    <div class="reading-box">
+        <h3></h3>
+        <p><strong>This is my schoolbag.</strong> It's red.</p>
+        <p><strong>This is my notebook.</strong> It's red, too.</p>
+        <p><strong>This is my red pencil case.</strong></p>
+        <p style="font-size: 1.2rem; font-weight: 800; color: var(--text-red);">Red is my favourite colour!</p>
+    </div>
+
+    <!-- ============ SECTION 1 ============ -->
+    <div class="exercise">
+        <h3></h3>
+        
+        <div class="question">
+            <span class="emoji-large"></span>
+            <span class="question-text">1. What is Julia's favourite colour?</span>
+            <input type="radio" name="q1" id="q1a" class="wrong quiz-radio"><label for="q1a" class="quiz-label">Blue</label>
+            <input type="radio" name="q1" id="q1b" class="correct quiz-radio"><label for="q1b" class="quiz-label">Red</label>
+            <input type="radio" name="q1" id="q1c" class="wrong quiz-radio"><label for="q1c" class="quiz-label">Green</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large"></span>
+            <span class="question-text">2. What colour is Julia's schoolbag?</span>
+            <input type="radio" name="q2" id="q2a" class="correct quiz-radio"><label for="q2a" class="quiz-label">It's red.</label>
+            <input type="radio" name="q2" id="q2b" class="wrong quiz-radio"><label for="q2b" class="quiz-label">It's yellow.</label>
+            <input type="radio" name="q2" id="q2c" class="wrong quiz-radio"><label for="q2c" class="quiz-label">It's pink.</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large"></span>
+            <span class="question-text">3. Which is NOT red?</span>
+            <input type="radio" name="q3" id="q3a" class="wrong quiz-radio"><label for="q3a" class="quiz-label">Notebook</label>
+            <input type="radio" name="q3" id="q3b" class="wrong quiz-radio"><label for="q3b" class="quiz-label">Pencil case</label>
+            <input type="radio" name="q3" id="q3c" class="correct quiz-radio"><label for="q3c" class="quiz-label">Ruler</label>
+        </div>
+    </div>
+
+    <!-- ============ SECTION 2 ============ -->
+    <div class="exercise">
+        <h3>🧩 Отгадай</h3>
+        
+        <div class="question">
+            <span class="emoji-large">🖍️</span>
+            <span class="question-text"> <strong>o o u l r c</strong></span>
+            <input type="radio" name="q4" id="q4a" class="wrong quiz-radio"><label for="q4a" class="quiz-label">clour</label>
+            <input type="radio" name="q4" id="q4b" class="correct quiz-radio"><label for="q4b" class="quiz-label">colour</label>
+            <input type="radio" name="q4" id="q4c" class="wrong quiz-radio"><label for="q4c" class="quiz-label">color</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">🧍️</span>
+            <span class="question-text"><strong>t n a d s</strong></span>
+            <input type="radio" name="q5" id="q5a" class="correct quiz-radio"><label for="q5a" class="quiz-label">stand</label>
+            <input type="radio" name="q5" id="q5b" class="wrong quiz-radio"><label for="q5b" class="quiz-label">stnad</label>
+            <input type="radio" name="q5" id="q5c" class="wrong quiz-radio"><label for="q5c" class="quiz-label">satan</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">✍️</span>
+            <span class="question-text"> <strong>r e w i t</strong></span>
+            <input type="radio" name="q6" id="q6a" class="wrong quiz-radio"><label for="q6a" class="quiz-label">writ</label>
+            <input type="radio" name="q6" id="q6b" class="wrong quiz-radio"><label for="q6b" class="quiz-label">wriet</label>
+            <input type="radio" name="q6" id="q6c" class="correct quiz-radio"><label for="q6c" class="quiz-label">write</label>
+        </div>
+
+        <div class="question">
+            <span class="emoji-large">👂</span>
+            <span class="question-text"><strong>l n i t e s</strong></span>
+            <input type="radio" name="q7" id="q7a" class="correct quiz-radio"><label for="q7a" class="quiz-label">listen</label>
+            <input type="radio" name="q7" id="q7b" class="wrong quiz-radio"><label for="q7b" class="quiz-label">listne</label>
+            <input type="radio" name="q7" id="q7c" class="wrong quiz-radio"><label for="q7c" class="quiz-label">silent</label>
+        </div>
+    </div>
+
+    <!-- ============ SECTION 3 — RIDDLE ============ -->
+    <div class="exercise">
+        <h3>Прочитай и отгадай</h3>
+
+        <div class="question">
+            <span class="emoji-large">📖</span>
+            <span class="question-text"> I can run and I can listen, I can draw and I can sit, I can stand up and I can jump, I can read and I can write. What can't I do?</span>
+            <input type="radio" name="q8" id="q8a" class="wrong quiz-radio"><label for="q8a" class="quiz-label">I can't jump</label>
+            <input type="radio" name="q8" id="q8b" class="wrong quiz-radio"><label for="q8b" class="quiz-label">I can't listen</label>
+            <input type="radio" name="q8" id="q8c" class="correct quiz-radio"><label for="q8c" class="quiz-label">I can't fly</label>
+        </div>
+    </div>
+
+    <!-- ============ RESET ============ -->
+    <button class="reset-btn" onclick="document.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);">🔄 Restart Assignment</button>
+
+</div>
+
+</body>
+</html>
