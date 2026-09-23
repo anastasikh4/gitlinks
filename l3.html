@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML / PDF Preview + Drawing Board</title>
+
+    <style>
+        :root {
+            --purple: #6d28d9;
+            --dark-purple: #4c1d95;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --orange: #ea580c;
+            --yellow: #eab308;
+            --pink: #db2777;
+            --navy: #172554;
+            --ink: #1f2937;
+            --muted: #64748b;
+            --border: #dbe4f0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: Arial, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 10%, rgba(167, 139, 250, 0.25), transparent 22%),
+                radial-gradient(circle at 92% 15%, rgba(96, 165, 250, 0.22), transparent 21%),
+                linear-gradient(135deg, #edf4ff, #f8f4ff);
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =========================
+           LEFT SIDEBAR
+        ========================= */
+        .sidebar {
+            width: 340px;
+            min-width: 340px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.96);
+            border-right: 2px solid #d8e3f3;
+            box-shadow: 5px 0 25px rgba(30, 58, 138, 0.08);
+            transition: width 0.35s ease, min-width 0.35s ease, padding 0.35s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            overflow: hidden;
+            border-right: none;
+        }
+
+        .sidebar-content {
+            min-width: 300px;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar.collapsed .sidebar-content {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 15px;
+            color: var(--dark-purple);
+            background: #ede9fe;
+            border: 2px solid #c4b5fd;
+            font-size: 26px;
+            flex: 0 0 auto;
+        }
+
+        .logo h1 {
+            margin: 0;
+            color: var(--navy);
+            font-size: 20px;
+            line-height: 1.1;
+        }
+
+        .logo p {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .side-section {
+            margin-bottom: 18px;
+            padding: 15px;
+            background: #f8fbff;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+        }
+
+        .side-section h2 {
+            margin: 0 0 10px;
+            color: var(--navy);
+            font-size: 15px;
+        }
+
+        .hint {
+            margin: 0 0 10px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 155px;
+            resize: vertical;
+            padding: 12px;
+            color: var(--ink);
+            background: #ffffff;
+            border: 2px solid #cddced;
+            border-radius: 12px;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        textarea:focus {
+            outline: 3px solid rgba(109, 40, 217, 0.14);
+            border-color: var(--purple);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label,
+        button {
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+        }
+
+        .file-label:hover,
+        button:hover {
+            filter: brightness(1.05);
+        }
+
+        .file-label:active,
+        button:active {
+            transform: translateY(2px);
+        }
+
+        .file-label {
+            display: block;
+            width: 100%;
+            padding: 11px;
+            text-align: center;
+            color: var(--navy);
+            background: #dbeafe;
+            border: 2px solid #93c5fd;
+        }
+
+        .open-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            box-shadow: 0 4px 0 #3730a3;
+        }
+
+        .open-btn:active {
+            box-shadow: 0 1px 0 #3730a3;
+        }
+
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .tool-btn {
+            padding: 10px;
+            color: var(--navy);
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+        }
+
+        .tool-btn.active {
+            color: var(--dark-purple);
+            background: #ede9fe;
+            border-color: var(--purple);
+            box-shadow: 0 3px 0 #c4b5fd;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 9px;
+            margin-top: 10px;
+        }
+
+        .color-btn {
+            width: 38px;
+            aspect-ratio: 1;
+            padding: 0;
+            border-radius: 50%;
+            border: 3px solid #ffffff;
+            outline: 2px solid transparent;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .color-btn.active {
+            outline-color: var(--navy);
+            transform: scale(1.08);
+        }
+
+        .color-black { background: #161616; }
+        .color-blue { background: #2563eb; }
+        .color-green { background: #16a34a; }
+        .color-red { background: #dc2626; }
+        .color-orange { background: #ea580c; }
+        .color-yellow { background: #eab308; }
+        .color-purple { background: #7c3aed; }
+        .color-pink { background: #db2777; }
+        .color-brown { background: #78350f; }
+        .color-white { background: #ffffff; border-color: #cbd5e1; }
+
+        .range-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--purple);
+        }
+
+        .size-number {
+            min-width: 36px;
+            padding: 4px 8px;
+            text-align: center;
+            color: var(--dark-purple);
+            background: #ede9fe;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .action-btn {
+            width: 100%;
+            margin-top: 9px;
+            padding: 10px;
+            color: var(--navy);
+            background: #fef3c7;
+            border: 2px solid #fcd34d;
+        }
+
+        .erase-all-btn {
+            color: #7f1d1d;
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .save-btn {
+            color: #14532d;
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        .status {
+            margin-top: 11px;
+            padding: 9px;
+            color: var(--muted);
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* =========================
+           FLOATING TOOLBAR
+        ========================= */
+        .floating-toolbar {
+            position: fixed;
+            z-index: 1000;
+            top: 14px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: calc(100vw - 32px);
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            border: 2px solid #c4b5fd;
+            border-radius: 18px;
+            box-shadow: 0 6px 20px rgba(76, 29, 149, 0.18);
+            backdrop-filter: blur(8px);
+        }
+
+        .floating-toolbar button {
+            min-width: 40px;
+            padding: 9px 11px;
+            color: var(--navy);
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            font-size: 15px;
+        }
+
+        .floating-toolbar button.active {
+            color: var(--dark-purple);
+            background: #ede9fe;
+            border-color: var(--purple);
+        }
+
+        .floating-toolbar .toolbar-toggle {
+            color: #ffffff;
+            background: linear-gradient(135deg, var(--purple), var(--blue));
+            border-color: var(--purple);
+        }
+
+        .floating-toolbar .toolbar-danger {
+            color: #7f1d1d;
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
+        .floating-toolbar .toolbar-download {
+            color: #ffffff;
+            background: linear-gradient(135deg, #ea580c, #db2777);
+            border-color: #c2410c;
+        }
+
+        .floating-color {
+            width: 26px !important;
+            min-width: 26px !important;
+            height: 26px;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            border: 2px solid #ffffff !important;
+            outline: 2px solid transparent;
+        }
+
+        .floating-color.active {
+            outline-color: var(--navy);
+            transform: scale(1.12);
+        }
+
+        .toolbar-size {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0 6px;
+            color: var(--navy);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .toolbar-size input {
+            width: 82px;
+            accent-color: var(--purple);
+        }
+
+        /* =========================
+           DOWNLOAD MENU
+        ========================= */
+        .download-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .download-menu {
+            position: absolute;
+            z-index: 1200;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 250px;
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+            background: #ffffff;
+            border: 2px solid #c4b5fd;
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(76, 29, 149, 0.22);
+        }
+
+        .download-menu.open {
+            display: flex;
+            animation: dropIn 0.18s ease-out;
+        }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .download-menu button {
+            width: 100%;
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 14px;
+            background: #f8fafc;
+            color: var(--navy);
+            border: 2px solid #e2e8f0;
+        }
+
+        .download-menu button:hover:not(:disabled) {
+            background: #ede9fe;
+            border-color: #c4b5fd;
+        }
+
+        .download-menu button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.4);
+        }
+
+        .download-menu .menu-html {
+            color: #1e3a8a;
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+
+        .download-menu .menu-pdf {
+            color: #7c2d12;
+            background: #ffedd5;
+            border-color: #fdba74;
+        }
+
+        .download-menu .menu-png {
+            color: #14532d;
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        .download-menu .menu-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            padding: 2px 4px 6px;
+            border-bottom: 1px dashed #cbd5e1;
+            margin-bottom: 4px;
+        }
+
+        .download-menu .menu-note {
+            font-size: 11px;
+            color: var(--muted);
+            padding: 2px 4px;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .sidebar .download-menu {
+            position: static;
+            margin-top: 8px;
+            width: 100%;
+            min-width: 0;
+            box-shadow: none;
+        }
+
+        /* =========================
+           PREVIEW AREA
+        ========================= */
+        .main {
+            min-width: 0;
+            min-height: 100vh;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 85px 20px 20px;
+            transition: padding 0.35s ease;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .topbar h2 {
+            margin: 0;
+            color: var(--navy);
+            font-size: clamp(18px, 3vw, 25px);
+        }
+
+        .source-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .source-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 800;
+            background: #e2e8f0;
+            color: var(--navy);
+            border: 1px solid #cbd5e1;
+        }
+
+        .source-chip.pdf {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+
+        .source-chip.html {
+            background: #dbeafe;
+            color: #1e3a8a;
+            border-color: #93c5fd;
+        }
+
+        .mode-badge {
+            padding: 8px 12px;
+            border-radius: 100px;
+            color: #14532d;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .mode-badge.off {
+            color: #7c2d12;
+            background: #ffedd5;
+            border-color: #fdba74;
+        }
+
+        .preview-shell {
+            position: relative;
+            flex: 1;
+            min-height: 680px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 4px solid var(--navy);
+            border-radius: 22px;
+            box-shadow: 10px 10px 0 rgba(30, 58, 138, 0.18);
+        }
+
+        #htmlPreview {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #ffffff;
+        }
+
+        #drawingCanvas {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        #drawingCanvas.drawing-off {
+            pointer-events: none;
+            cursor: default;
+        }
+
+        #drawingCanvas.highlighter-cursor {
+            cursor: cell;
+        }
+
+        .empty-preview {
+            position: absolute;
+            z-index: 2;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 25px;
+            text-align: center;
+            background:
+                linear-gradient(45deg, rgba(219, 234, 254, 0.6) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(219, 234, 254, 0.6) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(219, 234, 254, 0.6) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(219, 234, 254, 0.6) 75%);
+            background-size: 34px 34px;
+            background-position: 0 0, 0 17px, 17px -17px, -17px 0;
+        }
+
+        .empty-preview.hidden {
+            display: none;
+        }
+
+        .empty-card {
+            max-width: 520px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 3px dashed var(--purple);
+            border-radius: 22px;
+            color: var(--navy);
+        }
+
+        .empty-card h3 {
+            margin: 0 0 10px;
+            font-size: 25px;
+        }
+
+        .empty-card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .empty-card .format-hint {
+            margin-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .format-pill {
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-weight: 800;
+            font-size: 13px;
+            background: #f1f5f9;
+            color: var(--navy);
+            border: 2px solid #cbd5e1;
+        }
+
+        .format-pill.pdf {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .format-pill.html {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1e3a8a;
+        }
+
+        .drawing-message {
+            position: absolute;
+            z-index: 8;
+            right: 18px;
+            bottom: 18px;
+            display: none;
+            padding: 9px 13px;
+            color: #14532d;
+            background: #dcfce7;
+            border: 2px solid #86efac;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .drawing-message.show {
+            display: block;
+        }
+
+        @media (max-width: 1100px) {
+            .floating-toolbar {
+                gap: 5px;
+                padding: 6px;
+            }
+
+            .floating-toolbar button {
+                padding: 7px 8px;
+                font-size: 13px;
+            }
+
+            .toolbar-size {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                max-height: 72vh;
+                border-right: none;
+                border-bottom: 2px solid #d8e3f3;
+            }
+
+            .sidebar.collapsed {
+                width: 100%;
+                min-width: 100%;
+                height: 0;
+                min-height: 0;
+                padding: 0;
+                border-bottom: none;
+            }
+
+            .main {
+                padding: 85px 14px 14px;
+            }
+
+            .preview-shell {
+                min-height: 580px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .floating-toolbar {
+                left: 8px;
+                right: 8px;
+                top: 8px;
+                justify-content: center;
+                flex-wrap: wrap;
+                border-radius: 14px;
+            }
+
+            .floating-toolbar button {
+                min-width: 36px;
+            }
+
+            .floating-toolbar .text-button {
+                font-size: 12px;
+            }
+
+            .main {
+                padding-top: 150px;
+            }
+
+            .preview-shell {
+                min-height: 500px;
+            }
+
+            .download-menu {
+                min-width: 200px;
+            }
+        }
+
+        @media print {
+            @page {
+                margin: 0;
+                size: A4 landscape;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
+            .sidebar,
+            .floating-toolbar,
+            .topbar,
+            .drawing-message,
+            .download-menu {
+                display: none !important;
+            }
+
+            .app {
+                display: block !important;
+            }
+
+            .main {
+                padding: 0 !important;
+                min-height: 100vh !important;
+                display: block !important;
+            }
+
+            .preview-shell {
+                position: fixed !important;
+                inset: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+                border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                background: #ffffff !important;
+                overflow: hidden !important;
+            }
+
+            .empty-preview {
+                display: none !important;
+            }
+
+            #htmlPreview {
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            #drawingCanvas {
+                width: 100% !important;
+                height: 100% !important;
+                position: absolute !important;
+                z-index: 5 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+
+            <div class="logo">
+                <div class="logo-icon">✎</div>
+
+                <div>
+                    <h1>HTML / PDF Preview<br>+ Drawing</h1>
+                    <p>Open a page or PDF and draw on it.</p>
+                </div>
+            </div>
+
+            <section class="side-section">
+                <h2>1. Upload a file</h2>
+                <p class="hint">Choose an <strong>.html</strong>, <strong>.htm</strong> or <strong>.pdf</strong> file from your device.</p>
+
+                <label class="file-label" for="htmlFile">
+                    📁 Choose file (HTML or PDF)
+                </label>
+
+                <input type="file" id="htmlFile" accept=".html,.htm,.pdf,text/html,application/pdf">
+            </section>
+
+            <section class="side-section">
+                <h2>2. Or paste HTML code</h2>
+                <p class="hint">Paste HTML code below and open it in the preview (only for HTML, not PDF).</p>
+
+                <textarea id="htmlCode" placeholder="<!DOCTYPE html>
+<html>
+<head>
+  <title>My page</title>
+</head>
+<body>
+  <h1>Hello!</h1>
+</body>
+</html>"></textarea>
+
+                <button class="open-btn" id="openCodeBtn">
+                    Open code in preview
+                </button>
+            </section>
+
+            <section class="side-section">
+                <h2>Drawing tools</h2>
+
+                <div class="tool-grid">
+                    <button class="tool-btn active" id="sidebarPencilBtn">✏ Pencil</button>
+                    <button class="tool-btn" id="sidebarHighlighterBtn">🖍 Highlighter</button>
+                    <button class="tool-btn" id="sidebarEraserBtn">▱ Eraser</button>
+                    <button class="tool-btn" id="sidebarBrowseBtn">✋ Browse mode</button>
+                    <button class="tool-btn" id="sidebarUndoBtn">↶ Undo</button>
+                </div>
+            </section>
+
+            <section class="side-section">
+                <h2>Colours</h2>
+
+                <div class="color-grid">
+                    <button class="color-btn color-black active" data-color="#161616" title="Black"></button>
+                    <button class="color-btn color-blue" data-color="#2563eb" title="Blue"></button>
+                    <button class="color-btn color-green" data-color="#16a34a" title="Green"></button>
+                    <button class="color-btn color-red" data-color="#dc2626" title="Red"></button>
+                    <button class="color-btn color-orange" data-color="#ea580c" title="Orange"></button>
+                    <button class="color-btn color-yellow" data-color="#eab308" title="Yellow"></button>
+                    <button class="color-btn color-purple" data-color="#7c3aed" title="Purple"></button>
+                    <button class="color-btn color-pink" data-color="#db2777" title="Pink"></button>
+                    <button class="color-btn color-brown" data-color="#78350f" title="Brown"></button>
+                    <button class="color-btn color-white" data-color="#ffffff" title="White"></button>
+                </div>
+
+                <div class="range-row">
+                    <label for="sidebarBrushSize">Brush size</label>
+                    <input type="range" id="sidebarBrushSize" min="2" max="60" value="5">
+                    <span class="size-number" id="sidebarSizeNumber">5</span>
+                </div>
+            </section>
+
+            <section class="side-section">
+                <h2>Actions</h2>
+
+                <button class="action-btn erase-all-btn" id="sidebarEraseAllBtn">
+                    🗑 Erase all drawing
+                </button>
+
+                <div class="download-wrap" id="sidebarDownloadWrap">
+                    <button class="action-btn save-btn" id="sidebarDownloadBtn" style="background:#ffe4e6; border-color:#fda4af; color:#881337;">
+                        ⬇ Choose format to download
+                    </button>
+
+                    <div class="download-menu" id="sidebarDownloadMenu">
+                        <div class="menu-title">Save your page</div>
+
+                        <button class="menu-html" id="menuHtmlBtn1">
+                            💾 Save as HTML (with drawing)
+                        </button>
+
+                        <button class="menu-pdf" id="menuPdfBtn1">
+                            📄 Save as PDF (print)
+                        </button>
+
+                        <button class="menu-png" id="menuPngBtn1">
+                            🖼 Save drawing only (PNG)
+                        </button>
+
+                        <div class="menu-note" id="menuNote1"></div>
+                    </div>
+                </div>
+
+                <p class="status" id="statusText">
+                    Upload an HTML or PDF file, or paste HTML code to begin.
+                </p>
+            </section>
+        </div>
+    </aside>
+
+    <!-- FLOATING TOOLBAR -->
+    <div class="floating-toolbar">
+
+        <button class="toolbar-toggle text-button" id="toggleSidebarBtn">
+            ☰ Tools
+        </button>
+
+        <button id="floatingPencilBtn" class="active" title="Pencil">
+            ✏
+        </button>
+
+        <button id="floatingHighlighterBtn" title="Highlighter">
+            🖍
+        </button>
+
+        <button id="floatingEraserBtn" title="Eraser">
+            ▱
+        </button>
+
+        <button id="floatingBrowseBtn" title="Turn drawing on or off">
+            ✋
+        </button>
+
+        <button id="floatingUndoBtn" title="Undo">
+            ↶
+        </button>
+
+        <button id="floatingEraseAllBtn" class="toolbar-danger" title="Erase all drawing">
+            🗑
+        </button>
+
+        <div class="download-wrap" id="floatingDownloadWrap">
+            <button id="floatingDownloadBtn" class="toolbar-download" title="Choose format to download">
+                ⬇
+            </button>
+
+            <div class="download-menu" id="floatingDownloadMenu">
+                <div class="menu-title">Download as</div>
+
+                <button class="menu-html" id="menuHtmlBtn2">
+                    💾 HTML (with drawing)
+                </button>
+
+                <button class="menu-pdf" id="menuPdfBtn2">
+                    📄 PDF (print)
+                </button>
+
+                <button class="menu-png" id="menuPngBtn2">
+                    🖼 PNG (drawing only)
+                </button>
+
+                <div class="menu-note" id="menuNote2"></div>
+            </div>
+        </div>
+
+        <button class="floating-color color-black active" data-color="#161616" title="Black"></button>
+        <button class="floating-color color-blue" data-color="#2563eb" title="Blue"></button>
+        <button class="floating-color color-green" data-color="#16a34a" title="Green"></button>
+        <button class="floating-color color-red" data-color="#dc2626" title="Red"></button>
+        <button class="floating-color color-orange" data-color="#ea580c" title="Orange"></button>
+        <button class="floating-color color-yellow" data-color="#eab308" title="Yellow"></button>
+        <button class="floating-color color-purple" data-color="#7c3aed" title="Purple"></button>
+        <button class="floating-color color-pink" data-color="#db2777" title="Pink"></button>
+
+        <label class="toolbar-size" title="Brush size">
+            Size
+            <input type="range" id="floatingBrushSize" min="2" max="60" value="5">
+            <span id="floatingSizeNumber">5</span>
+        </label>
+    </div>
+
+    <!-- PREVIEW -->
+    <main class="main">
+        <div class="topbar">
+            <h2>Preview window</h2>
+
+            <div class="source-info">
+                <div class="source-chip" id="sourceChip" style="display:none;">—</div>
+                <div class="mode-badge" id="modeBadge">Drawing mode: ON</div>
+            </div>
+        </div>
+
+        <div class="preview-shell" id="previewShell">
+
+            <div class="empty-preview" id="emptyPreview">
+                <div class="empty-card">
+                    <h3>Open your page</h3>
+                    <p>
+                        Upload an HTML file, a PDF file, or paste HTML code in the left panel.
+                        You can hide the panel with "Tools"; the drawing toolbar will stay at the top.
+                    </p>
+
+                    <div class="format-hint">
+                        <span class="format-pill html">.html / .htm</span>
+                        <span class="format-pill pdf">.pdf</span>
+                    </div>
+                </div>
+            </div>
+
+            <iframe
+                id="htmlPreview"
+                title="HTML / PDF preview"
+                sandbox="allow-forms allow-modals allow-popups allow-scripts"
+            ></iframe>
+
+            <canvas id="drawingCanvas"></canvas>
+
+            <div class="drawing-message" id="drawingMessage">
+                Drawing saved as PNG
+            </div>
+        </div>
+    </main>
+
+</div>
+
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const toggleSidebarBtn = document.getElementById("toggleSidebarBtn");
+
+    const htmlFile = document.getElementById("htmlFile");
+    const htmlCode = document.getElementById("htmlCode");
+    const openCodeBtn = document.getElementById("openCodeBtn");
+
+    const htmlPreview = document.getElementById("htmlPreview");
+    const emptyPreview = document.getElementById("emptyPreview");
+
+    const drawingCanvas = document.getElementById("drawingCanvas");
+    const previewShell = document.getElementById("previewShell");
+    const ctx = drawingCanvas.getContext("2d");
+
+    const statusText = document.getElementById("statusText");
+    const modeBadge = document.getElementById("modeBadge");
+    const drawingMessage = document.getElementById("drawingMessage");
+    const sourceChip = document.getElementById("sourceChip");
+
+    const pencilButtons = [
+        document.getElementById("sidebarPencilBtn"),
+        document.getElementById("floatingPencilBtn")
+    ];
+
+    const highlighterButtons = [
+        document.getElementById("sidebarHighlighterBtn"),
+        document.getElementById("floatingHighlighterBtn")
+    ];
+
+    const eraserButtons = [
+        document.getElementById("sidebarEraserBtn"),
+        document.getElementById("floatingEraserBtn")
+    ];
+
+    const browseButtons = [
+        document.getElementById("sidebarBrowseBtn"),
+        document.getElementById("floatingBrowseBtn")
+    ];
+
+    const undoButtons = [
+        document.getElementById("sidebarUndoBtn"),
+        document.getElementById("floatingUndoBtn")
+    ];
+
+    const eraseAllButtons = [
+        document.getElementById("sidebarEraseAllBtn"),
+        document.getElementById("floatingEraseAllBtn")
+    ];
+
+    const sidebarBrushSize = document.getElementById("sidebarBrushSize");
+    const floatingBrushSize = document.getElementById("floatingBrushSize");
+    const sidebarSizeNumber = document.getElementById("sidebarSizeNumber");
+    const floatingSizeNumber = document.getElementById("floatingSizeNumber");
+
+    /* Download UI */
+    const sidebarDownloadWrap = document.getElementById("sidebarDownloadWrap");
+    const sidebarDownloadBtn = document.getElementById("sidebarDownloadBtn");
+    const sidebarDownloadMenu = document.getElementById("sidebarDownloadMenu");
+    const menuNote1 = document.getElementById("menuNote1");
+
+    const floatingDownloadWrap = document.getElementById("floatingDownloadWrap");
+    const floatingDownloadBtn = document.getElementById("floatingDownloadBtn");
+    const floatingDownloadMenu = document.getElementById("floatingDownloadMenu");
+    const menuNote2 = document.getElementById("menuNote2");
+
+    const htmlDownloadButtons = [
+        document.getElementById("menuHtmlBtn1"),
+        document.getElementById("menuHtmlBtn2")
+    ];
+
+    const pdfDownloadButtons = [
+        document.getElementById("menuPdfBtn1"),
+        document.getElementById("menuPdfBtn2")
+    ];
+
+    const pngDownloadButtons = [
+        document.getElementById("menuPngBtn1"),
+        document.getElementById("menuPngBtn2")
+    ];
+
+    let isDrawing = false;
+    let drawingEnabled = true;
+    let tool = "pencil";
+    let color = "#161616";
+    let size = 5;
+    let lastX = 0;
+    let lastY = 0;
+    let history = [];
+
+    /* Current source info */
+    let currentSourceType = null;   /* 'html' | 'pdf' | null */
+    let currentSourceName = "";
+    let currentPdfURL = null;       /* blob URL, revoked on replace */
+    let currentHtmlCode = "";       /* latest HTML code, used for HTML export */
+
+    const DEFAULT_SIZES = {
+        pencil: 5,
+        highlighter: 24,
+        eraser: 12
+    };
+
+    const DEFAULT_COLORS = {
+        pencil: "#161616",
+        highlighter: "#facc15",
+        eraser: "#ffffff"
+    };
+
+    /* Softer, more transparent highlighter */
+    const HIGHLIGHTER_ALPHA = 0.2;
+
+    /* =========================================================
+       CANVAS RESIZE
+       ========================================================= */
+    function resizeCanvas() {
+        const oldCanvas = document.createElement("canvas");
+        oldCanvas.width = drawingCanvas.width;
+        oldCanvas.height = drawingCanvas.height;
+
+        const oldContext = oldCanvas.getContext("2d");
+        oldContext.drawImage(drawingCanvas, 0, 0);
+
+        const rect = previewShell.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        drawingCanvas.width = Math.floor(rect.width * dpr);
+        drawingCanvas.height = Math.floor(rect.height * dpr);
+
+        drawingCanvas.style.width = rect.width + "px";
+        drawingCanvas.style.height = rect.height + "px";
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (oldCanvas.width > 0 && oldCanvas.height > 0) {
+            ctx.drawImage(
+                oldCanvas,
+                0,
+                0,
+                oldCanvas.width,
+                oldCanvas.height,
+                0,
+                0,
+                rect.width,
+                rect.height
+            );
+        }
+    }
+
+    /* =========================================================
+       TOOLS
+       ========================================================= */
+    function updateToolButtons() {
+        pencilButtons.forEach(button => {
+            button.classList.toggle("active", tool === "pencil");
+        });
+
+        highlighterButtons.forEach(button => {
+            button.classList.toggle("active", tool === "highlighter");
+        });
+
+        eraserButtons.forEach(button => {
+            button.classList.toggle("active", tool === "eraser");
+        });
+
+        drawingCanvas.classList.toggle(
+            "highlighter-cursor",
+            tool === "highlighter" && drawingEnabled
+        );
+    }
+
+    function setTool(newTool) {
+        tool = newTool;
+
+        size = DEFAULT_SIZES[newTool] || size;
+        color = DEFAULT_COLORS[newTool] || color;
+
+        sidebarBrushSize.value = size;
+        floatingBrushSize.value = size;
+        sidebarSizeNumber.textContent = size;
+        floatingSizeNumber.textContent = size;
+
+        updateColorButtons();
+        updateToolButtons();
+
+        if (tool === "pencil") {
+            statusText.textContent = "Pencil selected. Choose a colour and draw on the preview.";
+        } else if (tool === "highlighter") {
+            statusText.textContent = "Highlighter selected. Soft transparent yellow highlight by default.";
+        } else {
+            statusText.textContent = "Eraser selected. Draw over the lines you want to remove.";
+        }
+    }
+
+    function setDrawingEnabled(enabled) {
+        drawingEnabled = enabled;
+        drawingCanvas.classList.toggle("drawing-off", !enabled);
+        drawingCanvas.classList.toggle(
+            "highlighter-cursor",
+            tool === "highlighter" && enabled
+        );
+
+        browseButtons.forEach(button => {
+            button.classList.toggle("active", !enabled);
+        });
+
+        if (enabled) {
+            document.getElementById("sidebarBrowseBtn").textContent = "✋ Browse mode";
+            modeBadge.textContent = "Drawing mode: ON";
+            modeBadge.classList.remove("off");
+            statusText.textContent = "Drawing mode is on. You can draw over the preview.";
+        } else {
+            document.getElementById("sidebarBrowseBtn").textContent = "✏ Draw mode";
+            modeBadge.textContent = "Drawing mode: OFF";
+            modeBadge.classList.add("off");
+            statusText.textContent = "Browse mode is on. You can click and scroll inside the preview.";
+        }
+    }
+
+    function updateBrushSize(newSize) {
+        size = Number(newSize);
+
+        sidebarBrushSize.value = size;
+        floatingBrushSize.value = size;
+
+        sidebarSizeNumber.textContent = size;
+        floatingSizeNumber.textContent = size;
+    }
+
+    function updateColorButtons() {
+        document.querySelectorAll("[data-color]").forEach(button => {
+            button.classList.toggle("active", button.dataset.color === color);
+        });
+    }
+
+    function setColor(newColor) {
+        color = newColor;
+        updateColorButtons();
+
+        if (tool !== "eraser") {
+            statusText.textContent = "Colour selected. You can draw with this colour.";
+        }
+    }
+
+    /* =========================================================
+       DRAWING
+       ========================================================= */
+    function getCoordinates(event) {
+        const rect = drawingCanvas.getBoundingClientRect();
+
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top
+        };
+    }
+
+    function saveHistory() {
+        if (history.length >= 25) {
+            history.shift();
+        }
+
+        history.push(drawingCanvas.toDataURL("image/png"));
+    }
+
+    function applyBrushStyle() {
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = size;
+
+        if (tool === "eraser") {
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = "rgba(0,0,0,1)";
+            ctx.fillStyle = "rgba(0,0,0,1)";
+        } else if (tool === "highlighter") {
+            ctx.globalCompositeOperation = "multiply";
+            ctx.globalAlpha = HIGHLIGHTER_ALPHA;
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+        } else {
+            ctx.globalCompositeOperation = "source-over";
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+        }
+    }
+
+    function startDrawing(event) {
+        if (!drawingEnabled) return;
+
+        event.preventDefault();
+        saveHistory();
+
+        isDrawing = true;
+
+        const point = getCoordinates(event);
+        lastX = point.x;
+        lastY = point.y;
+
+        drawingCanvas.setPointerCapture(event.pointerId);
+
+        applyBrushStyle();
+
+        ctx.beginPath();
+        ctx.arc(lastX, lastY, Math.max(size / 2, 1), 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function draw(event) {
+        if (!isDrawing || !drawingEnabled) return;
+
+        event.preventDefault();
+
+        const point = getCoordinates(event);
+
+        applyBrushStyle();
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+
+        lastX = point.x;
+        lastY = point.y;
+    }
+
+    function stopDrawing(event) {
+        if (!isDrawing) return;
+
+        isDrawing = false;
+
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = "source-over";
+
+        if (event && drawingCanvas.hasPointerCapture(event.pointerId)) {
+            drawingCanvas.releasePointerCapture(event.pointerId);
+        }
+    }
+
+    function eraseAllDrawing() {
+        const rect = drawingCanvas.getBoundingClientRect();
+
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        history = [];
+
+        statusText.textContent = "All drawing has been erased.";
+    }
+
+    function undoDrawing() {
+        const previousImage = history.pop();
+
+        if (!previousImage) {
+            statusText.textContent = "Nothing to undo yet.";
+            return;
+        }
+
+        const image = new Image();
+
+        image.onload = function () {
+            const rect = drawingCanvas.getBoundingClientRect();
+
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            ctx.drawImage(image, 0, 0, rect.width, rect.height);
+
+            statusText.textContent = "Last drawing action undone.";
+        };
+
+        image.src = previousImage;
+    }
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
+    function showToast(message) {
+        drawingMessage.textContent = message;
+        drawingMessage.classList.add("show");
+
+        setTimeout(function () {
+            drawingMessage.classList.remove("show");
+        }, 2400);
+    }
+
+    /* =========================================================
+       DOWNLOAD: PNG (drawing only)
+       ========================================================= */
+    function saveDrawing() {
+        const link = document.createElement("a");
+        const now = new Date().toISOString().replace(/[:.]/g, "-");
+
+        link.download = "drawing-" + now + ".png";
+        link.href = drawingCanvas.toDataURL("image/png");
+        link.click();
+
+        showToast("Drawing saved as PNG");
+    }
+
+    /* =========================================================
+       DOWNLOAD: HTML (page + drawing baked in)
+       ========================================================= */
+    function downloadHTML() {
+        if (currentSourceType !== "html") {
+            statusText.textContent = "HTML export is only available for HTML sources, not PDF.";
+            showToast("HTML export not available for PDF");
+            return;
+        }
+
+        const sourceHTML = (currentHtmlCode || "").trim();
+
+        if (!sourceHTML) {
+            statusText.textContent = "No HTML code is available to export.";
+            return;
+        }
+
+        const drawingPNG = drawingCanvas.toDataURL("image/png");
+
+        const overlayTag =
+            '\n<!-- Drawing overlay added by HTML / PDF Preview + Drawing -->\n' +
+            '<img id="__drawingOverlay" alt="drawing" ' +
+            'src="' + drawingPNG + '" ' +
+            'style="position:fixed;top:0;left:0;width:100vw;height:100vh;' +
+            'pointer-events:none;z-index:2147483647;">\n';
+
+        let outputHTML;
+
+        if (/<\/body>/i.test(sourceHTML)) {
+            outputHTML = sourceHTML.replace(/<\/body>/i, overlayTag + "</body>");
+        } else {
+            outputHTML = sourceHTML + overlayTag;
+        }
+
+        const blob = new Blob([outputHTML], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const now = new Date().toISOString().replace(/[:.]/g, "-");
+
+        const link = document.createElement("a");
+        link.download = "page-with-drawing-" + now + ".html";
+        link.href = url;
+        link.click();
+
+        setTimeout(function () {
+            URL.revokeObjectURL(url);
+        }, 1500);
+
+        statusText.textContent = "Downloaded HTML file with the drawing baked in.";
+        showToast("HTML downloaded with drawing");
+    }
+
+    /* =========================================================
+       DOWNLOAD: PDF (browser print)
+       ========================================================= */
+    function downloadPDF() {
+        statusText.textContent = "Opening the print dialog — choose 'Save as PDF'.";
+
+        setTimeout(function () {
+            window.print();
+        }, 150);
+    }
+
+    /* =========================================================
+       OPEN HTML CODE
+       ========================================================= */
+    function openHTMLCode(code, sourceName) {
+        if (!code.trim()) {
+            statusText.textContent = "Please paste HTML code or select an HTML file first.";
+            return;
+        }
+
+        /* Cleanup previous PDF blob if any */
+        if (currentPdfURL) {
+            URL.revokeObjectURL(currentPdfURL);
+            currentPdfURL = null;
+        }
+
+        /* Reset iframe to allow srcdoc, restore sandbox for safety */
+        htmlPreview.removeAttribute("src");
+        htmlPreview.setAttribute(
+            "sandbox",
+            "allow-forms allow-modals allow-popups allow-scripts"
+        );
+        htmlPreview.srcdoc = code;
+
+        emptyPreview.classList.add("hidden");
+
+        const rect = drawingCanvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        history = [];
+
+        currentSourceType = "html";
+        currentSourceName = sourceName;
+        currentHtmlCode = code;
+
+        updateSourceUI();
+        updateDownloadMenuState();
+
+        statusText.textContent = "Preview opened: " + sourceName + ". Drawing layer is ready.";
+    }
+
+    /* =========================================================
+       OPEN PDF FILE
+       ========================================================= */
+    function openPDFFile(arrayBuffer, sourceName) {
+        /* Cleanup previous PDF blob */
+        if (currentPdfURL) {
+            URL.revokeObjectURL(currentPdfURL);
+            currentPdfURL = null;
+        }
+
+        const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        currentPdfURL = url;
+
+        /* Reset srcdoc, and remove sandbox so the PDF viewer works */
+        htmlPreview.removeAttribute("srcdoc");
+        htmlPreview.removeAttribute("sandbox");
+        htmlPreview.src = url;
+
+        emptyPreview.classList.add("hidden");
+
+        const rect = drawingCanvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
+        history = [];
+
+        currentSourceType = "pdf";
+        currentSourceName = sourceName;
+        currentHtmlCode = "";
+
+        updateSourceUI();
+        updateDownloadMenuState();
+
+        statusText.textContent = "PDF opened: " + sourceName + ". You can now draw on it.";
+    }
+
+    /* =========================================================
+       SOURCE UI
+       ========================================================= */
+    function updateSourceUI() {
+        if (currentSourceType === "html") {
+            sourceChip.style.display = "inline-flex";
+            sourceChip.className = "source-chip html";
+            sourceChip.textContent = "📄 " + (currentSourceName || "HTML");
+        } else if (currentSourceType === "pdf") {
+            sourceChip.style.display = "inline-flex";
+            sourceChip.className = "source-chip pdf";
+            sourceChip.textContent = "📕 " + (currentSourceName || "PDF");
+        } else {
+            sourceChip.style.display = "none";
+        }
+    }
+
+    function updateDownloadMenuState() {
+        const isPdf = currentSourceType === "pdf";
+        const isHtml = currentSourceType === "html";
+
+        /* HTML button behavior */
+        htmlDownloadButtons.forEach(button => {
+            button.disabled = !isHtml;
+        });
+
+        /* Notes */
+        if (isPdf) {
+            const note = "PDF source — HTML export is disabled. Use PDF or PNG.";
+            menuNote1.textContent = note;
+            menuNote2.textContent = note;
+        } else if (isHtml) {
+            const note = "HTML source — all export options available.";
+            menuNote1.textContent = note;
+            menuNote2.textContent = note;
+        } else {
+            const note = "Open a file first to enable downloads.";
+            menuNote1.textContent = note;
+            menuNote2.textContent = note;
+        }
+    }
+
+    /* =========================================================
+       DOWNLOAD MENU BEHAVIOR
+       ========================================================= */
+    function closeAllDownloadMenus() {
+        sidebarDownloadMenu.classList.remove("open");
+        floatingDownloadMenu.classList.remove("open");
+    }
+
+    function toggleDownloadMenu(menu) {
+        const wasOpen = menu.classList.contains("open");
+
+        closeAllDownloadMenus();
+
+        if (!wasOpen) {
+            menu.classList.add("open");
+        }
+    }
+
+    sidebarDownloadBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        toggleDownloadMenu(sidebarDownloadMenu);
+    });
+
+    floatingDownloadBtn.addEventListener("click", function (event) {
+        event.stopPropagation();
+        toggleDownloadMenu(floatingDownloadMenu);
+    });
+
+    document.addEventListener("click", function (event) {
+        if (!sidebarDownloadWrap.contains(event.target) &&
+            !floatingDownloadWrap.contains(event.target)) {
+            closeAllDownloadMenus();
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeAllDownloadMenus();
+        }
+    });
+
+    /* Menu actions */
+    htmlDownloadButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            if (button.disabled) return;
+            closeAllDownloadMenus();
+            downloadHTML();
+        });
+    });
+
+    pdfDownloadButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            closeAllDownloadMenus();
+            downloadPDF();
+        });
+    });
+
+    pngDownloadButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            closeAllDownloadMenus();
+            saveDrawing();
+        });
+    });
+
+    /* =========================================================
+       OTHER UI EVENTS
+       ========================================================= */
+    toggleSidebarBtn.addEventListener("click", function () {
+        sidebar.classList.toggle("collapsed");
+
+        if (sidebar.classList.contains("collapsed")) {
+            toggleSidebarBtn.textContent = "☰ Open tools";
+        } else {
+            toggleSidebarBtn.textContent = "☰ Tools";
+        }
+
+        setTimeout(resizeCanvas, 380);
+    });
+
+    /* File input handler — HTML and PDF */
+    htmlFile.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+
+        if (!file) return;
+
+        const lowerName = file.name.toLowerCase();
+        const isPdf = file.type === "application/pdf" || lowerName.endsWith(".pdf");
+        const isHtml = file.type === "text/html" ||
+                       lowerName.endsWith(".html") ||
+                       lowerName.endsWith(".htm");
+
+        if (isPdf) {
+            const reader = new FileReader();
+
+            reader.onload = function (loadEvent) {
+                openPDFFile(loadEvent.target.result, file.name);
+            };
+
+            reader.onerror = function () {
+                statusText.textContent = "The PDF could not be read. Please try another file.";
+            };
+
+            reader.readAsArrayBuffer(file);
+        } else if (isHtml) {
+            const reader = new FileReader();
+
+            reader.onload = function (loadEvent) {
+                const code = loadEvent.target.result;
+                htmlCode.value = code;
+                openHTMLCode(code, file.name);
+            };
+
+            reader.onerror = function () {
+                statusText.textContent = "The file could not be read. Please try another HTML file.";
+            };
+
+            reader.readAsText(file, "UTF-8");
+        } else {
+            statusText.textContent = "Unsupported file type. Please choose .html, .htm or .pdf.";
+        }
+
+        /* Reset input so choosing the same file again triggers change */
+        htmlFile.value = "";
+    });
+
+    openCodeBtn.addEventListener("click", function () {
+        openHTMLCode(htmlCode.value, "pasted HTML code");
+    });
+
+    pencilButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            setTool("pencil");
+        });
+    });
+
+    highlighterButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            setTool("highlighter");
+        });
+    });
+
+    eraserButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            setTool("eraser");
+        });
+    });
+
+    browseButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            setDrawingEnabled(!drawingEnabled);
+        });
+    });
+
+    undoButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            undoDrawing();
+        });
+    });
+
+    eraseAllButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const confirmed = confirm("Erase all drawing from the preview?");
+
+            if (confirmed) {
+                eraseAllDrawing();
+            }
+        });
+    });
+
+    sidebarBrushSize.addEventListener("input", function () {
+        updateBrushSize(this.value);
+    });
+
+    floatingBrushSize.addEventListener("input", function () {
+        updateBrushSize(this.value);
+    });
+
+    document.querySelectorAll("[data-color]").forEach(button => {
+        button.addEventListener("click", function () {
+            setColor(button.dataset.color);
+        });
+    });
+
+    drawingCanvas.addEventListener("pointerdown", startDrawing);
+    drawingCanvas.addEventListener("pointermove", draw);
+    drawingCanvas.addEventListener("pointerup", stopDrawing);
+    drawingCanvas.addEventListener("pointercancel", stopDrawing);
+
+    drawingCanvas.addEventListener("pointerleave", function (event) {
+        if (isDrawing) {
+            stopDrawing(event);
+        }
+    });
+
+    window.addEventListener("resize", resizeCanvas);
+
+    if ("ResizeObserver" in window) {
+        const resizeObserver = new ResizeObserver(function () {
+            resizeCanvas();
+        });
+
+        resizeObserver.observe(previewShell);
+    }
+
+    resizeCanvas();
+    updateBrushSize(5);
+    updateColorButtons();
+    updateToolButtons();
+    setDrawingEnabled(true);
+    updateSourceUI();
+    updateDownloadMenuState();
+</script>
+
+</body>
+</html>
