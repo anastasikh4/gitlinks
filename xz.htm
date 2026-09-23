@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1+ English Quiz - Vocabulary &amp; Have Got</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .quiz-header {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .quiz-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .quiz-header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .progress-area {
+            background: #f0f0f0;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 98px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+            border-radius: 98px;
+            transition: width 0.3s ease;
+        }
+
+        .counter {
+            font-weight: 800;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Question Area */
+        .question-area {
+            padding: 30px;
+        }
+
+        .sentence-card {
+            background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+            border-radius: 24px;
+            padding: 35px 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #e8eaff;
+        }
+
+        .sentence-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 140px;
+            background: #FFEAA7;
+            border-radius: 12px;
+            padding: 5px 12px;
+            margin: 0 5px;
+            color: #11998e;
+            font-weight: 800;
+            border-bottom: 3px solid #FFD166;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-bottom: 5px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            border-color: #11998e;
+            border-bottom-color: #38ef7d;
+            background: #edfbf7;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active:not(.disabled) {
+            border-bottom-width: 2px;
+            transform: translateY(3px);
+        }
+
+        .option-btn.correct {
+            background: #d4edda !important;
+            border-color: #28a745 !important;
+            border-bottom-color: #1e7e34 !important;
+            color: #155724 !important;
+        }
+
+        .option-btn.wrong {
+            background: #f8d7da !important;
+            border-color: #dc3545 !important;
+            border-bottom-color: #bd2130 !important;
+            color: #721c24 !important;
+            animation: shake 0.4s ease;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Feedback Message */
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.correct-feedback {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .feedback.wrong-feedback {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        /* Timer */
+        .timer-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: conic-gradient(#11998e 0deg, #e0e0e0 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .timer-text {
+            position: relative;
+            font-size: 22px;
+            font-weight: 800;
+            color: #11998e;
+            z-index: 1;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .result-stars {
+            font-size: 50px;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #4a5568;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border: none;
+            border-bottom: 4px solid #0e8075;
+            color: white;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            font-family: inherit;
+        }
+
+        .restart-btn:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="quiz-block">
+        <div class="quiz-header">
+            <h1>Vocabulary &amp; Have Got Quest 🌍</h1>
+            <p>Test your knowledge on countries, categories, and verb forms!</p>
+        </div>
+
+        <div class="progress-area">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="counter" id="question-counter">Question 1 / 14</div>
+        </div>
+
+        <div class="question-area">
+            <div class="timer-area">
+                <div class="timer-circle" id="timer-circle">
+                    <span class="timer-text" id="timer-text">30</span>
+                </div>
+            </div>
+
+            <div class="sentence-card">
+                <div class="sentence-text" id="sentence-text"></div>
+            </div>
+
+            <div class="options-grid" id="options-grid"></div>
+            <div class="feedback" id="feedback-text"></div>
+        </div>
+    </div>
+
+    <div class="result-screen" id="result-screen">
+        <div class="result-stars">🏆🌟🎉</div>
+        <div class="result-title">Quiz Completed!</div>
+        <div class="result-score" id="result-score"></div>
+        <button class="restart-btn" onclick="restartQuiz()">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    /* =========================================================
+       QUIZ DATA — 14 questions (Exercises 3 & 4 + extras)
+       ========================================================= */
+    const quizData = [
+        {
+            q: "<strong>Germany</strong> ?",
+            correct: "Countries",
+            options: ["Countries", "Nationalities", "Months"]
+        },
+        {
+            q: " <strong>Chinese</strong> ?",
+            correct: "Nationalities",
+            options: ["Countries", "Nationalities", "Months"]
+        },
+        {
+            q: " <strong>September</strong> ?",
+            correct: "Months",
+            options: ["Countries", "Nationalities", "Months"]
+        },
+        {
+            q: "A: Have you <span class='blank'>____</span> a sister?<br>B: No, I haven't.",
+            correct: "got",
+            options: ["got", "has", "have", "had"]
+        },
+        {
+            q: "A: Have you got a sister?<br>B: No, I <span class='blank'>____</span>.",
+            correct: "haven't",
+            options: ["hasn't", "haven't", "don't", "not"]
+        },
+        {
+            q: "He <span class='blank'>____</span> a dog. Its name is Rex.",
+            correct: "'s got",
+            options: ["'ve got", "'s got", "have", "got"]
+        },
+        {
+            q: "I <span class='blank'>____</span> a new bike. My bike is old.",
+            correct: "'ve got",
+            options: ["'ve got", "'s got", "has got", "got"]
+        },
+        {
+            q: "A: <span class='blank'>____</span> she got a cat?<br>B: No, she hasn't.",
+            correct: "Has",
+            options: ["Have", "Has", "Is", "Does"]
+        },
+        /* ---------- EXTRA QUESTIONS ---------- */
+        {
+            q: " <strong>Monday</strong> ?",
+            correct: "Days of the week",
+            options: ["Countries", "Days of the week", "Months"]
+        },
+        {
+            q: " <strong>Brazilian</strong>?",
+            correct: "Nationalities",
+            options: ["Countries", "Nationalities", "Months"]
+        },
+        {
+            q: " <strong>France</strong> ?",
+            correct: "Countries",
+            options: ["Countries", "Nationalities", "Months"]
+        },
+        {
+            q: "A: Has he got a bike?<br>B: Yes, he <span class='blank'>____</span>.",
+            correct: "has",
+            options: ["have", "has", "is", "does"]
+        },
+        {
+            q: "She <span class='blank'>____</span> got a new phone.",
+            correct: "has",
+            options: ["have", "has", "is", "does"]
+        },
+        {
+            q: "They <span class='blank'>____</span> got any brothers or sisters.",
+            correct: "haven't",
+            options: ["hasn't", "haven't", "don't", "not"]
+        }
+    ];
+
+    /* =========================================================
+       STATE
+       ========================================================= */
+    let currentQuestionIdx = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 30;
+    let isAnswered = false;
+
+    /* =========================================================
+       LOAD QUESTION
+       ========================================================= */
+    function loadQuestion() {
+        isAnswered = false;
+        clearInterval(timer);
+        timeLeft = 30;
+        updateTimerCircle();
+
+        const currentQuestion = quizData[currentQuestionIdx];
+
+        // Progress updates
+        document.getElementById('question-counter').innerText =
+            `Question ${currentQuestionIdx + 1} / ${quizData.length}`;
+        document.getElementById('progress-bar').style.width =
+            `${((currentQuestionIdx) / quizData.length) * 100}%`;
+
+        // Render question text
+        document.getElementById('sentence-text').innerHTML = currentQuestion.q;
+
+        // Hide previous feedback
+        const feedback = document.getElementById('feedback-text');
+        feedback.style.display = 'none';
+        feedback.className = 'feedback';
+
+        // Render option buttons
+        const optionsGrid = document.getElementById('options-grid');
+        optionsGrid.innerHTML = '';
+
+        // Shuffle options
+        const scrambledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+
+        scrambledOptions.forEach(option => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option;
+            btn.onclick = () => selectOption(option, btn);
+            optionsGrid.appendChild(btn);
+        });
+
+        startTimer();
+    }
+
+    /* =========================================================
+       TIMER
+       ========================================================= */
+    function startTimer() {
+        timer = setInterval(() => {
+            timeLeft--;
+            updateTimerCircle();
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                autoTimeOut();
+            }
+        }, 1000);
+    }
+
+    function updateTimerCircle() {
+        document.getElementById('timer-text').innerText = timeLeft;
+        const deg = (timeLeft / 30) * 360;
+        document.getElementById('timer-circle').style.background =
+            `conic-gradient(#11998e ${deg}deg, #e0e0e0 ${deg}deg)`;
+    }
+
+    /* =========================================================
+       SELECT OPTION
+       ========================================================= */
+    function selectOption(selectedOption, clickedBtn) {
+        if (isAnswered) return;
+        isAnswered = true;
+        clearInterval(timer);
+
+        const currentQuestion = quizData[currentQuestionIdx];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.classList.add('disabled'));
+
+        const feedback = document.getElementById('feedback-text');
+
+        if (selectedOption === currentQuestion.correct) {
+            clickedBtn.classList.add('correct');
+            score++;
+            feedback.innerText = "Splendid job! Correct! ✨";
+            feedback.className = "feedback correct-feedback";
+
+            const blankEl = document.querySelector('.blank');
+            if (blankEl) {
+                blankEl.innerText = currentQuestion.correct;
+                blankEl.style.background = "#d4edda";
+                blankEl.style.color = "#155724";
+            }
+        } else {
+            clickedBtn.classList.add('wrong');
+            feedback.innerText = `Oops! The correct answer was: ${currentQuestion.correct}`;
+            feedback.className = "feedback wrong-feedback";
+
+            buttons.forEach(btn => {
+                if (btn.innerText === currentQuestion.correct) btn.classList.add('correct');
+            });
+        }
+
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 2000);
+    }
+
+    /* =========================================================
+       TIMEOUT
+       ========================================================= */
+    function autoTimeOut() {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const currentQuestion = quizData[currentQuestionIdx];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(btn => btn.classList.add('disabled'));
+
+        const feedback = document.getElementById('feedback-text');
+        feedback.innerText = `Time's up! The correct answer was: ${currentQuestion.correct}`;
+        feedback.className = "feedback wrong-feedback";
+        feedback.style.display = 'block';
+
+        buttons.forEach(btn => {
+            if (btn.innerText === currentQuestion.correct) btn.classList.add('correct');
+        });
+
+        setTimeout(() => {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 2000);
+    }
+
+    /* =========================================================
+       RESULTS
+       ========================================================= */
+    function showResults() {
+        document.getElementById('progress-bar').style.width = '100%';
+        document.getElementById('quiz-block').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('result-score').innerText =
+            `You mastered ${score} out of ${quizData.length} questions correctly!`;
+    }
+
+    /* =========================================================
+       RESTART
+       ========================================================= */
+    function restartQuiz() {
+        currentQuestionIdx = 0;
+        score = 0;
+        document.getElementById('quiz-block').style.display = 'block';
+        document.getElementById('result-screen').style.display = 'none';
+        loadQuestion();
+    }
+
+    /* =========================================================
+       START
+       ========================================================= */
+    loadQuestion();
+</script>
+</body>
+</html>

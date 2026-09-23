@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verb To Be Quiz - Homework</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #f3f0ff;
+            --text-dark: #1f1235;
+            --text-purple: #4c1d95;
+            --card-bg: #ffffff;
+            --btn-default: #e0e7ff;
+            --btn-correct: #52b788;
+            --btn-wrong: #ff6b6b;
+            --border-color: #312e81;
+            --accent: #ffb703;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--page-bg);
+            background-image: radial-gradient(#dbeafe 20%, transparent 20%);
+            background-size: 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 4px solid var(--border-color); 
+            box-shadow: 0 10px 0 rgba(49, 46, 129, 0.2); 
+        }
+
+        h1 { color: var(--text-dark); text-align: center; margin-bottom: 10px; font-weight: 800; }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-purple);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .exercise {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .exercise h3 {
+            margin-top: 0;
+            color: var(--text-purple);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 1.3rem;
+        }
+
+        .lesson-tag {
+            background: #ede9fe;
+            border: 2px solid var(--border-color);
+            border-radius: 999px;
+            font-size: 0.8rem;
+            padding: 3px 12px;
+            color: var(--text-purple);
+            font-weight: 800;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-text { 
+            font-size: 1.15rem; 
+            font-weight: 800; 
+            line-height: 1.4;
+        }
+
+        .options-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input[type="radio"].quiz-radio { display: none; }
+        
+        .quiz-label {
+            padding: 10px 20px;
+            background-color: var(--btn-default);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1rem;
+            color: #1e3a8a;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .quiz-label:hover { filter: brightness(0.95); transform: translateY(-2px); }
+
+        .correct:checked + .quiz-label { 
+            background-color: var(--btn-correct); 
+            color: white; 
+            border-color: #14532d;
+            box-shadow: 0 4px 0 rgba(20, 83, 45, 0.3);
+        }
+        .correct:checked + .quiz-label::after { content: " ✓ Correct!"; font-weight: 800; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .wrong:checked + .quiz-label { 
+            background-color: var(--btn-wrong); 
+            color: white; 
+            animation: shake 0.3s;
+            border-color: #991b1b;
+        }
+        .wrong:checked + .quiz-label::after { content: " ✗ Try again!"; font-weight: 800; }
+
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            background: #fff9c4;
+            border: 3px dashed #ffd700;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #856404;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: var(--accent);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--border-color); }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: 2px solid #000; }
+            .quiz-label:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🇬🇧 Verb 'To Be' Master Quest 📝</h1>
+    <p class="subtitle">Grammar Lab &bull; Affirmative &amp; Negative Forms</p>
+    
+    <div class="score-box">
+        ✨ Click the correct word forms to complete the sentences! ✨
+    </div>
+
+    <!-- ===== EXERCISE 2 ===== -->
+    <div class="exercise">
+        <h3>🔮 Present Simple: am / is / are <span class="lesson-tag">Exercise 2</span></h3>
+        
+        <!-- Sentence 1 (mixed: wrong first, correct second | correct first, wrong second) -->
+        <div class="question">
+            <span class="question-text">1. Amy <span style="color:var(--text-purple);">_______</span> eleven. She <span style="color:var(--text-purple);">_______</span> twelve.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q1_1" id="q1_1a" class="wrong quiz-radio"><label for="q1_1a" class="quiz-label">aren't</label>
+                <input type="radio" name="q1_1" id="q1_1b" class="correct quiz-radio"><label for="q1_1b" class="quiz-label">isn't</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q1_2" id="q1_2a" class="wrong quiz-radio"><label for="q1_2a" class="quiz-label">'re</label>
+                <input type="radio" name="q1_2" id="q1_2b" class="correct quiz-radio"><label for="q1_2b" class="quiz-label">'s</label>
+            </div>
+        </div>
+
+        <!-- Sentence 2 (mixed: wrong first, correct second | correct first, wrong second) -->
+        <div class="question">
+            <span class="question-text">2. A: <span style="color:var(--text-purple);">_______</span> you from Wales?<br>B: Yes, I <span style="color:var(--text-purple);">_______</span>.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q2_1" id="q2_1a" class="wrong quiz-radio"><label for="q2_1a" class="quiz-label">Is</label>
+                <input type="radio" name="q2_1" id="q2_1b" class="correct quiz-radio"><label for="q2_1b" class="quiz-label">Are</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q2_2" id="q2_2a" class="wrong quiz-radio"><label for="q2_2a" class="quiz-label">are</label>
+                <input type="radio" name="q2_2" id="q2_2b" class="correct quiz-radio"><label for="q2_2b" class="quiz-label">am</label>
+            </div>
+        </div>
+
+        <!-- Sentence 3 (mixed: wrong first, correct second | wrong first, correct second) -->
+        <div class="question">
+            <span class="question-text">3. We <span style="color:var(--text-purple);">_______</span> sisters. We <span style="color:var(--text-purple);">_______</span> friends.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q3_1" id="q3_1a" class="wrong quiz-radio"><label for="q3_1a" class="quiz-label">am not</label>
+                <input type="radio" name="q3_1" id="q3_1b" class="correct quiz-radio"><label for="q3_1b" class="quiz-label">aren't</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q3_2" id="q3_2a" class="wrong quiz-radio"><label for="q3_2a" class="quiz-label">'s</label>
+                <input type="radio" name="q3_2" id="q3_2b" class="correct quiz-radio"><label for="q3_2b" class="quiz-label">'re</label>
+            </div>
+        </div>
+
+        <!-- Sentence 4 (mixed: correct first, wrong second | wrong first, correct second) -->
+        <div class="question">
+            <span class="question-text">4. A: <span style="color:var(--text-purple);">_______</span> they Italian?<br>B: No, they <span style="color:var(--text-purple);">_______</span>.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q4_1" id="q4_1a" class="correct quiz-radio"><label for="q4_1a" class="quiz-label">Are</label>
+                <input type="radio" name="q4_1" id="q4_1b" class="wrong quiz-radio"><label for="q4_1b" class="quiz-label">Is</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q4_2" id="q4_2a" class="wrong quiz-radio"><label for="q4_2a" class="quiz-label">isn't</label>
+                <input type="radio" name="q4_2" id="q4_2b" class="correct quiz-radio"><label for="q4_2b" class="quiz-label">aren't</label>
+            </div>
+        </div>
+
+        <!-- Sentence 5 (mixed: correct first, wrong second | correct first, wrong second) -->
+        <div class="question">
+            <span class="question-text">5. He <span style="color:var(--text-purple);">_______</span> my brother. He <span style="color:var(--text-purple);">_______</span> my cousin.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q5_1" id="q5_1a" class="correct quiz-radio"><label for="q5_1a" class="quiz-label">isn't</label>
+                <input type="radio" name="q5_1" id="q5_1b" class="wrong quiz-radio"><label for="q5_1b" class="quiz-label">aren't</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q5_2" id="q5_2a" class="wrong quiz-radio"><label for="q5_2a" class="quiz-label">'re</label>
+                <input type="radio" name="q5_2" id="q5_2b" class="correct quiz-radio"><label for="q5_2b" class="quiz-label">'s</label>
+            </div>
+        </div>
+
+        <!-- Sentence 6 (mixed: correct first, wrong second | wrong first, correct second) -->
+        <div class="question">
+            <span class="question-text">6. A: <span style="color:var(--text-purple);">_______</span> I late?<br>B: No, you <span style="color:var(--text-purple);">_______</span>.</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q6_1" id="q6_1a" class="correct quiz-radio"><label for="q6_1a" class="quiz-label">Am</label>
+                <input type="radio" name="q6_1" id="q6_1b" class="wrong quiz-radio"><label for="q6_1b" class="quiz-label">Are</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q6_2" id="q6_2a" class="wrong quiz-radio"><label for="q6_2a" class="quiz-label">isn't</label>
+                <input type="radio" name="q6_2" id="q6_2b" class="correct quiz-radio"><label for="q6_2b" class="quiz-label">aren't</label>
+            </div>
+        </div>
+
+        <!-- Sentence 7 (mixed: wrong first, correct second | correct first, wrong second) -->
+        <div class="question">
+            <span class="question-text">7. It <span style="color:var(--text-purple);">_______</span> a cat. It <span style="color:var(--text-purple);">_______</span> a dog!</span>
+            
+            <div style="font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part A:</div>
+            <div class="options-group">
+                <input type="radio" name="q7_1" id="q7_1a" class="wrong quiz-radio"><label for="q7_1a" class="quiz-label">aren't</label>
+                <input type="radio" name="q7_1" id="q7_1b" class="correct quiz-radio"><label for="q7_1b" class="quiz-label">isn't</label>
+            </div>
+            
+            <div style="font-weight: bold; margin-top: 10px; margin-bottom: 5px; font-size: 0.9rem; color: #64748b;">Part B:</div>
+            <div class="options-group">
+                <input type="radio" name="q7_2" id="q7_2a" class="correct quiz-radio"><label for="q7_2a" class="quiz-label">'s</label>
+                <input type="radio" name="q7_2" id="q7_2b" class="wrong quiz-radio"><label for="q7_2b" class="quiz-label">'re</label>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">🔄 Restart Evaluation</button>
+
+</div>
+
+<script>
+    function resetAll() {
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
