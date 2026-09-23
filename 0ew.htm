@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌟 Linking Words Quiz 🌟</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com" rel="stylesheet">
+  <style>
+    body { font-family: 'Quicksand', sans-serif; background: #f0fdf4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+    .quiz-card { background: white; width: 90%; max-width: 520px; padding: 35px; border-radius: 40px; border: 8px solid #2ecc71; box-shadow: 0 15px 0 #27ae60; text-align: center; position: relative; }
+    .mascot { font-size: 4rem; margin-bottom: 10px; line-height: 1; }
+    h1 { font-family: 'Fredoka', cursive; color: #27ae60; margin: 0 0 20px; font-size: 2.2rem; text-transform: uppercase; }
+    
+    .question-container { display: none; }
+    .question-container.active { display: block; animation: popIn 0.4s ease; }
+    
+    @keyframes popIn { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    .prompt { font-size: 1.25rem; font-weight: 700; margin-bottom: 25px; color: #1e293b; line-height: 1.6; text-align: left; background: #f8fafc; padding: 20px; border-radius: 20px; border: 2px dashed #cbd5e1; }
+    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    
+    .option-btn { 
+      background: #f0fdf4; border: 3px solid #a7f3d0; border-radius: 20px; padding: 14px; 
+      font-size: 1.3rem; font-weight: 700; color: #047857; cursor: pointer; transition: 0.2s;
+      font-family: 'Quicksand', sans-serif;
+    }
+    .option-btn:hover { background: #d1fae5; transform: translateY(-3px); }
+    .option-btn:active { transform: translateY(0); }
+
+    .progress { font-size: 1rem; color: #94a3b8; margin-top: 25px; font-weight: bold; }
+    #result-screen { display: none; }
+    .confetti { font-size: 4rem; }
+    h2 { font-family: 'Fredoka', cursive; color: #059669; font-size: 2rem; margin: 15px 0 5px; }
+    p { font-size: 1.2rem; color: #475569; font-weight: bold; margin-bottom: 25px; }
+  </style>
+</head>
+<body>
+
+<div class="quiz-card">
+  <h1>Link Power!</h1>
+
+  <!-- QUESTION 1 (and) -->
+  <div id="q1" class="question-container active">
+    <div class="mascot">👨‍🍳🍽️</div>
+    <div class="prompt">Dad sets the table for dinner ______ Hetty helps him.</div>
+    <div class="options">
+      <button class="option-btn" onclick="checkChoice(1, 'and', 'and')">and</button>
+      <button class="option-btn" onclick="checkChoice(1, 'but', 'and')">but</button>
+      <button class="option-btn" onclick="checkChoice(1, 'because', 'and')">because</button>
+      <button class="option-btn" onclick="checkChoice(1, 'so', 'and')">so</button>
+    </div>
+    <div class="progress">Question 1 of 4</div>
+  </div>
+
+  <!-- QUESTION 2 (but) -->
+  <div id="q2" class="question-container">
+    <div class="mascot">🏊‍♂️❌</div>
+    <div class="prompt">I love swimming, ______ I can't go to the pool every day.</div>
+    <div class="options">
+      <button class="option-btn" onclick="checkChoice(2, 'and', 'but')">and</button>
+      <button class="option-btn" onclick="checkChoice(2, 'but', 'but')">but</button>
+      <button class="option-btn" onclick="checkChoice(2, 'because', 'but')">because</button>
+      <button class="option-btn" onclick="checkChoice(2, 'so', 'but')">so</button>
+    </div>
+    <div class="progress">Question 2 of 4</div>
+  </div>
+
+  <!-- QUESTION 3 (because) -->
+  <div id="q3" class="question-container">
+    <div class="mascot">🛌🏫</div>
+    <div class="prompt">I go to bed early on weekdays ______ I have school in the morning.</div>
+    <div class="options">
+      <button class="option-btn" onclick="checkChoice(3, 'and', 'because')">and</button>
+      <button class="option-btn" onclick="checkChoice(3, 'but', 'because')">but</button>
+      <button class="option-btn" onclick="checkChoice(3, 'because', 'because')">because</button>
+      <button class="option-btn" onclick="checkChoice(3, 'so', 'because')">so</button>
+    </div>
+    <div class="progress">Question 3 of 4</div>
+  </div>
+
+  <!-- QUESTION 4 (so) -->
+  <div id="q4" class="question-container">
+    <div class="mascot">🏪⏰</div>
+    <div class="prompt">Mum opens her shop at 8.30 ______ she leaves home at 7.45.</div>
+    <div class="options">
+      <button class="option-btn" onclick="checkChoice(4, 'and', 'so')">and</button>
+      <button class="option-btn" onclick="checkChoice(4, 'but', 'so')">but</button>
+      <button class="option-btn" onclick="checkChoice(4, 'because', 'so')">because</button>
+      <button class="option-btn" onclick="checkChoice(4, 'so', 'so')">so</button>
+    </div>
+    <div class="progress">Question 4 of 4</div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen">
+    <div class="confetti">🏁📝✨🌱</div>
+    <h2>CONGRATULATIONS!</h2>
+    <p>You have linked all sentences perfectly!</p>
+    <button class="option-btn" onclick="location.reload()" style="background:#fef3c7; border-color:#f59e0b; color: #b45309; width: 100%;">Play Again</button>
+  </div>
+</div>
+
+<script>
+  function checkChoice(currentNum, selected, correct) {
+    const container = document.getElementById('q' + currentNum);
+    const buttons = container.querySelectorAll('.option-btn');
+    
+    // Disable inputs to lock clicks
+    buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+    // Performance indicators
+    buttons.forEach(btn => {
+      if (btn.innerText === correct) {
+        btn.style.background = '#2ecc71';
+        btn.style.borderColor = '#27ae60';
+        btn.style.color = 'white';
+      } else if (btn.innerText === selected && selected !== correct) {
+        btn.style.background = '#e74c3c';
+        btn.style.borderColor = '#c0392b';
+        btn.style.color = 'white';
+      }
+    });
+
+    // Schedule next routing segment
+    setTimeout(() => {
+      container.classList.remove('active');
+      if (currentNum < 4) {
+        document.getElementById('q' + (currentNum + 1)).classList.add('active');
+      } else {
+        document.querySelector('h1').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+      }
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>

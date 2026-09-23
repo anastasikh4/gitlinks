@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Neighbour's Week: Linking Words Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #fcf8f2;
+            --text-dark: #2c3e50;
+            --text-green: #27ae60;
+            --card-bg: #ffffff;
+            --btn-default: #d1fae5;
+            --btn-correct: #52b788;
+            --btn-wrong: #ff6b6b;
+            --border-color: #34495e;
+            --accent: #f39c12;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--page-bg);
+            background-image: radial-gradient(#ebdcd0 20%, transparent 20%);
+            background-size: 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 4px solid var(--border-color); 
+            box-shadow: 0 10px 0 rgba(52, 73, 94, 0.15); 
+        }
+
+        h1 { color: var(--text-dark); text-align: center; margin-bottom: 5px; font-weight: 800; }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-green);
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .story-text {
+            background-color: #fcf8f2;
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .exercise {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .exercise h3 {
+            margin-top: 0;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-tag {
+            background: #fef3c7;
+            border: 2px solid var(--border-color);
+            border-radius: 999px;
+            font-size: 0.8rem;
+            padding: 3px 12px;
+            color: #b45309;
+            font-weight: 800;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-text { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            color: var(--text-dark);
+        }
+
+        .options-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        input[type="radio"].quiz-radio { display: none; }
+        
+        .quiz-label {
+            padding: 10px 22px;
+            background-color: var(--btn-default);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1rem;
+            color: #065f46;
+            transition: 0.2s;
+            display: inline-block;
+        }
+
+        .quiz-label:hover { filter: brightness(0.95); transform: translateY(-2px); }
+
+        .correct:checked + .quiz-label { 
+            background-color: var(--btn-correct); 
+            color: white; 
+            border-color: #14532d;
+            box-shadow: 0 4px 0 rgba(20, 83, 45, 0.3);
+        }
+        .correct:checked + .quiz-label::after { content: " ✓ Correct!"; font-weight: 800; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .wrong:checked + .quiz-label { 
+            background-color: var(--btn-wrong); 
+            color: white; 
+            animation: shake 0.3s;
+            border-color: #991b1b;
+        }
+        .wrong:checked + .quiz-label::after { content: " ✗ Try again!"; font-weight: 800; }
+
+        /* Form Styling for Exercise 5 */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 800;
+            color: var(--text-dark);
+            font-size: 1.05rem;
+        }
+
+        .input-line {
+            width: 100%;
+            border: none;
+            border-bottom: 3px solid var(--border-color);
+            background: transparent;
+            padding: 8px 5px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            color: #0369a1;
+            font-weight: 700;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-line:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        .score-box {
+            text-align: center;
+            padding: 15px;
+            background: #fff9c4;
+            border: 3px dashed #ffd700;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #856404;
+        }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 35px;
+            background: var(--accent);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #b67a07;
+        }
+        
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 0 var(--border-color); }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: 2px solid #000; }
+            .quiz-label:hover { transform: none; }
+            .input-line { border-bottom: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 Linking Words Matrix Quest 🗺️</h1>
+    <p class="subtitle">Module 1 • Connectors &amp; Personal Portfolio Logs</p>
+    
+    <div class="score-box">
+        ✨ Complete the exercises below based on your textbook sheet! ✨
+    </div>
+
+    <!-- Reading text adapted from Exercise 4 -->
+   
+
+    <!-- ===== EXERCISE 4 — CONNECTORS ===== -->
+    <div class="exercise">
+        <h3>🔗 Conjunction Target Selection <span class="lesson-tag">Exercise 4</span></h3>
+        
+        <div class="question">
+            <span class="question-text">1. They never have breakfast as a family [ but / because ] her mum and dad leave for work early.</span>
+            <div class="options-group">
+                <input type="radio" name="q1" id="q1a" class="wrong quiz-radio"><label for="q1a" class="quiz-label">but</label>
+                <input type="radio" name="q1" id="q1b" class="correct quiz-radio"><label for="q1b" class="quiz-label">because</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <span class="question-text">2. The family don't have lunch together, [ so / but ] they always eat dinner at home.</span>
+            <div class="options-group">
+                <input type="radio" name="q2" id="q2a" class="correct quiz-radio"><label for="q2a" class="quiz-label">so</label>
+                <input type="radio" name="q2" id="q2b" class="wrong quiz-radio"><label for="q2b" class="quiz-label">but</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <span class="question-text">3. She tidies her bedroom [ and / so ] she loads the washing machine.</span>
+            <div class="options-group">
+                <input type="radio" name="q3" id="q3a" class="correct quiz-radio"><label for="q3a" class="quiz-label">and</label>
+                <input type="radio" name="q3" id="q3b" class="wrong quiz-radio"><label for="q3b" class="quiz-label">so</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <span class="question-text">4. Then they watch TV [ because / and ] hang out with their friends.</span>
+            <div class="options-group">
+                <input type="radio" name="q4" id="q4a" class="wrong quiz-radio"><label for="q4a" class="quiz-label">because</label>
+                <input type="radio" name="q4" id="q4b" class="correct quiz-radio"><label for="q4b" class="quiz-label">and</label>
+            </div>
+        </div>
+
+        <div class="question">
+            <span class="question-text">5. They don't have a car [ because / so ] they take a bus.</span>
+            <div class="options-group">
+                <input type="radio" name="q5" id="q5a" class="wrong quiz-radio"><label for="q5a" class="quiz-label">because</label>
+                <input type="radio" name="q5" id="q5b" class="correct quiz-radio"><label for="q5b" class="quiz-label">so</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EXERCISE 5 — PERSONAL INFORMATION PROFILE (NOW MCQ) ===== -->
+    <div class="exercise">
+        <h3>📋 Personal Information Profile <span class="lesson-tag">Exercise 5</span></h3>
+        <p style="margin-top:0; margin-bottom:20px; color:#475569; font-weight:600;">
+            Choose the correct option (A, B or C) based on the text about Ellen's family.
+        </p>
+
+        <!-- Q1 -->
+        <div class="question">
+            <span class="question-text">1. My girl friend's name is…</span>
+            <div class="options-group">
+                <input type="radio" name="p1" id="p1a" class="correct quiz-radio"><label for="p1a" class="quiz-label">Emma</label>
+                <input type="radio" name="p1" id="p1b" class="wrong quiz-radio"><label for="p1b" class="quiz-label">Max</label>
+                <input type="radio" name="p1" id="p1c" class="wrong quiz-radio"><label for="p1c" class="quiz-label">Mr Smith</label>
+            </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="question">
+            <span class="question-text">2. She lives with a big family…</span>
+            <div class="options-group">
+                <input type="radio" name="p2" id="p2a" class="correct quiz-radio"><label for="p2a" class="quiz-label">her mum, dad and sister Amy</label>
+                <input type="radio" name="p2" id="p2b" class="wrong quiz-radio"><label for="p2b" class="quiz-label">her grandparents</label>
+                <input type="radio" name="p2" id="p2c" class="wrong quiz-radio"><label for="p2c" class="quiz-label">only her mum</label>
+            </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="question">
+            <span class="question-text">3. On weekdays in the morning, the family…</span>
+            <div class="options-group">
+                <input type="radio" name="p3" id="p3a" class="wrong quiz-radio"><label for="p3a" class="quiz-label">don't do a lot of things together</label>
+                <input type="radio" name="p3" id="p3b" class="correct quiz-radio"><label for="p3b" class="quiz-label">have breakfast together</label>
+                <input type="radio" name="p3" id="p3c" class="wrong quiz-radio"><label for="p3c" class="quiz-label">have lunch together</label>
+            </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="question">
+            <span class="question-text">4. At the weekend outside, they…</span>
+            <div class="options-group">
+                <input type="radio" name="p4" id="p4a" class="correct quiz-radio"><label for="p4a" class="quiz-label">often go to the park</label>
+                <input type="radio" name="p4" id="p4b" class="wrong quiz-radio"><label for="p4b" class="quiz-label">stay at home</label>
+                <input type="radio" name="p4" id="p4c" class="wrong quiz-radio"><label for="p4c" class="quiz-label">work in the garden</label>
+            </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="question">
+            <span class="question-text">5. They don't have a car, so…</span>
+            <div class="options-group">
+                <input type="radio" name="p5" id="p5a" class="wrong quiz-radio"><label for="p5a" class="quiz-label">they drive</label>
+                <input type="radio" name="p5" id="p5b" class="correct quiz-radio"><label for="p5b" class="quiz-label">they walk</label>
+                <input type="radio" name="p5" id="p5c" class="wrong quiz-radio"><label for="p5c" class="quiz-label">they stay home</label>
+            </div>
+        </div>
+
+        <!-- Q6 -->
+        <div class="question">
+            <span class="question-text">6. They always eat dinner at home, so…</span>
+            <div class="options-group">
+                <input type="radio" name="p6" id="p6a" class="correct quiz-radio"><label for="p6a" class="quiz-label">they are together in the evening</label>
+                <input type="radio" name="p6" id="p6b" class="wrong quiz-radio"><label for="p6b" class="quiz-label">they don't have lunch</label>
+                <input type="radio" name="p6" id="p6c" class="wrong quiz-radio"><label for="p6c" class="quiz-label">they go to the park</label>
+            </div>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetAll()">🔄 Restart Evaluation</button>
+
+</div>
+
+<script>
+    function resetAll() {
+        // Clear all radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+        // Clear all text inputs (if any remain)
+        document.querySelectorAll('.input-line').forEach(i => i.value = '');
+        // Scroll back to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Household Chores Target Race</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #4ea8de 0%, #5e60ce 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, #4895ef, #4cc9f0);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+
+        .quiz-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 5px; }
+        .quiz-header p { font-size: 16px; opacity: 0.95; }
+
+        .progress-area {
+            background: #f0f0f0;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 98px;
+            overflow: hidden;
+            margin-right: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4895ef, #4cc9f0);
+            border-radius: 98px;
+            transition: width 0.3s ease;
+        }
+
+        .counter { font-weight: 800; color: #666; font-size: 14px; }
+
+        .question-area { padding: 30px; }
+
+        .sentence-card {
+            background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+            border-radius: 24px;
+            padding: 35px 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 2px solid #e8eaff;
+        }
+
+        .sentence-text {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 140px;
+            background: #FFEAA7;
+            border-radius: 12px;
+            padding: 5px 12px;
+            margin: 0 5px;
+            color: #4895ef;
+            font-weight: 800;
+            border-bottom: 3px solid #FFD166;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 500px) { .options-grid { grid-template-columns: 1fr; } }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-bottom: 5px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            border-color: #4895ef;
+            border-bottom-color: #4cc9f0;
+            background: #f1f8ff;
+            transform: translateY(-2px);
+        }
+
+        .option-btn:active:not(.disabled) {
+            border-bottom-width: 2px;
+            transform: translateY(3px);
+        }
+
+        .option-btn.correct {
+            background: #d4edda !important;
+            border-color: #28a745 !important;
+            border-bottom-color: #1e7e34 !important;
+            color: #155724 !important;
+        }
+
+        .option-btn.wrong {
+            background: #f8d7da !important;
+            border-color: #dc3545 !important;
+            border-bottom-color: #bd2130 !important;
+            color: #721c24 !important;
+            animation: shake 0.4s ease;
+        }
+
+        .option-btn.disabled { pointer-events: none; opacity: 0.7; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* ============================================================
+           LEVEL 2 — UNSCRAMBLE
+           ============================================================ */
+        .scramble-instruction {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 16px;
+            background: #fffbea;
+            border-radius: 12px;
+            padding: 10px 14px;
+            border: 2px dashed #FFD166;
+        }
+
+        .sentence-builder {
+            min-height: 90px;
+            background: linear-gradient(135deg, #f0f7ff, #eaf1ff);
+            border: 3px dashed #a5c9ff;
+            border-radius: 20px;
+            padding: 18px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+            transition: background 0.3s;
+        }
+
+        .sentence-builder.correct-builder {
+            background: linear-gradient(135deg, #eafce9, #d8f7d6);
+            border-color: #28a745;
+        }
+
+        .sentence-builder.wrong-builder {
+            background: linear-gradient(135deg, #fdecec, #fbdada);
+            border-color: #dc3545;
+            animation: shake 0.4s ease;
+        }
+
+        .builder-empty {
+            color: #97a5b8;
+            font-weight: 700;
+            font-size: 15px;
+            width: 100%;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+            justify-content: center;
+        }
+
+        .word-chip {
+            background: white;
+            border: 2px solid #4ea8de;
+            border-bottom: 5px solid #4ea8de;
+            border-radius: 14px;
+            padding: 10px 18px;
+            font-size: 17px;
+            font-weight: 800;
+            color: #2d3748;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            font-family: inherit;
+            user-select: none;
+        }
+
+        .word-chip:hover:not(.disabled) {
+            background: #eaf5ff;
+            transform: translateY(-2px);
+        }
+
+        .word-chip:active:not(.disabled) {
+            border-bottom-width: 2px;
+            transform: translateY(3px);
+        }
+
+        .word-chip.placed {
+            background: linear-gradient(135deg, #4895ef, #4cc9f0);
+            color: white;
+            border-color: #3b7ddd;
+            border-bottom-color: #3b7ddd;
+        }
+
+        .word-chip.placed.correct-chip {
+            background: linear-gradient(135deg, #28a745, #4cc96c);
+            border-color: #1e7e34;
+            border-bottom-color: #1e7e34;
+        }
+
+        .word-chip.placed.wrong-chip {
+            background: linear-gradient(135deg, #dc3545, #e86170);
+            border-color: #bd2130;
+            border-bottom-color: #bd2130;
+        }
+
+        .word-chip.disabled { pointer-events: none; opacity: 0.6; }
+
+        .scramble-controls {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .control-btn {
+            border: none;
+            border-radius: 50px;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            border-bottom-width: 4px;
+            border-bottom-style: solid;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #4895ef, #4cc9f0);
+            color: white;
+            border-bottom-color: #3b7ddd;
+        }
+
+        .check-btn:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .check-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .reset-btn-l2 {
+            background: #f0f0f0;
+            color: #4a5568;
+            border-bottom-color: #cbd5e1;
+        }
+
+        .reset-btn-l2:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        /* ============================================================
+           CORRECT ANSWER PANEL (shown after wrong / timeout)
+           ============================================================ */
+        .correct-answer-panel {
+            display: none;
+            background: linear-gradient(135deg, #fff5f5, #fdecec);
+            border: 3px solid #dc3545;
+            border-radius: 20px;
+            padding: 20px 22px;
+            margin-top: 18px;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .correct-answer-panel.visible { display: block; }
+
+        .correct-answer-panel .label {
+            font-size: 14px;
+            font-weight: 900;
+            color: #b02a37;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .correct-answer-panel .answer-sentence {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.5;
+            background: white;
+            border-radius: 14px;
+            padding: 14px 18px;
+            border-left: 6px solid #28a745;
+            text-align: left;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Feedback Message */
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 15px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.correct-feedback {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .feedback.wrong-feedback {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        /* Timer */
+        .timer-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .timer-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 58px;
+            height: 58px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .timer-text {
+            position: relative;
+            font-size: 22px;
+            font-weight: 800;
+            color: #4895ef;
+            z-index: 1;
+        }
+
+        /* Result Screen */
+        .result-screen { display: none; text-align: center; padding: 40px 30px; }
+        .result-stars { font-size: 50px; letter-spacing: 10px; margin-bottom: 20px; }
+        .result-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #4895ef, #4cc9f0);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+        .result-score { font-size: 22px; font-weight: 700; margin-bottom: 12px; color: #4a5568; }
+        .result-score-2 { font-size: 18px; font-weight: 700; margin-bottom: 30px; color: #718096; }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #4895ef, #4cc9f0);
+            border: none;
+            border-bottom: 4px solid #3b7ddd;
+            color: white;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            font-family: inherit;
+        }
+
+        .restart-btn:active { border-bottom-width: 2px; transform: translateY(2px); }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="play-area">
+        <div class="quiz-header">
+            <h1>Household Chores Target Race 🧹</h1>
+            <p id="header-sub">Level 1 · Complete the phrase with the correct word!</p>
+        </div>
+
+        <div class="progress-area">
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="p-bar"></div>
+            </div>
+            <div class="counter" id="counter-txt">Task 1 / 6</div>
+        </div>
+
+        <div class="question-area">
+
+            <div class="timer-area">
+                <div class="timer-circle" id="t-circle">
+                    <span class="timer-text" id="t-text">40</span>
+                </div>
+            </div>
+
+            <!-- ============ LEVEL 1 ============ -->
+            <div id="level1-content">
+                <div class="sentence-card">
+                    <div class="sentence-text" id="sentence-box">
+                        Can you <span class="blank" id="blank-word">????</span> the floor?
+                    </div>
+                </div>
+                <div class="options-grid" id="options-box"></div>
+                <div class="feedback" id="feedback-box"></div>
+            </div>
+
+            <!-- ============ LEVEL 2 ============ -->
+            <div id="level2-content" style="display:none;">
+                <div class="scramble-instruction">
+                    👆 Click the words in the correct order to build the sentence.
+                    <br>Tap a placed word to send it back.
+                </div>
+
+                <div class="sentence-builder" id="sentence-builder">
+                    <span class="builder-empty">Your sentence will appear here…</span>
+                </div>
+
+                <div class="word-pool" id="word-pool"></div>
+
+                <div class="scramble-controls">
+                    <button class="control-btn reset-btn-l2" onclick="resetScramble()">↺ Reset</button>
+                    <button class="control-btn check-btn" id="check-btn" onclick="checkScramble()" disabled>✓ Check</button>
+                </div>
+
+                <div class="feedback" id="scramble-feedback"></div>
+
+                <!-- Correct answer panel (hidden by default) -->
+                <div class="correct-answer-panel" id="correct-panel">
+                    <span class="label">✔ Correct sentence</span>
+                    <div class="answer-sentence" id="correct-sentence"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============ RESULT ============ -->
+    <div class="result-screen" id="result-area">
+        <div class="result-stars">🏆🎉✨</div>
+        <div class="result-title">MISSION COMPLETE!</div>
+        <div class="result-score" id="score-text">You got 6 / 6 correct in Level 1!</div>
+        <div class="result-score-2" id="score-text-2">You got 6 / 6 correct in Level 2!</div>
+        <button class="restart-btn" onclick="resetQuest()">RESTART QUEST</button>
+    </div>
+</div>
+
+<script>
+    /* =========================================================
+       DATA — LEVEL 1 (Multiple Choice)
+       ========================================================= */
+    const level1Data = [
+        { q: "Can you <span class='blank'>????</span> the floor? 🧹", correct: "vacuum", options: ["vacuum", "wash", "load", "make"] },
+        { q: "Could you load the <span class='blank'>????</span>? 🍽️", correct: "dishwasher", options: ["dishwasher", "table", "rubbish", "bed"] },
+        { q: "Please, feed the <span class='blank'>????</span>! 🐶", correct: "dog", options: ["dog", "floor", "table", "rubbish"] },
+        { q: "Don't forget to take <span class='blank'>????</span> the rubbish. 🗑️", correct: "out", options: ["out", "off", "up", "down"] },
+        { q: "Help me set the <span class='blank'>????</span> for dinner. 🍽️", correct: "table", options: ["table", "dishwasher", "bed", "floor"] },
+        { q: "I always make my <span class='blank'>????</span> in the morning. 🛌", correct: "bed", options: ["bed", "floor", "table", "rubbish"] }
+    ];
+
+    /* =========================================================
+       DATA — LEVEL 2 (Unscramble sentences)
+       ========================================================= */
+    const level2Data = [
+        { words: ["Can", "you", "help", "me", "with", "the", "vacuuming?"] },
+        { words: ["Please,", "feed", "the", "dog."] },
+        { words: ["Can", "you", "load", "the", "dishwasher?"] },
+        { words: ["Take", "out", "the", "rubbish."] },
+        { words: ["Help", "me", "set", "the", "table,", "please."] },
+        { words: ["I", "always", "make", "my", "bed", "in", "the", "morning."] }
+    ];
+
+    /* =========================================================
+       STATE
+       ========================================================= */
+    let currentLevel = 1;
+    let taskIdx = 0;
+    let totalScore = 0;
+    let level1Score = 0;
+    let level2Score = 0;
+    let timerCountdown;
+    let remainingSeconds = 40;
+    let inputLocked = false;
+
+    // Level 2 state
+    let placedWords = [];
+    let shuffledWords = [];
+
+    /* =========================================================
+       INIT
+       ========================================================= */
+    function initTask() {
+        if (currentLevel === 1) {
+            if (taskIdx >= level1Data.length) {
+                currentLevel = 2;
+                taskIdx = 0;
+                showLevel2();
+                return;
+            }
+            initLevel1Task();
+        } else {
+            if (taskIdx >= level2Data.length) {
+                finishQuest();
+                return;
+            }
+            initLevel2Task();
+        }
+    }
+
+    /* =========================================================
+       LEVEL 1 — Multiple choice
+       ========================================================= */
+    function initLevel1Task() {
+        inputLocked = false;
+        remainingSeconds = 40;
+        document.getElementById('t-text').innerText = remainingSeconds;
+
+        document.getElementById('header-sub').innerText =
+            "Level 1 · Complete the phrase with the correct word!";
+        document.getElementById('level1-content').style.display = 'block';
+        document.getElementById('level2-content').style.display = 'none';
+
+        const currentTask = level1Data[taskIdx];
+        document.getElementById('counter-txt').innerText =
+            `L1 · Task ${taskIdx + 1} / ${level1Data.length}`;
+        document.getElementById('p-bar').style.width =
+            ((taskIdx) / (level1Data.length + level2Data.length) * 100) + '%';
+
+        document.getElementById('sentence-box').innerHTML = currentTask.q;
+
+        const feedbackBox = document.getElementById('feedback-box');
+        feedbackBox.className = "feedback";
+        feedbackBox.style.display = "none";
+
+        const optionsBox = document.getElementById('options-box');
+        optionsBox.innerHTML = '';
+
+        const scrambledOptions = [...currentTask.options].sort(() => Math.random() - 0.5);
+        scrambledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => verifyLevel1(opt, btn);
+            optionsBox.appendChild(btn);
+        });
+
+        startCountdown(40, timeoutLevel1);
+    }
+
+    function verifyLevel1(userChoice, btn) {
+        if (inputLocked) return;
+        inputLocked = true;
+        clearInterval(timerCountdown);
+
+        const currentTask = level1Data[taskIdx];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        const feedbackBox = document.getElementById('feedback-box');
+
+        if (userChoice === currentTask.correct) {
+            btn.classList.add('correct');
+            totalScore++;
+            level1Score++;
+            feedbackBox.innerText = "Excellent choice! Correct! 🌟";
+            feedbackBox.className = "feedback correct-feedback";
+
+            const blank = document.querySelector('.blank');
+            if (blank) {
+                blank.innerText = currentTask.correct;
+                blank.style.background = "#d4edda";
+                blank.style.color = "#155724";
+            }
+        } else {
+            btn.classList.add('wrong');
+            feedbackBox.innerText = `Incorrect! The target word was: ${currentTask.correct}`;
+            feedbackBox.className = "feedback wrong-feedback";
+
+            buttons.forEach(b => {
+                if (b.innerText === currentTask.correct) b.classList.add('correct');
+            });
+        }
+
+        setTimeout(() => {
+            taskIdx++;
+            initTask();
+        }, 1800);
+    }
+
+    function timeoutLevel1() {
+        if (inputLocked) return;
+        inputLocked = true;
+
+        const currentTask = level1Data[taskIdx];
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        const feedbackBox = document.getElementById('feedback-box');
+        feedbackBox.innerText = `Time out! The target word was: ${currentTask.correct}`;
+        feedbackBox.className = "feedback wrong-feedback";
+
+        buttons.forEach(b => {
+            if (b.innerText === currentTask.correct) b.classList.add('correct');
+        });
+
+        setTimeout(() => {
+            taskIdx++;
+            initTask();
+        }, 1800);
+    }
+
+    /* =========================================================
+       SWITCH TO LEVEL 2
+       ========================================================= */
+    function showLevel2() {
+        document.getElementById('header-sub').innerText =
+            "Level 2 · Unscramble the sentence!";
+        document.getElementById('level1-content').style.display = 'none';
+        document.getElementById('level2-content').style.display = 'block';
+        initLevel2Task();
+    }
+
+    /* =========================================================
+       LEVEL 2 — Unscramble
+       ========================================================= */
+    function initLevel2Task() {
+        inputLocked = false;
+        placedWords = [];
+
+        const currentTask = level2Data[taskIdx];
+
+        shuffledWords = currentTask.words.map((word, i) => ({
+            word: word,
+            originalIndex: i,
+            used: false
+        })).sort(() => Math.random() - 0.5);
+
+        // Ensure it isn't accidentally already in correct order
+        let attempts = 0;
+        while (
+            shuffledWords.every((w, i) => w.originalIndex === i) &&
+            attempts < 10
+        ) {
+            shuffledWords.sort(() => Math.random() - 0.5);
+            attempts++;
+        }
+
+        document.getElementById('counter-txt').innerText =
+            `L2 · Task ${taskIdx + 1} / ${level2Data.length}`;
+        document.getElementById('p-bar').style.width =
+            ((level1Data.length + taskIdx) /
+             (level1Data.length + level2Data.length) * 100) + '%';
+
+        // Reset feedback + correct-answer panel
+        const fb = document.getElementById('scramble-feedback');
+        fb.className = 'feedback';
+        fb.style.display = 'none';
+
+        const panel = document.getElementById('correct-panel');
+        panel.classList.remove('visible');
+        document.getElementById('correct-sentence').innerText = '';
+
+        const builder = document.getElementById('sentence-builder');
+        builder.className = 'sentence-builder';
+        builder.innerHTML =
+            '<span class="builder-empty">Your sentence will appear here…</span>';
+
+        renderWordPool();
+
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('check-btn').innerText = '✓ Check';
+
+        remainingSeconds = 40;
+        document.getElementById('t-text').innerText = remainingSeconds;
+        startCountdown(40, timeoutLevel2);
+    }
+
+    function renderWordPool() {
+        const pool = document.getElementById('word-pool');
+        pool.innerHTML = '';
+
+        shuffledWords.forEach((w, idx) => {
+            if (w.used) return;
+            const chip = document.createElement('button');
+            chip.className = 'word-chip';
+            chip.innerText = w.word;
+            chip.onclick = () => placeWord(idx);
+            pool.appendChild(chip);
+        });
+    }
+
+    function renderBuilder() {
+        const builder = document.getElementById('sentence-builder');
+
+        if (placedWords.length === 0) {
+            builder.innerHTML =
+                '<span class="builder-empty">Your sentence will appear here…</span>';
+            return;
+        }
+
+        builder.innerHTML = '';
+
+        placedWords.forEach((poolIdx, position) => {
+            const w = shuffledWords[poolIdx];
+            const chip = document.createElement('button');
+            chip.className = 'word-chip placed';
+            chip.innerText = w.word;
+            chip.onclick = () => removeWord(position);
+            builder.appendChild(chip);
+        });
+    }
+
+    function placeWord(poolIdx) {
+        if (inputLocked) return;
+        if (shuffledWords[poolIdx].used) return;
+
+        shuffledWords[poolIdx].used = true;
+        placedWords.push(poolIdx);
+
+        renderWordPool();
+        renderBuilder();
+
+        const total = level2Data[taskIdx].words.length;
+        document.getElementById('check-btn').disabled = (placedWords.length !== total);
+    }
+
+    function removeWord(position) {
+        if (inputLocked) return;
+
+        const poolIdx = placedWords[position];
+        shuffledWords[poolIdx].used = false;
+        placedWords.splice(position, 1);
+
+        renderWordPool();
+        renderBuilder();
+
+        const total = level2Data[taskIdx].words.length;
+        document.getElementById('check-btn').disabled = (placedWords.length !== total);
+    }
+
+    function resetScramble() {
+        if (inputLocked) return;
+        placedWords = [];
+        shuffledWords.forEach(w => (w.used = false));
+        renderWordPool();
+        renderBuilder();
+        document.getElementById('check-btn').disabled = true;
+
+        const fb = document.getElementById('scramble-feedback');
+        fb.className = 'feedback';
+        fb.style.display = 'none';
+
+        const panel = document.getElementById('correct-panel');
+        panel.classList.remove('visible');
+    }
+
+    function checkScramble() {
+        if (inputLocked) return;
+        if (placedWords.length !== level2Data[taskIdx].words.length) return;
+
+        inputLocked = true;
+        clearInterval(timerCountdown);
+
+        const correctOrder = level2Data[taskIdx].words;
+
+        let isCorrect = true;
+        placedWords.forEach((poolIdx, i) => {
+            if (shuffledWords[poolIdx].word !== correctOrder[i]) isCorrect = false;
+        });
+
+        const builder = document.getElementById('sentence-builder');
+        const fb = document.getElementById('scramble-feedback');
+        const chips = builder.querySelectorAll('.word-chip');
+
+        chips.forEach(c => (c.disabled = true));
+        document.querySelectorAll('.word-chip').forEach(c => c.classList.add('disabled'));
+        document.getElementById('check-btn').disabled = true;
+        document.getElementById('check-btn').innerText = '✓ Checked';
+
+        if (isCorrect) {
+            chips.forEach(c => c.classList.add('correct-chip'));
+            builder.classList.add('correct-builder');
+            fb.innerText = "Perfect! The sentence is correct! 🌟";
+            fb.className = "feedback correct-feedback";
+            totalScore++;
+            level2Score++;
+
+            setTimeout(() => {
+                taskIdx++;
+                initTask();
+            }, 1800);
+        } else {
+            chips.forEach(c => c.classList.add('wrong-chip'));
+            builder.classList.add('wrong-builder');
+            fb.innerText = "Not quite! Look at the correct sentence below 👇";
+            fb.className = "feedback wrong-feedback";
+
+            // Show correct sentence panel
+            const panel = document.getElementById('correct-panel');
+            document.getElementById('correct-sentence').innerText = correctOrder.join(' ');
+            panel.classList.add('visible');
+
+            setTimeout(() => {
+                taskIdx++;
+                initTask();
+            }, 2800);
+        }
+    }
+
+    function timeoutLevel2() {
+        if (inputLocked) return;
+        inputLocked = true;
+
+        const correctOrder = level2Data[taskIdx].words;
+
+        const builder = document.getElementById('sentence-builder');
+        builder.classList.add('wrong-builder');
+
+        const fb = document.getElementById('scramble-feedback');
+        fb.innerText = "Time out! Look at the correct sentence below 👇";
+        fb.className = "feedback wrong-feedback";
+
+        // Show correct sentence panel
+        const panel = document.getElementById('correct-panel');
+        document.getElementById('correct-sentence').innerText = correctOrder.join(' ');
+        panel.classList.add('visible');
+
+        document.querySelectorAll('.word-chip').forEach(c => c.classList.add('disabled'));
+        document.getElementById('check-btn').disabled = true;
+
+        setTimeout(() => {
+            taskIdx++;
+            initTask();
+        }, 2800);
+    }
+
+    /* =========================================================
+       TIMER HELPER
+       ========================================================= */
+    function startCountdown(seconds, onTimeout) {
+        clearInterval(timerCountdown);
+        remainingSeconds = seconds;
+        document.getElementById('t-text').innerText = remainingSeconds;
+
+        timerCountdown = setInterval(() => {
+            remainingSeconds--;
+            document.getElementById('t-text').innerText = remainingSeconds;
+            if (remainingSeconds <= 0) {
+                clearInterval(timerCountdown);
+                onTimeout();
+            }
+        }, 1000);
+    }
+
+    /* =========================================================
+       FINISH
+       ========================================================= */
+    function finishQuest() {
+        document.getElementById('p-bar').style.width = '100%';
+        document.getElementById('play-area').style.display = 'none';
+        document.getElementById('result-area').style.display = 'block';
+
+        document.getElementById('score-text').innerText =
+            `Level 1 · Multiple choice: ${level1Score} / ${level1Data.length} correct!`;
+        document.getElementById('score-text-2').innerText =
+            `Level 2 · Unscramble: ${level2Score} / ${level2Data.length} correct! Total: ${totalScore} / ${level1Data.length + level2Data.length}`;
+    }
+
+    /* =========================================================
+       RESET
+       ========================================================= */
+    function resetQuest() {
+        currentLevel = 1;
+        taskIdx = 0;
+        totalScore = 0;
+        level1Score = 0;
+        level2Score = 0;
+        placedWords = [];
+        shuffledWords = [];
+
+        document.getElementById('play-area').style.display = 'block';
+        document.getElementById('result-area').style.display = 'none';
+        document.getElementById('level1-content').style.display = 'block';
+        document.getElementById('level2-content').style.display = 'none';
+
+        initTask();
+    }
+
+    /* =========================================================
+       START
+       ========================================================= */
+    initTask();
+</script>
+</body>
+</html>
