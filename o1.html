@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Hero: Possessive, Articles, This/That, To Be</title>
+    <style>
+        :root {
+            --hero-blue: #2980b9;
+            --hero-purple: #8e44ad;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #27ae60;
+            --wrong: #e74c3c;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--hero-blue);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        #academy-card {
+            background-color: var(--white);
+            width: 95%;
+            max-width: 620px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--hero-purple);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 4px solid var(--comic-black);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .lvl-badge {
+            background: var(--hero-purple);
+            color: white;
+            padding: 8px 20px;
+            display: inline-block;
+            transform: rotate(-2deg);
+            font-size: 1rem;
+            border: 3px solid var(--comic-black);
+            letter-spacing: 1px;
+        }
+
+        #quiz-screen {
+            text-align: center;
+        }
+
+        #question-counter {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--hero-blue);
+        }
+
+        .prompt {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            padding: 18px 10px;
+            background: #f9f9f9;
+            border: 3px dashed var(--hero-purple);
+            border-radius: 12px;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            background: var(--hero-yellow);
+            border: 4px solid var(--comic-black);
+            padding: 16px 24px;
+            font-size: 1.2rem;
+            font-family: 'Arial Black', sans-serif;
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 5px 0 #333;
+            cursor: pointer;
+            transition: all 0.08s ease;
+            min-width: 140px;
+            color: var(--comic-black);
+        }
+
+        .option-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #333;
+        }
+
+        .option-btn.correct {
+            background: var(--success);
+            color: #fff;
+            box-shadow: 0 5px 0 #1e8449;
+        }
+
+        .option-btn.wrong {
+            background: var(--wrong);
+            color: #fff;
+            box-shadow: 0 5px 0 #922b21;
+            animation: shake 0.35s ease;
+        }
+
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .feedback {
+            font-size: 1rem;
+            min-height: 30px;
+            color: var(--wrong);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #win {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        #win h1 {
+            font-size: 5rem;
+            margin: 0;
+        }
+
+        #win h2 {
+            margin: 10px 0 30px;
+            font-size: 2rem;
+        }
+
+        #win .hero-btn {
+            background: var(--hero-blue);
+            color: white;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            border: 4px solid var(--comic-black);
+            border-radius: 12px;
+            box-shadow: 0 5px 0 #333;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 14px;
+            background: #eee;
+            border: 3px solid var(--comic-black);
+            margin-top: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        @media (max-width: 520px) {
+            .prompt {
+                font-size: 1.2rem;
+                padding: 14px 8px;
+            }
+            .option-btn {
+                font-size: 1rem;
+                padding: 14px 18px;
+                min-width: 110px;
+            }
+            .lvl-badge {
+                font-size: 0.85rem;
+                padding: 6px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="academy-card">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-badge">LEVEL 1: POSSESSIVE CASE</div>
+    </div>
+
+    <div id="quiz-screen">
+        <h3 id="question-counter">Question 1/5</h3>
+        <div id="question-prompt" class="prompt"></div>
+        <div id="options-container" class="options-grid"></div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div id="win" class="hidden">
+        <h1>🎉</h1>
+        <h2>MISSION COMPLETE!</h2>
+        <button class="hero-btn" onclick="location.reload()">NEW MISSION</button>
+    </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+</div>
+
+<script>
+    const levels = [
+        {
+            title: "POSSESSIVE CASE",
+            questions: [
+                { prompt: "My (mother) birthday is in June.", correct: "mother's", options: ["mother's", "mothers", "mother"] },
+                { prompt: "My (sister) schoolbag is nice.", correct: "sister's", options: ["sister's", "sisters", "sister"] },
+                { prompt: "(John) friend is funny.", correct: "John's", options: ["John's", "Johns", "John"] },
+                { prompt: "(Mona) ruler.", correct: "Mona's", options: ["Mona's", "Mona", "Monas"] },
+                { prompt: "(Sam) cats.", correct: "Sam's", options: ["Sam's", "Sams", "Sam"] }
+            ]
+        },
+        {
+            title: "ARTICLES A / AN",
+            questions: [
+                { prompt: "___ aeroplane", correct: "an", options: ["a", "an"] },
+                { prompt: "___ pencil", correct: "a", options: ["a", "an"] },
+                { prompt: "___ cat", correct: "a", options: ["a", "an"] },
+                { prompt: "___ book", correct: "a", options: ["a", "an"] },
+                { prompt: "___ desk", correct: "a", options: ["a", "an"] },
+                { prompt: "___ umbrella", correct: "an", options: ["a", "an"] }
+            ]
+        },
+        {
+            title: "THIS / THAT",
+            questions: [
+                { prompt: "___ is my pencil. (близко)", correct: "This", options: ["This", "That"] },
+                { prompt: "___ is your ruler. (далеко)", correct: "That", options: ["This", "That"] },
+                { prompt: "___ is my bag. (близко)", correct: "This", options: ["This", "That"] },
+                { prompt: "___ is his cat. (далеко)", correct: "That", options: ["This", "That"] },
+                { prompt: "___ is her pen. (близко)", correct: "This", options: ["This", "That"] }
+            ]
+        },
+        {
+            title: "VERB TO BE",
+            questions: [
+                { prompt: "It ___ a funny dog. (negative)", correct: "isn't", options: ["isn't", "aren't", "am not"] },
+                { prompt: "___ we good friends?", correct: "Are", options: ["Are", "Is", "Am"] },
+                { prompt: "___ she a nice girl?", correct: "Is", options: ["Is", "Are", "Am"] },
+                { prompt: "Ann and I ___ students.", correct: "are", options: ["are", "is", "am"] },
+                { prompt: "They ___ sisters. (negative)", correct: "aren't", options: ["aren't", "isn't", "am not"] }
+            ]
+        },
+        {
+            title: "SHORT ANSWERS",
+            questions: [
+                { prompt: "Is she happy?", correct: "No, she isn't.", options: ["No, she isn't.", "No, she is.", "Yes, she isn't."] },
+                { prompt: "Are they sisters?", correct: "Yes, they are.", options: ["Yes, they are.", "Yes, they is.", "No, they are."] },
+                { prompt: "Is he my grandpa?", correct: "Yes, he is.", options: ["Yes, he is.", "Yes, he are.", "No, he is."] }
+            ]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentQuestion = 0;
+    let completed = 0;
+    let totalQuestions = levels.reduce((sum, lvl) => sum + lvl.questions.length, 0);
+
+    const lvlTag = document.getElementById('lvl-tag');
+    const questionCounter = document.getElementById('question-counter');
+    const questionPrompt = document.getElementById('question-prompt');
+    const optionsContainer = document.getElementById('options-container');
+    const feedback = document.getElementById('feedback');
+    const progressFill = document.getElementById('fill');
+    const quizScreen = document.getElementById('quiz-screen');
+    const winScreen = document.getElementById('win');
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function renderQuestion() {
+        const level = levels[currentLevel];
+        const question = level.questions[currentQuestion];
+
+        lvlTag.textContent = `LEVEL ${currentLevel + 1}: ${level.title}`;
+        questionCounter.textContent = `Question ${currentQuestion + 1}/${level.questions.length}`;
+        questionPrompt.textContent = question.prompt;
+        feedback.textContent = '';
+        optionsContainer.innerHTML = '';
+
+        const shuffledOptions = shuffleArray([...question.options]);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt;
+            btn.onclick = () => handleAnswer(opt, question.correct, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selected, correct, btn) {
+        if (btn.disabled) return;
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            // disable all buttons
+            document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+            completed++;
+            updateProgress();
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < levels[currentLevel].questions.length) {
+                    renderQuestion();
+                } else {
+                    currentLevel++;
+                    currentQuestion = 0;
+                    if (currentLevel < levels.length) {
+                        renderQuestion();
+                    } else {
+                        showWin();
+                    }
+                }
+            }, 600);
+        } else {
+            btn.classList.add('wrong');
+            feedback.textContent = 'Try again!';
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+            }, 500);
+        }
+    }
+
+    function updateProgress() {
+        const percent = (completed / totalQuestions) * 100;
+        progressFill.style.width = percent + '%';
+    }
+
+    function showWin() {
+        quizScreen.classList.add('hidden');
+        winScreen.classList.remove('hidden');
+        lvlTag.textContent = 'MISSION COMPLETE';
+        progressFill.style.width = '100%';
+    }
+
+    // start
+    renderQuestion();
+    updateProgress();
+</script>
+</body>
+</html>

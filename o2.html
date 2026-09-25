@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Hero: Sentences &amp; Words</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-dark-green: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-dark-blue: #1899d6;
+            --duo-red: #ff4b4b;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-purple: #8e44ad;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #ffffff;
+            color: var(--duo-text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            width: 100%;
+            max-width: 640px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .close-x {
+            font-size: 24px;
+            color: #afafaf;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .close-x:hover { color: var(--duo-red); }
+
+        .progress-bg {
+            flex-grow: 1;
+            height: 16px;
+            background: var(--duo-gray);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--duo-green), #7ee22a);
+            border-radius: 20px;
+            transition: width 0.4s ease;
+            box-shadow: 0 2px 0 rgba(255,255,255,0.35) inset;
+        }
+
+        .score-pill {
+            background: #fff4e0;
+            color: #ff9600;
+            font-weight: 900;
+            font-size: 14px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #ffd88a;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* ===== MAIN QUIZ ===== */
+        .quiz-container {
+            width: 90%;
+            max-width: 620px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px 0 40px;
+        }
+
+        .type-badge {
+            display: inline-block;
+            background: var(--duo-purple);
+            color: #ffffff;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            padding: 6px 18px;
+            border-radius: 40px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            color: var(--duo-text);
+        }
+
+        .character-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .emoji-display {
+            font-size: 52px;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .bubble {
+            border: 2px solid var(--duo-gray);
+            padding: 16px 18px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            position: relative;
+            background: #ffffff;
+            flex: 1;
+            line-height: 1.4;
+            color: var(--duo-text);
+        }
+
+        .bubble::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid var(--duo-gray);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .option-card {
+            border: 2px solid var(--duo-gray);
+            border-bottom: 4px solid var(--duo-gray);
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            background: white;
+            text-align: center;
+            color: var(--duo-text);
+        }
+
+        .option-card:hover:not(.disabled) {
+            background-color: #fcfcfc;
+            border-color: #d4d4d4;
+        }
+
+        .option-card:active:not(.disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .option-card.disabled { pointer-events: none; cursor: default; }
+
+        .correct {
+            background-color: #d7ffb8 !important;
+            border-color: var(--duo-green) !important;
+            color: var(--duo-dark-green) !important;
+            animation: pop 0.35s ease;
+        }
+
+        .wrong {
+            background-color: #ffdfe0 !important;
+            border-color: var(--duo-red) !important;
+            color: var(--duo-red) !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-9px); }
+            40%, 80% { transform: translateX(9px); }
+        }
+
+        /* ===== RESULT ===== */
+        #result-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .result-emoji {
+            font-size: 80px;
+            margin-bottom: 10px;
+            animation: pop 0.6s ease;
+        }
+
+        #result-screen h1 {
+            font-size: 30px;
+            color: var(--duo-green);
+            margin: 10px 0;
+            font-weight: 900;
+        }
+
+        #score-text {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--duo-text);
+            margin-bottom: 30px;
+        }
+
+        .btn-restart {
+            background: var(--duo-blue);
+            color: white;
+            border: none;
+            border-bottom: 5px solid var(--duo-dark-blue);
+            padding: 16px 48px;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: 0.1s;
+        }
+
+        .btn-restart:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 500px) {
+            .bubble { font-size: 17px; padding: 14px; }
+            .emoji-display { font-size: 42px; }
+            .option-card { font-size: 16px; padding: 14px; }
+            .question-title { font-size: 19px; }
+            #result-screen h1 { font-size: 24px; }
+            #score-text { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="close-x" onclick="location.reload()">✕</div>
+        <div class="progress-bg"><div id="progress-fill"></div></div>
+        <div class="score-pill" id="score-pill">0</div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="quiz-container">
+        <div id="game-ui">
+            <div class="type-badge" id="type-title">I. MAKE THE SENTENCE</div>
+            <div class="question-title" id="question-counter">Question 1 / 17</div>
+
+            <div class="character-row">
+                <div class="emoji-display" id="current-emoji">👋</div>
+                <div class="bubble" id="current-prompt">granny / hi</div>
+            </div>
+
+            <div class="options-grid" id="options-box"></div>
+        </div>
+
+        <div id="result-screen">
+            <div class="result-emoji">🎯</div>
+            <h1>Mission Complete!</h1>
+            <p id="score-text"></p>
+            <button class="btn-restart" onclick="location.reload()">RESTART</button>
+        </div>
+    </div>
+
+    <script>
+        const missionData = [
+            /* ============================================================
+               PART I — Make the sentence (word order)
+               ============================================================ */
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "👋",
+                prompt: "granny / hi",
+                options: ["Granny, hi", "Hi, granny", "hi granny"],
+                correct: "Hi, granny"
+            },
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "😊",
+                prompt: "am / I / fine",
+                options: ["Am I fine", "Fine I am", "I am fine"],
+                correct: "I am fine"
+            },
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "👨‍👩‍👧",
+                prompt: "family / my / fine / is / too",
+                options: ["My family is fine too", "Fine is my family too", "My family too is fine"],
+                correct: "My family is fine too"
+            },
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "🚴",
+                prompt: "like / play / to / I / and / bike / a / ride",
+                options: ["I and play like to ride a bike", "I like to ride a bike and play", "Like I to ride a bike and play"],
+                correct: "I like to ride a bike and play"
+            },
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "❤️",
+                prompt: "love / I / you",
+                options: ["I love you", "Love I you", "You love I"],
+                correct: "I love you"
+            },
+            {
+                type: "I. MAKE THE SENTENCE",
+                emoji: "🐶",
+                prompt: "Tib / bye",
+                options: ["Tib, bye", "bye Tib", "Bye, Tib"],
+                correct: "Bye, Tib"
+            },
+
+            /* ============================================================
+               PART II — Missing letters
+               ============================================================ */
+            {
+                type: "II. MISSING LETTERS",
+                emoji: "🔟",
+                prompt: "t_n   r_ler",
+                options: ["tan / reler", "ten / ruler", "tin / roler"],
+                correct: "ten / ruler"
+            },
+            {
+                type: "II. MISSING LETTERS",
+                emoji: "✏️",
+                prompt: "pe_ci_   sch_ _l",
+                options: ["pensil / scool", "pencel / schol", "pencil / school"],
+                correct: "pencil / school"
+            },
+            {
+                type: "II. MISSING LETTERS",
+                emoji: "🧽",
+                prompt: "r_bbe_   te_ch_r",
+                options: ["rabber / teachear", "rubber / teacher", "rubber / teechar"],
+                correct: "rubber / teacher"
+            },
+            {
+                type: "II. MISSING LETTERS",
+                emoji: "🖊️",
+                prompt: "sharp_n_r   p_p_l",
+                options: ["sharpner / pupel", "sharpener / pupile", "sharpener / pupil"],
+                correct: "sharpener / pupil"
+            },
+            {
+                type: "II. MISSING LETTERS",
+                emoji: "7️⃣",
+                prompt: "s_v_n   ele_e_",
+                options: ["sevan / elevan", "siven / elevin", "seven / eleven"],
+                correct: "seven / eleven"
+            },
+
+            /* ============================================================
+               PART III — Choose the correct option
+               ============================================================ */
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "🏠",
+                prompt: "I ___ at home.",
+                options: ["is", "-", "am"],
+                correct: "am"
+            },
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "🌍",
+                prompt: "Bob ___ in Africa.",
+                options: ["is", "am", "-"],
+                correct: "is"
+            },
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "🚲",
+                prompt: "Kate ___ a bike.",
+                options: ["have got", "is", "has got"],
+                correct: "has got"
+            },
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "🐱",
+                prompt: "I have got a ___.",
+                options: ["kittens", "cats", "kitten"],
+                correct: "kitten"
+            },
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "🎮",
+                prompt: "He ___ five games.",
+                options: ["is", "has got", "have got"],
+                correct: "has got"
+            },
+            {
+                type: "III. CHOOSE THE OPTION",
+                emoji: "5️⃣",
+                prompt: "He ___ five.",
+                options: ["has got", "is", "have got"],
+                correct: "is"
+            }
+        ];
+
+        let idx = 0;
+        let score = 0;
+
+        const typeTitle   = document.getElementById('type-title');
+        const counter     = document.getElementById('question-counter');
+        const emojiBox    = document.getElementById('current-emoji');
+        const promptBox   = document.getElementById('current-prompt');
+        const optionsBox  = document.getElementById('options-box');
+        const progressBar = document.getElementById('progress-fill');
+        const scorePill   = document.getElementById('score-pill');
+        const gameUI      = document.getElementById('game-ui');
+        const resultUI    = document.getElementById('result-screen');
+
+        /* Fisher–Yates shuffle so options appear in random order */
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function loadTask() {
+            const item = missionData[idx];
+
+            typeTitle.textContent  = item.type;
+            counter.textContent    = `Question ${idx + 1} / ${missionData.length}`;
+            emojiBox.textContent   = item.emoji;
+            promptBox.textContent  = item.prompt;
+
+            optionsBox.innerHTML = '';
+
+            const shuffled = shuffleArray(item.options);
+
+            shuffled.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option-card';
+                btn.textContent = opt;
+                btn.onclick = () => check(btn, opt);
+                optionsBox.appendChild(btn);
+            });
+
+            updateUI();
+        }
+
+        function check(btn, choice) {
+            const correct = missionData[idx].correct;
+            const cards = document.querySelectorAll('.option-card');
+            cards.forEach(c => c.classList.add('disabled'));
+
+            if (choice === correct) {
+                btn.classList.add('correct');
+                score++;
+                scorePill.textContent = score;
+                setTimeout(next, 700);
+            } else {
+                btn.classList.add('wrong');
+                cards.forEach(c => {
+                    if (c.textContent === correct) c.classList.add('correct');
+                });
+                setTimeout(next, 1400);
+            }
+        }
+
+        function next() {
+            idx++;
+            if (idx < missionData.length) {
+                loadTask();
+            } else {
+                finish();
+            }
+        }
+
+        function updateUI() {
+            progressBar.style.width = (idx / missionData.length) * 100 + '%';
+        }
+
+        function finish() {
+            gameUI.style.display = 'none';
+            resultUI.style.display = 'block';
+            document.getElementById('score-text').textContent =
+                `Amazing! Your score: ${score} / ${missionData.length}`;
+            progressBar.style.width = '100%';
+        }
+
+        window.onload = loadTask;
+    </script>
+</body>
+</html>
