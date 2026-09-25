@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Formula 1 · Paddock History Challenge</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #111; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; }
+        #quiz-container { background: #222; border-radius: 20px; box-shadow: 0 10px 30px rgba(225, 6, 0, 0.3); width: 95%; max-width: 550px; padding: 30px; text-align: center; border: 2px solid #e10600; }
+        .progress-bar { height: 10px; background: #444; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        #progress-fill { height: 100%; background: #e10600; width: 0%; transition: 0.3s; }
+        .f1-mascot { font-size: 50px; margin-bottom: 10px; }
+        h2 { font-style: italic; color: #e10600; text-transform: uppercase; letter-spacing: 2px; margin-top: 10px; }
+        .paddock-passage { background: #1a1a1a; padding: 15px; border-radius: 12px; border-left: 5px solid #ffb703; text-align: left; font-size: 14px; line-height: 1.6; margin-bottom: 20px; color: #ccc; }
+        .paddock-passage strong { color: #fff; }
+        .question { font-size: 18px; margin: 20px 0; min-height: 50px; font-weight: bold; color: #f0f0f0; line-height: 1.4; }
+        .options { display: grid; gap: 10px; }
+        button { background: #333; color: white; border: 2px solid #444; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; font-family: inherit; }
+        button:hover { background: #444; border-color: #ffb703; }
+        #feedback { margin-top: 20px; font-weight: bold; height: 24px; font-size: 16px; }
+        .hidden { display: none; }
+        #rank { color: #ffb703; font-size: 40px; margin: 20px 0; text-shadow: 0 0 10px rgba(255,183,3,0.5); font-weight: 900; }
+        p.desc { color: #aaa; font-size: 14px; margin-bottom: 25px; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <div class="f1-mascot">🏎️🏁⏱️</div>
+    
+    <div id="game-view">
+        <div id="category" style="color: #ffb703; font-size: 13px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Paddock Reading Analytics</div>
+        
+        <!-- Context log pane directly containing the data from image panel 3 -->
+        <div class="paddock-passage">
+            <strong>Paddock History Log:</strong><br>
+            He was at the Halloween party wearing a clown face mask. Team bought a new real car for the house living room. Yesterday, they worked hard at the garage shop inside the pit zone wearing blue gloves. Right after finishing the mechanics job, a driver bought fresh  flowers at the local florist's.
+        </div>
+
+        <div class="question" id="question-text">Loading mission profile...</div>
+        <div class="options" id="options-container"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-view" class="hidden">
+        <h2>Telemetry Completed!</h2>
+        <div id="rank">P1</div>
+        <p id="score-text"></p>
+        <button onclick="location.reload()">RESTART LAP</button>
+    </div>
+</div>
+
+<script>
+    // Expanded dataset including full True / False / Not Stated evaluations from text panel 3
+    const questions = [
+        {
+            q: "The driver was at a special Halloween party.",
+            options: ["True", "False", "Not Stated"],
+            correct: 0,
+            cat: "Text Analysis"
+        },
+        {
+            q: "He drove his Formula 1 car through the city streets yesterday.",
+            options: ["True", "False", "Not Stated"],
+            correct: 1, // Text explicitly notes "Yesterday He didn't drive a car" (crossed out card 1 matches the negative context)
+            cat: "Fact Check"
+        },
+        {
+            q: "They bought a car-chair for the room.",
+            options: ["True", "False", "Not Stated"],
+            correct: 1, // Text explicitly notes "they didn't take a car-chair on the carpet"
+            cat: "Detail Scan"
+        },
+        {
+            q: " He bought the flowers to give to his sister.",
+            options: ["True", "False", "Not Stated"],
+            correct: 2, // It says he bought flowers at the florist's, but who they are for is Not Stated
+            cat: "Inference Check"
+        },
+        {
+            q: " They were at the garage shop, and they wore gloves.",
+            options: ["True", "False", "Not Stated"],
+            correct: 0, // Text states "he worked at the garage shop in gloves"
+            cat: "Fact Check"
+        },
+        {
+            q: "The new real car they bought for the house was painted red.",
+            options: ["True", "False", "Not Stated"],
+            correct: 2, // They bought a car for the house, but its color specification is Not Stated
+            cat: "Color Parameter"
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('category').innerText = q.cat;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i);
+            container.appendChild(btn);
+        });
+        
+        updateProgress();
+    }
+
+    function checkAnswer(idx) {
+        const feedback = document.getElementById('feedback');
+        const buttons = document.getElementById('options-container').querySelectorAll('button');
+        
+        // Lock inputs during update sequence
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+
+        if(idx === questions[currentIdx].correct) {
+            score++;
+            feedback.innerText = "FASTEST LAP RUN! 🟢 (+100 XP)";
+            feedback.style.color = "#58cc02";
+        } else {
+            feedback.innerText = "PIT LANE LIMIT FAULT! 🔴";
+            feedback.style.color = "#ff4b4b";
+        }
+
+        setTimeout(() => {
+            feedback.innerText = "";
+            currentIdx++;
+            if(currentIdx < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }, 1200);
+    }
+
+    function updateProgress() {
+        const percent = (currentIdx / questions.length) * 100;
+        document.getElementById('progress-fill').style.width = percent + "%";
+    }
+
+    function showResults() {
+        document.getElementById('game-view').classList.add('hidden');
+        document.getElementById('result-view').classList.remove('hidden');
+        
+        // Calculate dynamic racing ranks based on data verification scores
+        let rankText = "DNF";
+        if (score === questions.length) rankText = "P1 (GOLD)";
+        else if (score >= 4) rankText = "P2 (SILVER)";
+        else if (score >= 2) rankText = "P3 (BRONZE)";
+        
+        document.getElementById('rank').innerText = rankText;
+        document.getElementById('score-text').innerText = `Telemetry checks complete. You synchronized ${score} out of ${questions.length} matrices accurately!`;
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

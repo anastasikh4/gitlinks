@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Formula 1 · Paddock History Challenge</title>
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-blue: #1e3a8a;
+            --correct-green: #2ecc71;
+            --wrong-red: #e74c3c;
+            --bg-dark: #111111;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --quest-gold: #ffb703;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .mission-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 2px solid #333;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(225, 6, 0, 0.4);
+        }
+
+        .score-tracker {
+            position: sticky;
+            top: 10px;
+            background: rgba(0,0,0,0.9);
+            padding: 12px;
+            border: 2px solid var(--f1-red);
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            z-index: 100;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        h1, h2 { font-family: 'Segoe UI', sans-serif; font-weight: 900; text-transform: uppercase; text-align: center; margin: 10px 0; }
+        h1 { color: var(--f1-red); letter-spacing: 1px; }
+        
+        .quest-box {
+            border-bottom: 1px solid #333;
+            padding: 25px 0;
+        }
+
+        .image-box {
+            width: 100%;
+            max-width: 440px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: block;
+            object-fit: cover;
+            max-height: 240px;
+        }
+
+        .variant-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .variant-btn {
+            background: #2b2b2b;
+            color: white;
+            border: 1px solid #444;
+            padding: 12px 24px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .variant-btn:hover {
+            border-color: var(--quest-gold);
+            background: #383838;
+        }
+
+        /* Success/Fail States */
+        .variant-btn.correct { background-color: var(--correct-green) !important; border-color: white; color: #111; }
+        .variant-btn.wrong { background-color: var(--wrong-red) !important; opacity: 0.7; }
+
+        .reading-text {
+            background: #000;
+            padding: 15px;
+            border-left: 4px solid var(--f1-blue);
+            margin: 15px 0;
+            font-style: italic;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="score-tracker">
+    TELEMETRY LAP PROGRESS: <span id="score">0</span> / 6 | CURRENT STATUS: <span id="rank" style="color: var(--quest-gold)">P4</span>
+</div>
+
+<div class="mission-container">
+    <h1>Formula 1: Telemetry & Chrono Lab</h1>
+
+    <!-- Q1: Vocabulary & Past Simple -->
+    <div class="quest-box">
+        <h2>Quest 01: Forest Circuit</h2>
+        <p style="text-align:center; font-size: 1.1rem; margin-top: 10px;"><b>"Yesterday on the first of November, the car ______ in the autumn forest."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">is</button>
+            <button class="variant-btn" onclick="check(this, true)">was</button>
+            <button class="variant-btn" onclick="check(this, false)">were</button>
+        </div>
+    </div>
+
+    <!-- Q2: Past Simple irregular -->
+    <div class="quest-box">
+        <h2>Quest 02: Paddock Wall Trick</h2>
+        <p style="text-align:center; font-size: 1.1rem;"><b>"The car was on the wall ______ the house."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, true)">in</button>
+            <button class="variant-btn" onclick="check(this, false)">on</button>
+            <button class="variant-btn" onclick="check(this, false)">at</button>
+        </div>
+    </div>
+
+    <!-- Q3: Past Simple action -->
+    <div class="quest-box">
+        <h2>Quest 03: Circuit Weather</h2>
+        <p style="text-align:center; font-size: 1.1rem;"><b>"The cars ______ on the sunny track yesterday afternoon."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">drive</button>
+            <button class="variant-btn" onclick="check(this, false)">driving</button>
+            <button class="variant-btn" onclick="check(this, true)">drove</button>
+        </div>
+    </div>
+
+    <!-- Q4: Substantive descriptors -->
+    <div class="quest-box">
+        <h2>Quest 04: Driver Telemetry</h2>
+        <p style="text-align:center; font-size: 1.1rem;"><b>"The driver was safe in a special ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">suit</button>
+            <button class="variant-btn" onclick="check(this, true)">helmet</button>
+            <button class="variant-btn" onclick="check(this, false)">gloves</button>
+        </div>
+    </div>
+
+    <!-- Q5: Calendar Chrono Check -->
+    <div class="quest-box">
+        <h2>Quest 05: Flat Showroom Inventory</h2>
+        <p style="text-align:center; font-size: 1.1rem;"><b>"What did they buy for the flat on Saturday? They bought a Formula 1 ______."</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">simulator</button>
+            <button class="variant-btn" onclick="check(this, false)">trophy</button>
+            <button class="variant-btn" onclick="check(this, true)">car</button>
+        </div>
+    </div>
+
+    <!-- Q6: Final Check - Podiums -->
+    <div class="quest-box" style="border: 2px solid var(--f1-red); padding: 20px; background: #1a0202; border-radius: 12px;">
+        <h2>FINAL PROMPT: THE PODIUM</h2>
+        <div class="reading-text">"Look at Monday's race yesterday. The driver had a winner cup and saw many fireworks."</div>
+        <p style="text-align:center; font-size: 1.1rem;"><b>"When was he the winner?"</b></p>
+        <div class="variant-grid">
+            <button class="variant-btn" onclick="check(this, false)">On Saturday (SAT)</button>
+            <button class="variant-btn" onclick="check(this, true)">On Monday (MON)</button>
+            <button class="variant-btn" onclick="check(this, false)">In December</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let points = 0;
+    const total = 6;
+
+    function check(btn, isCorrect) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('button');
+        
+        if (isCorrect) {
+            if(!btn.classList.contains('correct')) {
+                btn.classList.add('correct');
+                points++;
+                updateScore();
+            }
+        } else {
+            btn.classList.add('wrong');
+            // Highlight the correct answer for clarity
+            buttons.forEach(b => {
+                if (b.onclick.toString().includes('true')) {
+                    b.classList.add('correct');
+                }
+            });
+        }
+        
+        buttons.forEach(b => b.style.pointerEvents = 'none');
+    }
+
+    function updateScore() {
+        document.getElementById('score').innerText = points;
+        let rank = "P4";
+        if (points >= 2) rank = "P3 (BRONZE)";
+        if (points >= 4) rank = "P2 (SILVER)";
+        if (points === total) rank = "P1 (GOLD Champion)";
+        document.getElementById('rank').innerText = rank;
+    }
+</script>
+
+</body>
+</html>

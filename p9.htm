@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Formula 1 · Paddock Gram Quest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', 'Segoe UI', monospace;
+        }
+        body {
+            background: #111;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .game-container {
+            max-width: 720px;
+            width: 100%;
+            background: #222;
+            border-radius: 16px;
+            padding: 24px 22px 32px;
+            border: 4px solid #333;
+            box-shadow: inset 0 -6px 0 #111, 0 8px 0 #000;
+        }
+        .quest-header {
+            background: #e10600;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border-bottom: 6px solid #990400;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .quest-badge {
+            background: #fff;
+            padding: 4px 14px;
+            font-weight: 900;
+            color: #111;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border-bottom: 4px solid #ccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quest-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #f0f0f0;
+            text-shadow: 2px 2px 0 #1a1a1a;
+        }
+        .can-badge {
+            margin-left: auto;
+            background: #00d4ff;
+            color: #111;
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 0.8rem;
+            border-bottom: 4px solid #0099cc;
+        }
+
+        .mine-block {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+            border-bottom: 6px solid #222;
+            margin-bottom: 18px;
+        }
+        .mine-block p {
+            color: #f0f0f0;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .option-btn {
+            background: #444;
+            border: none;
+            border-bottom: 6px solid #222;
+            border-radius: 8px;
+            padding: 16px 12px;
+            font-weight: 800;
+            color: #f0f0f0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            text-align: center;
+        }
+        .option-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+        .option-btn.correct {
+            background: #58cc02;
+            border-bottom-color: #2d7a0a;
+            color: #111;
+            text-shadow: none;
+        }
+        .option-btn.wrong {
+            background: #ff4b4b;
+            border-bottom-color: #8a1a1a;
+        }
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        .nav-btn {
+            background: #ffb703;
+            border: none;
+            border-bottom: 6px solid #b67a07;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 900;
+            color: #111;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.05s linear;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+        }
+        .nav-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+        .nav-btn.secondary {
+            background: #4facfe;
+            border-bottom-color: #1a5c8a;
+            color: white;
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .feedback-area {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: #111;
+            border-radius: 8px;
+            border-left: 6px solid #e10600;
+            color: #f0f0f0;
+            font-weight: 600;
+            min-height: 60px;
+            text-shadow: 1px 1px 0 #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .img-preview {
+            background: #111;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid #333;
+            margin: 12px 0;
+        }
+        .img-preview img {
+            max-width: 100%;
+            border-radius: 4px;
+            max-height: 160px;
+            object-fit: cover;
+        }
+
+        .progress-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 12px 0 6px;
+        }
+        .progress-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            background: #4d4d4d;
+            border-bottom: 3px solid #2d2d2d;
+        }
+        .progress-dot.done {
+            background: #58cc02;
+        }
+        .progress-dot.active {
+            background: #ffb703;
+            border-bottom-color: #b67a07;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #333;
+            border: none;
+            border-bottom: 6px solid #111;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 800;
+            color: #f0f0f0;
+            cursor: pointer;
+            transition: 0.05s linear;
+            flex: 1;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: #e10600;
+            border-bottom-color: #990400;
+            color: #fff;
+        }
+        .tab-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 550px) {
+            .game-container { padding: 16px; }
+            .option-grid { grid-template-columns: 1fr; gap: 10px; }
+            .quest-title { font-size: 1.2rem; }
+            .tab-btn { font-size: 0.7rem; padding: 8px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="quest-header">
+        <span class="quest-badge">🏁 SYNTAX</span>
+        <span class="quest-title">F1 Paddock &amp; Aspect</span>
+        <span class="can-badge">TELEMETRY</span>
+    </div>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" id="tab1Btn" onclick="switchTab('tab1')">🧩 Part 1: Showroom</button>
+        <button class="tab-btn" id="tab2Btn" onclick="switchTab('tab2')" disabled>⏱️ Part 2: Actions</button>
+    </div>
+
+    <!-- ========== TAB 1 ========== -->
+    <div id="tab1" class="tab-content active">
+        <div class="img-preview">
+            <img src="https://i.pinimg.com/736x/84/d3/d6/84d3d606f760144b7c1bd7b5e4f4406e.jpg" alt="Formula 1 car setup">
+        </div>
+
+        <div class="mine-block">
+            <p id="t1-text">Loading syntax system parameters...</p>
+        </div>
+
+        <div class="option-grid" id="t1-options"></div>
+
+        <div class="progress-indicator" id="t1-progress"></div>
+        <div class="feedback-area" id="t1-feedback">🔧 Select the perfect syntax component matching the layout environment.</div>
+    </div>
+
+    <!-- ========== TAB 2 ========== -->
+    <div id="tab2" class="tab-content">
+        <div class="img-preview">
+            <img src="https://s0.rbk.ru/v6_top_pics/media/img/2/02/754788606465022.jpeg" alt="Race engineers tracking telemetry data">
+        </div>
+
+        <div class="mine-block">
+            <p id="t2-text">Loading aspect configurations...</p>
+        </div>
+
+        <div class="option-grid" id="t2-options"></div>
+
+        <div class="progress-indicator" id="t2-progress"></div>
+        <div class="feedback-area" id="t2-feedback">🚦 Evaluate the live action timelines: NOW (Continuous) vs EVERY DAY (Simple).</div>
+    </div>
+</div>
+
+<script>
+    // ===== DATASET FROM THE TEXTBOOK PAGE =====
+    const tab1Tasks = [
+        {
+            text: "There is a Formula 1 ________ in the living room and it is on the carpet.",
+            correct: "car",
+            options: ["car", "carpet", "living", "wall"]
+        },
+        {
+            text: "There is a Formula 1 car in the ________ room and it is on the carpet.",
+            correct: "living",
+            options: ["living", "wall", "carpet", "car"]
+        },
+        {
+            text: "There is a Formula 1 car in the living room and it is on the ________.",
+            correct: "carpet",
+            options: ["carpet", "wall", "living", "car"]
+        },
+        {
+            text: "One fast car isn't on the ________ in the living room.",
+            correct: "wall",
+            options: ["wall", "carpet", "car", "living"]
+        }
+    ];
+
+    const tab2Tasks = [
+        {
+            text: "[NOW ASPECT] Look! She ________ standing next to a car at the moment.",
+            correct: "is",
+            options: ["is", "does", "are", "do"]
+        },
+        {
+            text: "[NOW ASPECT] The race car isn't driving in the city centre ________ the house.",
+            correct: "opposite",
+            options: ["opposite", "under", "in", "at"]
+        },
+        {
+            text: "[EVERY DAY ASPECT] She works with the electronic system at the new garage ________.",
+            correct: "shop",
+            options: ["shop", "moment", "Autumn", "now"]
+        },
+        {
+            text: "[EVERY DAY ASPECT] She buys and ________ coffee every day at the new cafe in the city.",
+            correct: "drinks",
+            options: ["drinks", "drinking", "drink", "drank"]
+        }
+    ];
+
+    let t1Idx = 0;
+    let t2Idx = 0;
+    let switching = false;   // prevents double-triggering auto-switch
+
+    function initTrack() {
+        renderDots('t1-progress', tab1Tasks.length);
+        renderDots('t2-progress', tab2Tasks.length);
+        loadTab1Task();
+        loadTab2Task();
+    }
+
+    function renderDots(containerId, count) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot';
+            container.appendChild(dot);
+        }
+    }
+
+    function updateDots(containerId, activeIdx, count) {
+        const dots = document.getElementById(containerId).children;
+        for (let i = 0; i < count; i++) {
+            dots[i].className = 'progress-dot';
+            if (i < activeIdx) dots[i].classList.add('done');
+            if (i === activeIdx) dots[i].classList.add('active');
+        }
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ===== TAB 1 =====
+    function loadTab1Task() {
+        // If all Tab 1 tasks are done → auto-switch to Tab 2
+        if (t1Idx >= tab1Tasks.length) {
+            updateDots('t1-progress', tab1Tasks.length, tab1Tasks.length);
+            document.getElementById('t1-text').innerText = "🏁 Showroom analysis complete! Switching to live telemetry...";
+            document.getElementById('t1-options').innerHTML = '';
+            document.getElementById('t1-feedback').innerText = "Telemetry clear. Auto-navigating to Part 2...";
+
+            if (!switching) {
+                switching = true;
+                setTimeout(() => {
+                    document.getElementById('tab2Btn').removeAttribute('disabled');
+                    switchTab('tab2');
+                    switching = false;
+                }, 1200);
+            }
+            return;
+        }
+
+        updateDots('t1-progress', t1Idx, tab1Tasks.length);
+        const task = tab1Tasks[t1Idx];
+        document.getElementById('t1-text').innerHTML = task.text;
+
+        const optGrid = document.getElementById('t1-options');
+        optGrid.innerHTML = '';
+
+        shuffle(task.options).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkTab1(opt, btn);
+            optGrid.appendChild(btn);
+        });
+    }
+
+    function checkTab1(selected, btn) {
+        const task = tab1Tasks[t1Idx];
+        const buttons = document.getElementById('t1-options').querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (selected === task.correct) {
+            btn.classList.add('correct');
+            document.getElementById('t1-feedback').innerText = "⚡ Systems normal! Telemetry accepted.";
+            setTimeout(() => {
+                t1Idx++;
+                loadTab1Task();
+            }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('t1-feedback').innerText = `⚠️ Defect found! The required component was: "${task.correct}"`;
+            setTimeout(() => {
+                loadTab1Task();
+            }, 1500);
+        }
+    }
+
+    // ===== TAB 2 =====
+    function loadTab2Task() {
+        if (t2Idx >= tab2Tasks.length) {
+            updateDots('t2-progress', tab2Tasks.length, tab2Tasks.length);
+            document.getElementById('t2-text').innerText = "🏆 CHAMPIONSHIP COMPLETE! All showroom configurations and active continuous metrics verified successfully.";
+            document.getElementById('t2-options').innerHTML = '';
+            document.getElementById('t2-feedback').innerText = "Circuit complete. Lap record verified.";
+            return;
+        }
+
+        updateDots('t2-progress', t2Idx, tab2Tasks.length);
+        const task = tab2Tasks[t2Idx];
+        document.getElementById('t2-text').innerHTML = task.text;
+
+        const optGrid = document.getElementById('t2-options');
+        optGrid.innerHTML = '';
+
+        shuffle(task.options).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkTab2(opt, btn);
+            optGrid.appendChild(btn);
+        });
+    }
+
+    function checkTab2(selected, btn) {
+        const task = tab2Tasks[t2Idx];
+        const buttons = document.getElementById('t2-options').querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (selected === task.correct) {
+            btn.classList.add('correct');
+            document.getElementById('t2-feedback').innerText = "🟢 Green flag! Timeline matched accurately.";
+            setTimeout(() => {
+                t2Idx++;
+                loadTab2Task();
+            }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            document.getElementById('t2-feedback').innerText = `🔴 Red flag! Telemetry syntax requires: "${task.correct}"`;
+            setTimeout(() => {
+                loadTab2Task();
+            }, 1500);
+        }
+    }
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById(tabId + 'Btn').classList.add('active');
+    }
+
+    initTrack();
+</script>
+
+</body>
+</html>
