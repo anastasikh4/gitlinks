@@ -892,7 +892,7 @@
   // ВТОРНИК
   [
     { name: 'Sophia', price: 1100 },
-    { name: 'Игорь', price: 1000 },
+    { name: 'Катя', price: 1100 },
     { name: 'Лиза', price: 0 },      // пакет
     { name: 'Гоша', price: 700 }     // добавлен во вторник, 18:00, Яндекс
   ],
@@ -900,6 +900,7 @@
   [
     { name: 'Sonya', price: 0 },    // пакет
     { name: 'Egor', price: 0 },     // пакет
+    { name: 'Олег', price: 1000 },
     { name: 'Andrey', price: 800 }
   ],
   // ЧЕТВЕРГ
@@ -926,11 +927,7 @@
     { name: 'Девочки', price: 1000 }
   ]
 ];
-      const EXTRA = [
-  { name: 'Соня · пакет', price: 9000 },
-  { name: 'Егор · пакет', price: 8800 },
-];
-
+      
       // ---------- Дни ----------
       function taskRow(item, id){
         const tax=Math.round(item.price*TAX);
