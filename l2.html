@@ -280,42 +280,34 @@
 
 <script>
   (function() {
-    // ----- Кнопки "Open" -----
     document.querySelectorAll('.open-btn').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         const url = this.getAttribute('data-url');
-        if (url) {
-          window.open(url, '_blank', 'noopener,noreferrer');
-        } else {
-          console.warn('Open button: data-url missing');
-        }
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+        else console.warn('Open button: data-url missing');
       });
     });
-
-    // ----- Кнопки "Copy" (если у вас их ещё нет) -----
     document.querySelectorAll('.copy').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        const text = this.getAttribute('data-copy') || this.closest('[data-copy]')?.getAttribute('data-copy') || '';
-        if (text) {
-          navigator.clipboard.writeText(text).then(() => {
-            const orig = this.textContent;
-            this.textContent = '✓ Copied!';
-            setTimeout(() => this.textContent = orig, 1500);
-          }).catch(() => {
-            // fallback
-            const area = document.createElement('textarea');
-            area.value = text;
-            document.body.appendChild(area);
-            area.select();
-            document.execCommand('copy');
-            area.remove();
-            const orig = this.textContent;
-            this.textContent = '✓ Copied!';
-            setTimeout(() => this.textContent = orig, 1500);
-          });
-        }
+        const text = this.getAttribute('data-copy') || '';
+        if (!text) return;
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = this.textContent;
+          this.textContent = '✓ Copied!';
+          setTimeout(() => this.textContent = orig, 1500);
+        }).catch(() => {
+          const area = document.createElement('textarea');
+          area.value = text;
+          document.body.appendChild(area);
+          area.select();
+          document.execCommand('copy');
+          area.remove();
+          const orig = this.textContent;
+          this.textContent = '✓ Copied!';
+          setTimeout(() => this.textContent = orig, 1500);
+        });
       });
     });
   })();
@@ -395,203 +387,176 @@
         </div>
       </div>
 
-  <!-- Финансовый трекер -->
-<div id="finTracker" class="fin-page active">
-  
-  <!-- Сводка финансов -->
-  <div id="financeSummary" class="mb-5 overflow-hidden rounded-2xl border border-emerald-400/20 bg-[#07140f] p-4">
-    <div class="mb-3 flex items-end justify-between gap-3">
-      <div>
-        <p class="text-[10px] font-semibold uppercase tracking-[.22em] text-emerald-300">Финансовый трекер 2026</p>
-        <p id="weekLabel" class="mt-1 text-xs text-zinc-500"></p>
-      </div>
-      <p class="text-[11px] text-zinc-500">налог 4%</p>
-    </div>
+      <!-- Финансовый трекер -->
+      <div id="finTracker" class="fin-page active">
 
-    <!-- Сетка показателей -->
-    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-      <div class="rounded-xl bg-emerald-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-emerald-300">К выплате (−4%)</p><p id="sumNet" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      <div class="rounded-xl bg-white/5 p-3"><p class="text-[10px] uppercase tracking-wider text-zinc-500">Грязными</p><p id="sumGross" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      <div class="rounded-xl bg-rose-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-rose-300">Налог</p><p id="sumTax" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      <div class="rounded-xl bg-sky-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-sky-300">После расходов</p><p id="sumAfter" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      <div class="rounded-xl bg-amber-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-amber-300">Расходы</p><p id="sumExp" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      <div class="rounded-xl bg-indigo-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-indigo-300">Оплата по дням</p><p id="sumPay" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-      
-      <!-- ОБЪЕДИНЕННЫЙ БЛОК: Итого к получению -->
-      <div class="col-span-2 sm:col-span-3 lg:col-span-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 p-3 border border-emerald-500/30 mt-1">
-        <p class="text-[10px] uppercase tracking-wider text-zinc-300 font-semibold">Итого к получению (Выплата + Дни −4%):</p>
-        <p id="sumTotalCombined" class="mt-1 text-xl font-black text-emerald-400">0 ₽</p>
-      </div>
-    </div>
-            <p id="sumTotalCombined" class="mt-1 text-xl font-black text-emerald-400">0 ₽</p>
+        <!-- Сводка финансов -->
+        <div id="financeSummary" class="mb-5 overflow-hidden rounded-2xl border border-emerald-400/20 bg-[#07140f] p-4">
+          <div class="mb-3 flex items-end justify-between gap-3">
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-[.22em] text-emerald-300">Финансовый трекер 2026</p>
+              <p id="weekLabel" class="mt-1 text-xs text-zinc-500"></p>
+            </div>
+            <p class="text-[11px] text-zinc-500">налог 4%</p>
+          </div>
+
+          <!-- Сетка показателей -->
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            <div class="rounded-xl bg-emerald-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-emerald-300">К выплате (−4%)</p><p id="sumNet" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+            <div class="rounded-xl bg-white/5 p-3"><p class="text-[10px] uppercase tracking-wider text-zinc-500">Грязными</p><p id="sumGross" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+            <div class="rounded-xl bg-rose-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-rose-300">Налог</p><p id="sumTax" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+            <div class="rounded-xl bg-sky-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-sky-300">После расходов</p><p id="sumAfter" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+            <div class="rounded-xl bg-amber-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-amber-300">Расходы</p><p id="sumExp" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+            <div class="rounded-xl bg-indigo-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-indigo-300">Оплата по дням</p><p id="sumPay" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
+
+            <!-- Объединённый блок: Итого к получению -->
+            <div class="col-span-2 sm:col-span-3 lg:col-span-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 p-3 border border-emerald-500/30 mt-1">
+              <p class="text-[10px] uppercase tracking-wider text-zinc-300 font-semibold">Итого к получению (Выплата + Дни −4%):</p>
+              <p id="sumTotalCombined" class="mt-1 text-xl font-black text-emerald-400">0 ₽</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- ДВУХКОЛОНОЧНАЯ СЕТКА: Слева — контент, Справа — Калькулятор -->
-      <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
-        
-        <!-- ЛЕВАЯ КОЛОНКА (Объединяет весь контент трекера) -->
-        <div class="space-y-5">
-          
-          <!-- 1. Сетка дней недели -->
-          <div id="daysGrid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-2"></div>
+        <!-- Двухколоночная сетка: слева — контент, справа — калькулятор -->
+        <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
 
-          <!-- 2. Секция Дополнительно -->
-          <section class="rounded-2xl border border-amber-400/35 bg-amber-400/[.06] p-4">
-            <div class="mb-3 flex items-center justify-between">
-              <h2 class="text-sm font-semibold text-amber-200">Дополнительно</h2>
-              <span class="text-[10px] uppercase tracking-wider text-amber-300/80">пакеты и разовые</span>
-            </div>
-            <div id="extraList"></div>
-            
-            <div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
-              <p class="mb-2 text-[11px] text-zinc-400">Оплата за доп. блок</p>
-              <div class="flex flex-wrap items-center gap-2">
-                <label class="flex items-center gap-2 text-xs text-zinc-300">
-                  <input id="extraPayCb" class="pay-cb" type="checkbox" data-default="5000"> стандарт 6 000 ₽
-                </label>
-                <input id="extraPayCustom" class="fin-input max-w-[160px] pay-custom-input" type="number" min="0" placeholder="Своя сумма">
+          <!-- ЛЕВАЯ КОЛОНКА -->
+          <div class="space-y-5">
+
+            <!-- 1. Сетка дней недели -->
+            <div id="daysGrid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-2"></div>
+
+            <!-- 2. Секция Дополнительно -->
+            <section class="rounded-2xl border border-amber-400/35 bg-amber-400/[.06] p-4">
+              <div class="mb-3 flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-amber-200">Дополнительно</h2>
+                <span class="text-[10px] uppercase tracking-wider text-amber-300/80">пакеты и разовые</span>
               </div>
-            </div>
-            
-            <div class="mt-3 grid gap-2 sm:grid-cols-[1fr_120px_auto]">
-              <input id="customName" class="fin-input" placeholder="Имя ученика / занятия">
-              <input id="customPrice" class="fin-input" type="number" min="0" placeholder="Сумма">
-              <button id="addCustom" type="button" class="rounded-xl bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-400/30">Добавить в список</button>
-            </div>
-          </section>
-         
+              <div id="extraList"></div>
 
-        </div> <!-- /Конец левой колонки -->
-
-
-        <!-- ПРАВАЯ КОЛОНКА (Калькулятор, липкий при скролле) -->
-        <aside class="h-fit rounded-2xl border border-white/10 bg-[#0a0d16]/90 p-4 xl:sticky xl:top-[13.5rem] w-full">
-          <h2 class="mb-3 text-sm font-semibold text-white">Калькулятор</h2>
-          <div id="calcDisplay" class="mb-3 min-h-[52px] rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-right font-mono text-lg text-emerald-200">0</div>
-          <div class="mb-3 grid grid-cols-2 gap-2">
-            <button type="button" id="insIncome" class="rounded-xl bg-emerald-500/15 px-2 py-2 text-[11px] font-semibold text-emerald-200">📥 Доход</button>
-            <button type="button" id="insExp" class="rounded-xl bg-amber-500/15 px-2 py-2 text-[11px] font-semibold text-amber-200">📥 Расходы</button>
-          </div>
-          <div class="mb-2 grid grid-cols-4 gap-1.5 text-[11px]">
-            <button type="button" class="calc-btn" data-mem="mc">MC</button>
-            <button type="button" class="calc-btn" data-mem="mr">MR</button>
-            <button type="button" class="calc-btn" data-mem="mplus">M+</button>
-            <button type="button" class="calc-btn calc-op" data-op="%">%</button>
-          </div>
-          <div class="grid grid-cols-4 gap-1.5">
-            <button type="button" class="calc-btn" data-act="clear">C</button>
-            <button type="button" class="calc-btn" data-act="del">⌫</button>
-            <button type="button" class="calc-btn calc-op" data-op="/">÷</button>
-            <button type="button" class="calc-btn calc-op" data-op="*">×</button>
-            <button type="button" class="calc-btn" data-op="7">7</button>
-            <button type="button" class="calc-btn" data-op="8">8</button>
-            <button type="button" class="calc-btn" data-op="9">9</button>
-            <button type="button" class="calc-btn calc-op" data-op="-">−</button>
-            <button type="button" class="calc-btn" data-op="4">4</button>
-            <button type="button" class="calc-btn" data-op="5">5</button>
-            <button type="button" class="calc-btn" data-op="6">6</button>
-            <button type="button" class="calc-btn calc-op" data-op="+">+</button>
-            <button type="button" class="calc-btn" data-op="1">1</button>
-            <button type="button" class="calc-btn" data-op="2">2</button>
-            <button type="button" class="calc-btn" data-op="3">3</button>
-            <button type="button" class="calc-btn row-span-2 bg-emerald-500/30 text-emerald-100" data-act="eq">=</button>
-            <button type="button" class="calc-btn col-span-2" data-op="0">0</button>
-            <button type="button" class="calc-btn" data-op=".">.</button>
-          </div>
-        </aside>
-
-      </div> <!-- /Конец двухколоночной сетки -->
-
-      <!-- Авто-расчет общей суммы -->
-      <script>
-        (function() {
-          const netEl = document.getElementById('sumNet');
-          const payEl = document.getElementById('sumPay');
-          const totalEl = document.getElementById('sumTotalCombined');
-          if (!netEl || !payEl || !totalEl) return;
-          const parseNum = (txt) => parseFloat(txt.replace(/[^0-9.,-]/g, '').replace(',', '.')) || 0;
-          const fmt = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0, maximumFractionDigits: 0 });
-          function update() {
-            totalEl.innerText = fmt.format(parseNum(netEl.innerText) + (parseNum(payEl.innerText) * 0.96));
-          }
-          const obs = new MutationObserver(update);
-          obs.observe(netEl, { childList: true, characterData: true, subtree: true });
-          obs.observe(payEl, { childList: true, characterData: true, subtree: true });
-          update();
-        })();
-      </script>
-
-  </div>
-
- 
-
-            <section class="rounded-2xl border border-white/10 bg-white/[.03] p-4">
-              <h2 class="mb-3 text-sm font-semibold text-white">Расходы</h2>
-              <div class="grid gap-3 md:grid-cols-2">
-                <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Продукты">
-                  <p class="mb-2 text-xs font-semibold text-zinc-300">Продукты</p>
-                  <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Дикси</button><button type="button" class="tag-btn">ВкусВилл</button><button type="button" class="tag-btn">Перекрёсток</button><button type="button" class="tag-btn">Пятёрочка</button></div>
-                  <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-                </div>
-                <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Животные">
-                  <p class="mb-2 text-xs font-semibold text-zinc-300">Животные</p>
-                  <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Четыре лапы</button><button type="button" class="tag-btn">Ветклиника</button><button type="button" class="tag-btn">Корм</button></div>
-                  <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-                </div>
-                <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Связь">
-                  <p class="mb-2 text-xs font-semibold text-zinc-300">Связь</p>
-                  <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">МТС</button><button type="button" class="tag-btn">Мегафон</button><button type="button" class="tag-btn">Интернет</button><button type="button" class="tag-btn">Zoom Pro</button></div>
-                  <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-                </div>
-                <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Финансы">
-                  <p class="mb-2 text-xs font-semibold text-zinc-300">Финансы</p>
-                  <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Комиссия</button><button type="button" class="tag-btn">Перевод</button><button type="button" class="tag-btn">Подушка</button></div>
-                  <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-                </div>
-                <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2" data-cat="Дополнительное">
-                  <p class="mb-2 text-xs font-semibold text-zinc-300">Дополнительное поле</p>
-                  <div class="grid gap-2 sm:grid-cols-[1fr_140px_auto]">
-                    <input id="extraExpName" class="fin-input" placeholder="Название расхода">
-                    <input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма">
-                    <button type="button" class="exp-add rounded-xl bg-white/10 px-4 text-sm">+</button>
-                  </div>
+              <div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
+                <p class="mb-2 text-[11px] text-zinc-400">Оплата за доп. блок</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <label class="flex items-center gap-2 text-xs text-zinc-300">
+                    <input id="extraPayCb" class="pay-cb" type="checkbox" data-default="6000"> стандарт 6 000 ₽
+                  </label>
+                  <input id="extraPayCustom" class="fin-input max-w-[160px] pay-custom-input" type="number" min="0" placeholder="Своя сумма">
                 </div>
               </div>
-              <ul id="expenseList" class="mt-3 space-y-1.5 text-sm"></ul>
+
+              <div class="mt-3 grid gap-2 sm:grid-cols-[1fr_120px_auto]">
+                <input id="customName" class="fin-input" placeholder="Имя ученика / занятия">
+                <input id="customPrice" class="fin-input" type="number" min="0" placeholder="Сумма">
+                <button id="addCustom" type="button" class="rounded-xl bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-400/30">Добавить в список</button>
+              </div>
             </section>
 
-            <section class="rounded-2xl border border-white/10 bg-white/[.03] p-4">
-              <div class="mb-3 flex flex-wrap items-center gap-2">
-                <h2 class="mr-auto text-sm font-semibold text-white">Отчёт</h2>
-                <button id="makeReport" type="button" class="rounded-xl bg-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/30">Сформировать отчет</button>
-                <button id="copyReport" type="button" class="hidden rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300 hover:bg-white/5">Копировать текст</button>
-              </div>
-              <textarea id="reportText" class="fin-input hidden min-h-[180px] font-mono text-xs leading-5" readonly></textarea>
-            </section>
-
-            <section class="rounded-2xl border border-white/10 bg-white/[.03] p-4">
-              <div class="mb-3 flex flex-wrap items-center gap-2">
-                <h2 class="mr-auto text-sm font-semibold text-white">Кэшбек по банкам</h2>
-                <button id="makeCashback" type="button" class="rounded-xl bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/30">Собрать заметку</button>
-              </div>
-              <div id="banks" class="grid gap-3 md:grid-cols-2"></div>
-              <div class="mt-3 rounded-xl border border-dashed border-indigo-400/25 bg-indigo-400/[.04] p-3">
-                <p class="mb-2 text-[10px] font-semibold uppercase tracking-[.16em] text-indigo-300">Новый банк</p>
-                <div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-                  <input id="newBankName" class="fin-input" placeholder="Название банка">
-                  <input id="newBankCategory" class="fin-input" placeholder="Первая категория">
-                  <button id="addBank" type="button" class="rounded-xl bg-indigo-500/20 px-4 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/30">Добавить банк</button>
-                </div>
-                <p class="mt-2 text-[10px] text-zinc-600">После добавления название банка и все категории можно менять прямо в блоке.</p>
-              </div>
-              <textarea id="cashbackNote" class="fin-input mt-3 hidden min-h-[120px] text-xs" readonly></textarea>
-              <button id="copyCashback" type="button" class="mt-2 hidden rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300">Копировать кэшбек</button>
-            </section>
           </div>
+          <!-- /ЛЕВАЯ КОЛОНКА -->
+
+          <!-- ПРАВАЯ КОЛОНКА (Калькулятор) -->
+          <aside class="h-fit rounded-2xl border border-white/10 bg-[#0a0d16]/90 p-4 xl:sticky xl:top-[13.5rem] w-full">
+            <h2 class="mb-3 text-sm font-semibold text-white">Калькулятор</h2>
+            <div id="calcDisplay" class="mb-3 min-h-[52px] rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-right font-mono text-lg text-emerald-200">0</div>
+            <div class="mb-3 grid grid-cols-2 gap-2">
+              <button type="button" id="insIncome" class="rounded-xl bg-emerald-500/15 px-2 py-2 text-[11px] font-semibold text-emerald-200">📥 Доход</button>
+              <button type="button" id="insExp" class="rounded-xl bg-amber-500/15 px-2 py-2 text-[11px] font-semibold text-amber-200">📥 Расходы</button>
+            </div>
+            <div class="mb-2 grid grid-cols-4 gap-1.5 text-[11px]">
+              <button type="button" class="calc-btn" data-mem="mc">MC</button>
+              <button type="button" class="calc-btn" data-mem="mr">MR</button>
+              <button type="button" class="calc-btn" data-mem="mplus">M+</button>
+              <button type="button" class="calc-btn calc-op" data-op="%">%</button>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button type="button" class="calc-btn" data-act="clear">C</button>
+              <button type="button" class="calc-btn" data-act="del">⌫</button>
+              <button type="button" class="calc-btn calc-op" data-op="/">÷</button>
+              <button type="button" class="calc-btn calc-op" data-op="*">×</button>
+              <button type="button" class="calc-btn" data-op="7">7</button>
+              <button type="button" class="calc-btn" data-op="8">8</button>
+              <button type="button" class="calc-btn" data-op="9">9</button>
+              <button type="button" class="calc-btn calc-op" data-op="-">−</button>
+              <button type="button" class="calc-btn" data-op="4">4</button>
+              <button type="button" class="calc-btn" data-op="5">5</button>
+              <button type="button" class="calc-btn" data-op="6">6</button>
+              <button type="button" class="calc-btn calc-op" data-op="+">+</button>
+              <button type="button" class="calc-btn" data-op="1">1</button>
+              <button type="button" class="calc-btn" data-op="2">2</button>
+              <button type="button" class="calc-btn" data-op="3">3</button>
+              <button type="button" class="calc-btn row-span-2 bg-emerald-500/30 text-emerald-100" data-act="eq">=</button>
+              <button type="button" class="calc-btn col-span-2" data-op="0">0</button>
+              <button type="button" class="calc-btn" data-op=".">.</button>
+            </div>
+          </aside>
+
         </div>
+        <!-- /Двухколоночная сетка -->
+
+        <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
+          <h2 class="mb-3 text-sm font-semibold text-white">Расходы</h2>
+          <div class="grid gap-3 md:grid-cols-2">
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Продукты">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Продукты</p>
+              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Дикси</button><button type="button" class="tag-btn">ВкусВилл</button><button type="button" class="tag-btn">Перекрёсток</button><button type="button" class="tag-btn">Пятёрочка</button></div>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Животные">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Животные</p>
+              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Четыре лапы</button><button type="button" class="tag-btn">Ветклиника</button><button type="button" class="tag-btn">Корм</button></div>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Связь">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Связь</p>
+              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">МТС</button><button type="button" class="tag-btn">Мегафон</button><button type="button" class="tag-btn">Интернет</button><button type="button" class="tag-btn">Zoom Pro</button></div>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Финансы">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Финансы</p>
+              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Комиссия</button><button type="button" class="tag-btn">Перевод</button><button type="button" class="tag-btn">Подушка</button></div>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2" data-cat="Дополнительное">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Дополнительное поле</p>
+              <div class="grid gap-2 sm:grid-cols-[1fr_140px_auto]">
+                <input id="extraExpName" class="fin-input" placeholder="Название расхода">
+                <input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма">
+                <button type="button" class="exp-add rounded-xl bg-white/10 px-4 text-sm">+</button>
+              </div>
+            </div>
+          </div>
+          <ul id="expenseList" class="mt-3 space-y-1.5 text-sm"></ul>
+        </section>
+
+        <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
+          <div class="mb-3 flex flex-wrap items-center gap-2">
+            <h2 class="mr-auto text-sm font-semibold text-white">Отчёт</h2>
+            <button id="makeReport" type="button" class="rounded-xl bg-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/30">Сформировать отчет</button>
+            <button id="copyReport" type="button" class="hidden rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300 hover:bg-white/5">Копировать текст</button>
+          </div>
+          <textarea id="reportText" class="fin-input hidden min-h-[180px] font-mono text-xs leading-5" readonly></textarea>
+        </section>
+
+        <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
+          <div class="mb-3 flex flex-wrap items-center gap-2">
+            <h2 class="mr-auto text-sm font-semibold text-white">Кэшбек по банкам</h2>
+            <button id="makeCashback" type="button" class="rounded-xl bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/30">Собрать заметку</button>
+          </div>
+          <div id="banks" class="grid gap-3 md:grid-cols-2"></div>
+          <div class="mt-3 rounded-xl border border-dashed border-indigo-400/25 bg-indigo-400/[.04] p-3">
+            <p class="mb-2 text-[10px] font-semibold uppercase tracking-[.16em] text-indigo-300">Новый банк</p>
+            <div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+              <input id="newBankName" class="fin-input" placeholder="Название банка">
+              <input id="newBankCategory" class="fin-input" placeholder="Первая категория">
+              <button id="addBank" type="button" class="rounded-xl bg-indigo-500/20 px-4 py-2 text-xs font-semibold text-indigo-200 hover:bg-indigo-500/30">Добавить банк</button>
+            </div>
+            <p class="mt-2 text-[10px] text-zinc-600">После добавления название банка и все категории можно менять прямо в блоке.</p>
+          </div>
+          <textarea id="cashbackNote" class="fin-input mt-3 hidden min-h-[120px] text-xs" readonly></textarea>
+          <button id="copyCashback" type="button" class="mt-2 hidden rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300">Копировать кэшбек</button>
+        </section>
       </div>
+      <!-- /finTracker -->
 
       <!-- Заметки -->
       <div id="finNotes" class="fin-page">
@@ -872,7 +837,7 @@
       // 2. ФИНАНСОВЫЙ ТРЕКЕР
       // ================================================================
       let expenseTotal = 0, expenses = [], selectedNames = {};
-      let calcExpression = '', calcMemory = 0, lastNet = 0;
+      let calcExpression = '', calcMemory = 0, lastNet = 0, lastGross = 0;
       let finTab = localStorage.getItem('activePage') || 'tracker';
       let banksData = [];
 
@@ -882,52 +847,57 @@
         {name:'Альфа-Банк', cats:['Кафе','Такси','Одежда','Супермаркеты']},
         {name:'Озон Банк', cats:['Ozon','Аптеки','Развлечения','Путешествия']}
       ];
-    const SCHEDULE = [
-  // ПОНЕДЕЛЬНИК
-  [
-    { name: 'Vanya', price: 1000 },
-    { name: 'Sonya', price: 0 },    // пакет
-    { name: 'Лео', price: 700 }
-  ],
-  // ВТОРНИК
-  [
-    { name: 'Sophia', price: 1100 },
-    { name: 'Катя', price: 1100 },
-    { name: 'Лиза', price: 0 },      // пакет
-    { name: 'Гоша', price: 700 }     // добавлен во вторник, 18:00, Яндекс
-  ],
-  // СРЕДА
-  [
-    { name: 'Sonya', price: 0 },    // пакет
-    { name: 'Egor', price: 0 },     // пакет
-    { name: 'Олег', price: 1000 },
-    { name: 'Andrey', price: 800 }
-  ],
-  // ЧЕТВЕРГ
-  [
-    { name: 'Sophia', price: 1100 },
-    { name: 'Vanya', price: 1000 },
-    { name: 'Девочки', price: 1000 },
-    { name: 'Andrey', price: 800 }
-  ],
-  // ПЯТНИЦА
-  [
-    { name: 'Ksy', price: 0 },      // пакет
-    { name: 'Sonya', price: 0 },    // пакет
-    { name: 'Гоша', price: 700 },
-    { name: 'Лео', price: 700 },
-    { name: 'Лиза', price: 0 }      // пакет
-  ],
-  // СУББОТА
-  [
-    { name: 'Egor', price: 0 }      // пакет
-  ],
-  // ВОСКРЕСЕНЬЕ
-  [
-    { name: 'Девочки', price: 1000 }
-  ]
-];
-      
+
+      // ====== ДОПОЛНИТЕЛЬНЫЕ ЗАНЯТИЯ (пакеты, разовые) ======
+      // Формат: { name: 'Имя', price: 5000 }
+      const EXTRA = [];
+
+      const SCHEDULE = [
+        // ПОНЕДЕЛЬНИК
+        [
+          { name: 'Vanya', price: 1000 },
+          { name: 'Sonya', price: 0 },    // пакет
+          { name: 'Лео', price: 700 }
+        ],
+        // ВТОРНИК
+        [
+          { name: 'Sophia', price: 1100 },
+          { name: 'Катя', price: 1100 },
+          { name: 'Лиза', price: 0 },      // пакет
+          { name: 'Гоша', price: 700 }
+        ],
+        // СРЕДА
+        [
+          { name: 'Sonya', price: 0 },    // пакет
+          { name: 'Egor', price: 0 },     // пакет
+          { name: 'Олег', price: 1000 },
+          { name: 'Andrey', price: 800 }
+        ],
+        // ЧЕТВЕРГ
+        [
+          { name: 'Sophia', price: 1100 },
+          { name: 'Vanya', price: 1000 },
+          { name: 'Девочки', price: 1000 },
+          { name: 'Andrey', price: 800 }
+        ],
+        // ПЯТНИЦА
+        [
+          { name: 'Ksy', price: 0 },      // пакет
+          { name: 'Sonya', price: 0 },    // пакет
+          { name: 'Гоша', price: 700 },
+          { name: 'Лео', price: 700 },
+          { name: 'Лиза', price: 0 }      // пакет
+        ],
+        // СУББОТА
+        [
+          { name: 'Egor', price: 0 }      // пакет
+        ],
+        // ВОСКРЕСЕНЬЕ
+        [
+          { name: 'Девочки', price: 1000 }
+        ]
+      ];
+
       // ---------- Дни ----------
       function taskRow(item, id){
         const tax=Math.round(item.price*TAX);
@@ -1020,12 +990,17 @@
         document.querySelectorAll('.task-item input:checked').forEach(ch=>gross+=num(ch.dataset.price));
         const tax=gross*TAX, net=gross-tax, after=net-expenseTotal, pay=getDayPaymentsTotal();
         lastNet=net;
+        lastGross=gross;
         $('sumGross').textContent=money(gross);
         $('sumTax').textContent=money(tax);
         $('sumNet').textContent=money(net);
         $('sumExp').textContent=money(expenseTotal);
         $('sumAfter').textContent=money(after);
         $('sumPay').textContent=money(pay);
+        // Итоговая сумма: чистыми + оплата по дням после налога
+        const totalCombined = net + pay * (1 - TAX);
+        const totalEl = $('sumTotalCombined');
+        if (totalEl) totalEl.textContent = money(totalCombined);
         saveFinance();
       }
 
@@ -1240,7 +1215,8 @@
         $('calendarDays').innerHTML = SHORT.map((d,i)=>{
           const dt=new Date(monday); dt.setDate(monday.getDate()+i);
           const today=dt.toDateString()===now.toDateString();
-          document.querySelector(`.cal-date[data-idx="${i}"]`).textContent=dt.getDate()+' '+dt.toLocaleDateString('ru-RU',{month:'short'});
+          const card=document.querySelector(`.cal-date[data-idx="${i}"]`);
+          if (card) card.textContent=dt.getDate()+' '+dt.toLocaleDateString('ru-RU',{month:'short'});
           return `<button type="button" data-scroll="${i}" class="rounded-lg py-2 text-[11px] ${today?'bg-emerald-500/20 text-emerald-200':'hover:bg-white/10'}">${d}<br><span class="text-zinc-500">${dt.getDate()}</span></button>`;
         }).join('');
       }
@@ -1716,13 +1692,11 @@
           .catch(err => notify('Ошибка при создании изображения'));
       }
 
-      // Привязка кнопок
       $('btnWordsearch').onclick = generateGrid;
       $('btnSnake').onclick = generateSnake;
       $('btnCrossword').onclick = generateCrossword;
       window.downloadCrossword = downloadCrossword;
 
-      // Автозапуск кроссворда
       if (!$('magicWords').value.trim()) {
         $('magicWords').value = 'SHOULDER: Body part between your neck and arm\nBETTER: Opposite of worse\nTRY: To make an effort to do something\nTOGETHER: With each other, not alone';
         generateCrossword();
