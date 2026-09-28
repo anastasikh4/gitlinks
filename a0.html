@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Past Simple vs Past Continuous</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #a78bfa 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 760px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #7c3aed;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #6d28d9; font-size: 1.9em; margin-bottom: 10px; font-weight: 900; }
+        .subtitle { color: #7c3aed; font-size: 1em; font-weight: 600; margin-bottom: 12px; }
+
+        .progress-bar {
+            width: 100%; height: 12px; background: #ede9fe;
+            border-radius: 6px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #a78bfa, #7c3aed); width: 0%; transition: 0.4s; }
+
+        .q-badge {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 900;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .sentence-box {
+            background: #FFF9E6;
+            padding: 20px 22px;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            font-size: 1.15em;
+            color: #444;
+            border-left: 5px solid #fbbf24;
+            line-height: 1.6;
+        }
+        .sentence-box .num {
+            display: inline-block;
+            background: #fbbf24;
+            color: #fff;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-weight: 900;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        .sentence-box .blank {
+            display: inline-block;
+            min-width: 110px;
+            padding: 0 8px;
+            border-bottom: 3px dashed #7c3aed;
+            color: #6d28d9;
+            font-weight: 900;
+            text-align: center;
+            margin: 0 4px;
+        }
+
+        .question-text { font-size: 1.15em; color: #6d28d9; margin-bottom: 16px; font-weight: bold; text-align: center; }
+
+        .options { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+        .btn {
+            padding: 16px 20px;
+            border: 3px solid #e5e7eb;
+            border-radius: 14px;
+            background: #f9fafb;
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: all 0.15s;
+            font-family: inherit;
+            color: #1f2937;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn .letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px; height: 30px;
+            background: #7c3aed;
+            color: white;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+        .btn:hover:not(:disabled) { border-color: #7c3aed; background: #f5f3ff; transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: translateY(1px); }
+        .btn.correct {
+            background: #dcfce7 !important;
+            border-color: #16a34a !important;
+            color: #166534 !important;
+        }
+        .btn.correct .letter { background: #16a34a; }
+        .btn.wrong {
+            background: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b !important;
+            animation: shake 0.4s;
+        }
+        .btn.wrong .letter { background: #dc2626; }
+        .btn:disabled { cursor: default; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; animation: bounce 1.5s infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .result-stat {
+            background: #f5f3ff;
+            border: 3px solid #c4b5fd;
+            border-radius: 14px;
+            padding: 12px 20px;
+            min-width: 100px;
+        }
+        .result-stat .val {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: #6d28d9;
+        }
+        .result-stat .lbl {
+            font-size: 0.75em;
+            font-weight: 900;
+            color: #7c3aed;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .rule-hint {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px dashed #f59e0b;
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            font-size: 0.95em;
+            font-weight: 700;
+            color: #92400e;
+            text-align: center;
+        }
+
+        @media (max-width: 520px) {
+            .title { font-size: 1.4em; }
+            .btn { font-size: 0.95em; padding: 14px 14px; }
+            .sentence-box { font-size: 1em; padding: 16px; }
+            .sentence-box .blank { min-width: 90px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">📚 Past Simple vs Past Continuous</div>
+            <div class="subtitle">Choose the correct verb form</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="rule-hint">
+                💡 <b>Past Simple</b> — completed actions · <b>Past Continuous</b> — actions in progress (was/were + V-ing)
+            </div>
+            <div class="sentence-box" id="sentenceBox"></div>
+            <div class="question-text" id="qText">Choose the correct option:</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji" id="winEmoji">🏆</div>
+        <h1 style="color: #6d28d9;" id="winTitle">EXCELLENT!</h1>
+        <div class="result-stats">
+            <div class="result-stat"><div class="val" id="winCorrect">0/7</div><div class="lbl">Correct</div></div>
+            <div class="result-stat"><div class="val" id="winXP">0</div><div class="lbl">XP</div></div>
+            <div class="result-stat"><div class="val" id="winPct">0%</div><div class="lbl">Accuracy</div></div>
+        </div>
+        <p style="font-size: 1.1em; margin: 15px 0; color: #6d28d9; font-weight: 700;" id="winMsg"></p>
+        <button class="btn" onclick="location.reload()" style="padding: 12px 30px; font-size: 1.1em; justify-content: center; display: inline-flex;">🔄 Restart</button>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       QUIZ DATA — Past Simple vs Past Continuous
+       ============================================================ */
+    const questions = [
+        {
+            num: 1,
+            sentence: 'My parents <span class="blank">?</span> this huge birthday cake while I <span class="blank">?</span> in the pool.',
+            hint: 'make · swim',
+            options: [
+                'made / was swimming',
+                'were making / was swimming',
+                'made / swam',
+                'were making / swam'
+            ],
+            correct: 1,
+            explanation: '«While» + two long simultaneous actions → both Past Continuous: **were making / was swimming**.'
+        },
+        {
+            num: 2,
+            sentence: 'At that moment I <span class="blank">?</span> to run away as fast as I could.',
+            hint: 'want',
+            options: [
+                'was wanting',
+                'wanted',
+                'were wanting',
+                'want'
+            ],
+            correct: 1,
+            explanation: '«Want» — state verb, не используется в Continuous → **wanted**.'
+        },
+        {
+            num: 3,
+            sentence: 'When Betty <span class="blank">?</span> at the party, everyone <span class="blank">?</span> that delicious dish.',
+            hint: 'arrive · eat',
+            options: [
+                'was arriving / ate',
+                'arrived / was eating',
+                'arrived / ate',
+                'was arriving / was eating'
+            ],
+            correct: 1,
+            explanation: 'Short action (arrived) прерывает длинное (was eating) → **arrived / was eating**.'
+        },
+        {
+            num: 4,
+            sentence: 'Nelly <span class="blank">?</span> her neighbour\'s cat, <span class="blank">?</span> the plants and <span class="blank">?</span> away.',
+            hint: 'feed · water · go',
+            options: [
+                'fed / watered / went',
+                'was feeding / was watering / was going',
+                'fed / was watering / went',
+                'was feeding / watered / went'
+            ],
+            correct: 0,
+            explanation: 'Три последовательных завершённых действия → всё Past Simple: **fed / watered / went**.'
+        },
+        {
+            num: 5,
+            sentence: '<span class="blank">?</span> the wind <span class="blank">?</span> when you were on your way home?',
+            hint: 'blow (question)',
+            options: [
+                'Did / blow',
+                'Was / blowing',
+                'Were / blowing',
+                'Was / blow'
+            ],
+            correct: 1,
+            explanation: 'Вопрос в Past Continuous с «the wind» (ед.ч.) → **Was the wind blowing**?'
+        },
+        {
+            num: 6,
+            sentence: 'My father <span class="blank">?</span> at 6 o\'clock yesterday.',
+            hint: 'not fish',
+            options: [
+                'didn\'t fish',
+                'wasn\'t fishing',
+                'doesn\'t fish',
+                'weren\'t fishing'
+            ],
+            correct: 1,
+            explanation: 'Конкретное время «at 6 o\'clock yesterday» + процесс → **wasn\'t fishing**.'
+        },
+        {
+            num: 7,
+            sentence: 'I <span class="blank">?</span> university in 1995.',
+            hint: 'enter',
+            options: [
+                'was entering',
+                'entered',
+                'were entering',
+                'enter'
+            ],
+            correct: 1,
+            explanation: 'Год «in 1995» → завершённое действие → **entered**.'
+        }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let xp = 0;
+    const letters = ['A','B','C','D'];
+
+    function load() {
+        if (current >= questions.length) {
+            showEnd();
+            return;
+        }
+
+        const data = questions[current];
+
+        // Badge + sentence
+        document.getElementById('sentenceBox').innerHTML =
+            `<span class="num">${data.num}</span>${data.sentence}` +
+            `<div style="margin-top:10px; font-size:0.85em; color:#9ca3af; font-weight:600;">💡 Verbs: <b>${data.hint}</b></div>`;
+
+        document.getElementById('qText').textContent = 'Choose the correct option:';
+
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+
+        data.options.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+            b.onclick = () => check(i, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+        const data = questions[current];
+
+        if (choice === data.correct) {
+            btn.classList.add('correct');
+            score++;
+            xp += 10;
+        } else {
+            btn.classList.add('wrong');
+            // highlight correct
+            document.querySelectorAll('.btn').forEach((b, i) => {
+                if (i === data.correct) b.classList.add('correct');
+            });
+        }
+
+        document.getElementById('pFill').style.width = ((current + 1) / questions.length) * 100 + '%';
+
+        setTimeout(() => {
+            current++;
+            load();
+        }, 1300);
+    }
+
+    function showEnd() {
+        document.getElementById('gameUI').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+
+        const total = questions.length;
+        const pct = Math.round((score / total) * 100);
+
+        let emoji = '💪', title = 'KEEP PRACTISING!', msg = 'Review Past Simple and Past Continuous and try again!';
+        if (pct === 100) {
+            emoji = '🏆'; title = 'PERFECT!'; msg = 'Amazing! You know your tenses! 🎉';
+        } else if (pct >= 70) {
+            emoji = '🎉'; title = 'GREAT JOB!'; msg = 'Almost perfect! Just a couple of mistakes.';
+        } else if (pct >= 50) {
+            emoji = '👍'; title = 'GOOD EFFORT!'; msg = 'Not bad! Review the rules and try again.';
+        }
+
+        document.getElementById('winEmoji').textContent = emoji;
+        document.getElementById('winTitle').textContent = title;
+        document.getElementById('winMsg').textContent = msg;
+        document.getElementById('winCorrect').textContent = `${score}/${total}`;
+        document.getElementById('winXP').textContent = xp;
+        document.getElementById('winPct').textContent = pct + '%';
+    }
+
+    load();
+</script>
+
+</body>
+</html>
