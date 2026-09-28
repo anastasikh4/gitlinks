@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irregular Verbs — 3 Forms · Duolingo</title>
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito','Segoe UI',Tahoma,sans-serif;-webkit-tap-highlight-color:transparent;}
+
+    :root{
+        --duo-green:#58CC02;
+        --duo-green-dark:#46A302;
+        --duo-green-light:#D7FFB8;
+        --duo-blue:#1CB0F6;
+        --duo-blue-dark:#1899D6;
+        --duo-red:#FF4B4B;
+        --duo-red-dark:#E03E3E;
+        --duo-yellow:#FFC800;
+        --duo-yellow-dark:#E5B200;
+        --duo-gray:#E5E5E5;
+        --duo-gray-dark:#AFAFAF;
+        --duo-text:#3C3C3C;
+        --duo-text-light:#777777;
+        --duo-purple:#CE82FF;
+    }
+
+    body{
+        background:#FFFFFF;
+        color:var(--duo-text);
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        overflow-x:hidden;
+    }
+
+    /* ========== TOP BAR ========== */
+    .topbar{
+        position:sticky;top:0;background:#fff;
+        border-bottom:2px solid var(--duo-gray);
+        padding:12px 16px;z-index:50;
+    }
+    .topbar-inner{
+        max-width:760px;margin:0 auto;
+        display:flex;align-items:center;gap:14px;
+    }
+    .close-btn{
+        width:32px;height:32px;border:none;background:transparent;
+        color:var(--duo-gray-dark);font-size:24px;font-weight:900;
+        cursor:pointer;line-height:1;flex-shrink:0;
+        transition:.2s;border-radius:8px;
+    }
+    .close-btn:hover{background:#F7F7F7;color:var(--duo-text);}
+
+    .progress-track{
+        flex:1;height:16px;background:var(--duo-gray);
+        border-radius:8px;overflow:hidden;position:relative;
+    }
+    .progress-fill{
+        height:100%;width:0%;background:var(--duo-green);
+        border-radius:8px;transition:width .5s cubic-bezier(.4,0,.2,1);
+        position:relative;
+    }
+    .progress-fill::after{
+        content:"";position:absolute;top:3px;left:8px;right:8px;height:4px;
+        background:rgba(255,255,255,.4);border-radius:2px;
+    }
+
+    .hearts{
+        display:flex;align-items:center;gap:3px;
+        font-weight:900;color:var(--duo-red);
+        font-size:17px;flex-shrink:0;
+        min-width:60px;justify-content:flex-end;
+    }
+    .heart{transition:.3s;}
+    .heart.lost{opacity:.2;transform:scale(.7);}
+
+    .xp-badge{
+        background:var(--duo-yellow);color:#7A5C00;
+        padding:4px 10px;border-radius:20px;
+        font-weight:900;font-size:13px;flex-shrink:0;
+    }
+
+    /* ========== MAIN ========== */
+    main{
+        flex:1;display:flex;flex-direction:column;
+        max-width:760px;width:100%;margin:0 auto;
+        padding:24px 20px 160px;
+    }
+
+    .question-wrap{flex:1;animation:slideIn .35s cubic-bezier(.4,0,.2,1);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+
+    .q-num{
+        color:var(--duo-text-light);font-weight:800;font-size:13px;
+        letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;
+    }
+    .q-text{
+        font-size:22px;font-weight:900;color:var(--duo-text);
+        line-height:1.3;margin-bottom:20px;
+    }
+
+    /* ========== 3 FORMS TABLE (big display) ========== */
+    .forms-table{
+        display:grid;
+        grid-template-columns:1fr 1fr 1fr;
+        gap:10px;
+        margin-bottom:22px;
+    }
+    .form-box{
+        padding:18px 10px;
+        border-radius:16px;
+        text-align:center;
+        border:3px solid;
+        box-shadow:0 4px 0 rgba(0,0,0,.15);
+        position:relative;
+    }
+    .form-box .label{
+        display:block;
+        font-size:10px;
+        font-weight:900;
+        letter-spacing:1.2px;
+        text-transform:uppercase;
+        margin-bottom:6px;
+        opacity:.85;
+    }
+    .form-box .word{
+        display:block;
+        font-size:24px;
+        font-weight:900;
+        letter-spacing:.5px;
+        word-break:break-word;
+        line-height:1.1;
+    }
+    .form-box .ru-small{
+        display:block;
+        font-size:11px;
+        font-weight:600;
+        margin-top:4px;
+        opacity:.7;
+    }
+    .form-box.inf{
+        background:#DBEAFE;
+        border-color:#3B82F6;
+        color:#1E40AF;
+    }
+    .form-box.ps{
+        background:#FEF3C7;
+        border-color:#F59E0B;
+        color:#92400E;
+    }
+    .form-box.pp{
+        background:#D1FAE5;
+        border-color:#10B981;
+        color:#065F46;
+    }
+    .form-box.blank{
+        background:#F3F4F6;
+        border-color:#D1D5DB;
+        color:#9CA3AF;
+    }
+    .form-box.blank .word{
+        color:#D1D5DB;
+        font-size:22px;
+        letter-spacing:4px;
+    }
+    .form-box.revealed.correct{
+        background:var(--duo-green-light);
+        border-color:var(--duo-green);
+        color:var(--duo-green-dark);
+    }
+    .form-box.revealed.wrong{
+        background:#FFDFE0;
+        border-color:var(--duo-red);
+        color:var(--duo-red-dark);
+        animation:shake .4s;
+    }
+    @keyframes shake{
+        0%,100%{transform:translateX(0);}
+        25%{transform:translateX(-8px);}
+        75%{transform:translateX(8px);}
+    }
+
+    /* ========== OPTIONS ========== */
+    .options{display:flex;flex-direction:column;gap:12px;}
+
+    .option{
+        background:#fff;border:2px solid var(--duo-gray);
+        border-bottom-width:4px;border-radius:14px;
+        padding:16px 20px;cursor:pointer;
+        font-size:16px;font-weight:700;color:var(--duo-text);
+        text-align:left;transition:all .1s ease;
+        display:flex;align-items:center;gap:12px;
+        font-family:inherit;
+    }
+    .option:hover:not(.disabled){
+        background:#F7F7F7;border-color:var(--duo-gray-dark);
+    }
+    .option:active:not(.disabled){
+        transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px;
+    }
+    .option .key{
+        display:inline-flex;align-items:center;justify-content:center;
+        width:28px;height:28px;border:2px solid var(--duo-gray);
+        border-radius:8px;font-size:13px;font-weight:900;
+        color:var(--duo-text-light);flex-shrink:0;
+    }
+    .option.selected{
+        background:#DDF4FF;border-color:var(--duo-blue);
+    }
+    .option.selected .key{
+        background:var(--duo-blue);border-color:var(--duo-blue);color:#fff;
+    }
+    .option.correct{
+        background:var(--duo-green-light);border-color:var(--duo-green);
+        color:var(--duo-green-dark);
+    }
+    .option.correct .key{
+        background:var(--duo-green);border-color:var(--duo-green);color:#fff;
+    }
+    .option.incorrect{
+        background:#FFDFE0;border-color:var(--duo-red);
+        color:var(--duo-red-dark);animation:shake .4s;
+    }
+    .option.incorrect .key{
+        background:var(--duo-red);border-color:var(--duo-red);color:#fff;
+    }
+    .option.disabled{cursor:default;}
+
+    /* ========== FEEDBACK BANNER ========== */
+    .feedback-banner{
+        position:fixed;bottom:0;left:0;right:0;
+        background:var(--duo-green-light);
+        border-top:2px solid var(--duo-green);
+        padding:16px 20px 24px;
+        transform:translateY(100%);
+        transition:transform .3s cubic-bezier(.4,0,.2,1);
+        z-index:40;
+    }
+    .feedback-banner.show{transform:translateY(0);}
+    .feedback-banner.wrong{
+        background:#FFDFE0;border-top-color:var(--duo-red);
+    }
+    .feedback-inner{
+        max-width:760px;margin:0 auto;
+        display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    }
+    .feedback-icon{
+        width:48px;height:48px;background:#fff;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-size:24px;flex-shrink:0;
+    }
+    .feedback-text{flex:1;min-width:200px;}
+    .feedback-title{
+        font-weight:900;font-size:18px;color:var(--duo-green-dark);
+        margin-bottom:2px;
+    }
+    .feedback-banner.wrong .feedback-title{color:var(--duo-red-dark);}
+    .feedback-sub{
+        font-weight:700;font-size:13px;color:var(--duo-text-light);
+    }
+    .feedback-btn{
+        background:var(--duo-green);color:#fff;
+        border:none;border-bottom:4px solid var(--duo-green-dark);
+        border-radius:12px;padding:12px 28px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:.1s;
+        flex-shrink:0;font-family:inherit;
+    }
+    .feedback-btn:hover{filter:brightness(1.05);}
+    .feedback-btn:active{
+        transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px;
+    }
+    .feedback-banner.wrong .feedback-btn{
+        background:var(--duo-red);border-bottom-color:var(--duo-red-dark);
+    }
+
+    /* ========== CHECK BAR ========== */
+    .check-bar{
+        position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:2px solid var(--duo-gray);
+        padding:16px 20px 24px;z-index:30;
+    }
+    .check-bar-inner{
+        max-width:760px;margin:0 auto;
+        display:flex;justify-content:space-between;gap:14px;
+    }
+    .btn-skip{
+        background:#fff;color:var(--duo-gray-dark);
+        border:2px solid var(--duo-gray);border-bottom-width:4px;
+        border-radius:12px;padding:14px 22px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:.1s;
+        font-family:inherit;
+    }
+    .btn-skip:hover{background:#F7F7F7;}
+    .btn-check{
+        flex:1;background:var(--duo-green);color:#fff;
+        border:none;border-bottom:4px solid var(--duo-green-dark);
+        border-radius:12px;padding:14px 22px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:.1s;
+        font-family:inherit;
+    }
+    .btn-check:disabled{
+        background:var(--duo-gray);border-bottom-color:var(--duo-gray-dark);
+        color:var(--duo-gray-dark);cursor:not-allowed;
+    }
+    .btn-check:not(:disabled):hover{filter:brightness(1.05);}
+    .btn-check:not(:disabled):active{
+        transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px;
+    }
+
+    /* ========== SCREENS ========== */
+    .screen{
+        flex:1;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        text-align:center;padding:20px;animation:slideIn .4s;
+    }
+    .mascot{
+        font-size:96px;margin-bottom:20px;
+        animation:bounce 2s infinite;
+    }
+    @keyframes bounce{
+        0%,100%{transform:translateY(0);}
+        50%{transform:translateY(-12px);}
+    }
+    .screen h1{
+        font-size:30px;font-weight:900;
+        color:var(--duo-text);margin-bottom:12px;
+    }
+    .screen p{
+        font-size:16px;font-weight:700;
+        color:var(--duo-text-light);
+        margin-bottom:32px;max-width:480px;line-height:1.5;
+    }
+    .screen .btn-check{
+        max-width:280px;width:100%;flex:none;
+    }
+
+    .rule-cards{
+        display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;justify-content:center;
+    }
+    .rule-card{
+        padding:12px 16px;border-radius:12px;
+        border:2px solid;font-weight:900;font-size:13px;
+        letter-spacing:.5px;
+    }
+    .rule-card.inf{background:#DBEAFE;border-color:#3B82F6;color:#1E40AF;}
+    .rule-card.ps{background:#FEF3C7;border-color:#F59E0B;color:#92400E;}
+    .rule-card.pp{background:#D1FAE5;border-color:#10B981;color:#065F46;}
+
+    .result-stats{
+        display:flex;gap:16px;margin-bottom:28px;
+        flex-wrap:wrap;justify-content:center;
+    }
+    .result-stat{
+        background:#F7F7F7;border:2px solid var(--duo-gray);
+        border-radius:14px;padding:14px 22px;min-width:100px;
+    }
+    .result-stat .val{
+        font-size:22px;font-weight:900;color:var(--duo-yellow-dark);
+    }
+    .result-stat .lbl{
+        font-size:11px;font-weight:900;color:var(--duo-text-light);
+        letter-spacing:1px;text-transform:uppercase;margin-top:2px;
+    }
+
+    /* ========== MOBILE ========== */
+    @media(max-width:600px){
+        .q-text{font-size:18px;}
+        .option{font-size:14px;padding:14px 16px;}
+        .option .key{width:24px;height:24px;font-size:12px;}
+        .feedback-inner{gap:10px;}
+        .feedback-btn{padding:12px 20px;font-size:14px;}
+        .mascot{font-size:72px;}
+        .screen h1{font-size:24px;}
+        .form-box .word{font-size:20px;}
+        .form-box .label{font-size:9px;}
+    }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar" id="topbar" style="display:none;">
+    <div class="topbar-inner">
+        <button class="close-btn" id="closeBtn" aria-label="Close">✕</button>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="xp-badge" id="xpBadge">+0 XP</div>
+        <div class="hearts" id="hearts"></div>
+    </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<main id="main"></main>
+
+<!-- ============ CHECK BAR ============ -->
+<div class="check-bar" id="checkBar" style="display:none;">
+    <div class="check-bar-inner">
+        <button class="btn-skip" id="skipBtn">Skip</button>
+        <button class="btn-check" id="checkBtn" disabled>Check</button>
+    </div>
+</div>
+
+<!-- ============ FEEDBACK ============ -->
+<div class="feedback-banner" id="feedbackBanner">
+    <div class="feedback-inner">
+        <div class="feedback-icon" id="feedbackIcon">✓</div>
+        <div class="feedback-text">
+            <div class="feedback-title" id="feedbackTitle">Nice!</div>
+            <div class="feedback-sub" id="feedbackSub"></div>
+        </div>
+        <button class="feedback-btn" id="continueBtn">Continue</button>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   DATA — 8 verbs, 3 forms each
+   ============================================================ */
+const VERBS = [
+    { inf: 'meet',  ps: 'met',   pp: 'met',   ru: '(встречать)' },
+    { inf: 'swim',  ps: 'swam',  pp: 'swum',  ru: '(плавать)' },
+    { inf: 'say',   ps: 'said',  pp: 'said',  ru: '(сказать)' },
+    { inf: 'ride',  ps: 'rode',  pp: 'ridden',ru: '(ездить на)' },
+    { inf: 'send',  ps: 'sent',  pp: 'sent',  ru: '(посылать)' },
+    { inf: 'put',   ps: 'put',   pp: 'put',   ru: '(положить)' },
+    { inf: 'speak', ps: 'spoke', pp: 'spoken',ru: '(говорить)' },
+    { inf: 'spend', ps: 'spent', pp: 'spent', ru: '(проводить)' }
+];
+
+/* ============================================================
+   QUESTIONS — разных типов
+   Type 'ps' — найти Past Simple
+   Type 'pp' — найти Past Participle
+   Type 'full' — даны Inf + PS, найти PP
+   ============================================================ */
+function buildQuestions(){
+    const qs = [];
+
+    // Для каждого глагола — 1 вопрос на PS и 1 на PP
+    VERBS.forEach(v => {
+        // --- Найти Past Simple ---
+        const wrongPS = VERBS.filter(x => x.ps !== v.ps).map(x => x.ps);
+        const psOptions = shuffle([
+            v.ps,
+            ...shuffle(wrongPS).slice(0, 3)
+        ]);
+
+        qs.push({
+            type: 'ps',
+            verb: v,
+            q: `Choose the Past Simple form of «${v.inf}»`,
+            options: psOptions,
+            correct: v.ps,
+            explanation: `${v.inf} → ${v.ps} (Past Simple) → ${v.pp} (Past Participle)`
+        });
+
+        // --- Найти Past Participle ---
+        const wrongPP = VERBS.filter(x => x.pp !== v.pp).map(x => x.pp);
+        const ppOptions = shuffle([
+            v.pp,
+            ...shuffle(wrongPP).slice(0, 3)
+        ]);
+
+        qs.push({
+            type: 'pp',
+            verb: v,
+            q: `Choose the Past Participle of «${v.inf}»`,
+            options: ppOptions,
+            correct: v.pp,
+            explanation: `${v.inf} → ${v.ps} → ${v.pp} (Past Participle)`
+        });
+    });
+
+    return shuffle(qs);
+}
+
+function shuffle(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+const QUESTIONS = buildQuestions();
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let current = 0;
+let hearts = 3;
+let xp = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let selected = null;
+let answered = false;
+
+const main = document.getElementById('main');
+const topbar = document.getElementById('topbar');
+const checkBar = document.getElementById('checkBar');
+const feedbackBanner = document.getElementById('feedbackBanner');
+const checkBtn = document.getElementById('checkBtn');
+const skipBtn = document.getElementById('skipBtn');
+const continueBtn = document.getElementById('continueBtn');
+const progressFill = document.getElementById('progressFill');
+const heartsEl = document.getElementById('hearts');
+const xpBadge = document.getElementById('xpBadge');
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function renderHearts(){
+    heartsEl.innerHTML = '';
+    for(let i = 0; i < 3; i++){
+        const sp = document.createElement('span');
+        sp.className = 'heart' + (i < hearts ? '' : ' lost');
+        sp.textContent = '❤️';
+        heartsEl.appendChild(sp);
+    }
+}
+function renderXP(){ xpBadge.textContent = '+' + xp + ' XP'; }
+function updateProgress(){ progressFill.style.width = (current / QUESTIONS.length) * 100 + '%'; }
+
+/* ============================================================
+   START SCREEN
+   ============================================================ */
+function showStart(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">🦉</div>
+            <h1>Irregular Verbs</h1>
+            <p>Learn <b>3 forms</b> of 8 verbs:<br>
+               meet · swim · say · ride · send · put · speak · spend</p>
+            <div class="rule-cards">
+                <div class="rule-card inf">Infinitive</div>
+                <div class="rule-card ps">Past Simple</div>
+                <div class="rule-card pp">Past Participle</div>
+            </div>
+            <p style="margin-bottom:20px;">You have <b>3 hearts</b> ❤️ and <b>16 questions</b>.</p>
+            <button class="btn-check" id="startBtn">Start</button>
+        </div>
+    `;
+    document.getElementById('startBtn').addEventListener('click', startQuiz);
+}
+
+/* ============================================================
+   START
+   ============================================================ */
+function startQuiz(){
+    current = 0; hearts = 3; xp = 0; correctCount = 0; wrongCount = 0;
+    topbar.style.display = 'block';
+    renderHearts();
+    renderXP();
+    updateProgress();
+    renderQuestion();
+}
+
+/* ============================================================
+   RENDER QUESTION
+   ============================================================ */
+function renderQuestion(){
+    const q = QUESTIONS[current];
+    selected = null;
+    answered = false;
+
+    checkBtn.disabled = true;
+    checkBtn.textContent = 'Check';
+    checkBtn.style.display = '';
+    skipBtn.style.display = '';
+    checkBar.style.display = 'block';
+    feedbackBanner.classList.remove('show','wrong');
+
+    const v = q.verb;
+
+    // 3 boxes: INF shown, PS shown, PP hidden (or vice versa)
+    let infBox, psBox, ppBox;
+    if(q.type === 'ps'){
+        // ask for Past Simple → show Inf + PP hidden? Лучше: показать Inf, спрятать PS
+        infBox = `<div class="form-box inf"><span class="label">Infinitive</span><span class="word">${v.inf}</span><span class="ru-small">${v.ru}</span></div>`;
+        psBox  = `<div class="form-box blank"><span class="label">Past Simple</span><span class="word">? ? ?</span></div>`;
+        ppBox  = `<div class="form-box pp"><span class="label">Past Participle</span><span class="word">${v.pp}</span></div>`;
+    } else {
+        infBox = `<div class="form-box inf"><span class="label">Infinitive</span><span class="word">${v.inf}</span><span class="ru-small">${v.ru}</span></div>`;
+        psBox  = `<div class="form-box ps"><span class="label">Past Simple</span><span class="word">${v.ps}</span></div>`;
+        ppBox  = `<div class="form-box blank"><span class="label">Past Participle</span><span class="word">? ? ?</span></div>`;
+    }
+
+    const letters = ['A','B','C','D'];
+    const optsHTML = q.options.map((opt, i) => `
+        <button class="option" data-idx="${i}">
+            <span class="key">${letters[i]}</span>
+            <span>${opt}</span>
+        </button>
+    `).join('');
+
+    main.innerHTML = `
+        <div class="question-wrap">
+            <div class="q-num">Question ${current + 1} of ${QUESTIONS.length}</div>
+            <div class="q-text">${q.q}</div>
+
+            <div class="forms-table" id="formsTable">
+                ${infBox}
+                ${psBox}
+                ${ppBox}
+            </div>
+
+            <div class="options">${optsHTML}</div>
+        </div>
+    `;
+
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(answered) return;
+            main.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selected = Number(btn.dataset.idx);
+            checkBtn.disabled = false;
+        });
+    });
+
+    updateProgress();
+}
+
+/* ============================================================
+   CHECK
+   ============================================================ */
+checkBtn.addEventListener('click', () => {
+    if(answered) return;
+    answered = true;
+    const q = QUESTIONS[current];
+
+    const userAnswer = q.options[selected];
+    const isCorrect = (userAnswer === q.correct);
+
+    // highlight options
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.classList.add('disabled');
+        const idx = Number(btn.dataset.idx);
+        const val = q.options[idx];
+        if(val === q.correct) btn.classList.add('correct');
+        else if(idx === selected) btn.classList.add('incorrect');
+    });
+
+    // reveal the blank form box
+    const table = document.getElementById('formsTable');
+    const boxes = table.querySelectorAll('.form-box');
+    const blankBox = [...boxes].find(b => b.classList.contains('blank'));
+    if(blankBox){
+        blankBox.classList.remove('blank');
+        blankBox.classList.add('revealed', isCorrect ? 'correct' : 'wrong');
+        blankBox.querySelector('.word').textContent = q.correct;
+    }
+
+    if(isCorrect){ correctCount++; xp += 10; }
+    else { wrongCount++; hearts = Math.max(0, hearts - 1); }
+    renderHearts();
+    renderXP();
+    progressFill.style.width = ((current + 1) / QUESTIONS.length) * 100 + '%';
+
+    showFeedback(isCorrect, q.explanation);
+});
+
+/* ============================================================
+   FEEDBACK
+   ============================================================ */
+function showFeedback(isCorrect, explanation){
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('wrong');
+    if(isCorrect){
+        document.getElementById('feedbackIcon').textContent = '✓';
+        document.getElementById('feedbackTitle').textContent = 'Correct!';
+        document.getElementById('feedbackIcon').style.color = 'var(--duo-green)';
+    } else {
+        feedbackBanner.classList.add('wrong');
+        document.getElementById('feedbackIcon').textContent = '✕';
+        document.getElementById('feedbackTitle').textContent = 'Not quite…';
+        document.getElementById('feedbackIcon').style.color = 'var(--duo-red)';
+    }
+    document.getElementById('feedbackSub').textContent = explanation;
+    feedbackBanner.classList.add('show');
+}
+
+continueBtn.addEventListener('click', () => {
+    feedbackBanner.classList.remove('show');
+    current++;
+    if(hearts <= 0){ showFail(); return; }
+    if(current >= QUESTIONS.length){ showEnd(); return; }
+    renderQuestion();
+});
+
+/* ============================================================
+   SKIP / CLOSE
+   ============================================================ */
+skipBtn.addEventListener('click', () => {
+    if(answered) return;
+    answered = true;
+    const q = QUESTIONS[current];
+    wrongCount++;
+    hearts = Math.max(0, hearts - 1);
+    renderHearts();
+
+    // reveal correct
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.classList.add('disabled');
+        if(q.options[Number(btn.dataset.idx)] === q.correct) btn.classList.add('correct');
+    });
+    const blankBox = [...document.querySelectorAll('.form-box')].find(b => b.classList.contains('blank'));
+    if(blankBox){
+        blankBox.classList.remove('blank');
+        blankBox.classList.add('revealed', 'wrong');
+        blankBox.querySelector('.word').textContent = q.correct;
+    }
+    showFeedback(false, q.explanation);
+});
+
+document.getElementById('closeBtn').addEventListener('click', () => {
+    if(confirm('Quit the quiz?')) showStart();
+});
+
+/* ============================================================
+   END / FAIL
+   ============================================================ */
+function showEnd(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+
+    const total = QUESTIONS.length;
+    const pct = Math.round((correctCount / total) * 100);
+    let emoji, title, msg;
+    if(pct === 100){ emoji='🏆'; title='PERFECT!'; msg='Amazing! You know all 3 forms! 🎉'; }
+    else if(pct >= 80){ emoji='🎉'; title='GREAT JOB!'; msg='Almost perfect! Just a few mistakes.'; }
+    else if(pct >= 50){ emoji='👍'; title='GOOD EFFORT!'; msg='Not bad! Review the irregular verbs.'; }
+    else { emoji='💪'; title='KEEP PRACTISING!'; msg='Try again — you can do it!'; }
+
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">${emoji}</div>
+            <h1>${title}</h1>
+            <div class="result-stats">
+                <div class="result-stat"><div class="val">${xp}</div><div class="lbl">XP</div></div>
+                <div class="result-stat"><div class="val">${correctCount}/${total}</div><div class="lbl">Correct</div></div>
+                <div class="result-stat"><div class="val">${pct}%</div><div class="lbl">Accuracy</div></div>
+            </div>
+            <p>${msg}</p>
+            <button class="btn-check" id="retryBtn">Try again</button>
+        </div>
+    `;
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+}
+
+function showFail(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">💔</div>
+            <h1>Out of hearts!</h1>
+            <p>Review the 3 forms and try again.</p>
+            <div class="result-stats">
+                <div class="result-stat"><div class="val">${xp}</div><div class="lbl">XP</div></div>
+                <div class="result-stat"><div class="val">${correctCount}/${QUESTIONS.length}</div><div class="lbl">Correct</div></div>
+            </div>
+            <button class="btn-check" id="retryBtn">Try again</button>
+        </div>
+    `;
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+showStart();
+</script>
+</body>
+</html>

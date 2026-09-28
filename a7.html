@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Simple — 3 Forms Quiz</title>
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --secondary: #1cb0f6;
+            --secondary-dark: #1899d6;
+            --error: #ff4b4b;
+            --text: #4b4b4b;
+            --gray: #e5e5e5;
+            --purple: #7c3aed;
+            --gold: #f59e0b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 620px;
+            background: white;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 10px 0px var(--gray), 0 20px 40px rgba(124,58,237,.15);
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--gray);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.3s;
+            border-radius: 10px;
+        }
+
+        h1 { font-size: 22px; color: var(--purple); margin-bottom: 6px; }
+        .subtitle { font-size: 13px; color: #8b5cf6; font-weight: 700; margin-bottom: 20px; }
+
+        .level-container { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+
+        /* ---------- LEVEL 1: 3-FORM MATCHING ---------- */
+        .level1-title {
+            font-weight: 800;
+            color: var(--purple);
+            margin-bottom: 14px;
+            font-size: 15px;
+        }
+        .forms-hint {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .form-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .form-badge.inf { background: #dbeafe; color: #1e40af; }
+        .form-badge.ps  { background: #fef3c7; color: #92400e; }
+        .form-badge.pp  { background: #d1fae5; color: #065f46; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .card {
+            padding: 14px 6px;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 15px;
+            transition: 0.1s;
+            background: white;
+            color: var(--text);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 56px;
+            position: relative;
+        }
+        .card:hover:not(.matched):not(.disabled) {
+            border-color: #c4b5fd;
+            transform: translateY(-2px);
+        }
+
+        .card.selected {
+            border-color: var(--secondary);
+            background: #ddf4ff;
+            color: var(--secondary-dark);
+        }
+        .card.matched {
+            background: #d7ffb8;
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            cursor: default;
+            opacity: .55;
+        }
+
+        .card.flash-ok { animation: pop 0.4s; background: #d7ffb8; border-color: var(--primary); color: var(--primary-dark); }
+        .card.flash-bad { animation: shake 0.4s; background: #ffdfe0; border-color: var(--error); color: var(--error); }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* ---------- LEVEL 2 & 3 ---------- */
+        .question-line {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--purple);
+            margin: 14px 0 18px;
+            line-height: 1.5;
+            padding: 12px;
+            background: #f5f3ff;
+            border-radius: 12px;
+            border-left: 5px solid var(--purple);
+            text-align: left;
+        }
+        .question-line .gap {
+            display: inline-block;
+            min-width: 90px;
+            padding: 0 8px;
+            border-bottom: 3px dashed var(--purple);
+            color: var(--secondary-dark);
+            font-weight: 900;
+            text-align: center;
+        }
+        .question-line .hint {
+            display: block;
+            font-size: 13px;
+            color: #8b5cf6;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .btn-grid { display: grid; gap: 10px; }
+        .option-btn {
+            padding: 15px;
+            border: 2px solid var(--gray);
+            border-bottom: 4px solid var(--gray);
+            border-radius: 15px;
+            background: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+            color: var(--text);
+            transition: 0.1s;
+        }
+        .option-btn:hover:not(:disabled) {
+            border-color: #c4b5fd;
+            transform: translateY(-2px);
+        }
+        .option-btn:disabled { cursor: default; }
+
+        .correct {
+            background: #d7ffb8 !important;
+            border-color: var(--primary) !important;
+            color: var(--primary-dark) !important;
+        }
+        .wrong {
+            background: #ffdfe0 !important;
+            border-color: var(--error) !important;
+            color: var(--error) !important;
+            animation: shake 0.4s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .audio-icon {
+            font-size: 50px;
+            cursor: pointer;
+            background: var(--secondary);
+            color: white;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            margin: 20px auto;
+            border-bottom: 5px solid var(--secondary-dark);
+            user-select: none;
+            transition: 0.15s;
+        }
+        .audio-icon:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .result-emoji { font-size: 80px; margin: 20px 0; animation: fadeIn 0.5s; }
+
+        .score-line {
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin: 8px 0;
+        }
+
+        @media (max-width: 520px) {
+            #game-container { padding: 16px; }
+            h1 { font-size: 18px; }
+            .card { font-size: 13px; padding: 10px 4px; min-height: 50px; }
+            .option-btn { font-size: 15px; padding: 12px; }
+            .question-line { font-size: 15px; }
+            .form-badge { font-size: 10px; padding: 3px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="progress-bar"><div id="progress-fill"></div></div>
+    <h1 id="theme-title">🎯 3 Forms of Irregular Verbs</h1>
+    <div class="subtitle">Infinitive · Past Simple · Past Participle</div>
+
+    <!-- ============ LEVEL 1: 3-FORM MATCHING ============ -->
+    <div id="level1" class="level-container active">
+        <div class="level1-title">Level 1 · Match all 3 forms together</div>
+        <div class="forms-hint">
+            <span class="form-badge inf">Infinitive</span>
+            <span class="form-badge ps">Past Simple</span>
+            <span class="form-badge pp">Past Participle</span>
+        </div>
+        <div id="card-grid" class="grid"></div>
+    </div>
+
+    <!-- ============ LEVEL 2: FILL IN THE GAP ============ -->
+    <div id="level2" class="level-container">
+        <div class="level1-title">Level 2 · Complete the sentence</div>
+        <div id="l2-question" class="question-line"></div>
+        <div id="l2-options" class="btn-grid"></div>
+    </div>
+
+    <!-- ============ LEVEL 3: LISTEN & CHOOSE ============ -->
+    <div id="level3" class="level-container">
+        <div class="level1-title">Level 3 · Listen and choose the correct form</div>
+        <div class="audio-icon" id="audioIcon">🔊</div>
+        <div id="l3-options" class="btn-grid"></div>
+    </div>
+
+    <!-- ============ RESULT ============ -->
+    <div id="result" class="level-container">
+        <div class="result-emoji">🏆</div>
+        <h2>Отличная работа!</h2>
+        <p id="final-score" class="score-line"></p>
+        <button class="option-btn" style="width:100%; background: var(--primary); color:white; border-bottom-color: var(--primary-dark);" onclick="location.reload()">Начать заново 🔄</button>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   LEVEL 1 — MATCH 3 FORMS TOGETHER
+   Каждая группа = 3 карточки с одним pair id
+   ============================================================ */
+const level1Data = [
+    // go
+    { pair: 1, form: 'inf', text: 'go' },
+    { pair: 1, form: 'ps',  text: 'went' },
+    { pair: 1, form: 'pp',  text: 'gone' },
+
+    // see
+    { pair: 2, form: 'inf', text: 'see' },
+    { pair: 2, form: 'ps',  text: 'saw' },
+    { pair: 2, form: 'pp',  text: 'seen' },
+
+    // run
+    { pair: 3, form: 'inf', text: 'run' },
+    { pair: 3, form: 'ps',  text: 'ran' },
+    { pair: 3, form: 'pp',  text: 'run' },
+
+    // buy
+    { pair: 4, form: 'inf', text: 'buy' },
+    { pair: 4, form: 'ps',  text: 'bought' },
+    { pair: 4, form: 'pp',  text: 'bought' },
+
+    // come
+    { pair: 5, form: 'inf', text: 'come' },
+    { pair: 5, form: 'ps',  text: 'came' },
+    { pair: 5, form: 'pp',  text: 'come' },
+
+    // drink
+    { pair: 6, form: 'inf', text: 'drink' },
+    { pair: 6, form: 'ps',  text: 'drank' },
+    { pair: 6, form: 'pp',  text: 'drunk' }
+];
+
+/* ============================================================
+   LEVEL 2 — FILL IN THE GAP (10 sentences)
+   ============================================================ */
+const questions2 = [
+    {
+        sentence: 'Yesterday I <span class="gap">?</span> to the market.',
+        hint: 'go → ___ (Past Simple)',
+        correct: 'went',
+        options: ['goed', 'went', 'gone']
+    },
+    {
+        sentence: 'I <span class="gap">?</span> a strange man.',
+        hint: 'see → ___ (Past Simple)',
+        correct: 'saw',
+        options: ['saw', 'seen', 'seed']
+    },
+    {
+        sentence: 'He <span class="gap">?</span> a weapon.',
+        hint: 'have → ___ (Past Simple)',
+        correct: 'had',
+        options: ['haved', 'had', 'haves']
+    },
+    {
+        sentence: 'He <span class="gap">?</span>: "You need to trade."',
+        hint: 'say → ___ (Past Simple)',
+        correct: 'said',
+        options: ['sayed', 'said', 'says']
+    },
+    {
+        sentence: 'I <span class="gap">?</span> a noise.',
+        hint: 'hear → ___ (Past Simple)',
+        correct: 'heard',
+        options: ['heared', 'heard', 'hears']
+    },
+    {
+        sentence: 'I <span class="gap">?</span> away.',
+        hint: 'run → ___ (Past Simple)',
+        correct: 'ran',
+        options: ['runned', 'ran', 'run']
+    },
+    {
+        sentence: 'He <span class="gap">?</span> nothing.',
+        hint: 'do → ___ (Past Simple)',
+        correct: 'did',
+        options: ['doed', 'did', 'done']
+    },
+    {
+        sentence: 'She <span class="gap">?</span> a new phone.',
+        hint: 'buy → ___ (Past Simple)',
+        correct: 'bought',
+        options: ['buyed', 'bought', 'buying']
+    },
+    {
+        sentence: 'They <span class="gap">?</span> to the party.',
+        hint: 'come → ___ (Past Simple)',
+        correct: 'came',
+        options: ['comed', 'came', 'come']
+    },
+    {
+        sentence: 'He <span class="gap">?</span> all the water.',
+        hint: 'drink → ___ (Past Simple)',
+        correct: 'drank',
+        options: ['drinked', 'drank', 'drunk']
+    }
+];
+
+/* ============================================================
+   LEVEL 3 — LISTEN & CHOOSE (past simple form)
+   ============================================================ */
+const questions3 = [
+    { word: 'went',    options: ['want', 'went', 'wind'] },
+    { word: 'saw',     options: ['saw', 'sow', 'say'] },
+    { word: 'ran',     options: ['ran', 'run', 'rain'] },
+    { word: 'bought',  options: ['boat', 'bought', 'brought'] },
+    { word: 'came',    options: ['come', 'came', 'game'] },
+    { word: 'drank',   options: ['drank', 'drunk', 'draw'] }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let selectedCards = [];
+let l2Idx = 0;
+let l3Idx = 0;
+let score = 0;
+const TOTAL_QUESTIONS = questions2.length + questions3.length;
+
+/* ============================================================
+   LEVEL 1 — 3-FORM MATCHING LOGIC
+   ============================================================ */
+function initL1() {
+    const grid = document.getElementById('card-grid');
+    grid.innerHTML = '';
+    const shuffled = [...level1Data].sort(() => Math.random() - 0.5);
+    shuffled.forEach((item, i) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerText = item.text;
+        div.dataset.pair = item.pair;
+        div.dataset.form = item.form;
+        div.dataset.id = 'c' + i;
+        div.onclick = () => handleCardClick(div, item);
+        grid.appendChild(div);
+    });
+    selectedCards = [];
+}
+
+function handleCardClick(div, item) {
+    if (div.classList.contains('matched') || div.classList.contains('disabled')) return;
+    if (selectedCards.some(c => c.div === div)) return;
+
+    div.classList.add('selected');
+    selectedCards.push({ div, item });
+
+    // as soon as we have 3 cards — check them
+    if (selectedCards.length === 3) {
+        const allSame = selectedCards.every(c => c.item.pair === selectedCards[0].item.pair);
+        const allDifferentForms = new Set(selectedCards.map(c => c.item.form)).size === 3;
+
+        if (allSame && allDifferentForms) {
+            // ✅ correct triple
+            selectedCards.forEach(c => {
+                c.div.classList.remove('selected');
+                c.div.classList.add('flash-ok');
+            });
+            setTimeout(() => {
+                selectedCards.forEach(c => {
+                    c.div.classList.remove('flash-ok');
+                    c.div.classList.add('matched');
+                    c.div.classList.add('disabled');
+                });
+                selectedCards = [];
+                checkL1End();
+            }, 500);
+        } else {
+            // ❌ wrong
+            selectedCards.forEach(c => {
+                c.div.classList.remove('selected');
+                c.div.classList.add('flash-bad');
+            });
+            setTimeout(() => {
+                selectedCards.forEach(c => c.div.classList.remove('flash-bad'));
+                selectedCards = [];
+            }, 700);
+        }
+    }
+}
+
+function checkL1End() {
+    const matched = document.querySelectorAll('.card.matched').length;
+    if (matched === level1Data.length) {
+        score += 6;
+        setTimeout(() => goToLevel(2), 400);
+    }
+}
+
+/* ============================================================
+   LEVEL 2 — FILL IN THE GAP
+   ============================================================ */
+function initL2() {
+    const q = questions2[l2Idx];
+
+    document.getElementById('l2-question').innerHTML =
+        q.sentence + `<span class="hint">💡 ${q.hint}</span>`;
+
+    const optionsDiv = document.getElementById('l2-options');
+    optionsDiv.innerHTML = '';
+
+    const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            optionsDiv.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+            if (opt === q.correct) {
+                btn.classList.add('correct');
+                score++;
+                setTimeout(() => {
+                    l2Idx++;
+                    if (l2Idx < questions2.length) initL2();
+                    else goToLevel(3);
+                }, 700);
+            } else {
+                btn.classList.add('wrong');
+                optionsDiv.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.innerText === q.correct) b.classList.add('correct');
+                });
+                setTimeout(() => {
+                    l2Idx++;
+                    if (l2Idx < questions2.length) initL2();
+                    else goToLevel(3);
+                }, 1200);
+            }
+        };
+        optionsDiv.appendChild(btn);
+    });
+}
+
+/* ============================================================
+   LEVEL 3 — LISTEN & CHOOSE
+   ============================================================ */
+function initL3() {
+    const q = questions3[l3Idx];
+
+    const optionsDiv = document.getElementById('l3-options');
+    optionsDiv.innerHTML = '';
+
+    const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        btn.onclick = () => {
+            optionsDiv.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+            if (opt === q.word) {
+                btn.classList.add('correct');
+                score++;
+                setTimeout(() => {
+                    l3Idx++;
+                    if (l3Idx < questions3.length) initL3();
+                    else goToLevel('result');
+                }, 700);
+            } else {
+                btn.classList.add('wrong');
+                optionsDiv.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.innerText === q.word) b.classList.add('correct');
+                });
+                setTimeout(() => {
+                    l3Idx++;
+                    if (l3Idx < questions3.length) initL3();
+                    else goToLevel('result');
+                }, 1200);
+            }
+        };
+        optionsDiv.appendChild(btn);
+    });
+
+    setTimeout(playCurrentWord, 250);
+}
+
+function playCurrentWord() {
+    if (l3Idx >= questions3.length) return;
+    const word = questions3[l3Idx].word;
+    const msg = new SpeechSynthesisUtterance(word);
+    msg.lang = 'en-US';
+    msg.rate = 0.85;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(msg);
+}
+
+document.getElementById('audioIcon').addEventListener('click', playCurrentWord);
+
+/* ============================================================
+   LEVEL CONTROL
+   ============================================================ */
+function goToLevel(num) {
+    document.querySelectorAll('.level-container').forEach(c => c.classList.remove('active'));
+
+    if (num === 'result') {
+        document.getElementById('result').classList.add('active');
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('final-score').textContent =
+            `Правильных ответов: ${score} из ${TOTAL_QUESTIONS + 6}`;
+        return;
+    }
+
+    document.getElementById('level' + num).classList.add('active');
+    document.getElementById('progress-fill').style.width = (num - 1) * 33 + '%';
+
+    if (num === 2) initL2();
+    if (num === 3) initL3();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+initL1();
+</script>
+
+</body>
+</html>

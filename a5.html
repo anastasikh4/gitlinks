@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Question Words Quiz — Jobs (Duolingo style)</title>
+<style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Nunito','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;-webkit-tap-highlight-color:transparent;}
+
+    :root{
+        --duo-green:#58CC02;
+        --duo-green-dark:#46A302;
+        --duo-green-light:#D7FFB8;
+        --duo-blue:#1CB0F6;
+        --duo-blue-dark:#1899D6;
+        --duo-red:#FF4B4B;
+        --duo-red-dark:#E03E3E;
+        --duo-yellow:#FFC800;
+        --duo-yellow-dark:#E5B200;
+        --duo-gray:#E5E5E5;
+        --duo-gray-dark:#AFAFAF;
+        --duo-text:#3C3C3C;
+        --duo-text-light:#777777;
+        --duo-bg:#FFFFFF;
+        --duo-bg-soft:#F7F7F7;
+    }
+
+    body{
+        background:#FFFFFF;
+        color:var(--duo-text);
+        min-height:100vh;
+        display:flex;
+        flex-direction:column;
+        overflow-x:hidden;
+    }
+
+    /* ---------- TOP BAR ---------- */
+    .topbar{
+        position:sticky;top:0;background:#fff;
+        border-bottom:2px solid var(--duo-gray);
+        padding:12px 16px;z-index:50;
+    }
+    .topbar-inner{
+        max-width:720px;margin:0 auto;
+        display:flex;align-items:center;gap:14px;
+    }
+    .close-btn{
+        width:32px;height:32px;border:none;background:transparent;
+        color:var(--duo-gray-dark);font-size:24px;font-weight:900;
+        cursor:pointer;line-height:1;flex-shrink:0;
+        transition:.2s;border-radius:8px;
+    }
+    .close-btn:hover{background:var(--duo-bg-soft);color:var(--duo-text);}
+
+    .progress-track{
+        flex:1;height:16px;background:var(--duo-gray);
+        border-radius:8px;overflow:hidden;position:relative;
+    }
+    .progress-fill{
+        height:100%;width:0%;background:var(--duo-green);
+        border-radius:8px;transition:width .5s cubic-bezier(.4,0,.2,1);
+        position:relative;
+    }
+    .progress-fill::after{
+        content:"";position:absolute;top:3px;left:8px;right:8px;height:4px;
+        background:rgba(255,255,255,.4);border-radius:2px;
+    }
+
+    .hearts{
+        display:flex;align-items:center;gap:4px;
+        font-weight:900;color:var(--duo-red);
+        font-size:18px;flex-shrink:0;
+        min-width:60px;justify-content:flex-end;
+    }
+    .heart{transition:.3s;}
+    .heart.lost{opacity:.2;transform:scale(.7);}
+
+    .xp-badge{
+        background:var(--duo-yellow);color:#7A5C00;
+        padding:4px 10px;border-radius:20px;
+        font-weight:900;font-size:13px;flex-shrink:0;
+    }
+
+    /* ---------- MAIN ---------- */
+    main{
+        flex:1;display:flex;flex-direction:column;
+        max-width:720px;width:100%;margin:0 auto;
+        padding:24px 20px 140px;
+    }
+
+    .question-wrap{flex:1;animation:slideIn .35s cubic-bezier(.4,0,.2,1);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+
+    .q-num{
+        color:var(--duo-text-light);font-weight:800;font-size:13px;
+        letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;
+    }
+    .q-text{
+        font-size:24px;font-weight:900;color:var(--duo-text);
+        line-height:1.3;margin-bottom:20px;
+    }
+
+    /* ---------- INFO CARD (given answer / context) ---------- */
+    .info-card{
+        background:linear-gradient(135deg,#FFF8E1,#FFEFC2);
+        border:2px solid #FFD966;
+        border-radius:14px;
+        padding:14px 18px;
+        margin-bottom:18px;
+        font-size:15px;
+        font-weight:700;
+        color:#5C4500;
+        line-height:1.5;
+        text-align:center;
+    }
+    .info-card .who{
+        display:inline-block;
+        background:#FFB347;
+        color:#fff;
+        font-weight:900;
+        font-size:12px;
+        padding:3px 12px;
+        border-radius:20px;
+        letter-spacing:1px;
+        margin-bottom:8px;
+    }
+    .info-card .answer{
+        display:block;
+        font-size:16px;
+        color:#7A5C00;
+        margin-top:4px;
+    }
+
+    /* ---------- SENTENCE WITH GAP ---------- */
+    .sentence{
+        background:var(--duo-bg-soft);
+        border:2px dashed var(--duo-gray-dark);
+        border-radius:16px;
+        padding:22px 20px;
+        font-size:20px;
+        font-weight:700;
+        color:var(--duo-text);
+        line-height:1.5;
+        margin-bottom:22px;
+        text-align:center;
+    }
+    .sentence .gap{
+        display:inline-block;
+        min-width:120px;
+        padding:2px 10px;
+        border-bottom:4px solid var(--duo-blue);
+        color:var(--duo-blue-dark);
+        font-weight:900;
+        background:#DDF4FF;
+        border-radius:6px 6px 0 0;
+    }
+    .sentence .gap.filled{
+        background:#FFF7CC;
+        border-bottom-color:var(--duo-yellow);
+        color:#7A5C00;
+    }
+
+    /* ---------- WORD BANK ---------- */
+    .wordbank{
+        display:flex;
+        flex-wrap:wrap;
+        gap:10px;
+        margin-bottom:16px;
+        justify-content:center;
+    }
+    .word-chip{
+        background:#fff;
+        border:2px solid var(--duo-gray);
+        border-bottom-width:4px;
+        border-radius:12px;
+        padding:10px 20px;
+        font-weight:900;
+        font-size:16px;
+        color:var(--duo-text);
+        cursor:pointer;
+        transition:all .1s ease;
+        user-select:none;
+        font-family:inherit;
+    }
+    .word-chip:hover:not(.used){
+        background:var(--duo-bg-soft);
+        border-color:var(--duo-gray-dark);
+    }
+    .word-chip:active:not(.used){
+        transform:translateY(2px);
+        border-bottom-width:2px;
+    }
+    .word-chip.used{
+        opacity:.25;
+        cursor:default;
+        pointer-events:none;
+    }
+    .word-chip.selected{
+        background:#DDF4FF;
+        border-color:var(--duo-blue);
+        color:var(--duo-blue-dark);
+    }
+
+    /* ---------- OPTION BUTTONS ---------- */
+    .options{display:flex;flex-direction:column;gap:12px;}
+
+    .option{
+        background:#fff;
+        border:2px solid var(--duo-gray);
+        border-bottom-width:4px;
+        border-radius:14px;
+        padding:16px 20px;
+        cursor:pointer;
+        font-size:16px;
+        font-weight:700;
+        color:var(--duo-text);
+        text-align:left;
+        transition:all .1s ease;
+        display:flex;
+        align-items:center;
+        gap:12px;
+        font-family:inherit;
+        position:relative;
+    }
+    .option:hover:not(.disabled){
+        background:var(--duo-bg-soft);
+        border-color:var(--duo-gray-dark);
+    }
+    .option:active:not(.disabled){
+        transform:translateY(2px);
+        border-bottom-width:2px;
+        margin-bottom:2px;
+    }
+    .option .key{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:26px;height:26px;
+        border:2px solid var(--duo-gray);
+        border-radius:6px;
+        font-size:13px;
+        font-weight:900;
+        color:var(--duo-text-light);
+        flex-shrink:0;
+    }
+    .option.selected{
+        background:#DDF4FF;border-color:var(--duo-blue);
+    }
+    .option.selected .key{
+        background:var(--duo-blue);border-color:var(--duo-blue);color:#fff;
+    }
+    .option.correct{
+        background:var(--duo-green-light);
+        border-color:var(--duo-green);
+        color:var(--duo-green-dark);
+    }
+    .option.correct .key{
+        background:var(--duo-green);border-color:var(--duo-green);color:#fff;
+    }
+    .option.incorrect{
+        background:#FFDFE0;border-color:var(--duo-red);
+        color:var(--duo-red-dark);
+    }
+    .option.incorrect .key{
+        background:var(--duo-red);border-color:var(--duo-red);color:#fff;
+    }
+    .option.disabled{cursor:default;}
+
+    /* ---------- TRUE / FALSE ---------- */
+    .tf-instr{
+        text-align:center;font-size:14px;font-weight:800;
+        color:var(--duo-text-light);text-transform:uppercase;
+        letter-spacing:1.2px;margin-bottom:12px;
+    }
+
+    /* ---------- FEEDBACK BANNER ---------- */
+    .feedback-banner{
+        position:fixed;bottom:0;left:0;right:0;
+        background:var(--duo-green-light);
+        border-top:2px solid var(--duo-green);
+        padding:16px 20px 24px;
+        transform:translateY(100%);
+        transition:transform .3s cubic-bezier(.4,0,.2,1);
+        z-index:40;
+    }
+    .feedback-banner.show{transform:translateY(0);}
+    .feedback-banner.wrong{background:#FFDFE0;border-top-color:var(--duo-red);}
+    .feedback-inner{
+        max-width:720px;margin:0 auto;
+        display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    }
+    .feedback-icon{
+        width:48px;height:48px;background:#fff;border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-size:24px;flex-shrink:0;
+    }
+    .feedback-text{flex:1;min-width:200px;}
+    .feedback-title{
+        font-weight:900;font-size:18px;color:var(--duo-green-dark);
+        margin-bottom:2px;
+    }
+    .feedback-banner.wrong .feedback-title{color:var(--duo-red-dark);}
+    .feedback-sub{
+        font-weight:700;font-size:13px;color:var(--duo-text-light);
+    }
+    .feedback-btn{
+        background:var(--duo-green);color:#fff;border:none;
+        border-bottom:4px solid var(--duo-green-dark);
+        border-radius:12px;padding:12px 28px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:all .1s;
+        flex-shrink:0;font-family:inherit;
+    }
+    .feedback-btn:hover{filter:brightness(1.05);}
+    .feedback-btn:active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px;}
+    .feedback-banner.wrong .feedback-btn{
+        background:var(--duo-red);border-bottom-color:var(--duo-red-dark);
+    }
+
+    /* ---------- CHECK BAR ---------- */
+    .check-bar{
+        position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:2px solid var(--duo-gray);
+        padding:16px 20px 24px;z-index:30;
+    }
+    .check-bar-inner{
+        max-width:720px;margin:0 auto;
+        display:flex;justify-content:space-between;gap:14px;
+    }
+    .btn-skip{
+        background:#fff;color:var(--duo-gray-dark);
+        border:2px solid var(--duo-gray);border-bottom-width:4px;
+        border-radius:12px;padding:14px 22px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:.1s;
+        font-family:inherit;
+    }
+    .btn-skip:hover{background:var(--duo-bg-soft);}
+    .btn-check{
+        flex:1;background:var(--duo-green);color:#fff;border:none;
+        border-bottom:4px solid var(--duo-green-dark);
+        border-radius:12px;padding:14px 22px;
+        font-weight:900;font-size:15px;letter-spacing:1px;
+        text-transform:uppercase;cursor:pointer;transition:.1s;
+        font-family:inherit;
+    }
+    .btn-check:disabled{
+        background:var(--duo-gray);border-bottom-color:var(--duo-gray-dark);
+        color:var(--duo-gray-dark);cursor:not-allowed;
+    }
+    .btn-check:not(:disabled):hover{filter:brightness(1.05);}
+    .btn-check:not(:disabled):active{transform:translateY(2px);border-bottom-width:2px;margin-bottom:2px;}
+
+    /* ---------- SCREENS ---------- */
+    .screen{
+        flex:1;display:flex;flex-direction:column;
+        align-items:center;justify-content:center;
+        text-align:center;padding:20px;animation:slideIn .4s;
+    }
+    .mascot{
+        font-size:96px;margin-bottom:20px;
+        animation:bounce 2s infinite;
+    }
+    @keyframes bounce{
+        0%,100%{transform:translateY(0);}
+        50%{transform:translateY(-12px);}
+    }
+    .screen h1{
+        font-size:32px;font-weight:900;
+        color:var(--duo-text);margin-bottom:12px;
+    }
+    .screen p{
+        font-size:17px;font-weight:700;
+        color:var(--duo-text-light);
+        margin-bottom:32px;max-width:480px;line-height:1.5;
+    }
+    .screen .btn-check{max-width:280px;width:100%;}
+
+    .rule-box{
+        background:#FFF9E5;border:2px solid #FFD966;
+        border-radius:16px;padding:16px 20px;
+        text-align:left;max-width:480px;
+        margin-bottom:24px;font-size:14px;
+        font-weight:700;color:#5C4500;line-height:1.7;
+    }
+    .rule-box b{color:#7A5C00;}
+    .rule-box .chip{
+        display:inline-block;
+        background:#FFB347;color:#fff;
+        padding:2px 10px;border-radius:14px;
+        font-size:12px;font-weight:900;
+        margin:2px 2px;
+    }
+
+    .result-stats{
+        display:flex;gap:16px;margin-bottom:32px;
+        flex-wrap:wrap;justify-content:center;
+    }
+    .result-stat{
+        background:var(--duo-bg-soft);
+        border:2px solid var(--duo-gray);
+        border-radius:14px;padding:14px 22px;
+        min-width:100px;
+    }
+    .result-stat .val{
+        font-size:22px;font-weight:900;color:var(--duo-yellow-dark);
+    }
+    .result-stat .lbl{
+        font-size:11px;font-weight:900;color:var(--duo-text-light);
+        letter-spacing:1px;text-transform:uppercase;margin-top:2px;
+    }
+
+    @media(max-width:600px){
+        .q-text{font-size:20px;}
+        .sentence{font-size:17px;padding:18px 16px;}
+        .feedback-inner{gap:10px;}
+        .feedback-btn{padding:12px 20px;font-size:14px;}
+        .mascot{font-size:72px;}
+        .screen h1{font-size:26px;}
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar" style="display:none;">
+    <div class="topbar-inner">
+        <button class="close-btn" id="closeBtn" aria-label="Close">✕</button>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="xp-badge" id="xpBadge">+0 XP</div>
+        <div class="hearts" id="hearts"></div>
+    </div>
+</div>
+
+<main id="main"></main>
+
+<div class="check-bar" id="checkBar" style="display:none;">
+    <div class="check-bar-inner">
+        <button class="btn-skip" id="skipBtn">Skip</button>
+        <button class="btn-check" id="checkBtn" disabled>Check</button>
+    </div>
+</div>
+
+<div class="feedback-banner" id="feedbackBanner">
+    <div class="feedback-inner">
+        <div class="feedback-icon" id="feedbackIcon">✓</div>
+        <div class="feedback-text">
+            <div class="feedback-title" id="feedbackTitle">Nice!</div>
+            <div class="feedback-sub" id="feedbackSub"></div>
+        </div>
+        <button class="feedback-btn" id="continueBtn">Continue</button>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   QUIZ DATA — Question words (Jobs)
+   Types: 'mc' | 'tf' | 'gap'
+   ============================================================ */
+const QUIZ = [
+    // ============ EXERCISE 4 · Complete with a question word ============
+    {
+        type: 'gap',
+        question: 'Complete the question with the correct question word.',
+        sentence: '___ does your dad do?',
+        bank: ['What', 'Where', 'When'],
+        correct: 'What',
+        explanation: '«What does your dad do?» — спрашиваем о работе (профессии). Ответ: «He\'s a teacher.»'
+    },
+    {
+        type: 'gap',
+        question: 'Complete the question with the correct question word.',
+        sentence: '___ does he work?',
+        bank: ['Where', 'What', 'Who'],
+        correct: 'Where',
+        explanation: '«Where does he work?» — спрашиваем о МЕСТЕ работы. Ответ: «He works in a school.»'
+    },
+    {
+        type: 'gap',
+        question: 'Complete the question with the correct question word.',
+        sentence: '___ does he wear at work?',
+        bank: ['What', 'How', 'When'],
+        correct: 'What',
+        explanation: '«What does he wear at work?» — спрашиваем о ВЕЩАХ (что носит). Ответ: «He wears a uniform.»'
+    },
+    {
+        type: 'gap',
+        question: 'Complete the question with the correct question word.',
+        sentence: '___ does he start work?',
+        bank: ['When', 'Where', 'Who'],
+        correct: 'When',
+        explanation: '«When does he start work?» — спрашиваем о ВРЕМЕНИ. Ответ: «He starts at 8 o\'clock.»'
+    },
+    {
+        type: 'gap',
+        question: 'Complete the question with the correct question word.',
+        sentence: '___ does he travel to work?',
+        bank: ['How', 'What', 'Where'],
+        correct: 'How',
+        explanation: '«How does he travel to work?» — спрашиваем о СПОСОБЕ (как). Ответ: «By bus.»'
+    },
+
+    // ============ EXERCISE 2 · Write the question from the answer ============
+    {
+        type: 'mc',
+        info: { who: 'ANSWER', answer: 'She works in a shoe shop.' },
+        question: 'Make a question for the answer above. (she / work)',
+        options: [
+            'Where does she work?',
+            'What does she work?',
+            'When does she work?',
+            'Who does she work?'
+        ],
+        correct: 0,
+        explanation: 'Ответ про МЕСТО (in a shoe shop) → «Where does she work?»'
+    },
+    {
+        type: 'mc',
+        info: { who: 'ANSWER', answer: 'She goes by car.' },
+        question: 'Make a question for the answer above. (she / go to work)',
+        options: [
+            'What does she go to work?',
+            'How does she go to work?',
+            'Where does she go to work?',
+            'Who does she go to work?'
+        ],
+        correct: 1,
+        explanation: 'Ответ про СПОСОБ (by car) → «How does she go to work?»'
+    },
+    {
+        type: 'mc',
+        info: { who: 'ANSWER', answer: 'She starts at nine o\'clock.' },
+        question: 'Make a question for the answer above. (she / start)',
+        options: [
+            'What does she start?',
+            'Where does she start?',
+            'When does she start?',
+            'How does she start?'
+        ],
+        correct: 2,
+        explanation: 'Ответ про ВРЕМЯ (at nine o\'clock) → «When does she start?»'
+    },
+    {
+        type: 'mc',
+        info: { who: 'ANSWER', answer: 'She meets lots of people.' },
+        question: 'Make a question for the answer above. (she / meet at the shop)',
+        options: [
+            'What does she meet at the shop?',
+            'Who does she meet at the shop?',
+            'When does she meet at the shop?',
+            'How does she meet at the shop?'
+        ],
+        correct: 1,
+        explanation: 'Ответ про ЛЮДЕЙ (lots of people) → «Who does she meet at the shop?»'
+    },
+
+    // ============ Grammar check ============
+    {
+        type: 'tf',
+        question: 'The question «What does your mum do?» is grammatically correct.',
+        correct: true,
+        explanation: '✅ True. Схема: question word + does + subject + verb (без -s).'
+    }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let current = 0;
+let hearts = 3;
+let xp = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let selectedOption = null;
+let selectedTF = null;
+let gapValue = null;
+
+const main = document.getElementById('main');
+const topbar = document.getElementById('topbar');
+const checkBar = document.getElementById('checkBar');
+const feedbackBanner = document.getElementById('feedbackBanner');
+const checkBtn = document.getElementById('checkBtn');
+const skipBtn = document.getElementById('skipBtn');
+const continueBtn = document.getElementById('continueBtn');
+const progressFill = document.getElementById('progressFill');
+const heartsEl = document.getElementById('hearts');
+const xpBadge = document.getElementById('xpBadge');
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function shuffle(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function renderHearts(){
+    heartsEl.innerHTML = '';
+    for(let i = 0; i < 3; i++){
+        const sp = document.createElement('span');
+        sp.className = 'heart' + (i < hearts ? '' : ' lost');
+        sp.textContent = '❤️';
+        heartsEl.appendChild(sp);
+    }
+}
+
+function renderXP(){ xpBadge.textContent = '+' + xp + ' XP'; }
+function updateProgress(){ progressFill.style.width = (current / QUIZ.length) * 100 + '%'; }
+
+/* ============================================================
+   START SCREEN
+   ============================================================ */
+function showStart(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">💼</div>
+            <h1>Question Words</h1>
+            <div class="rule-box">
+                <b>Question words:</b>
+                <span class="chip">What</span>
+                <span class="chip">Where</span>
+                <span class="chip">When</span>
+                <span class="chip">Who</span>
+                <span class="chip">How</span>
+                <br><br>
+                <b>Схема вопроса:</b><br>
+                What <b>does</b> your dad <b>do</b>?<br>
+                Where <b>does</b> she <b>work</b>?
+            </div>
+            <p>10 вопросов. У тебя <b>3 сердечка</b>!</p>
+            <button class="btn-check" id="startBtn">Start</button>
+        </div>
+    `;
+    document.getElementById('startBtn').addEventListener('click', startQuiz);
+}
+
+function startQuiz(){
+    current = 0; hearts = 3; xp = 0; correctCount = 0; wrongCount = 0;
+    topbar.style.display = 'block';
+    renderHearts();
+    renderXP();
+    updateProgress();
+    renderQuestion();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderQuestion(){
+    const q = QUIZ[current];
+    selectedOption = null;
+    selectedTF = null;
+    gapValue = null;
+
+    checkBtn.disabled = true;
+    checkBtn.textContent = 'Check';
+    checkBtn.style.display = '';
+    skipBtn.style.display = '';
+    checkBar.style.display = 'block';
+    feedbackBanner.classList.remove('show','wrong');
+
+    const qNum = `Question ${current + 1} of ${QUIZ.length}`;
+
+    if(q.type === 'mc')      renderMC(q, qNum);
+    else if(q.type === 'tf') renderTF(q, qNum);
+    else if(q.type === 'gap') renderGap(q, qNum);
+
+    updateProgress();
+}
+
+/* ---------- MC ---------- */
+function renderMC(q, qNum){
+    const letters = ['A','B','C','D'];
+
+    const infoHTML = q.info ? `
+        <div class="info-card">
+            <span class="who">${q.info.who}</span>
+            <span class="answer">💬 ${q.info.answer}</span>
+        </div>
+    ` : '';
+
+    const optsHTML = q.options.map((opt, i) => `
+        <button class="option" data-idx="${i}">
+            <span class="key">${letters[i]}</span>
+            <span>${opt}</span>
+        </button>
+    `).join('');
+
+    main.innerHTML = `
+        <div class="question-wrap">
+            <div class="q-num">${qNum}</div>
+            <div class="q-text">${q.question}</div>
+            ${infoHTML}
+            <div class="options">${optsHTML}</div>
+        </div>
+    `;
+
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(btn.classList.contains('disabled')) return;
+            main.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedOption = Number(btn.dataset.idx);
+            checkBtn.disabled = false;
+        });
+    });
+}
+
+/* ---------- TF ---------- */
+function renderTF(q, qNum){
+    main.innerHTML = `
+        <div class="question-wrap">
+            <div class="q-num">${qNum}</div>
+            <div class="q-text">${q.question}</div>
+            <div class="tf-instr">Is this correct?</div>
+            <div class="options">
+                <button class="option" data-val="true">
+                    <span class="key">✓</span><span>True</span>
+                </button>
+                <button class="option" data-val="false">
+                    <span class="key">✕</span><span>False</span>
+                </button>
+            </div>
+        </div>
+    `;
+
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(btn.classList.contains('disabled')) return;
+            main.querySelectorAll('.option').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedTF = btn.dataset.val === 'true';
+            checkBtn.disabled = false;
+        });
+    });
+}
+
+/* ---------- GAP FILL ---------- */
+function renderGap(q, qNum){
+    const sentenceHTML = q.sentence.replace('___', '<span class="gap" id="gap">?</span>');
+
+    const bankHTML = shuffle(q.bank).map(w => `
+        <button class="word-chip" data-word="${w}">${w}</button>
+    `).join('');
+
+    main.innerHTML = `
+        <div class="question-wrap">
+            <div class="q-num">${qNum}</div>
+            <div class="q-text">${q.question}</div>
+            <div class="sentence">${sentenceHTML}</div>
+            <div class="wordbank">${bankHTML}</div>
+        </div>
+    `;
+
+    const gap = document.getElementById('gap');
+
+    main.querySelectorAll('.word-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            if(chip.classList.contains('used')) return;
+
+            main.querySelectorAll('.word-chip').forEach(c => {
+                c.classList.remove('used','selected');
+            });
+
+            chip.classList.add('used','selected');
+            gapValue = chip.dataset.word;
+            gap.textContent = chip.dataset.word;
+            gap.classList.add('filled');
+            checkBtn.disabled = false;
+        });
+    });
+}
+
+/* ============================================================
+   CHECK
+   ============================================================ */
+checkBtn.addEventListener('click', () => {
+    const q = QUIZ[current];
+    let isCorrect = false;
+
+    if(q.type === 'mc'){
+        const correctIdx = q.correct;
+        const chosen = selectedOption;
+        main.querySelectorAll('.option').forEach((btn, i) => {
+            btn.classList.add('disabled');
+            if(i === correctIdx) btn.classList.add('correct');
+            else if(i === chosen) btn.classList.add('incorrect');
+        });
+        isCorrect = (chosen === correctIdx);
+    }
+
+    if(q.type === 'tf'){
+        const chosen = selectedTF;
+        main.querySelectorAll('.option').forEach(btn => {
+            btn.classList.add('disabled');
+            const val = btn.dataset.val === 'true';
+            if(val === q.correct) btn.classList.add('correct');
+            else if(val === chosen) btn.classList.add('incorrect');
+        });
+        isCorrect = (chosen === q.correct);
+    }
+
+    if(q.type === 'gap'){
+        const gap = document.getElementById('gap');
+        if(gapValue === q.correct){
+            gap.style.background = 'var(--duo-green-light)';
+            gap.style.borderBottomColor = 'var(--duo-green)';
+            gap.style.color = 'var(--duo-green-dark)';
+            isCorrect = true;
+        } else {
+            gap.style.background = '#FFDFE0';
+            gap.style.borderBottomColor = 'var(--duo-red)';
+            gap.style.color = 'var(--duo-red-dark)';
+            gap.textContent = q.correct;
+            isCorrect = false;
+        }
+        main.querySelectorAll('.word-chip').forEach(c => c.style.pointerEvents = 'none');
+    }
+
+    if(isCorrect){ correctCount++; xp += 10; }
+    else { wrongCount++; hearts = Math.max(0, hearts - 1); }
+    renderHearts();
+    renderXP();
+    showFeedback(isCorrect, q.explanation);
+});
+
+/* ============================================================
+   FEEDBACK
+   ============================================================ */
+function showFeedback(isCorrect, explanation){
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('wrong');
+    if(isCorrect){
+        document.getElementById('feedbackIcon').textContent = '✓';
+        document.getElementById('feedbackTitle').textContent = 'Correct!';
+        document.getElementById('feedbackSub').textContent = explanation;
+        document.getElementById('feedbackIcon').style.color = 'var(--duo-green)';
+    } else {
+        feedbackBanner.classList.add('wrong');
+        document.getElementById('feedbackIcon').textContent = '✕';
+        document.getElementById('feedbackTitle').textContent = 'Not quite…';
+        document.getElementById('feedbackSub').textContent = explanation;
+        document.getElementById('feedbackIcon').style.color = 'var(--duo-red)';
+    }
+    feedbackBanner.classList.add('show');
+}
+
+continueBtn.addEventListener('click', () => {
+    feedbackBanner.classList.remove('show');
+    current++;
+    if(hearts <= 0){ showFail(); return; }
+    if(current >= QUIZ.length){ showEnd(); return; }
+    renderQuestion();
+});
+
+/* ============================================================
+   SKIP / CLOSE
+   ============================================================ */
+skipBtn.addEventListener('click', () => {
+    const q = QUIZ[current];
+    wrongCount++;
+    hearts = Math.max(0, hearts - 1);
+    renderHearts();
+    showFeedback(false, q.explanation);
+});
+
+document.getElementById('closeBtn').addEventListener('click', () => {
+    if(confirm('Quit the quiz?')) showStart();
+});
+
+/* ============================================================
+   END / FAIL
+   ============================================================ */
+function showEnd(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+
+    const total = QUIZ.length;
+    const pct = Math.round((correctCount / total) * 100);
+    const emoji = pct >= 90 ? '🏆' : pct >= 70 ? '🎉' : pct >= 50 ? '👍' : '💪';
+    const msg = pct >= 90 ? 'Outstanding! You know question words!'
+              : pct >= 70 ? 'Great job! Almost perfect!'
+              : pct >= 50 ? 'Good effort — review the rules!'
+              : 'Keep practising — try again!';
+
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">${emoji}</div>
+            <h1>Quiz complete!</h1>
+            <div class="result-stats">
+                <div class="result-stat"><div class="val">${xp}</div><div class="lbl">Total XP</div></div>
+                <div class="result-stat"><div class="val">${correctCount}/${total}</div><div class="lbl">Correct</div></div>
+                <div class="result-stat"><div class="val">${pct}%</div><div class="lbl">Accuracy</div></div>
+            </div>
+            <p>${msg}</p>
+            <button class="btn-check" id="retryBtn">Try again</button>
+        </div>
+    `;
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+}
+
+function showFail(){
+    topbar.style.display = 'none';
+    checkBar.style.display = 'none';
+    feedbackBanner.classList.remove('show');
+
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">💔</div>
+            <h1>Out of hearts!</h1>
+            <p>Don't worry — review the rule and try again.</p>
+            <div class="result-stats">
+                <div class="result-stat"><div class="val">${xp}</div><div class="lbl">XP</div></div>
+                <div class="result-stat"><div class="val">${correctCount}/${QUIZ.length}</div><div class="lbl">Correct</div></div>
+            </div>
+            <button class="btn-check" id="retryBtn">Try again</button>
+        </div>
+    `;
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+showStart();
+</script>
+</body>
+</html>
