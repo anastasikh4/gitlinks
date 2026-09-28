@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Time &amp; Words Adventure 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 700px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #FFD700;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #FF8C00; font-size: 2em; margin-bottom: 10px; }
+
+        .story-box {
+            background: #FFF9E6;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 1.1em;
+            color: #444;
+            border-left: 5px solid #FFD700;
+            text-align: center;
+        }
+        .story-box .big {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #E65100;
+            letter-spacing: 2px;
+            display: block;
+            margin-top: 6px;
+        }
+
+        .q-badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-weight: 900;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .question-text { font-size: 1.4em; color: #2E8B57; margin-bottom: 20px; font-weight: bold; text-align: center; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .options.single-column { grid-template-columns: 1fr; }
+
+        .btn {
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: #2b2d42;
+        }
+        .btn:hover { border-color: #FF8C00; background: #FFF4E6; transform: scale(1.02); }
+        .btn.correct { background: #90EE90 !important; border-color: #2E8B57; color: #1B5E20; }
+        .btn.wrong { background: #FFB6C1 !important; border-color: #DC143C; color: #B71C1C; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .progress-bar {
+            width: 100%; height: 10px; background: #eee;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.4s; }
+
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; animation: bounce 1.5s infinite; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .word-list {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #0d3b66;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 16px;
+        }
+        .word-list span {
+            padding: 4px 12px;
+            background: #F0F8FF;
+            border-radius: 10px;
+            border: 2px dashed #87CEEB;
+        }
+
+        @media (max-width: 520px) {
+            .options { grid-template-columns: 1fr; }
+            .title { font-size: 1.5em; }
+            .btn { font-size: 1em; padding: 12px; }
+            .story-box .big { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">⏰ Time &amp; Words Quest 🔍</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div id="storySection" class="story-box"></div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆⏰🌟</div>
+        <h1 style="color: #FF8C00;">EXCELLENT!</h1>
+        <p style="font-size: 1.3em; margin: 15px 0;">You've finished the Time &amp; Words Quest!</p>
+        <button class="btn" onclick="location.reload()" style="padding: 10px 30px;">Restart</button>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       QUIZ DATA — только "past" и "to"
+       ============================================================ */
+    const questions = [
+        // ---- Exercise 1: What time is it? (only past/to) ----
+        {
+            part: 1,
+            display: '8:25',
+            q: 'What time is it?',
+            type: 'time',
+            options: [
+                'It is twenty-five past eight.',
+                'It is twenty-five to eight.',
+                'It is a quarter past eight.'
+            ],
+            correct: 0
+        },
+        {
+            part: 1,
+            display: '11:15',
+            q: 'What time is it?',
+            type: 'time',
+            options: [
+                'It is a quarter to eleven.',
+                'It is a quarter past eleven.',
+                'It is half past eleven.'
+            ],
+            correct: 1
+        },
+        {
+            part: 1,
+            display: '1:45',
+            q: 'What time is it?',
+            type: 'time',
+            options: [
+                'It is a quarter past two.',
+                'It is a quarter to two.',
+                'It is half past one.'
+            ],
+            correct: 1
+        },
+        {
+            part: 1,
+            display: '12:30',
+            q: 'What time is it?',
+            type: 'time',
+            options: [
+                'It is half past twelve.',
+                'It is half past one.',
+                'It is half past eleven.'
+            ],
+            correct: 0
+        },
+        {
+            part: 1,
+            display: '7:30',
+            q: 'What time is it?',
+            type: 'time',
+            options: [
+                'It is half past seven.',
+                'It is half past six.',
+                'It is half past eight.'
+            ],
+            correct: 0
+        },
+
+        // ---- Exercise 2: Choose the odd word out ----
+        {
+            part: 2,
+            words: ['bank', "baker's", 'vase', 'library'],
+            q: 'Which word is the ODD one out?',
+            type: 'odd',
+            options: ['bank', "baker's", 'vase', 'library'],
+            correct: 2,
+            hint: 'Three of these are places.'
+        },
+        {
+            part: 2,
+            words: ['fireplace', 'sofa', 'armchair', 'bathtub'],
+            q: 'Which word is the ODD one out?',
+            type: 'odd',
+            options: ['fireplace', 'sofa', 'armchair', 'bathtub'],
+            correct: 3,
+            hint: 'Three of these are in the living room.'
+        },
+        {
+            part: 2,
+            words: ["newsagent's", 'toy shop', 'supermarket', 'aspirin'],
+            q: 'Which word is the ODD one out?',
+            type: 'odd',
+            options: ["newsagent's", 'toy shop', 'supermarket', 'aspirin'],
+            correct: 3,
+            hint: 'Three of these are shops.'
+        },
+        {
+            part: 2,
+            words: ['spring', 'May', 'autumn', 'winter'],
+            q: 'Which word is the ODD one out?',
+            type: 'odd',
+            options: ['spring', 'May', 'autumn', 'winter'],
+            correct: 1,
+            hint: 'Three of these are seasons.'
+        },
+        {
+            part: 2,
+            words: ['first', 'two', 'ninth', 'sixth'],
+            q: 'Which word is the ODD one out?',
+            type: 'odd',
+            options: ['first', 'two', 'ninth', 'sixth'],
+            correct: 1,
+            hint: 'Three of these are ordinal numbers.'
+        }
+    ];
+
+    let current = 0;
+
+    function load() {
+        if (current >= questions.length) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            return;
+        }
+
+        const data = questions[current];
+
+        // Badge
+        const badgeHTML = `<span class="q-badge">Exercise ${data.part} · Q${current + 1}/${questions.length}</span>`;
+
+        // Story / display box
+        const story = document.getElementById('storySection');
+
+        if (data.type === 'time') {
+            story.innerHTML = `${badgeHTML}<span class="big">🕐 ${data.display}</span>`;
+            story.style.display = 'block';
+        } else if (data.type === 'odd') {
+            const wordsHTML = data.words.map(w => `<span>${w}</span>`).join('');
+            story.innerHTML = `${badgeHTML}<div class="word-list">${wordsHTML}</div>`;
+            story.style.display = 'block';
+        }
+
+        document.getElementById('qText').innerText = data.q;
+
+        const box = document.getElementById('optBox');
+        box.className = 'options' + (data.options.length > 3 ? ' single-column' : '');
+        box.innerHTML = '';
+
+        // Shuffle options but keep correct index
+        const indexed = data.options.map((opt, i) => ({ text: opt, orig: i }));
+        indexed.sort(() => Math.random() - 0.5);
+
+        indexed.forEach((o) => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = o.text;
+            b.onclick = () => check(o.orig, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        document.querySelectorAll('.btn').forEach(b => b.style.pointerEvents = 'none');
+
+        const data = questions[current];
+        if (choice === data.correct) {
+            btn.classList.add('correct');
+            setTimeout(() => { current++; load(); }, 800);
+        } else {
+            btn.classList.add('wrong');
+            document.querySelectorAll('.btn').forEach(b => {
+                const match = data.options.find((opt, i) => i === data.correct);
+                if (b.innerText === match) b.classList.add('correct');
+            });
+            setTimeout(() => { current++; load(); }, 1200);
+        }
+    }
+
+    load();
+</script>
+
+</body>
+</html>
