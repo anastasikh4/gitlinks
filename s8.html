@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌟 Sentence Scramble · This or That</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+    .quiz-card {
+      background: white;
+      width: 100%;
+      max-width: 620px;
+      padding: 34px 26px;
+      border-radius: 40px;
+      border: 8px solid #38bdf8;
+      box-shadow: 0 15px 0 #0284c7;
+      text-align: center;
+      position: relative;
+    }
+    .mascot {
+      font-size: 3.4rem;
+      margin-bottom: 6px;
+      display: block;
+      animation: pop 0.5s ease;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.6); }
+      60% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    h1 {
+      font-family: 'Fredoka One', 'Comic Sans MS', cursive;
+      color: #0284c7;
+      margin: 0 0 12px;
+      font-size: 1.85rem;
+      letter-spacing: 1px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 22px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #10b981;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .question-container { display: none; }
+    .question-container.active { display: block; animation: slideIn 0.4s ease; }
+
+    @keyframes slideIn {
+      0% { transform: translateX(30px); opacity: 0; }
+      100% { transform: translateX(0); opacity: 1; }
+    }
+
+    .task-label {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .scene {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      display: block;
+      line-height: 1.2;
+    }
+
+    /* -------- Answer zone -------- */
+    .answer-zone {
+      min-height: 100px;
+      background: #f0f9ff;
+      border: 3px dashed #7dd3fc;
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .answer-zone.correct {
+      background: #dcfce7;
+      border-color: #22c55e;
+      border-style: solid;
+    }
+    .answer-zone.wrong {
+      background: #fee2e2;
+      border-color: #ef4444;
+      border-style: solid;
+      animation: shake 0.5s ease;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .placed-word {
+      background: #fff;
+      border: 3px solid #38bdf8;
+      border-radius: 14px;
+      padding: 8px 14px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0284c7;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #38bdf8;
+      transition: 0.15s;
+      font-family: inherit;
+    }
+    .placed-word:hover:not(:disabled) {
+      background: #e0f2fe;
+      transform: translateY(-2px);
+    }
+    .placed-word:active:not(:disabled) {
+      transform: translateY(1px);
+      box-shadow: 0 1px 0 #38bdf8;
+    }
+    .placed-word.revealed {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #14532d;
+      cursor: default;
+    }
+
+    /* -------- Word bank -------- */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 18px;
+      min-height: 50px;
+    }
+    .word-chip {
+      background: #fef3c7;
+      border: 3px solid #fbbf24;
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #92400e;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #d97706;
+      transition: 0.15s;
+      font-family: inherit;
+    }
+    .word-chip:hover:not(:disabled) {
+      background: #fde68a;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 0 #d97706;
+    }
+    .word-chip:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #d97706;
+    }
+    .word-chip:disabled {
+      opacity: 0.25;
+      cursor: default;
+      box-shadow: 0 2px 0 #d97706;
+      transform: translateY(2px);
+    }
+
+    .feedback {
+      min-height: 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #16a34a;
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+    .feedback.wrong-msg { color: #dc2626; }
+
+    .progress {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* -------- Result screen -------- */
+    #result-screen { display: none; }
+    .confetti {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      animation: pop 0.6s ease;
+    }
+    #result-screen h2 {
+      color: #0284c7;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    #result-screen p {
+      font-size: 1.15rem;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .btn-restart {
+      background: #fef3c7;
+      border: 3px solid #f59e0b;
+      color: #92400e;
+      border-radius: 20px;
+      padding: 16px 32px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 5px 0 #d97706;
+      transition: 0.15s;
+    }
+    .btn-restart:hover { transform: translateY(-2px); }
+    .btn-restart:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #d97706;
+    }
+
+    @media (max-width: 420px) {
+      .mascot { font-size: 2.8rem; }
+      .scene { font-size: 2.4rem; }
+      h1 { font-size: 1.45rem; }
+      .placed-word, .word-chip { font-size: 1rem; padding: 7px 11px; }
+      .answer-zone { min-height: 88px; padding: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="quiz-card">
+  <h1>SENTENCE SCRAMBLE · THIS / THAT</h1>
+  <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+
+  <div id="gameArea"></div>
+
+  <div id="result-screen">
+    <div class="confetti">🎉🌈✨</div>
+    <h2>WELL DONE!</h2>
+    <p>You unscrambled all the sentences! 🎊</p>
+    <button class="btn-restart" onclick="location.reload()">Play Again? 🔁</button>
+  </div>
+</div>
+
+<script>
+  /* ============================================================
+     DATA — sentences from the schoolbook photo
+     Exercise 2 · This / That (8) + Exercise 3 · What's this/that (6)
+     Each sentence is split into words, shuffled for the bank.
+     ============================================================ */
+  const questions = [
+    /* ===== Exercise 2 · This / That ===== */
+    { scene: "👦📘", label: "This or That?",  sentence: "This is my book." },
+    { scene: "👧👒", label: "This or That?",  sentence: "That is my hat." },
+    { scene: "👦✈️", label: "This or That?",  sentence: "That is my aeroplane." },
+    { scene: "👦🏫", label: "This or That?",  sentence: "That is my school." },
+    { scene: "👦🪑", label: "This or That?",  sentence: "That is my desk." },
+    { scene: "👧☂️", label: "This or That?",  sentence: "That is my umbrella." },
+    { scene: "👧🎒", label: "This or That?",  sentence: "That is my schoolbag." },
+    { scene: "👧🖍️", label: "This or That?",  sentence: "That is my pencil case." },
+
+    /* ===== Exercise 3 · What's this / that? ===== */
+    { scene: "🧩🖍️", label: "Question & Answer", sentence: "What's this? It's a pencil case." },
+    { scene: "🧩📏", label: "Question & Answer", sentence: "What's that? It's a ruler." },
+    { scene: "🧩🎒", label: "Question & Answer", sentence: "What's that? It's a schoolbag." },
+    { scene: "🧩📕", label: "Question & Answer", sentence: "What's that? It's a book." },
+    { scene: "🧩✏️", label: "Question & Answer", sentence: "What's that? It's a pencil." },
+    { scene: "🧩👦", label: "Question & Answer", sentence: "What's that? It's a boy." }
+  ];
+
+  let current = 0;
+  let placedWords = [];
+  let locked = false;
+
+  /* Fisher-Yates shuffle */
+  function shuffle(arr){
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* Shuffle questions on every reload */
+  const mixedOrder = shuffle(questions);
+
+  function renderCurrent(){
+    const gameArea = document.getElementById('gameArea');
+
+    if (current >= mixedOrder.length) {
+      gameArea.style.display = 'none';
+      document.querySelector('h1').style.display = 'none';
+      document.getElementById('pFill').style.width = '100%';
+      document.getElementById('result-screen').style.display = 'block';
+      return;
+    }
+
+    locked = false;
+    placedWords = [];
+    const q = mixedOrder[current];
+    const correctWords = q.sentence.split(' ');
+
+    /* shuffle words for the bank */
+    const shuffledWords = shuffle(correctWords);
+
+    gameArea.innerHTML = `
+      <div class="question-container active">
+        <div class="task-label">${q.label}</div>
+        <span class="scene">${q.scene}</span>
+
+        <div class="answer-zone" id="answerZone"></div>
+        <div class="feedback" id="feedback"></div>
+
+        <div class="word-bank" id="wordBank">
+          ${shuffledWords.map((w, i) => `<button class="word-chip" data-word="${w}" data-id="w${i}">${w}</button>`).join('')}
+        </div>
+
+        <div class="progress">Question ${current + 1} of ${mixedOrder.length}</div>
+      </div>
+    `;
+
+    document.querySelectorAll('.word-chip').forEach(btn => {
+      btn.onclick = () => placeWord(btn);
+    });
+
+    document.getElementById('pFill').style.width = (current / mixedOrder.length) * 100 + '%';
+  }
+
+  /* -------- Tap a word → move it into the answer zone -------- */
+  function placeWord(chip){
+    if (locked) return;
+    if (chip.disabled) return;
+
+    const answerZone = document.getElementById('answerZone');
+    const word = chip.dataset.word;
+
+    chip.disabled = true;
+    placedWords.push({ word, chipId: chip.dataset.id });
+
+    const placedBtn = document.createElement('button');
+    placedBtn.className = 'placed-word';
+    placedBtn.innerText = word;
+    placedBtn.dataset.chipId = chip.dataset.id;
+    placedBtn.onclick = () => removeWord(placedBtn);
+
+    answerZone.appendChild(placedBtn);
+
+    const total = mixedOrder[current].sentence.split(' ').length;
+    if (placedWords.length === total) {
+      checkAnswer();
+    }
+  }
+
+  /* -------- Tap a placed word → return it to the bank -------- */
+  function removeWord(placedBtn){
+    if (locked) return;
+    const chipId = placedBtn.dataset.chipId;
+    const chip = document.querySelector(`.word-chip[data-id="${chipId}"]`);
+    if (chip) chip.disabled = false;
+    placedWords = placedWords.filter(p => p.chipId !== chipId);
+    placedBtn.remove();
+    document.getElementById('feedback').innerText = '';
+  }
+
+  /* -------- Verify the built sentence -------- */
+  function checkAnswer(){
+    locked = true;
+    const q = mixedOrder[current];
+    const correctWords = q.sentence.split(' ');
+    const builtWords = placedWords.map(p => p.word);
+    const isCorrect = builtWords.join(' ') === correctWords.join(' ');
+
+    const answerZone = document.getElementById('answerZone');
+    const feedback = document.getElementById('feedback');
+
+    if (isCorrect){
+      answerZone.classList.add('correct');
+      feedback.className = 'feedback';
+      feedback.innerText = '✓ Correct! 🎉';
+      setTimeout(() => {
+        current++;
+        renderCurrent();
+      }, 1100);
+    } else {
+      answerZone.classList.add('wrong');
+      feedback.className = 'feedback wrong-msg';
+      feedback.innerText = '✗ Try again! Correct sentence shown below.';
+      /* reveal the correct sentence in green */
+      setTimeout(() => {
+        answerZone.classList.remove('wrong');
+        answerZone.classList.add('correct');
+        answerZone.innerHTML = '';
+        correctWords.forEach(w => {
+          const b = document.createElement('div');
+          b.className = 'placed-word revealed';
+          b.innerText = w;
+          answerZone.appendChild(b);
+        });
+      }, 700);
+      setTimeout(() => {
+        current++;
+        renderCurrent();
+      }, 2200);
+    }
+  }
+
+  renderCurrent();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Spelling Quest: Pick the Right Word 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Quicksand', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(135deg, #fbbf24 0%, #34d399 50%, #60a5fa 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden;
+            padding: 10px;
+        }
+        .app { max-width: 560px; width: 100%; }
+        .card {
+            background: white;
+            color: #1e293b;
+            padding: 30px 24px;
+            border-radius: 40px;
+            border: 8px solid #fbbf24;
+            box-shadow: 0 15px 0 #d97706;
+            text-align: center;
+            position: relative;
+        }
+        .badge {
+            background: #ef4444; color: #fff;
+            padding: 8px 20px; border-radius: 20px;
+            font-weight: bold; display: inline-block;
+            margin-bottom: 12px; font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .progress-bar {
+            width: 100%; height: 14px;
+            background: #e2e8f0; border-radius: 10px;
+            margin: 14px 0 22px; overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+        .progress-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.3s; }
+
+        .visual {
+            font-size: 6rem;
+            display: block;
+            margin-bottom: 8px;
+            animation: pop 0.5s ease;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.6); }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .prompt {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 22px;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .options { display: flex; flex-direction: column; gap: 14px; }
+        .btn {
+            background: #fef3c7;
+            border: 4px solid #fbbf24;
+            border-radius: 22px;
+            padding: 22px 16px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #92400e;
+            cursor: pointer;
+            transition: 0.15s;
+            font-family: inherit;
+            box-shadow: 0 5px 0 #d97706;
+            letter-spacing: 1px;
+        }
+        .btn:hover:not(:disabled) {
+            background: #fde68a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #d97706;
+        }
+        .btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #d97706;
+        }
+        .btn.correct {
+            background: #4def8d !important;
+            border-color: #10b981 !important;
+            color: #064e3b !important;
+            box-shadow: 0 5px 0 #047857 !important;
+        }
+        .btn.wrong {
+            background: #fecaca !important;
+            border-color: #ef4444 !important;
+            color: #7f1d1d !important;
+            box-shadow: 0 5px 0 #b91c1c !important;
+        }
+
+        .win-screen { display: none; }
+        .win-screen h2 {
+            color: #d97706;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 400px) {
+            .visual { font-size: 5rem; }
+            .prompt { font-size: 1.3rem; }
+            .btn { font-size: 1.5rem; padding: 18px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div class="card" id="quizCard">
+        <div id="missionBadge" class="badge">FIND THE RIGHT WORD</div>
+        <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+
+        <div id="gamePlay">
+            <span class="visual" id="visualBox">✏️</span>
+            <div class="prompt" id="promptText">Which word is correct?</div>
+            <div class="options" id="optionsBox"></div>
+        </div>
+
+        <div id="winScreen" class="win-screen">
+            <span class="visual">🏆✏️✨</span>
+            <h2>SUPER SPELLER!</h2>
+            <p style="font-size: 1.15rem; color: #64748b; margin-bottom: 22px;">
+                You can spell all the school words! 🎉
+            </p>
+            <button class="btn" onclick="location.reload()" style="width: 100%;">
+                PLAY AGAIN ✏️
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       A0+ · 12 cards
+       Each card: 1 correct spelling + 1 random misspelling
+       The wrong option is picked from a pool of typical A0 mistakes,
+       so it's DIFFERENT on every play.
+       The two options are shuffled — the correct one can be first OR second.
+       ============================================================ */
+    const questions = [
+        { v: "✏️",    correct: "pencil",     wrongPool: ["pencel", "pensil", "pancil", "pencle"] },
+        { v: "📕",    correct: "book",       wrongPool: ["buk", "boook", "bok", "boock"] },
+        { v: "🧽",    correct: "rubber",     wrongPool: ["rubar", "rubberr", "rubbir", "rubbe"] },
+        { v: "🎒",    correct: "schoolbag",  wrongPool: ["scoolbag", "scholbag", "schoolbagg", "skoolbag"] },
+        { v: "🪑",    correct: "desk",       wrongPool: ["deks", "desc", "dessk", "dask"] },
+        { v: "✈️",    correct: "aeroplane",  wrongPool: ["aeroplan", "airopane", "aeroplaen", "aeropln"] },
+        { v: "🖍️🎒", correct: "pencil case",wrongPool: ["pencil kase", "pensil case", "pencil caise", "pencel case"] },
+        { v: "✏️🔴",  correct: "red",        wrongPool: ["rad", "redd", "reed", "rid"] },
+        { v: "🎒🟡",  correct: "yellow",     wrongPool: ["yelow", "yellou", "yallow", "yeallow"] },
+        { v: "📕⚫",  correct: "black",      wrongPool: ["blak", "blackk", "bleck", "blaack"] },
+        { v: "✈️🟠",  correct: "orange",     wrongPool: ["orenge", "oragne", "orrange", "oreanje"] },
+        { v: "🧽🔵",  correct: "blue",       wrongPool: ["blu", "bleu", "bluee", "bloo"] }
+    ];
+
+    let current = 0;
+    let locked = false;
+
+    /* Fisher-Yates shuffle — proper mix */
+    function shuffle(arr){
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--){
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function loadQuestion() {
+        if (current >= questions.length) {
+            document.getElementById('gamePlay').style.display = 'none';
+            document.getElementById('missionBadge').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            document.getElementById('pFill').style.width = '100%';
+            return;
+        }
+
+        locked = false;
+        const data = questions[current];
+
+        /* emoji — big pop-in */
+        const visual = document.getElementById('visualBox');
+        visual.innerText = data.v;
+        visual.style.animation = 'none';
+        void visual.offsetWidth;
+        visual.style.animation = 'pop 0.5s ease';
+
+        document.getElementById('promptText').innerText = "Which word is correct?";
+
+        /* pick 1 random misspelling */
+        const wrong = data.wrongPool[Math.floor(Math.random() * data.wrongPool.length)];
+
+        /* mix correct + wrong — correct can be 1st or 2nd */
+        const allOptions = shuffle([data.correct, wrong]);
+
+        const box = document.getElementById('optionsBox');
+        box.innerHTML = '';
+
+        allOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => verifySelection(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function verifySelection(choice, btnElement) {
+        if (locked) return;
+        const data = questions[current];
+        const buttons = document.getElementById('optionsBox').querySelectorAll('.btn');
+
+        if (choice === data.correct) {
+            locked = true;
+            buttons.forEach(b => b.disabled = true);
+            btnElement.classList.add('correct');
+            setTimeout(() => {
+                current++;
+                loadQuestion();
+            }, 750);
+        } else {
+            btnElement.classList.add('wrong');
+            btnElement.disabled = true;
+            /* reveal the correct word */
+            buttons.forEach(b => {
+                if (b.innerText === data.correct) b.classList.add('correct');
+            });
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
