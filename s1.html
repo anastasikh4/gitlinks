@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading: My New Neighbourhood</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --success: #00b894;
+            --error: #ff4757;
+            --bg: #f7f9fc;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            max-width: 720px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #333; margin-top: 30px; }
+
+        /* Email box styling */
+        .email-box {
+            background-color: #f1f2f6;
+            border: 1px solid #dfe4ea;
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .email-header {
+            background-color: #dfe4ea;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ced6e0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .email-header .row {
+            display: flex;
+            gap: 10px;
+            padding: 2px 0;
+        }
+        .email-header .label {
+            font-weight: bold;
+            width: 70px;
+            color: #2f3542;
+        }
+        .email-header .value {
+            color: #1e90ff;
+            font-weight: bold;
+        }
+        .email-body {
+            background-color: #ffffff;
+            padding: 20px 22px;
+            line-height: 1.7;
+            font-size: 1rem;
+            color: #2f3542;
+        }
+        .email-body p { margin-bottom: 12px; }
+
+        /* Question cards */
+        .question-card {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #fff;
+            transition: background-color 0.3s;
+            border: 1px solid #eef1f5;
+            font-size: 1rem;
+            gap: 8px;
+        }
+        .question-card.correct { background-color: #e8f8f0; border-color: #b7e8d4; }
+        .question-card.wrong   { background-color: #fff0f0; border-color: #ffc9c9; }
+        .question-card .qnum {
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 42px;
+        }
+        .question-card .qtext { flex: 1; }
+
+        select {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            width: 120px;
+            background: white;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* Example card */
+        .question-card.example {
+            background: #fffbea;
+            border-color: #ffe58f;
+        }
+        .question-card.example .qnum { color: #d48806; }
+        .question-card.example .qtext::after {
+            content: " (example)";
+            color: #d48806;
+            font-size: 0.85rem;
+        }
+
+        /* Score button & result */
+        .actions {
+            margin-top: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 26px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #d94c4c;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #d94c4c; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #d94c4c; }
+
+        .btn-reset {
+            background: #dfe6e9;
+            color: #2f3542;
+            box-shadow: 0 4px 0 #b2bec3;
+        }
+        .btn-reset:hover { box-shadow: 0 6px 0 #b2bec3; }
+        .btn-reset:active { box-shadow: 0 2px 0 #b2bec3; }
+
+        #score-display {
+            font-weight: bold;
+            font-size: 1.05rem;
+            color: #2f3542;
+            background: #f1f2f6;
+            padding: 8px 16px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.3rem; }
+            h2 { font-size: 1.05rem; }
+            .email-body { font-size: 0.95rem; }
+            .question-card { font-size: 0.9rem; padding: 10px; }
+            select { width: 100px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Reading · My New Neighbourhood</h1>
+
+    <h2>Read the email and mark the sentences T (true) or F (false).</h2>
+
+    <!-- Email -->
+    <div class="email-box">
+        <div class="email-header">
+            <div class="row"><span class="label">From:</span><span class="value">Andy</span></div>
+            <div class="row"><span class="label">To:</span><span class="value">Darren</span></div>
+            <div class="row"><span class="label">Subject:</span><span class="value">My new neighbourhood!</span></div>
+        </div>
+        <div class="email-body">
+            <p>Hi, Darren!</p>
+            <p>How are you? My new neighbourhood is great. There are lots of shops and cafés. I even have a sports shop right opposite my house! My Mum is very happy because there is a supermarket and a chemist's on our street. There is also a library next to the supermarket. I go there to read books every weekend.</p>
+            <p>It is really nice here. Why don't you come and stay with me during the school holidays?</p>
+            <p>Love,<br>Andy</p>
+        </div>
+    </div>
+
+    <!-- Example -->
+    <div class="question-card example" data-ans="T">
+        <span class="qnum">e.g.</span>
+        <span class="qtext">The email is about Andy's new neighbourhood.</span>
+        <select disabled>
+            <option value="T" selected>T</option>
+        </select>
+    </div>
+
+    <!-- Questions -->
+    <div id="questions">
+        <div class="question-card" data-ans="F">
+            <span class="qnum">40</span>
+            <span class="qtext">The email is from Darren.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <div class="question-card" data-ans="T">
+            <span class="qnum">41</span>
+            <span class="qtext">Andy likes his new neighbourhood.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <div class="question-card" data-ans="F">
+            <span class="qnum">42</span>
+            <span class="qtext">There are not many shops.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <div class="question-card" data-ans="T">
+            <span class="qnum">43</span>
+            <span class="qtext">There is a sports shop near his house.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <div class="question-card" data-ans="F">
+            <span class="qnum">44</span>
+            <span class="qtext">There isn't a supermarket.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+
+        <div class="question-card" data-ans="T">
+            <span class="qnum">45</span>
+            <span class="qtext">Darren can stay at Andy's new house.</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">--</option>
+                <option value="T">T</option>
+                <option value="F">F</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+        <button class="btn btn-reset" onclick="resetQuiz()">Reset</button>
+        <div id="score-display">Score: 0 / 6</div>
+        <button class="btn" onclick="showScore()">Check Score</button>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       CHECK ANSWER — instant feedback per card
+       ============================================================ */
+    function checkAnswer(selectElement) {
+        const card = selectElement.closest('.question-card');
+        const correctAnswer = card.dataset.ans;
+
+        if (selectElement.value === correctAnswer) {
+            card.classList.remove('wrong');
+            card.classList.add('correct');
+        } else if (selectElement.value === '') {
+            card.classList.remove('correct', 'wrong');
+        } else {
+            card.classList.remove('correct');
+            card.classList.add('wrong');
+        }
+    }
+
+    /* ============================================================
+       COUNT AND SHOW SCORE
+       ============================================================ */
+    function showScore() {
+        const cards = document.querySelectorAll('#questions .question-card');
+        let correct = 0;
+
+        cards.forEach(card => {
+            const select = card.querySelector('select');
+            if (select.value === card.dataset.ans) {
+                card.classList.add('correct');
+                card.classList.remove('wrong');
+                correct++;
+            } else if (select.value !== '') {
+                card.classList.add('wrong');
+                card.classList.remove('correct');
+            }
+        });
+
+        document.getElementById('score-display').textContent =
+            `Score: ${correct} / ${cards.length}`;
+    }
+
+    /* ============================================================
+       RESET
+       ============================================================ */
+    function resetQuiz() {
+        const selects = document.querySelectorAll('#questions select');
+        selects.forEach(s => s.value = '');
+
+        const cards = document.querySelectorAll('#questions .question-card');
+        cards.forEach(c => c.classList.remove('correct', 'wrong'));
+
+        document.getElementById('score-display').textContent =
+            `Score: 0 / ${cards.length}`;
+    }
+</script>
+
+</body>
+</html>
