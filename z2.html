@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tom's Room · Wordwall Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+        --blue: #2563eb;
+        --blue-dark: #1e40af;
+        --purple: #7c3aed;
+        --purple-dark: #5b21b6;
+        --green: #16a34a;
+        --green-dark: #14532d;
+        --green-soft: #dcfce7;
+        --red: #dc2626;
+        --red-soft: #fee2e2;
+        --yellow: #facc15;
+        --orange: #f97316;
+        --pink: #ec4899;
+        --dark: #1f2937;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+        font-family: 'Nunito', sans-serif;
+        background: linear-gradient(135deg, #ffd89b 0%, #c86dd7 50%, #3023ae 100%);
+        background-attachment: fixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 14px;
+        min-height: 100vh;
+        min-height: 100dvh;
+        color: var(--dark);
+        overflow-x: hidden;
+    }
+
+    .quiz-wrap {
+        width: 100%;
+        max-width: 720px;
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 22px 55px rgba(0,0,0,0.3), 0 8px 0 rgba(0,0,0,0.15);
+        overflow: hidden;
+        position: relative;
+        min-height: 520px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ================= HEADER ================= */
+    .header {
+        background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+        padding: 16px 22px 14px;
+        color: white;
+        position: relative;
+    }
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 0.5px;
+    }
+    .brand .logo {
+        background: white;
+        color: var(--purple-dark);
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        font-weight: 800;
+        box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    }
+    .score {
+        background: rgba(255,255,255,0.25);
+        border: 2px solid rgba(255,255,255,0.5);
+        border-radius: 40px;
+        padding: 5px 16px;
+        font-weight: 900;
+        font-size: 1rem;
+        backdrop-filter: blur(6px);
+    }
+
+    .progress-track {
+        height: 14px;
+        background: rgba(255,255,255,0.25);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #fde047, #facc15);
+        width: 0%;
+        border-radius: 8px;
+        transition: width 0.45s cubic-bezier(.4,0,.2,1);
+        position: relative;
+        box-shadow: 0 0 12px rgba(250,204,21,0.6);
+    }
+    .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 2px; left: 4px; right: 4px; height: 4px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 4px;
+    }
+
+    .counter {
+        text-align: center;
+        font-weight: 800;
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.9);
+        margin-top: 8px;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    /* ================= CARD ================= */
+    .card {
+        padding: 34px 28px 30px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        animation: slideIn 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .category {
+        display: inline-block;
+        align-self: center;
+        background: linear-gradient(135deg, #fef3c7, #fcd34d);
+        color: #78350f;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        letter-spacing: 1.5px;
+        padding: 6px 18px;
+        border-radius: 20px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 0 #d97706;
+        text-transform: uppercase;
+    }
+    .category.some { background: linear-gradient(135deg, #fce7f3, #f9a8d4); color: #9d174d; box-shadow: 0 4px 0 #be185d; }
+    .category.there { background: linear-gradient(135deg, #dbeafe, #93c5fd); color: #1e3a8a; box-shadow: 0 4px 0 #1e40af; }
+    .category.can { background: linear-gradient(135deg, #d1fae5, #6ee7b7); color: #065f46; box-shadow: 0 4px 0 #047857; }
+
+    .scene {
+        font-size: 3.6rem;
+        text-align: center;
+        margin-bottom: 14px;
+        line-height: 1;
+        animation: pop 0.5s ease;
+    }
+    @keyframes pop {
+        0% { transform: scale(0.5); }
+        60% { transform: scale(1.15); }
+        100% { transform: scale(1); }
+    }
+
+    .question-text {
+        font-family: 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 1.35rem;
+        line-height: 1.55;
+        color: var(--dark);
+        text-align: center;
+        margin-bottom: 26px;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .question-text .blank {
+        display: inline-block;
+        min-width: 90px;
+        padding: 0 8px;
+        border-bottom: 4px solid var(--purple);
+        color: var(--purple);
+        background: #ede9fe;
+        border-radius: 6px 6px 0 0;
+        font-weight: 900;
+        vertical-align: middle;
+        margin: 0 4px;
+    }
+
+    /* ================= ANSWERS ================= */
+    .answers {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: auto;
+    }
+    .answers.two-col-big {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ans-btn {
+        background: white;
+        border: 3px solid var(--purple);
+        border-bottom-width: 6px;
+        border-bottom-color: var(--purple-dark);
+        border-radius: 16px;
+        padding: 18px 12px;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 800;
+        font-size: 1.05rem;
+        color: var(--purple-dark);
+        cursor: pointer;
+        transition: all 0.1s ease;
+        text-align: center;
+        line-height: 1.3;
+        min-height: 74px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .ans-btn:hover:not(.disabled) {
+        background: #ede9fe;
+        transform: translateY(-2px);
+        border-bottom-width: 8px;
+    }
+    .ans-btn:active:not(.disabled) {
+        transform: translateY(3px);
+        border-bottom-width: 3px;
+    }
+    .ans-btn.correct {
+        background: var(--green-soft);
+        border-color: var(--green);
+        border-bottom-color: var(--green-dark);
+        color: var(--green-dark);
+        animation: pulseGreen 0.5s ease;
+    }
+    .ans-btn.wrong {
+        background: var(--red-soft);
+        border-color: var(--red);
+        border-bottom-color: #991b1b;
+        color: #991b1b;
+        animation: shake 0.4s ease;
+    }
+    .ans-btn.disabled {
+        cursor: default;
+        pointer-events: none;
+    }
+    .ans-btn.faded { opacity: 0.35; }
+
+    @keyframes pulseGreen {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    @keyframes shake {
+        0%, 20%, 60%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70% { transform: translateX(-8px); }
+        20%, 40%, 60% { transform: translateX(8px); }
+    }
+
+    /* ================= FEEDBACK BANNER ================= */
+    .feedback {
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 0;
+        padding: 18px 22px;
+        transform: translateY(120%);
+        transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+        font-weight: 800;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-top: 4px solid;
+        z-index: 10;
+    }
+    .feedback.show { transform: translateY(0); }
+    .feedback.good {
+        background: var(--green-soft);
+        border-color: var(--green);
+        color: var(--green-dark);
+    }
+    .feedback.bad {
+        background: var(--red-soft);
+        border-color: var(--red);
+        color: #991b1b;
+    }
+    .feedback .icon {
+        width: 44px;
+        height: 44px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        font-weight: 900;
+    }
+    .feedback .text { flex: 1; line-height: 1.35; }
+    .feedback .text strong { display: block; font-size: 1.1rem; }
+    .feedback .text small {
+        display: block;
+        font-weight: 600;
+        opacity: 0.8;
+        font-size: 0.85rem;
+        margin-top: 3px;
+    }
+
+    /* ================= START SCREEN ================= */
+    .start-screen {
+        padding: 46px 30px 38px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        animation: slideIn 0.5s ease;
+    }
+    .start-screen .big-icon {
+        font-size: 5rem;
+        margin-bottom: 14px;
+        animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-14px); }
+    }
+    .start-screen h1 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 1.9rem;
+        color: var(--purple-dark);
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+    .start-screen p {
+        font-size: 1rem;
+        color: #6b7280;
+        font-weight: 700;
+        margin-bottom: 24px;
+        max-width: 400px;
+        line-height: 1.55;
+    }
+    .start-btn {
+        background: var(--green);
+        color: white;
+        border: none;
+        border-bottom: 6px solid var(--green-dark);
+        border-radius: 16px;
+        padding: 18px 48px;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 900;
+        font-size: 1.15rem;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+        transition: 0.15s;
+        text-transform: uppercase;
+    }
+    .start-btn:hover {
+        transform: translateY(-3px);
+        border-bottom-width: 9px;
+    }
+    .start-btn:active {
+        transform: translateY(4px);
+        border-bottom-width: 3px;
+    }
+
+    /* ================= RESULT SCREEN ================= */
+    .result {
+        display: none;
+        padding: 40px 28px 36px;
+        text-align: center;
+        animation: slideIn 0.5s ease;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .result.show { display: flex; }
+    .result .trophy {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 2.6rem;
+        color: var(--purple-dark);
+        margin-bottom: 10px;
+        letter-spacing: 3px;
+    }
+    .result h2 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--purple-dark);
+        margin-bottom: 8px;
+    }
+    .result .sub {
+        font-size: 1.05rem;
+        color: #6b7280;
+        font-weight: 700;
+        margin-bottom: 24px;
+    }
+    .result-score {
+        background: linear-gradient(135deg, #fef3c7, #fcd34d);
+        border: 4px solid var(--yellow);
+        border-radius: 22px;
+        padding: 22px 40px;
+        margin-bottom: 24px;
+        box-shadow: 0 7px 0 #d97706;
+    }
+    .result-score .num {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 3.6rem;
+        color: var(--orange);
+        line-height: 1;
+    }
+    .result-score .den {
+        font-size: 1.5rem;
+        color: #92400e;
+        font-weight: 800;
+    }
+    .result-score .label {
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #78350f;
+        font-size: 0.85rem;
+        margin-top: 8px;
+    }
+
+    .result-bars {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 26px;
+    }
+    .result-bars span {
+        display: block;
+        width: 44px;
+        height: 12px;
+        background: var(--yellow);
+        border-radius: 6px;
+        border: 2px solid #d97706;
+    }
+    .result-bars span.empty { background: white; }
+
+    .restart-btn {
+        background: var(--purple);
+        color: white;
+        border: none;
+        border-bottom: 6px solid var(--purple-dark);
+        border-radius: 16px;
+        padding: 16px 42px;
+        font-family: 'Nunito', sans-serif;
+        font-weight: 900;
+        font-size: 1.05rem;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: 0.15s;
+        text-transform: uppercase;
+    }
+    .restart-btn:hover {
+        transform: translateY(-3px);
+        border-bottom-width: 9px;
+    }
+    .restart-btn:active {
+        transform: translateY(4px);
+        border-bottom-width: 3px;
+    }
+
+    /* ================= MOBILE ================= */
+    @media (max-width: 520px) {
+        body { padding: 8px; }
+        .quiz-wrap { border-radius: 20px; min-height: 500px; }
+        .header { padding: 12px 16px 10px; }
+        .brand { font-size: 0.85rem; }
+        .brand .logo { width: 28px; height: 28px; font-size: 0.9rem; }
+        .score { font-size: 0.9rem; padding: 4px 12px; }
+        .card { padding: 24px 18px 22px; }
+        .scene { font-size: 2.8rem; }
+        .question-text { font-size: 1.1rem; }
+        .ans-btn { font-size: 0.95rem; padding: 16px 10px; border-radius: 14px; min-height: 66px; }
+        .answers { gap: 10px; }
+        .start-screen h1 { font-size: 1.5rem; }
+        .result h2 { font-size: 1.6rem; }
+        .result-score .num { font-size: 2.8rem; }
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap" id="quizWrap">
+
+    <!-- HEADER -->
+    <div class="header" id="header" style="display:none;">
+        <div class="header-row">
+            <div class="brand">
+                <div class="logo">W</div>
+                <span>TOM'S ROOM · QUIZ</span>
+            </div>
+            <div class="score">SCORE: <span id="scoreVal">0</span></div>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="counter">
+            Question <span id="qNow">1</span> / <span id="qTotal">16</span>
+        </div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div class="start-screen" id="startScreen">
+        <div class="big-icon">🛏️</div>
+        <h1>Tom's Room Quiz</h1>
+        <p>There is / There are · There isn't / There aren't · Can</p>
+        <button class="start-btn" id="startBtn">Start Quiz</button>
+    </div>
+
+    <!-- QUESTION CARD -->
+    <div class="card" id="card" style="display:none;">
+        <span class="category" id="category">THERE IS / THERE ARE</span>
+        <div class="scene" id="scene">🛏️</div>
+        <div class="question-text" id="question">Loading...</div>
+        <div class="answers" id="answers"></div>
+    </div>
+
+    <!-- FEEDBACK -->
+    <div class="feedback" id="feedback">
+        <div class="icon" id="fbIcon">✓</div>
+        <div class="text" id="fbText">
+            <strong>Correct!</strong>
+            <small>Well done</small>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div class="result" id="result">
+        <div class="trophy" id="trophy">FINISH</div>
+        <h2 id="resultTitle">WELL DONE!</h2>
+        <div class="sub" id="resultSub">You finished the quiz!</div>
+
+        <div class="result-bars" id="resultBars"></div>
+
+        <div class="result-score">
+            <span class="num" id="finalScore">0</span>
+            <span class="den">/ <span id="totalQ">16</span></span>
+            <div class="label">Your Score</div>
+        </div>
+
+        <button class="restart-btn" onclick="location.reload()">Play Again</button>
+    </div>
+
+</div>
+
+<script>
+/* ============================================================
+   QUIZ DATA — 16 questions
+   Q1–Q6  · There is / There are (Tom's room, Exercise 5)
+   Q7–Q11 · There isn't / There aren't (Exercise 6)
+   Q12–Q16 · Can + matching (Exercise 2 + 3)
+   ============================================================ */
+const questions = [
+    /* ---- THERE IS / THERE ARE ---- */
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '🛏️',
+        q: 'There <span class="blank">?</span> a bed next to the door.',
+        options: ['is', 'are'],
+        correct: 'is',
+        explain: 'One thing → there is'
+    },
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '👟⚽',
+        q: 'Under the bed there <span class="blank">?</span> some football boots.',
+        options: ['is', 'are'],
+        correct: 'are',
+        explain: 'Many things → there are'
+    },
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '🖼️🖼️',
+        q: 'There <span class="blank">?</span> two posters on the wall.',
+        options: ['is', 'are'],
+        correct: 'are',
+        explain: 'Two things → there are'
+    },
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '🪑',
+        q: 'There <span class="blank">?</span> a small table next to my bed.',
+        options: ['is', 'are'],
+        correct: 'is',
+        explain: 'One thing → there is'
+    },
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '📚🥪',
+        q: 'On the table there <span class="blank">?</span> some books and a sandwich.',
+        options: ['is', 'are'],
+        correct: 'are',
+        explain: 'Many things → there are'
+    },
+    {
+        cat: 'THERE IS / THERE ARE', catClass: 'there',
+        scene: '⏰',
+        q: 'There <span class="blank">?</span> an alarm clock too.',
+        options: ['is', 'are'],
+        correct: 'is',
+        explain: 'One thing → there is'
+    },
+
+    /* ---- THERE ISN'T / THERE AREN'T ---- */
+    {
+        cat: "THERE ISN'T / THERE AREN'T", catClass: 'there',
+        scene: '💻',
+        q: '<span class="blank">?</span> a computer in my room.',
+        options: ["There isn't", "There aren't"],
+        correct: "There isn't",
+        explain: 'Singular → there isn\'t'
+    },
+    {
+        cat: "THERE ISN'T / THERE AREN'T", catClass: 'there',
+        scene: '📰',
+        q: '<span class="blank">?</span> any posters on the wall.',
+        options: ["There isn't", "There aren't"],
+        correct: "There aren't",
+        explain: 'Plural → there aren\'t'
+    },
+    {
+        cat: "THERE ISN'T / THERE AREN'T", catClass: 'there',
+        scene: '🚪',
+        q: '<span class="blank">?</span> a big wardrobe.',
+        options: ["There isn't", "There aren't"],
+        correct: "There isn't",
+        explain: 'Singular → there isn\'t'
+    },
+    {
+        cat: "THERE ISN'T / THERE AREN'T", catClass: 'there',
+        scene: '📕',
+        q: '<span class="blank">?</span> any books in the bag.',
+        options: ["There isn't", "There aren't"],
+        correct: "There aren't",
+        explain: 'Plural → there aren\'t'
+    },
+    {
+        cat: "THERE ISN'T / THERE AREN'T", catClass: 'there',
+        scene: '🥪',
+        q: '<span class="blank">?</span> any sandwiches on the table.',
+        options: ["There isn't", "There aren't"],
+        correct: "There aren't",
+        explain: 'Plural → there aren\'t'
+    },
+
+    /* ---- CAN ---- */
+    {
+        cat: 'CAN · MATCHING', catClass: 'can',
+        scene: '👧🎸',
+        q: 'Elena can play <span class="blank">?</span>',
+        options: ['the guitar', 'play football'],
+        correct: 'the guitar',
+        explain: 'Elena can play the guitar.'
+    },
+    {
+        cat: 'CAN · MATCHING', catClass: 'can',
+        scene: '👦⚽',
+        q: 'Tom can <span class="blank">?</span>',
+        options: ['the guitar', 'play football'],
+        correct: 'play football',
+        explain: 'Tom can play football.'
+    },
+    {
+        cat: 'CAN · MATCHING', catClass: 'can',
+        scene: '❓🚴',
+        q: 'Can Lucas <span class="blank">?</span>',
+        options: ['ride a bike?', "can't sing"],
+        correct: 'ride a bike?',
+        explain: 'Can Lucas ride a bike?'
+    },
+    {
+        cat: 'CAN · MATCHING', catClass: 'can',
+        scene: '👧🎤',
+        q: 'Amy <span class="blank">?</span>',
+        options: ['ride a bike', "can't sing"],
+        correct: "can't sing",
+        explain: "Amy can't sing."
+    },
+    {
+        cat: 'CAN · QUESTIONS', catClass: 'can',
+        scene: '🏊',
+        q: 'Can you swim?',
+        options: ['Yes, I can.', "No, I can't."],
+        correct: 'Yes, I can.',
+        explain: 'Yes, I can. / No, I can\'t.'
+    }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let current = 0;
+let score = 0;
+let answered = false;
+
+const startScreen = document.getElementById('startScreen');
+const headerEl = document.getElementById('header');
+const cardEl = document.getElementById('card');
+const categoryEl = document.getElementById('category');
+const sceneEl = document.getElementById('scene');
+const questionEl = document.getElementById('question');
+const answersEl = document.getElementById('answers');
+const feedbackEl = document.getElementById('feedback');
+const fbIcon = document.getElementById('fbIcon');
+const fbText = document.getElementById('fbText');
+const progressFill = document.getElementById('progressFill');
+const qNow = document.getElementById('qNow');
+const qTotal = document.getElementById('qTotal');
+const scoreVal = document.getElementById('scoreVal');
+const resultEl = document.getElementById('result');
+
+qTotal.textContent = questions.length;
+document.getElementById('totalQ').textContent = questions.length;
+
+/* ============================================================
+   FISHER–YATES SHUFFLE
+   ============================================================ */
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/* ============================================================
+   START QUIZ
+   ============================================================ */
+document.getElementById('startBtn').addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    headerEl.style.display = 'block';
+    cardEl.style.display = 'flex';
+    renderQuestion();
+});
+
+/* ============================================================
+   RENDER QUESTION
+   ============================================================ */
+function renderQuestion() {
+    answered = false;
+    const q = questions[current];
+
+    progressFill.style.width = (current / questions.length) * 100 + '%';
+    qNow.textContent = current + 1;
+
+    categoryEl.textContent = q.cat;
+    categoryEl.className = 'category ' + (q.catClass || '');
+
+    sceneEl.textContent = q.scene;
+    sceneEl.style.animation = 'none';
+    void sceneEl.offsetWidth;
+    sceneEl.style.animation = 'pop 0.5s ease';
+
+    questionEl.innerHTML = q.q;
+
+    answersEl.innerHTML = '';
+    answersEl.className = 'answers';
+    const shuffled = shuffle(q.options);
+
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'ans-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(btn, opt, q);
+        answersEl.appendChild(btn);
+    });
+
+    feedbackEl.className = 'feedback';
+}
+
+/* ============================================================
+   CHECK ANSWER
+   ============================================================ */
+function checkAnswer(btn, choice, q) {
+    if (answered) return;
+    answered = true;
+
+    const isCorrect = choice === q.correct;
+    const allBtns = answersEl.querySelectorAll('.ans-btn');
+    allBtns.forEach(b => b.classList.add('disabled'));
+
+    if (isCorrect) {
+        score++;
+        scoreVal.textContent = score;
+        btn.classList.add('correct');
+        allBtns.forEach(b => { if (b !== btn) b.classList.add('faded'); });
+
+        fbIcon.textContent = '✓';
+        fbText.innerHTML = '<strong>Correct!</strong><small>' + q.explain + '</small>';
+        feedbackEl.className = 'feedback good show';
+
+        setTimeout(() => {
+            feedbackEl.classList.remove('show');
+            current++;
+            if (current >= questions.length) {
+                showResult();
+            } else {
+                setTimeout(renderQuestion, 300);
+            }
+        }, 1200);
+    } else {
+        btn.classList.add('wrong');
+        allBtns.forEach(b => {
+            if (b.textContent === q.correct) b.classList.add('correct');
+            else if (b !== btn) b.classList.add('faded');
+        });
+
+        fbIcon.textContent = '✕';
+        fbText.innerHTML = '<strong>Not quite…</strong><small>Correct: ' + q.correct + ' — ' + q.explain + '</small>';
+        feedbackEl.className = 'feedback bad show';
+
+        setTimeout(() => {
+            feedbackEl.classList.remove('show');
+            current++;
+            if (current >= questions.length) {
+                showResult();
+            } else {
+                setTimeout(renderQuestion, 300);
+            }
+        }, 1900);
+    }
+}
+
+/* ============================================================
+   RESULT SCREEN
+   ============================================================ */
+function showResult() {
+    cardEl.style.display = 'none';
+    feedbackEl.className = 'feedback';
+    progressFill.style.width = '100%';
+    resultEl.classList.add('show');
+
+    const pct = Math.round((score / questions.length) * 100);
+    document.getElementById('finalScore').textContent = score;
+
+    let trophy, title, sub, bars;
+    if (pct === 100) {
+        trophy = 'PERFECT'; title = 'PERFECT!'; sub = 'You are a grammar star!';
+        bars = 3;
+    } else if (pct >= 80) {
+        trophy = 'EXCELLENT'; title = 'EXCELLENT!'; sub = 'Almost perfect — well done!';
+        bars = 3;
+    } else if (pct >= 60) {
+        trophy = 'GOOD JOB'; title = 'GOOD JOB!'; sub = 'Keep practising!';
+        bars = 2;
+    } else if (pct >= 40) {
+        trophy = 'KEEP GOING'; title = 'KEEP GOING!'; sub = 'Try the quiz again!';
+        bars = 1;
+    } else {
+        trophy = 'TRY AGAIN'; title = 'TRY AGAIN!'; sub = 'Practise makes perfect!';
+        bars = 1;
+    }
+
+    document.getElementById('trophy').textContent = trophy;
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('resultSub').textContent = sub;
+
+    const barsEl = document.getElementById('resultBars');
+    barsEl.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        if (i >= bars) span.classList.add('empty');
+        barsEl.appendChild(span);
+    }
+}
+</script>
+
+</body>
+</html>

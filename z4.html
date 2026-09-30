@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Fill in the Blank — Future Dreams · Duolingo Quiz</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+        --green: #58CC02;
+        --green-dark: #46A302;
+        --green-light: #D7FFB8;
+        --blue: #1CB0F6;
+        --blue-light: #DDF4FF;
+        --red: #FF4B4B;
+        --red-dark: #E03E3E;
+        --red-light: #FFDFE0;
+        --yellow: #FFC800;
+        --yellow-dark: #E5B200;
+        --purple: #CE82FF;
+        --gray: #E5E5E5;
+        --gray-dark: #AFAFAF;
+        --text: #3C3C3C;
+        --text-light: #777777;
+        --bg-soft: #F7F7F7;
+    }
+
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
+        background: linear-gradient(160deg, #F3ECFF 0%, #E8F4FF 50%, #FFF2F9 100%);
+        background-attachment: fixed;
+        color: var(--text);
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ================= TOP BAR ================= */
+    .topbar {
+        position: sticky;
+        top: 0;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 2px solid var(--gray);
+        padding: 12px 16px;
+        padding-top: calc(12px + env(safe-area-inset-top));
+        z-index: 50;
+    }
+
+    .topbar-inner {
+        max-width: 640px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .progress-track {
+        flex: 1;
+        height: 18px;
+        background: var(--gray);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #7BDC4A, #58CC02);
+        border-radius: 10px;
+        transition: width 0.5s cubic-bezier(.4, 0, .2, 1);
+        position: relative;
+    }
+
+    .progress-fill::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 10px;
+        right: 10px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.45);
+        border-radius: 3px;
+    }
+
+    .counter {
+        font-weight: 900;
+        font-size: 14px;
+        color: var(--text-light);
+        flex-shrink: 0;
+        min-width: 46px;
+        text-align: right;
+        letter-spacing: 0.3px;
+    }
+
+    /* ================= MAIN ================= */
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        max-width: 640px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 26px 18px 40px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
+    }
+
+    .question-wrap {
+        flex: 1;
+        animation: slideIn 0.4s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ---- Russian hint ---- */
+    .hint-ru {
+        display: inline-block;
+        background: var(--blue-light);
+        color: #0A5A8A;
+        padding: 8px 18px;
+        border-radius: 20px;
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: 0.3px;
+        margin-bottom: 20px;
+        border: 2px solid #C9E9FF;
+        line-height: 1.5;
+    }
+
+    /* ---- English sentence card ---- */
+    .sentence-card {
+        background: #fff;
+        border: 2px solid var(--gray);
+        border-radius: 22px;
+        padding: 32px 22px;
+        text-align: center;
+        margin-bottom: 28px;
+        box-shadow: 0 6px 0 rgba(0, 0, 0, 0.06), 0 14px 40px rgba(0, 0, 0, 0.07);
+        font-size: 1.4rem;
+        font-weight: 800;
+        line-height: 1.6;
+        color: var(--text);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sentence-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #7c3aed, #ec4899, #f97316);
+    }
+
+    .sentence-card .blank {
+        display: inline-block;
+        min-width: 110px;
+        padding: 0 12px;
+        border-bottom: 4px dashed var(--purple);
+        color: var(--purple);
+        font-weight: 900;
+        text-align: center;
+        vertical-align: middle;
+        margin: 0 4px;
+        transition: all 0.25s;
+    }
+
+    .sentence-card .blank.revealed {
+        border-bottom-color: var(--green);
+        border-bottom-style: solid;
+        color: var(--green-dark);
+        background: var(--green-light);
+        border-radius: 6px 6px 0 0;
+    }
+
+    /* ---- Options grid ---- */
+    .options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .option {
+        background: #fff;
+        border: 2px solid var(--gray);
+        border-bottom-width: 5px;
+        border-bottom-color: var(--gray-dark);
+        border-radius: 16px;
+        padding: 20px 12px;
+        font-family: inherit;
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: var(--text);
+        cursor: pointer;
+        transition: all 0.1s ease;
+        text-align: center;
+        line-height: 1.3;
+        min-height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        word-break: break-word;
+    }
+
+    .option:hover:not(.disabled) {
+        background: var(--bg-soft);
+        border-color: var(--gray-dark);
+    }
+
+    .option:active:not(.disabled) {
+        transform: translateY(3px);
+        border-bottom-width: 2px;
+        margin-bottom: 3px;
+    }
+
+    .option.correct {
+        background: var(--green-light);
+        border-color: var(--green);
+        border-bottom-color: var(--green-dark);
+        color: var(--green-dark);
+        animation: pulseGreen 0.5s ease;
+    }
+
+    .option.wrong {
+        background: var(--red-light);
+        border-color: var(--red);
+        border-bottom-color: var(--red-dark);
+        color: var(--red-dark);
+        animation: shake 0.5s ease;
+    }
+
+    .option.disabled { cursor: default; pointer-events: none; }
+    .option.faded { opacity: 0.35; }
+
+    @keyframes pulseGreen {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        15% { transform: translateX(-10px); }
+        30% { transform: translateX(10px); }
+        45% { transform: translateX(-7px); }
+        60% { transform: translateX(7px); }
+        80% { transform: translateX(-3px); }
+    }
+
+    /* ================= FEEDBACK BANNER ================= */
+    .feedback-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 18px 20px calc(24px + env(safe-area-inset-bottom));
+        transform: translateY(110%);
+        transition: transform 0.35s cubic-bezier(.4, 0, .2, 1);
+        z-index: 40;
+        background: var(--green-light);
+        border-top: 3px solid var(--green);
+    }
+
+    .feedback-banner.show { transform: translateY(0); }
+    .feedback-banner.wrong {
+        background: var(--red-light);
+        border-top-color: var(--red);
+    }
+
+    .feedback-inner {
+        max-width: 640px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .feedback-icon {
+        width: 52px;
+        height: 52px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        flex-shrink: 0;
+        font-weight: 900;
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    .feedback-text { flex: 1; min-width: 0; }
+
+    .feedback-title {
+        font-weight: 900;
+        font-size: 1.1rem;
+        color: var(--green-dark);
+        margin-bottom: 3px;
+    }
+
+    .feedback-banner.wrong .feedback-title { color: var(--red-dark); }
+
+    .feedback-sub {
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        line-height: 1.4;
+    }
+
+    .feedback-banner.wrong .feedback-sub { color: #A51D1D; }
+
+    /* ================= SCREENS ================= */
+    .screen {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        animation: slideIn 0.5s;
+    }
+
+    .mascot {
+        font-size: 100px;
+        margin-bottom: 18px;
+        animation: bounce 2.2s infinite;
+        line-height: 1;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-14px); }
+    }
+
+    .screen h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        color: var(--text);
+        margin-bottom: 12px;
+        letter-spacing: 0.3px;
+    }
+
+    .screen p {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--text-light);
+        margin-bottom: 30px;
+        max-width: 420px;
+        line-height: 1.55;
+    }
+
+    .start-btn {
+        background: var(--green);
+        color: #fff;
+        border: none;
+        border-bottom: 5px solid var(--green-dark);
+        border-radius: 16px;
+        padding: 18px 48px;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 1.15rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 0.12s;
+        max-width: 320px;
+        width: 100%;
+    }
+
+    .start-btn:hover { filter: brightness(1.05); }
+    .start-btn:active {
+        transform: translateY(3px);
+        border-bottom-width: 2px;
+    }
+
+    /* ---- Result screen ---- */
+    .score-ring {
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: conic-gradient(var(--green) var(--pct, 0%), var(--gray) 0%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        position: relative;
+        transition: background 1s;
+    }
+
+    .score-ring::before {
+        content: "";
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .score-ring .inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .score-ring .score-num {
+        font-size: 2.6rem;
+        font-weight: 900;
+        color: var(--green-dark);
+        line-height: 1;
+    }
+
+    .score-ring .score-lbl {
+        font-size: 0.7rem;
+        font-weight: 900;
+        color: var(--text-light);
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-top: 6px;
+    }
+
+    .result-stats {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 26px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .result-stat {
+        background: #fff;
+        border: 2px solid var(--gray);
+        border-radius: 14px;
+        padding: 12px 20px;
+        min-width: 100px;
+    }
+
+    .result-stat .val {
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: var(--yellow-dark);
+    }
+
+    .result-stat .lbl {
+        font-size: 0.7rem;
+        font-weight: 900;
+        color: var(--text-light);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    /* ================= MOBILE ================= */
+    @media (max-width: 520px) {
+        .sentence-card { font-size: 1.15rem; padding: 26px 18px; }
+        .sentence-card .blank { min-width: 90px; }
+        .option { font-size: 0.95rem; padding: 16px 10px; min-height: 66px; border-radius: 14px; }
+        .screen h1 { font-size: 1.6rem; }
+        .mascot { font-size: 80px; }
+        .score-ring { width: 150px; height: 150px; }
+        .score-ring .score-num { font-size: 2.2rem; }
+        main { padding: 20px 14px 40px; }
+        .hint-ru { font-size: 0.88rem; }
+    }
+
+    @media (max-width: 360px) {
+        .sentence-card { font-size: 1.05rem; }
+        .option { font-size: 0.88rem; min-height: 62px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar" style="display: none;">
+    <div class="topbar-inner">
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="counter" id="counter">1 / 10</div>
+    </div>
+</div>
+
+<main id="main"></main>
+
+<div class="feedback-banner" id="feedbackBanner">
+    <div class="feedback-inner">
+        <div class="feedback-icon" id="feedbackIcon">✓</div>
+        <div class="feedback-text">
+            <div class="feedback-title" id="feedbackTitle">Correct!</div>
+            <div class="feedback-sub" id="feedbackSub"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   PHRASES — 10 sentences with a hidden key word
+   ============================================================ */
+const PHRASES = [
+    {
+        ru: 'Что ты сейчас делаешь?',
+        en: 'What are you ___ now?',
+        answer: 'doing',
+        full: 'What are you doing now?'
+    },
+    {
+        ru: 'Я делаю домашнюю работу по естествознанию.',
+        en: "I'm doing my science ___.",
+        answer: 'homework',
+        full: "I'm doing my science homework."
+    },
+    {
+        ru: 'Она, вероятно, идёт на тренировку по теннису.',
+        en: 'She is probably on her way to ___ tennis.',
+        answer: 'practice',
+        full: 'She is probably on her way to practice tennis.'
+    },
+    {
+        ru: 'Она очень усердно тренируется.',
+        en: 'She ___ very hard.',
+        answer: 'practices',
+        full: 'She practices very hard.'
+    },
+    {
+        ru: 'Она станет отличной теннисисткой.',
+        en: 'She will become a great tennis ___.',
+        answer: 'player',
+        full: 'She will become a great tennis player.'
+    },
+    {
+        ru: 'Кем ты хочешь стать, когда вырастешь?',
+        en: 'What do you want to be when you ___ up?',
+        answer: 'grow',
+        full: 'What do you want to be when you grow up?'
+    },
+    {
+        ru: 'Я хочу стать певицей в будущем.',
+        en: 'I want to be a ___ in the future.',
+        answer: 'singer',
+        full: 'I want to be a singer in the future.'
+    },
+    {
+        ru: 'Я хочу работать в зоопарке.',
+        en: 'I want to work at a ___.',
+        answer: 'zoo',
+        full: 'I want to work at a zoo.'
+    },
+    {
+        ru: 'Я хочу кормить животных и заботиться о них.',
+        en: 'I want to feed ___ and take care of them.',
+        answer: 'animals',
+        full: 'I want to feed animals and take care of them.'
+    },
+    {
+        ru: 'Я хочу стать космонавтом.',
+        en: 'I want to be an ___.',
+        answer: 'astronaut',
+        full: 'I want to be an astronaut.'
+    }
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+let order = [];
+let current = 0;
+let score = 0;
+let answered = false;
+
+const main = document.getElementById('main');
+const topbar = document.getElementById('topbar');
+const progressFill = document.getElementById('progressFill');
+const counter = document.getElementById('counter');
+const feedbackBanner = document.getElementById('feedbackBanner');
+const feedbackIcon = document.getElementById('feedbackIcon');
+const feedbackTitle = document.getElementById('feedbackTitle');
+const feedbackSub = document.getElementById('feedbackSub');
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function vibrate(pattern) {
+    if (navigator.vibrate) {
+        try { navigator.vibrate(pattern); } catch (e) {}
+    }
+}
+
+/* ============================================================
+   START SCREEN
+   ============================================================ */
+function showStart() {
+    topbar.style.display = 'none';
+    feedbackBanner.classList.remove('show', 'wrong');
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">🦉</div>
+            <h1>Future Dreams</h1>
+            <p>Choose the missing word to complete each English sentence.<br>
+               You have <b>10 questions</b> — good luck!</p>
+            <button class="start-btn" id="startBtn">Start</button>
+        </div>
+    `;
+    document.getElementById('startBtn').addEventListener('click', startQuiz);
+}
+
+/* ============================================================
+   START QUIZ
+   ============================================================ */
+function startQuiz() {
+    order = shuffle(PHRASES);
+    current = 0;
+    score = 0;
+    topbar.style.display = 'block';
+    renderQuestion();
+}
+
+/* ============================================================
+   RENDER QUESTION
+   ============================================================ */
+function renderQuestion() {
+    answered = false;
+    const q = order[current];
+
+    progressFill.style.width = (current / order.length) * 100 + '%';
+    counter.textContent = (current + 1) + ' / ' + order.length;
+    feedbackBanner.classList.remove('show', 'wrong');
+
+    /* pick 3 wrong answers from the OTHER phrases' correct words */
+    const otherWords = PHRASES
+        .filter(p => p.answer !== q.answer)
+        .map(p => p.answer);
+    const wrongs = shuffle(otherWords).slice(0, 3);
+
+    const options = shuffle([q.answer, ...wrongs]);
+
+    const optionsHTML = options.map(opt => `
+        <button class="option" data-word="${opt}">${opt}</button>
+    `).join('');
+
+    main.innerHTML = `
+        <div class="question-wrap">
+            <div class="hint-ru">🇷🇺 ${q.ru}</div>
+            <div class="sentence-card" id="sentenceCard">
+                ${q.en.replace('___', '<span class="blank" id="blank">?</span>')}
+            </div>
+            <div class="options">${optionsHTML}</div>
+        </div>
+    `;
+
+    main.querySelectorAll('.option').forEach(btn => {
+        btn.addEventListener('click', () => handleAnswer(btn));
+    });
+}
+
+/* ============================================================
+   HANDLE ANSWER
+   ============================================================ */
+function handleAnswer(btn) {
+    if (answered) return;
+    answered = true;
+
+    const q = order[current];
+    const chosen = btn.dataset.word;
+    const isCorrect = (chosen === q.answer);
+    const blank = document.getElementById('blank');
+    const allOpts = main.querySelectorAll('.option');
+
+    allOpts.forEach(b => b.classList.add('disabled'));
+
+    if (isCorrect) {
+        score++;
+        btn.classList.add('correct');
+        allOpts.forEach(b => {
+            if (b !== btn) b.classList.add('faded');
+        });
+
+        blank.textContent = q.answer;
+        blank.classList.add('revealed');
+
+        vibrate(30);
+        showFeedback(true, q);
+
+        setTimeout(() => {
+            feedbackBanner.classList.remove('show');
+            current++;
+            if (current >= order.length) {
+                showEnd();
+            } else {
+                setTimeout(renderQuestion, 300);
+            }
+        }, 1200);
+    } else {
+        btn.classList.add('incorrect');
+        vibrate([60, 80, 60]);
+
+        allOpts.forEach(b => {
+            if (b.dataset.word === q.answer) b.classList.add('correct');
+            else if (b !== btn) b.classList.add('faded');
+        });
+
+        blank.textContent = q.answer;
+        blank.classList.add('revealed');
+
+        showFeedback(false, q);
+
+        setTimeout(() => {
+            feedbackBanner.classList.remove('show');
+            current++;
+            if (current >= order.length) {
+                showEnd();
+            } else {
+                setTimeout(renderQuestion, 300);
+            }
+        }, 1900);
+    }
+}
+
+/* ============================================================
+   FEEDBACK BANNER
+   ============================================================ */
+function showFeedback(isCorrect, q) {
+    if (isCorrect) {
+        feedbackBanner.classList.remove('wrong');
+        feedbackIcon.textContent = '✓';
+        feedbackIcon.style.color = 'var(--green)';
+        feedbackTitle.textContent = 'Correct! 🎉';
+        feedbackSub.textContent = q.full;
+    } else {
+        feedbackBanner.classList.add('wrong');
+        feedbackIcon.textContent = '✕';
+        feedbackIcon.style.color = 'var(--red)';
+        feedbackTitle.textContent = 'Not quite…';
+        feedbackSub.textContent = 'Correct: ' + q.full;
+    }
+    feedbackBanner.classList.add('show');
+}
+
+/* ============================================================
+   END SCREEN
+   ============================================================ */
+function showEnd() {
+    topbar.style.display = 'none';
+    progressFill.style.width = '100%';
+    feedbackBanner.classList.remove('show', 'wrong');
+
+    const total = order.length;
+    const pct = Math.round((score / total) * 100);
+
+    let emoji, title, msg;
+    if (score === total) {
+        emoji = '🏆'; title = 'PERFECT!';
+        msg = 'You are a Future Dreams Master! 🎉';
+    } else if (pct >= 80) {
+        emoji = '🎉'; title = 'GREAT JOB!';
+        msg = 'Almost perfect! Just a few mistakes.';
+    } else if (pct >= 60) {
+        emoji = '👍'; title = 'GOOD EFFORT!';
+        msg = 'Nice work! Review the tricky ones.';
+    } else if (pct >= 40) {
+        emoji = '💪'; title = 'KEEP GOING!';
+        msg = 'Not bad! Try again to improve.';
+    } else {
+        emoji = '🦉'; title = 'KEEP PRACTISING!';
+        msg = 'Read the sentences again and try once more!';
+    }
+
+    main.innerHTML = `
+        <div class="screen">
+            <div class="mascot">${emoji}</div>
+            <h1>${title}</h1>
+            <div class="score-ring" id="scoreRing" style="--pct: 0%;">
+                <div class="inner">
+                    <div class="score-num">${score}/${total}</div>
+                    <div class="score-lbl">Score</div>
+                </div>
+            </div>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <div class="val">${score}</div>
+                    <div class="lbl">Correct</div>
+                </div>
+                <div class="result-stat">
+                    <div class="val">${pct}%</div>
+                    <div class="lbl">Accuracy</div>
+                </div>
+            </div>
+            <p>${msg}</p>
+            <button class="start-btn" id="retryBtn">Try Again</button>
+        </div>
+    `;
+
+    setTimeout(() => {
+        const ring = document.getElementById('scoreRing');
+        if (ring) ring.style.setProperty('--pct', pct + '%');
+    }, 100);
+
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+showStart();
+</script>
+</body>
+</html>

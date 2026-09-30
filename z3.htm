@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Quiz: My Room · There is / There are (Underwater Theme)</title>
+<style>
+  /* Underwater Theme CSS */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom, #0076a3 0%, #00bfff 100%);
+    padding: 20px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Bubble background animation (pure CSS decoration) */
+  .bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: rise 15s infinite ease-in;
+    pointer-events: none;
+  }
+  .bubble:nth-child(2) { width: 15px; height: 15px; animation-duration: 10s; left: 10%; }
+  .bubble:nth-child(3) { width: 25px; height: 25px; animation-duration: 12s; left: 20%; background-color: rgba(255, 255, 255, 0.4); }
+  .bubble:nth-child(4) { width: 18px; height: 18px; animation-duration: 8s; left: 30%; }
+  .bubble:nth-child(5) { width: 22px; height: 22px; animation-duration: 14s; left: 40%; }
+  .bubble:nth-child(6) { width: 16px; height: 16px; animation-duration: 9s; left: 50%; background-color: rgba(255, 255, 255, 0.5); }
+  .bubble:nth-child(7) { width: 20px; height: 20px; animation-duration: 11s; left: 60%; }
+  .bubble:nth-child(8) { width: 24px; height: 24px; animation-duration: 13s; left: 70%; background-color: rgba(255, 255, 255, 0.4); }
+  .bubble:nth-child(9) { width: 19px; height: 19px; animation-duration: 7s; left: 80%; }
+  .bubble:nth-child(10) { width: 21px; height: 21px; animation-duration: 16s; left: 90%; }
+  @keyframes rise {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-120vh) scale(0.7); opacity: 0.1; }
+  }
+
+  .quiz-container {
+    max-width: 620px;
+    width: 100%;
+    background: rgba(0, 50, 100, 0.8);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+    text-align: center;
+    border: 2px solid #4dceff;
+    position: relative;
+    z-index: 10;
+  }
+  h1 {
+    color: #4dceff;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-top: 0;
+    height: 0;
+    overflow: hidden;
+  }
+  #question-number-bubble {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      background-color: #ffeb3b;
+      color: #003366;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-size: 1.2em;
+  }
+  .question-area h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+  .question-area .visual {
+    font-size: 3.4em;
+    margin-bottom: 25px;
+    line-height: 1.2;
+  }
+  .sentence-builder {
+      min-height: 3em;
+      border: 2px dashed #4dceff;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.1em;
+      color: #fff;
+  }
+  .sentence-builder .word-token {
+      background-color: #4dceff;
+      padding: 5px 10px;
+      border: 1px solid #fff;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #003366;
+      font-weight: 700;
+  }
+  .sentence-builder .word-token:hover {
+      background-color: #ffeb3b;
+  }
+  .word-bank button, .options button {
+    padding: 12px 20px;
+    margin: 6px;
+    border: none;
+    border-radius: 30px;
+    background-color: #00bcd4;
+    color: white;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 700;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: 0.15s;
+  }
+  .word-bank button:hover:enabled, .options button:hover:enabled {
+    background-color: #0097a7;
+    transform: translateY(-2px);
+  }
+  .word-bank button:disabled, .options button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+  }
+  .feedback {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    font-size: 1em;
+  }
+  .correct { background-color: #a7f3d0; color: #065f46; }
+  .wrong { background-color: #fecaca; color: #991b1b; }
+  #nextButton {
+    margin-top: 20px;
+    padding: 15px 34px;
+    background-color: #ffeb3b;
+    color: #333;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 800;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: 0.15s;
+  }
+  #nextButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  }
+  #results {
+    font-size: 1.6em;
+    color: #ffeb3b;
+    text-shadow: 1px 1px 0 #000;
+    line-height: 1.6;
+    padding: 20px 0;
+  }
+
+  .correct-animation-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .checkmark-bubble {
+      position: absolute;
+      font-size: 3em;
+      color: #28a745;
+      opacity: 0;
+      animation: popAndFloat 2s forwards ease-out;
+  }
+  @keyframes popAndFloat {
+      0% { transform: translate(0, 0) scale(0); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 1; }
+      100% { transform: translate(var(--endX), var(--endY)) scale(0.5); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div>
+
+    <div id="animation-container" class="correct-animation-container"></div>
+
+<div class="quiz-container">
+  <h1></h1>
+  <div id="question-number-bubble"></div>
+  <div id="quiz-area">
+    <div class="question-area">
+      <h2 id="question-text"></h2>
+      <div class="visual" id="question-visual"></div>
+
+      <div class="sentence-builder" id="sentence-builder-area">
+          <span id="builder-placeholder">Build sentence here...</span>
+      </div>
+
+      <div class="word-bank" id="word-bank-area"></div>
+      <div class="options" id="options-container"></div>
+
+    </div>
+    <div class="feedback" id="feedback-area"></div>
+    <button id="nextButton" onclick="nextAction()">Next ➔</button>
+  </div>
+  <div id="results"></div>
+</div>
+
+<script>
+  /* ============================================================
+     EMOJIS for furniture items (from the picture)
+     ============================================================ */
+  const EMOJI_ARMCHAIR = '🪑';
+  const EMOJI_BATH     = '🛁';
+  const EMOJI_CHAIR    = '🪑';
+  const EMOJI_DESK     = '🖥️';
+  const EMOJI_FRIDGE   = '🧊';
+  const EMOJI_SHELVES  = '📚';
+  const EMOJI_SHOWER   = '🚿';
+  const EMOJI_SOFA     = '🛋️';
+  const EMOJI_WARDROBE = '🚪';
+  const EMOJI_ROOM     = '🛏️';
+  const EMOJI_BOOKS    = '📚📚📚';
+  const EMOJI_TV       = '📺';
+  const EMOJI_SHOES    = '👟';
+  const EMOJI_CAT      = '🐱';
+
+  /* ============================================================
+     QUESTIONS — based on the workbook photo
+     ============================================================ */
+  const questions_data = [
+    /* ---------- LEVEL 1 · VOCABULARY (multiple choice) ---------- */
+    {
+      id: 1, type: 'level1',
+      questionText: 'What can you see in the picture? (a comfortable seat for two)',
+      visual: EMOJI_SOFA,
+      options: ['sofa', 'shower', 'fridge'],
+      answer: 'sofa'
+    },
+    {
+      id: 2, type: 'level1',
+      questionText: 'You wash here',
+      visual: EMOJI_SHOWER,
+      options: ['desk', 'shower', 'wardrobe'],
+      answer: 'shower'
+    },
+    {
+      id: 3, type: 'level1',
+      questionText: 'You keep food cold here',
+      visual: EMOJI_FRIDGE,
+      options: ['fridge', 'chair', 'bath'],
+      answer: 'fridge'
+    },
+    {
+      id: 4, type: 'level1',
+      questionText: 'You put books here',
+      visual: EMOJI_SHELVES,
+      options: ['armchair', 'shelves', 'sofa'],
+      answer: 'shelves'
+    },
+    {
+      id: 5, type: 'level1',
+      questionText: 'You sleep in this room',
+      visual: EMOJI_ROOM,
+      options: ['bedroom', 'kitchen', 'bathroom'],
+      answer: 'bedroom'
+    },
+
+    /* ---------- LEVEL 2 · THERE IS / THERE ARE (fill the gap) ---------- */
+    {
+      id: 6, type: 'level2',
+      questionText: '___ a wardrobe in my bedroom.',
+      visual: EMOJI_WARDROBE,
+      options: ["There's", 'There are', "There isn't"],
+      answer: "There's"
+    },
+    {
+      id: 7, type: 'level2',
+      questionText: '___ three schoolbooks on the desk.',
+      visual: EMOJI_BOOKS,
+      options: ["There's", 'There are', "There aren't"],
+      answer: 'There are'
+    },
+    {
+      id: 8, type: 'level2',
+      questionText: '___ a TV in my room.',
+      visual: EMOJI_TV,
+      options: ["There's", "There aren't", 'There are'],
+      answer: "There isn't"
+    },
+    {
+      id: 9, type: 'level2',
+      questionText: '___ any clothes in the wardrobe.',
+      visual: EMOJI_WARDROBE,
+      options: ["There aren't", "There isn't", 'There is'],
+      answer: "There aren't"
+    },
+    {
+      id: 10, type: 'level2',
+      questionText: '___ a TV in your room? — Yes, there is.',
+      visual: '❓📺',
+      options: ['Is there', 'Are there', 'There is'],
+      answer: 'Is there'
+    },
+    {
+      id: 11, type: 'level2',
+      questionText: '___ there any shoes? — Yes, there are.',
+      visual: EMOJI_SHOES,
+      options: ['Are', 'Is', 'Do'],
+      answer: 'Are'
+    },
+
+    /* ---------- LEVEL 3 · BUILD THE SENTENCE (word bank) ---------- */
+    {
+      id: 12, type: 'level3',
+      targetSentence: "There is a bed in my bedroom.",
+      bank: ['there', 'is', 'a', 'bed', 'in', 'my', 'bedroom', '.'],
+      visual: '🛏️'
+    },
+    {
+      id: 13, type: 'level3',
+      targetSentence: "There are three schoolbooks.",
+      bank: ['there', 'are', 'three', 'schoolbooks', '.'],
+      visual: EMOJI_BOOKS
+    },
+    {
+      id: 14, type: 'level3',
+      targetSentence: "There isn't a TV.",
+      bank: ['there', "isn't", 'a', 'tv', '.'],
+      visual: EMOJI_TV
+    },
+    {
+      id: 15, type: 'level3',
+      targetSentence: "There aren't any clothes.",
+      bank: ['there', "aren't", 'any', 'clothes', '.'],
+      visual: EMOJI_WARDROBE
+    },
+    {
+      id: 16, type: 'level3',
+      targetSentence: "Is there a cat? Yes, there is.",
+      bank: ['is', 'there', 'a', 'cat', '?', 'yes', ',', 'there', 'is', '.'],
+      visual: EMOJI_CAT
+    }
+  ];
+
+  let questions = [...questions_data];
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answered = false;
+  let builtSentence = [];
+  const totalQuestionsCount = questions_data.length;
+
+  const questionNumberBubble = document.getElementById('question-number-bubble');
+  const questionTextElem = document.getElementById('question-text');
+  const questionVisualElem = document.getElementById('question-visual');
+  const optionsContainer = document.getElementById('options-container');
+  const sentenceBuilderArea = document.getElementById('sentence-builder-area');
+  const wordBankArea = document.getElementById('word-bank-area');
+  const feedbackArea = document.getElementById('feedback-area');
+  const nextButton = document.getElementById('nextButton');
+  const animationContainer = document.getElementById('animation-container');
+
+  function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+      showResults();
+      return;
+    }
+
+    questionNumberBubble.textContent = `${currentQuestionIndex + 1}/${questions.length}`;
+
+    answered = false;
+    nextButton.style.display = 'none';
+    feedbackArea.style.display = 'none';
+    optionsContainer.style.display = 'none';
+    wordBankArea.style.display = 'none';
+    sentenceBuilderArea.style.display = 'none';
+    optionsContainer.innerHTML = '';
+    wordBankArea.innerHTML = '';
+    sentenceBuilderArea.innerHTML = '';
+    feedbackArea.classList.remove('correct', 'wrong');
+    builtSentence = [];
+    showPlaceholder();
+
+    const currentQ = questions[currentQuestionIndex];
+    questionTextElem.textContent = currentQ.questionText || '';
+
+    questionVisualElem.textContent = currentQ.visual || '';
+
+    if (currentQ.type === 'level1' || currentQ.type === 'level2') {
+        optionsContainer.style.display = 'block';
+
+        currentQ.options.forEach(option => {
+          const button = document.createElement('button');
+          button.textContent = option;
+          button.onclick = () => checkAnswerStandard(option, currentQ.answer);
+          optionsContainer.appendChild(button);
+        });
+
+    } else if (currentQ.type === 'level3') {
+        wordBankArea.style.display = 'block';
+        sentenceBuilderArea.style.display = 'flex';
+        questionTextElem.textContent = 'Build the sentence:';
+
+        // shuffle the word bank
+        [...currentQ.bank].sort(() => Math.random() - 0.5).forEach(word => {
+            const button = document.createElement('button');
+            button.textContent = word;
+            button.onclick = () => addWord(word, button);
+            wordBankArea.appendChild(button);
+        });
+    }
+  }
+
+  function showPlaceholder() {
+      if (builtSentence.length === 0) {
+          sentenceBuilderArea.innerHTML = '<span id="builder-placeholder">Build sentence here...</span>';
+      }
+  }
+
+  function addWord(word, buttonElement) {
+      if (answered) return;
+      if (builtSentence.length === 0) sentenceBuilderArea.innerHTML = '';
+
+      builtSentence.push(word);
+      const token = document.createElement('span');
+      token.textContent = word;
+      token.classList.add('word-token');
+      token.onclick = () => removeWord(word, token, buttonElement);
+      sentenceBuilderArea.appendChild(token);
+      buttonElement.disabled = true;
+
+      if (builtSentence.length === questions[currentQuestionIndex].bank.length) {
+          checkAnswerBuilder();
+      }
+  }
+
+  function removeWord(word, tokenElement, buttonElement) {
+      if (answered) return;
+      const index = builtSentence.indexOf(word);
+      if (index > -1) {
+          builtSentence.splice(index, 1);
+          tokenElement.remove();
+          if (buttonElement) buttonElement.disabled = false;
+      }
+      showPlaceholder();
+  }
+
+  function checkAnswerBuilder() {
+      if (answered) return;
+      const currentQ = questions[currentQuestionIndex];
+      const userSentence = builtSentence
+        .join(' ')
+        .replace(/\s([,?.!])/g, '$1');
+
+      if (userSentence.toLowerCase() === currentQ.targetSentence.toLowerCase()) {
+          handleCorrect();
+      } else {
+          handleWrong(`Correct sentence: "${currentQ.targetSentence}"`);
+      }
+  }
+
+  function checkAnswerStandard(selectedOption, correctAnswer) {
+      if (answered) return;
+      if (selectedOption === correctAnswer) {
+          handleCorrect();
+      } else {
+          handleWrong(`Correct answer: "${correctAnswer}"`);
+      }
+  }
+
+  function handleCorrect() {
+      answered = true;
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = '✅ Great!';
+      feedbackArea.classList.add('correct');
+      feedbackArea.classList.remove('wrong');
+      nextButton.style.display = 'block';
+      score++;
+      disableAllOptions();
+      triggerCorrectAnimation();
+  }
+
+  function handleWrong(message) {
+      answered = true;
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = `❌ Oops! ${message}`;
+      feedbackArea.classList.add('wrong');
+      feedbackArea.classList.remove('correct');
+      nextButton.style.display = 'block';
+      disableAllOptions();
+  }
+
+  function disableAllOptions() {
+      document.querySelectorAll('.options button, .word-bank button').forEach(button => {
+          button.disabled = true;
+      });
+  }
+
+  function triggerCorrectAnimation() {
+      for (let i = 0; i < 10; i++) {
+          const checkmark = document.createElement('div');
+          checkmark.textContent = '✅';
+          checkmark.classList.add('checkmark-bubble');
+          const startX = window.innerWidth / 2 + (Math.random() - 0.5) * 100 + 'px';
+          const startY = window.innerHeight / 2 + (Math.random() - 0.5) * 100 + 'px';
+          const endX = (Math.random() - 0.5) * window.innerWidth * 0.8 + 'px';
+          const endY = -(window.innerHeight * (0.5 + Math.random() * 0.5)) + 'px';
+          checkmark.style.left = startX;
+          checkmark.style.top = startY;
+          checkmark.style.setProperty('--endX', endX);
+          checkmark.style.setProperty('--endY', endY);
+          animationContainer.appendChild(checkmark);
+          checkmark.addEventListener('animationend', () => {
+              checkmark.remove();
+          });
+      }
+  }
+
+  function nextAction() {
+    currentQuestionIndex++;
+    loadQuestion();
+  }
+
+  function showResults() {
+    document.getElementById('quiz-area').style.display = 'none';
+    questionNumberBubble.style.display = 'none';
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `🌟 Quiz Finished!<br>Your score: ${score} out of ${totalQuestionsCount}!<br>🎉 Great job!`;
+  }
+
+  window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
