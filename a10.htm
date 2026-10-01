@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starlight 3 · Module 1 Quiz · 30 Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --indigo:#4338ca; --indigo-d:#312e81;
+  --violet:#7c3aed; --violet-d:#5b21b6;
+  --pink:#ec4899; --pink-d:#be185d;
+  --green:#16a34a; --green-d:#166534;
+  --red:#ef4444; --red-d:#b91c1c;
+  --yellow:#facc15; --orange:#f97316;
+  --sky:#0ea5e9; --teal:#14b8a6;
+  --ink:#1e1b4b; --muted:#6b7280;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  font-family:'Nunito','Segoe UI',sans-serif;
+  background: linear-gradient(135deg,#4f46e5 0%,#7c3aed 45%,#ec4899 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  min-height:100vh;
+  padding:20px 14px 40px;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:760px;margin:0 auto;}
+
+.card{
+  background:#ffffff;
+  border-radius:26px;
+  padding:32px 28px;
+  box-shadow: 0 22px 50px rgba(0,0,0,.25), 0 6px 0 rgba(0,0,0,.08);
+  animation: pop .35s ease-out;
+}
+@keyframes pop{
+  0%{transform:scale(.95);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+/* ============ START SCREEN ============ */
+.start-hero{text-align:center;margin-bottom:24px;}
+.start-hero .logo{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  color:#7c2d12;
+  padding:8px 22px;
+  border-radius:50px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  letter-spacing:2px;
+  font-size:.78rem;
+  margin-bottom:16px;
+  box-shadow:0 4px 0 rgba(0,0,0,.15);
+}
+.start-hero h1{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:2.1rem;
+  background:linear-gradient(135deg,var(--indigo),var(--pink));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  margin-bottom:8px;
+  line-height:1.15;
+}
+.start-hero p{color:var(--muted);font-weight:700;font-size:.98rem;}
+
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:22px 0 18px;
+}
+.stat-box{
+  background:#f5f3ff;
+  border:2px solid #ddd6fe;
+  border-radius:16px;
+  padding:14px 10px;
+  text-align:center;
+}
+.stat-box .big{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:1.6rem;
+  color:var(--indigo);
+  display:block;
+  line-height:1;
+}
+.stat-box .lbl{
+  font-size:.72rem;font-weight:800;color:#6d28d9;
+  text-transform:uppercase;letter-spacing:1px;margin-top:6px;
+  display:block;
+}
+
+.shuffle-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  background:#fef3c7;
+  border:2px solid #fcd34d;
+  border-radius:16px;
+  padding:14px 18px;
+  margin-bottom:20px;
+  cursor:pointer;
+  user-select:none;
+  transition:.15s;
+}
+.shuffle-toggle:hover{background:#fde68a;}
+.shuffle-toggle .info{display:flex;align-items:center;gap:12px;}
+.shuffle-toggle .ico{
+  width:38px;height:38px;
+  background:linear-gradient(135deg,var(--orange),var(--pink));
+  color:white;
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.2rem;flex-shrink:0;
+}
+.shuffle-toggle .txt{font-weight:800;color:#78350f;font-size:.9rem;line-height:1.3;}
+.shuffle-toggle .txt small{display:block;font-size:.72rem;color:#92400e;font-weight:700;margin-top:2px;}
+.switch{
+  width:52px;height:30px;
+  background:#cbd5e1;
+  border-radius:20px;
+  position:relative;
+  transition:.2s;
+  flex-shrink:0;
+}
+.switch::after{
+  content:"";
+  position:absolute;
+  top:3px;left:3px;
+  width:24px;height:24px;
+  background:white;
+  border-radius:50%;
+  transition:.2s;
+  box-shadow:0 2px 4px rgba(0,0,0,.2);
+}
+.shuffle-toggle.on .switch{background:var(--green);}
+.shuffle-toggle.on .switch::after{left:25px;}
+
+.section-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:22px;
+}
+.sec-btn{
+  background:#faf5ff;
+  border:2px solid #e9d5ff;
+  border-radius:14px;
+  padding:12px 14px;
+  font-family:inherit;
+  font-weight:800;
+  font-size:.85rem;
+  color:var(--violet-d);
+  cursor:pointer;
+  text-align:left;
+  transition:.15s;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sec-btn:hover{
+  background:#f3e8ff;
+  transform:translateY(-2px);
+  border-color:var(--violet);
+}
+.sec-btn .ico{
+  width:32px;height:32px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--violet),var(--pink));
+  color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:.85rem;
+  flex-shrink:0;
+}
+.sec-btn .meta{display:block;font-size:.7rem;color:#9333ea;font-weight:700;margin-top:2px;}
+
+.play-all{
+  width:100%;
+  background:linear-gradient(135deg,var(--green),#059669);
+  color:white;
+  border:none;
+  border-bottom:5px solid var(--green-d);
+  border-radius:18px;
+  padding:18px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:1.1rem;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:.15s;
+  text-transform:uppercase;
+  line-height:1.3;
+}
+.play-all small{
+  display:block;
+  font-size:.72rem;
+  opacity:.9;
+  margin-top:4px;
+  letter-spacing:.5px;
+  font-family:'Nunito',sans-serif;
+  font-weight:800;
+}
+.play-all:hover{transform:translateY(-2px);border-bottom-width:7px;}
+.play-all:active{transform:translateY(2px);border-bottom-width:3px;}
+
+/* ============ QUIZ SCREEN ============ */
+.quiz-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+  color:white;
+  font-weight:800;
+  font-size:.92rem;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.quiz-top .pill{
+  background:rgba(255,255,255,.22);
+  backdrop-filter:blur(6px);
+  padding:6px 14px;
+  border-radius:50px;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.quiz-top .pill .val{color:var(--yellow);font-weight:900;}
+.progress-track{
+  height:14px;
+  background:rgba(255,255,255,.25);
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:18px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.15);
+}
+.progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--yellow),var(--orange));
+  border-radius:20px;
+  width:0%;
+  transition:width .45s cubic-bezier(.4,1.4,.5,1);
+  box-shadow:0 0 12px rgba(250,204,21,.7);
+}
+
+.q-num-badge{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--indigo),var(--violet));
+  color:white;
+  padding:5px 16px;
+  border-radius:50px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:.78rem;
+  letter-spacing:1.2px;
+  margin-bottom:12px;
+}
+.variant-pill{
+  display:inline-block;
+  background:linear-gradient(135deg,var(--sky),var(--teal));
+  color:white;
+  padding:5px 14px;
+  border-radius:50px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:.72rem;
+  letter-spacing:1.5px;
+  margin-bottom:12px;
+  margin-left:8px;
+}
+.q-text{
+  font-size:1.35rem;
+  font-weight:800;
+  line-height:1.5;
+  color:var(--ink);
+  margin-bottom:22px;
+  word-wrap:break-word;
+}
+
+.options{display:flex;flex-direction:column;gap:11px;}
+.opt-btn{
+  background:#f8fafc;
+  border:3px solid #e2e8f0;
+  border-radius:16px;
+  padding:16px 20px;
+  font-family:inherit;
+  font-weight:800;
+  font-size:1.02rem;
+  color:var(--ink);
+  text-align:left;
+  cursor:pointer;
+  transition:.15s;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.opt-btn:hover:not(:disabled){
+  background:#eef2ff;
+  border-color:var(--indigo);
+  transform:translateY(-2px);
+}
+.opt-btn .letter{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;
+  border-radius:10px;
+  background:var(--indigo);
+  color:white;
+  font-weight:900;
+  flex-shrink:0;
+  font-family:'Fredoka',sans-serif;
+}
+.opt-btn.correct{
+  background:#dcfce7 !important;
+  border-color:var(--green) !important;
+  color:var(--green-d);
+  animation:correctPulse .5s ease;
+}
+.opt-btn.correct .letter{background:var(--green);}
+.opt-btn.wrong{
+  background:#fee2e2 !important;
+  border-color:var(--red) !important;
+  color:var(--red-d);
+}
+.opt-btn.wrong .letter{background:var(--red);}
+.opt-btn:disabled{cursor:default;opacity:.95;}
+@keyframes correctPulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.03);}
+  100%{transform:scale(1);}
+}
+
+.feedback{
+  margin-top:18px;
+  padding:14px 18px;
+  border-radius:16px;
+  font-weight:800;
+  font-size:1rem;
+  display:none;
+  align-items:center;
+  gap:12px;
+  animation: slideUp .3s ease-out;
+}
+.feedback.show{display:flex;}
+.feedback.good{background:#dcfce7;color:var(--green-d);border:2px solid var(--green);}
+.feedback.bad{background:#fee2e2;color:var(--red-d);border:2px solid var(--red);}
+.feedback .fb-emoji{font-size:1.8rem;}
+@keyframes slideUp{
+  0%{opacity:0;transform:translateY(12px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+
+.next-btn{
+  margin-top:18px;
+  width:100%;
+  background:linear-gradient(135deg,var(--indigo),var(--violet));
+  color:white;
+  border:none;
+  border-bottom:5px solid var(--indigo-d);
+  border-radius:16px;
+  padding:16px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:1.05rem;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:.15s;
+  text-transform:uppercase;
+  display:none;
+}
+.next-btn.show{display:block;}
+.next-btn:hover{transform:translateY(-2px);border-bottom-width:7px;}
+
+/* ============ RESULT ============ */
+.result-card{text-align:center;}
+.result-emoji{font-size:4.5rem;line-height:1;margin-bottom:8px;animation:bounce 1s ease infinite;}
+@keyframes bounce{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+.result-title{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:1.7rem;
+  color:var(--indigo);
+  margin-bottom:6px;
+}
+.result-msg{
+  color:var(--muted);
+  font-weight:800;
+  margin-bottom:22px;
+  font-size:.98rem;
+}
+.score-circle{
+  width:170px;height:170px;
+  margin:0 auto 22px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--indigo),var(--pink));
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  box-shadow:0 14px 34px rgba(124,58,237,.4);
+  position:relative;
+}
+.score-circle::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:50%;
+  border:3px dashed rgba(255,255,255,.4);
+}
+.score-circle .num{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:3rem;
+  line-height:1;
+}
+.score-circle .of{
+  font-size:.95rem;
+  font-weight:800;
+  opacity:.9;
+}
+.stars{font-size:2rem;letter-spacing:6px;margin-bottom:22px;}
+
+.result-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:24px;
+}
+.result-stats .box{
+  background:#f5f3ff;
+  border:2px solid #ddd6fe;
+  border-radius:14px;
+  padding:14px 8px;
+}
+.result-stats .box .n{
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:1.4rem;
+  color:var(--indigo);
+  display:block;
+}
+.result-stats .box .l{
+  font-size:.7rem;
+  font-weight:800;
+  color:#6d28d9;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{
+  flex:1;
+  min-width:140px;
+  padding:15px;
+  border-radius:16px;
+  font-family:'Fredoka',sans-serif;
+  font-weight:700;
+  font-size:.98rem;
+  letter-spacing:.8px;
+  cursor:pointer;
+  transition:.15s;
+  text-transform:uppercase;
+  border:none;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--green),#059669);
+  color:white;
+  border-bottom:5px solid var(--green-d);
+}
+.btn-secondary{
+  background:#f1f5f9;
+  color:var(--indigo);
+  border-bottom:5px solid #cbd5e1;
+}
+.btn:hover{transform:translateY(-2px);}
+
+.confetti{
+  position:fixed;
+  top:-10px;
+  width:10px;height:14px;
+  pointer-events:none;
+  z-index:999;
+  animation: fall linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(105vh) rotate(720deg);opacity:.6;}
+}
+
+@media(max-width:520px){
+  .start-hero h1{font-size:1.55rem;}
+  .q-text{font-size:1.1rem;}
+  .section-list{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr 1fr;gap:8px;}
+  .stat-box{padding:10px 4px;}
+  .stat-box .big{font-size:1.2rem;}
+  .card{padding:22px 18px;border-radius:20px;}
+  .opt-btn{padding:14px 14px;font-size:.95rem;}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =====================================================
+   SETTINGS
+   ===================================================== */
+const ROUND_SIZE = 30;   // how many questions Play All draws
+
+/* =====================================================
+   QUESTION BANK — ALL MULTIPLE CHOICE
+   ===================================================== */
+const SECTIONS = [
+  {
+    id: 1, title: "Read & Circle", icon: "✏️", desc: "School objects & colours",
+    questions: [
+      {q:'This is a ___ ✏️', pool:['pencil','rubber','ruler','book'], answer:'pencil', distractors:2},
+      {q:'This is a ___ 📕', pool:['book','ruler','pencil','bag'], answer:'book', distractors:2},
+      {q:'This is a ___ 🪑', pool:['chair','desk','table','door'], answer:'chair', distractors:2},
+      {q:'This is a ___ 🎒', pool:['schoolbag','pencil case','ruler','book'], answer:'schoolbag', distractors:2},
+      {q:'This is a ___ 🖊️', pool:['sharpener','rubber','pencil','pen'], answer:'sharpener', distractors:2},
+      {q:'I have got a ___ apple 🍎', pool:['red','green','blue','yellow'], answer:'red', distractors:2},
+      {q:'The ___ is yellow ☀️', pool:['sun','moon','star','cloud'], answer:'sun', distractors:2},
+      {q:'I can see a ___ cat 🐈‍⬛', pool:['black','blue','red','green'], answer:'black', distractors:2},
+      {q:'The ball is ___ ⚽', pool:['purple','brown','pink','grey'], answer:'purple', distractors:3},
+      {q:'My bag is ___ 🎒', pool:['pink','grey','red','blue'], answer:'pink', distractors:2},
+    ]
+  },
+  {
+    id: 2, title: "Read & Colour", icon: "🎨", desc: "Choose the colour",
+    questions: [
+      {q:'a ___ cow 🐄', pool:['white','red','blue','green'], answer:'white', distractors:3},
+      {q:'a ___ dog 🐕', pool:['orange','yellow','black','purple'], answer:'orange', distractors:3},
+      {q:'a ___ ball ⚽', pool:['blue','green','pink','brown'], answer:'blue', distractors:3},
+      {q:'a ___ cat 🐈‍⬛', pool:['black','white','blue','red'], answer:'black', distractors:3},
+    ]
+  },
+  {
+    id: 3, title: "Look & Write", icon: "🔤", desc: "Spell the words",
+    questions: [
+      {q:'Which word is correct? 📕 ', pool:['book','bok','boook','buk'], answer:'book', distractors:2},
+      {q:'Which word is correct? 🧽 ', pool:['rubber','ruber','rubbr','rubar'], answer:'rubber', distractors:2},
+      {q:'Which word is correct? 🪑 ', pool:['desk','desck','desq','disck'], answer:'desk', distractors:2},
+    ]
+  },
+  {
+    id: 4, title: "Read & Match", icon: "🔗", desc: "Commands & pictures",
+    questions: [
+      {q:'"Be quiet!" — which picture?',
+       pool:['🤫 a boy with a finger on his lips','📖 a boy reading a book','🧍 a boy standing','🪑 a boy sitting'],
+       answer:'🤫 a boy with a finger on his lips', distractors:2},
+      {q:'"Open your book!" — which picture?',
+       pool:['📖 a boy reading a book','🧍 a boy standing','🪑 a boy sitting','🤫 a boy with a finger on his lips'],
+       answer:'📖 a boy reading a book', distractors:2},
+      {q:'"Stand up!" — which picture?',
+       pool:['🧍 a boy standing on a chair','🪑 a boy sitting on a chair','📖 a boy reading','🤫 a boy quiet'],
+       answer:'🧍 a boy standing on a chair', distractors:2},
+      {q:'"Sit down!" — which picture?',
+       pool:['🪑 a boy sitting on a chair','🧍 a boy standing','📖 a boy reading','🤫 a boy quiet'],
+       answer:'🪑 a boy sitting on a chair', distractors:2},
+    ]
+  },
+  {
+    id: 5, title: "Tick (√)", icon: "✅", desc: "Correct sentence",
+    questions: [
+      {q:'Какое верное?', pool:['How old are you?','How old you are?','How are you old?','Old how are you?'], answer:'How old are you?', distractors:2},
+      {q:'Какое верное?', pool:["Hi, I'm Emma.","Hi, am Emma.","Hi, I Emma.","Hi, Emma I'm."], answer:"Hi, I'm Emma.", distractors:2},
+      {q:'Какое верное?', pool:['Hi, nice to meet you.','Nice meet you.','Hi, nice meet you.','Nice to meeting you.'], answer:'Hi, nice to meet you.', distractors:2},
+      {q:'Какое верное?', pool:["Who's that?","Who that?","Whose that?","Who is that girl?"], answer:"Who's that?", distractors:2},
+      {q:'Какое верное?', pool:["I'm eight years old.","I'm eight years.","I'm eight old.","I have eight years."], answer:"I'm eight years old.", distractors:2},
+    ]
+  },
+  {
+    id: 6, title: "This is / That is", icon: "👉", desc: "Choose the sentence",
+    questions: [
+      {q:'🪁 (-->) — which sentence?', pool:['This is my kite.','That is my kite.','This my kite.','That my kite.'], answer:'This is my kite.', distractors:2},
+      {q:'🧸 (-->) — which sentence?', pool:['This is my teddy bear.','That is my teddy bear.','This my teddy bear.','That my teddy bear.'], answer:'This is my teddy bear.', distractors:2},
+      {q:'📕 (-------->) — which sentence?', pool:['That is my book.','This is my book.','That my book.','This my book.'], answer:'That is my book.', distractors:2},
+    ]
+  },
+  {
+    id: 7, title: "Count & Write", icon: "🔢", desc: "Numbers & plurals",
+    questions: [
+      {q:'How many chairs? 🪑🪑', pool:['two chairs','two chair','two chares','tow chairs'], answer:'two chairs', distractors:2},
+      {q:'How many sharpeners? 📦📦', pool:['two sharpeners','two sharpener','two sharpeneres','two sharpenerss'], answer:'two sharpeners', distractors:2},
+      {q:'How many planes? ✈️✈️✈️', pool:['three planes','three plane','three planies','tree planes'], answer:'three planes', distractors:2},
+      {q:'How many rubbers? 🧽🧽🧽🧽', pool:['four rubbers','four rubber','four rubberes','for rubbers'], answer:'four rubbers', distractors:2},
+    ]
+  },
+  {
+    id: 8, title: "Whose is it?", icon: "🔑", desc: "Possessive 's",
+    questions: [
+      {q:"🧸 Lee. It's ___ .", pool:["Lee's teddy bear","Lees teddy bear","Lee teddy bear's","Lees' teddy bear"], answer:"Lee's teddy bear", distractors:2},
+      {q:"🖊️ Erlina. It's ___ .", pool:["Erlina's pen","Erlinas pen","Erlina pen's","Erlinas' pen"], answer:"Erlina's pen", distractors:2},
+      {q:"✏️ IMona. It's ___ .", pool:["Mona's pencil","Monas pencil","Mona pencil's","Monas' pencil"], answer:"Mona's pencil", distractors:2},
+      {q:"📕 Emma. It's ___ .", pool:["Emma's book","Emmas book","Emma book's","Emmas' book"], answer:"Emma's book", distractors:2},
+      {q:"🎒 Erlina. It's ___ .", pool:["Erlina's schoolbag","Erlinas schoolbag","Erlina schoolbag's","Erlinas' schoolbag"], answer:"Erlina's schoolbag", distractors:2},
+      {q:"⛄ Iona. It's ___ .", pool:["Mona's snowman","Monas snowman","Mona snowman's","Monas' snowman"], answer:"Mona's snowman", distractors:2},
+    ]
+  },
+  {
+    id: 9, title: "Dialogue", icon: "💬", desc: "Choose the missing word",
+    questions: [
+      {q:"A: Hi, I'm Lee. What's your name?  B: Oh, hi! ___ Emma.", pool:["I'm","Hi","Nice to meet you","Who's"], answer:"I'm", distractors:2},
+      {q:"A: Hi, Emma. ___ .", pool:["Nice to meet you","I'm","Hi","Who's"], answer:"Nice to meet you", distractors:2},
+      {q:"B: Wow! ___ this?", pool:["Who's","I'm","Hi","Nice to meet you"], answer:"Who's", distractors:2},
+      {q:"A: This is Erlina.  B: ___ !", pool:["Hi","Who's","I'm","That"], answer:"Hi", distractors:2},
+    ]
+  },
+  {
+    id: 10, title: "Read & Choose", icon: "🤔", desc: "Pick the right reply",
+    questions: [
+      {q:"A: What's that?  B: ___", pool:["It's a sharpener.","Yes, it is.","It's Mona.","I'm nine."], answer:"It's a sharpener.", distractors:2},
+      {q:"A: Is that Mona's rubber?  B: ___", pool:["No, it's Emma's.","No, it's Emma.","Yes, it's a rubber.","No, it isn't a ruler."], answer:"No, it's Emma's.", distractors:2},
+      {q:"A: What's your name?  B: ___", pool:["I'm Mona.","Nice to meet you.","Yes, I am.","It's a pencil."], answer:"I'm Mona.", distractors:2},
+      {q:"A: Look at Lee's pencil.  B: ___", pool:["It's so funny.","They're so funny.","Yes, it is.","No, it isn't."], answer:"It's so funny.", distractors:2},
+      {q:"A: How old are you?  B: ___", pool:["I'm nine.","I'm Harry.","Yes, I am.","Nice to meet you."], answer:"I'm nine.", distractors:2},
+    ]
+  },
+  {
+    id: 11, title: "Complete the Text", icon: "📖", desc: "Choose the missing word",
+    questions: [
+      {q:"Hi! My name is John. I'm ___ years old.", pool:["nine","nine's","ninth","the nine"], answer:"nine", distractors:2},
+      {q:"This is my ___ Max.", pool:["dog","dogs","dog's","a dog"], answer:"dog", distractors:2},
+      {q:"Max is ___ and white.", pool:["black","a black","blacks","the black"], answer:"black", distractors:2},
+      {q:"I ___ my dog!", pool:["love","loves","loving","to love"], answer:"love", distractors:2},
+    ]
+  },
+  {
+    id: 12, title: "Read & Colour 2", icon: "🌈", desc: "Favourite things",
+    questions: [
+      {q:"🎒 This is my schoolbag. It's ___ .", pool:['red','blue','green','yellow'], answer:'red', distractors:2},
+      {q:"📏 This is my ruler. It's ___ , too.", pool:['red','blue','green','yellow'], answer:'red', distractors:2},
+      {q:"🖊️ This is my yellow ___ .", pool:['sharpener','rubber','pen','book'], answer:'sharpener', distractors:2},
+      {q:"🧽 This is my purple ___ .", pool:['rubber','pen','ruler','book'], answer:'rubber', distractors:2},
+    ]
+  },
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let state = {
+  queue: [],
+  index: 0,
+  score: 0,
+  streak: 0,
+  bestStreak: 0,
+  wrongList: [],
+  selectedSection: null,
+  shuffleMode: true,
+  variantId: 0,
+};
+
+const app = document.getElementById('app');
+const TOTAL_BANK = SECTIONS.reduce((s,x)=>s+x.questions.length,0);
+
+/* =====================================================
+   UTILITIES
+   ===================================================== */
+function shuffleArr(a){
+  a = a.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function buildOptions(q){
+  const wrongs = q.pool.filter(o => o !== q.answer);
+  const picked = shuffleArr(wrongs).slice(0, q.distractors || 3);
+  return shuffleArr([q.answer, ...picked]);
+}
+function flattenBank(sections){
+  const out = [];
+  sections.forEach(s => s.questions.forEach(q => out.push({
+    ...q, section:s.id, sectionTitle:s.title
+  })));
+  return out;
+}
+function buildVariant(sections, shuffleOn, cap){
+  let flat = flattenBank(sections);
+  if(shuffleOn) flat = shuffleArr(flat);
+  if(cap && flat.length > cap) flat = flat.slice(0, cap);
+  // Build options AFTER slicing so each drawn question gets shuffled options
+  flat = flat.map(q => ({
+    ...q,
+    options: shuffleOn ? buildOptions(q)
+                       : [q.answer, ...q.pool.filter(o=>o!==q.answer).slice(0,q.distractors||3)]
+  }));
+  return flat;
+}
+function newVariantId(){
+  return Math.floor(Math.random()*9000)+1000;
+}
+
+/* =====================================================
+   START SCREEN
+   ===================================================== */
+function renderStart(){
+  app.innerHTML = `
+    <div class="card">
+      <div class="start-hero">
+        <span class="logo">⭐ STARLIGHT 3 · MODULE 1</span>
+        <h1>Test Quiz</h1>
+        <p>30 questions · randomized every round</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box"><span class="big">${ROUND_SIZE}</span><span class="lbl">Per round</span></div>
+        <div class="stat-box"><span class="big">${TOTAL_BANK}</span><span class="lbl">Total bank</span></div>
+        <div class="stat-box"><span class="big">12</span><span class="lbl">Sections</span></div>
+      </div>
+
+      <div class="shuffle-toggle ${state.shuffleMode?'on':''}" onclick="toggleShuffle(this)">
+        <div class="info">
+          <div class="ico">🔀</div>
+          <div class="txt">
+            Shuffle mode
+            <small>${state.shuffleMode ? 'Questions & options are randomized' : 'Fixed order & options'}</small>
+          </div>
+        </div>
+        <div class="switch"></div>
+      </div>
+
+      <button class="play-all" onclick="startAll()">
+        ▶ Play ${ROUND_SIZE} random questions
+        <small>picked from all ${TOTAL_BANK} in the bank</small>
+      </button>
+
+      <div style="text-align:center;color:#9ca3af;font-weight:800;font-size:.8rem;margin:22px 0 12px;letter-spacing:2px;">— OR PICK A SECTION —</div>
+
+      <div class="section-list">
+        ${SECTIONS.map(s => `
+          <button class="sec-btn" onclick="startSection(${s.id})">
+            <span class="ico">${s.icon}</span>
+            <span>
+              ${s.title}
+              <span class="meta">${s.questions.length} q · ${s.desc}</span>
+            </span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function toggleShuffle(el){
+  state.shuffleMode = !state.shuffleMode;
+  el.classList.toggle('on', state.shuffleMode);
+  el.querySelector('.txt small').textContent = state.shuffleMode
+    ? 'Questions & options are randomized'
+    : 'Fixed order & options';
+}
+
+/* =====================================================
+   QUIZ
+   ===================================================== */
+function startAll(){
+  state.queue = buildVariant(SECTIONS, state.shuffleMode, ROUND_SIZE);
+  state.selectedSection = null;
+  state.variantId = newVariantId();
+  beginQuiz();
+}
+function startSection(id){
+  const s = SECTIONS.find(x => x.id === id);
+  state.queue = buildVariant([s], state.shuffleMode, null);
+  state.selectedSection = id;
+  state.variantId = newVariantId();
+  beginQuiz();
+}
+function beginQuiz(){
+  state.index = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.wrongList = [];
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = state.queue[state.index];
+  if(!q){ renderResult(); return; }
+
+  const progress = (state.index / state.queue.length) * 100;
+  const qNumText = state.selectedSection
+    ? `${q.sectionTitle} · Q${state.index+1}/${state.queue.length}`
+    : `Question ${state.index+1} / ${state.queue.length}`;
+
+  app.innerHTML = `
+    <div class="quiz-top">
+      <span class="pill">📋 <span class="val">${qNumText}</span></span>
+      <span class="pill">⭐ <span class="val">${state.score}</span></span>
+      ${state.streak >= 2 ? `<span class="pill">🔥 <span class="val">${state.streak}</span></span>` : ''}
+    </div>
+    <div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
+
+    <div class="card">
+      <div>
+        <span class="q-num-badge">${state.selectedSection ? 'SECTION ' + q.section : 'QUESTION ' + (state.index+1)}</span>
+        ${state.shuffleMode ? `<span class="variant-pill">VARIANT #${state.variantId}</span>` : ''}
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next →</button>
+    </div>
+  `;
+
+  const area = document.getElementById('options');
+  const letters = ['A','B','C','D','E'];
+  area.innerHTML = q.options.map((o,i) => `
+    <button class="opt-btn" data-idx="${i}" onclick="answerMC(this)">
+      <span class="letter">${letters[i]}</span>
+      <span>${o}</span>
+    </button>
+  `).join('');
+}
+
+function answerMC(btn){
+  const q = state.queue[state.index];
+  const all = btn.parentElement.querySelectorAll('.opt-btn');
+  all.forEach(b => b.disabled = true);
+  const chosen = q.options[parseInt(btn.dataset.idx)];
+  const isRight = chosen === q.answer;
+  if(isRight){
+    btn.classList.add('correct');
+    state.score++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+  } else {
+    btn.classList.add('wrong');
+    all.forEach(b => {
+      if(q.options[parseInt(b.dataset.idx)] === q.answer) b.classList.add('correct');
+    });
+    state.streak = 0;
+    state.wrongList.push({...q, userCorrect: q.answer});
+  }
+  const fb = document.getElementById('feedback');
+  if(isRight){
+    const praise = ['Awesome!','Perfect!','Well done!','Great job!','Excellent!','Brilliant!'][Math.floor(Math.random()*6)];
+    fb.className = 'feedback good show';
+    fb.innerHTML = `<span class="fb-emoji">🎉</span> <span>${praise}</span>`;
+  } else {
+    fb.className = 'feedback bad show';
+    fb.innerHTML = `<span class="fb-emoji">💡</span> <span>Correct answer: <b>${q.answer}</b></span>`;
+  }
+  document.getElementById('nextBtn').classList.add('show');
+  document.getElementById('nextBtn').focus();
+}
+
+function nextQuestion(){
+  state.index++;
+  renderQuestion();
+}
+
+/* =====================================================
+   RESULT
+   ===================================================== */
+function renderResult(){
+  const total = state.queue.length;
+  const pct = Math.round((state.score / total) * 100);
+  let stars = '⭐';
+  if(pct >= 50) stars = '⭐⭐';
+  if(pct >= 75) stars = '⭐⭐⭐';
+  if(pct >= 90) stars = '⭐⭐⭐⭐';
+  if(pct === 100) stars = '⭐⭐⭐⭐⭐';
+
+  let emoji = '💪', title = 'Keep practising!', msg = 'You can do better — try again!';
+  if(pct >= 50){ emoji = '👍'; title = 'Good job!'; msg = 'Not bad at all! Try to beat your score.'; }
+  if(pct >= 75){ emoji = '🎉'; title = 'Great work!'; msg = 'You really know your stuff!'; }
+  if(pct >= 90){ emoji = '🏆'; title = 'Amazing!'; msg = 'You are a star!'; }
+  if(pct === 100){ emoji = '👑'; title = 'Perfect!'; msg = 'A flawless performance!'; }
+
+  app.innerHTML = `
+    <div class="card result-card">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-title">${title}</div>
+      <div class="result-msg">${msg}</div>
+
+      ${state.shuffleMode ? `<div><span class="variant-pill">VARIANT #${state.variantId}</span></div>` : ''}
+
+      <div class="score-circle">
+        <span class="num">${state.score}</span>
+        <span class="of">out of ${total}</span>
+      </div>
+
+      <div class="stars">${stars}</div>
+
+      <div class="result-stats">
+        <div class="box"><span class="n">${pct}%</span><span class="l">Accuracy</span></div>
+        <div class="box"><span class="n">${state.bestStreak}</span><span class="l">Best streak</span></div>
+        <div class="box"><span class="n">${state.wrongList.length}</span><span class="l">Mistakes</span></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="restart()">🔁 New variant</button>
+        <button class="btn btn-secondary" onclick="renderStart()">🏠 Menu</button>
+      </div>
+    </div>
+  `;
+
+  if(pct >= 75) launchConfetti();
+}
+
+function restart(){
+  if(state.selectedSection) startSection(state.selectedSection);
+  else startAll();
+}
+
+/* =====================================================
+   CONFETTI
+   ===================================================== */
+function launchConfetti(){
+  const colors = ['#facc15','#ec4899','#7c3aed','#14b8a6','#f97316','#0ea5e9'];
+  for(let i=0;i<50;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration = (Math.random()*2 + 2) + 's';
+    c.style.animationDelay = (Math.random()*0.8) + 's';
+    c.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+
+/* INIT */
+renderStart();
+</script>
+</body>
+</html>
