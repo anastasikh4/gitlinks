@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: am / is / are Adventure</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+        }
+        body { 
+            font-family: 'Comic Sans MS', cursive, sans-serif; 
+            background: #a5d6a7; 
+            text-align: center; color: #1b5e20; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 650px; margin: 0 auto; padding: 30px; background: var(--safari-sand); 
+            border-radius: 30px; border: 8px solid var(--jungle-green); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 2;
+        }
+        .level { display: none; }
+        .active { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin: 20px 0; }
+        .card { 
+            padding: 20px; background: white; border-radius: 15px; border: 3px solid var(--jungle-green);
+            font-size: 22px; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .card:hover { background: #fff9c4; }
+        .options-row { display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap; }
+        button { 
+            padding: 15px 30px; font-size: 22px; cursor: pointer; 
+            color: white; border: none; border-radius: 50px; transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn-option { background: #3498db; box-shadow: 0 4px 0 #2980b9; }
+        .btn-option:hover { background: #2980b9; }
+        .btn-option:active { transform: translateY(3px); box-shadow: none; }
+        .btn-option:disabled { background: #bdc3c7; box-shadow: none; cursor: default; }
+
+        .btn-word { 
+            background: #e67e22; box-shadow: 0 4px 0 #d35400; 
+            font-size: 18px; padding: 12px 20px; margin: 5px;
+        }
+        .btn-word:hover { background: #d35400; }
+        .btn-word:active { transform: translateY(3px); box-shadow: none; }
+        .btn-word:disabled { background: #bdc3c7; box-shadow: none; cursor: default; }
+
+        .emoji-display { font-size: 90px; margin: 10px; line-height: 1.2; }
+        .feedback { font-weight: bold; min-height: 30px; margin-top: 10px; font-size: 22px; }
+        #score-board { 
+            font-size: 20px; background: white; padding: 10px 20px; 
+            border-radius: 20px; border: 2px dashed var(--jungle-green); 
+            margin-bottom: 20px; display: inline-block; 
+        }
+
+        .sentence-box {
+            background: white;
+            padding: 18px;
+            border-radius: 15px;
+            border: 3px dashed var(--jungle-green);
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+        .blank {
+            display: inline-block;
+            min-width: 90px;
+            border-bottom: 3px solid #e67e22;
+            color: #e67e22;
+            font-weight: bold;
+            padding: 0 6px;
+        }
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff8e1;
+            border-radius: 15px;
+            border: 2px solid #ffca28;
+        }
+        .word-bank .wb-label {
+            width: 100%;
+            font-size: 14px;
+            color: #e65100;
+            font-weight: bold;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🎓 am / is / are Adventure 🐾</h1>
+    <div id="score-board">Level: <span id="current-level">1</span> | Score: <span id="score">0</span></div>
+
+    <!-- LEVEL 1: Choose the right answer -->
+    <div id="level1" class="level active">
+        <h3>Choose the right answer ✅</h3>
+        <div class="emoji-display" id="l1-emoji">❓</div>
+        <div id="l1-question" style="font-size:20px; font-weight:bold; margin:15px 0;"></div>
+        <div class="options-row" id="l1-options"></div>
+        <div id="l1-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 2: Read and answer -->
+    <div id="level2" class="level">
+        <h3>Read and answer 💬</h3>
+        <div class="emoji-display" id="l2-emoji">❓</div>
+        <div id="l2-question" style="font-size:22px; font-weight:bold; margin:15px 0;"></div>
+        <div class="options-row" id="l2-options"></div>
+        <div id="l2-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 3: Complete the sentences -->
+    <div id="level3" class="level">
+        <h3>Complete the sentences ✏️</h3>
+        <div class="sentence-box" id="l3-sentence"></div>
+        <div class="word-bank" id="l3-words">
+            <div class="wb-label">📘 WORD BOX</div>
+        </div>
+        <div id="l3-feedback" class="feedback"></div>
+    </div>
+
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 40px;">YOU DID IT! 🏆</h2>
+        <p style="font-size:20px;">You finished all the exercises!</p>
+        <div style="font-size: 60px;">🌟🎉🌟</div>
+        <button onclick="location.reload()" style="background: var(--jungle-green); margin-top:20px; box-shadow: 0 4px 0 #1b5e20;">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLvl = 1;
+
+    // ─────────────────────────────────────────────
+    // LEVEL 1 — Choose the right answer
+    // ─────────────────────────────────────────────
+    const level1Data = [
+        { 
+            emoji: "👦❓", 
+            q: "Are you Emma's brother?", 
+            options: ["Yes, I am.", "Yes, I am not.", "No, he isn't."], 
+            ans: "Yes, I am." 
+        },
+        { 
+            emoji: "🎤👩", 
+            q: "Is she a singer?", 
+            options: ["No, she is.", "No, she isn't.", "Yes, they are."], 
+            ans: "No, she isn't." 
+        },
+        { 
+            emoji: "📏❓", 
+            q: "Is it a ruler?", 
+            options: ["Yes, I am.", "Yes, it is.", "No, it isn't."], 
+            ans: "Yes, it is." 
+        },
+        { 
+            emoji: "🧑❓", 
+            q: "Is he Alvin?", 
+            options: ["No, you aren't.", "No, he isn't.", "Yes, she is."], 
+            ans: "No, he isn't." 
+        }
+    ];
+
+    // ─────────────────────────────────────────────
+    // LEVEL 2 — Read and answer
+    // ─────────────────────────────────────────────
+    const level2Data = [
+        { 
+            emoji: "😊😊", 
+            q: "Are they happy?", 
+            options: ["Yes, they are.", "No, they aren't.", "Yes, she is."], 
+            ans: "Yes, they are." 
+        },
+        { 
+            emoji: "👦👦👦", 
+            q: "Are we brothers?", 
+            options: ["Yes, we are.", "No, we aren't.", "Yes, they are."], 
+            ans: "No, we aren't." 
+        },
+        { 
+            emoji: "😢👧", 
+            q: "Is she sad?", 
+            options: ["No, she isn't.", "Yes, she is.", "Yes, he is."], 
+            ans: "Yes, she is." 
+        },
+        { 
+            emoji: "🌸🌼", 
+            q: "Are they flowers?", 
+            options: ["No, they aren't.", "Yes, they are.", "Yes, it is."], 
+            ans: "Yes, they are." 
+        },
+        { 
+            emoji: "👩👩", 
+            q: "Are you sisters?", 
+            options: ["No, we aren't.", "Yes, they are.", "Yes, we are."], 
+            ans: "Yes, we are." 
+        },
+        { 
+            emoji: "🍋", 
+            q: "Is it an orange?", 
+            options: ["Yes, it is.", "No, it isn't.", "No, they aren't."], 
+            ans: "No, it isn't." 
+        }
+    ];
+
+    // ─────────────────────────────────────────────
+    // LEVEL 3 — Complete the sentences
+    // ─────────────────────────────────────────────
+    const level3Data = [
+        { 
+            before: "My father and mother aren't doctors. ", 
+            after: " teachers.", 
+            ans: "They're",
+            options: ["They're", "It's", "He isn't", "She's"]
+        },
+        { 
+            before: "St. Petersburg isn't in Germany. ", 
+            after: " in Russia.", 
+            ans: "It's",
+            options: ["They're", "It's", "is", "are"]
+        },
+        { 
+            before: "Harry isn't happy. ", 
+            after: " sad.", 
+            ans: "He isn't",
+            options: ["He isn't", "It's", "She's", "They're"]
+        },
+        { 
+            before: "My sister is twenty years old. ", 
+            after: " a pretty girl.", 
+            ans: "She's",
+            options: ["He isn't", "It's", "She's", "They're"]
+        },
+        { 
+            before: "Olga and Denis ", 
+            after: " late. Where are they?", 
+            ans: "are",
+            options: ["is", "are", "isn't", "It's"]
+        }
+    ];
+
+    // SALUTE EFFECT
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 20; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 600;
+            const y = Math.random() * 400;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // LEVEL 1
+    // ─────────────────────────────────────────────
+    let l1Index = 0;
+
+    function initLevel1() {
+        if (l1Index >= level1Data.length) return nextLevel();
+        const item = level1Data[l1Index];
+        document.getElementById('l1-emoji').innerText = item.emoji;
+        document.getElementById('l1-question').innerText = item.q;
+        document.getElementById('l1-feedback').innerText = "";
+
+        const box = document.getElementById('l1-options');
+        box.innerHTML = '';
+
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL1(opt, item.ans, btn);
+            box.appendChild(btn);
+        });
+    }
+
+    function checkL1(choice, correct, btn) {
+        const feed = document.getElementById('l1-feedback');
+        if (choice === correct) {
+            btn.style.background = '#4caf50';
+            feed.innerText = "Correct! ✅";
+            feed.style.color = "#2e7d32";
+            score += 10;
+            updateScore();
+            triggerSalute();
+            document.querySelectorAll('#l1-options button').forEach(b => b.disabled = true);
+            l1Index++;
+            setTimeout(initLevel1, 1100);
+        } else {
+            btn.style.background = '#f44336';
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            setTimeout(() => { btn.style.background = ''; btn.style.cssText = ''; }, 700);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // LEVEL 2
+    // ─────────────────────────────────────────────
+    let l2Index = 0;
+
+    function initLevel2() {
+        if (l2Index >= level2Data.length) return nextLevel();
+        const item = level2Data[l2Index];
+        document.getElementById('l2-emoji').innerText = item.emoji;
+        document.getElementById('l2-question').innerText = item.q;
+        document.getElementById('l2-feedback').innerText = "";
+
+        const box = document.getElementById('l2-options');
+        box.innerHTML = '';
+
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.style.background = '#9b59b6';
+            btn.style.boxShadow = '0 4px 0 #6c3483';
+            btn.innerText = opt;
+            btn.onclick = () => checkL2(opt, item.ans, btn);
+            box.appendChild(btn);
+        });
+    }
+
+    function checkL2(choice, correct, btn) {
+        const feed = document.getElementById('l2-feedback');
+        if (choice === correct) {
+            btn.style.background = '#4caf50';
+            btn.style.boxShadow = '0 4px 0 #2e7d32';
+            feed.innerText = "Correct! ✅";
+            feed.style.color = "#2e7d32";
+            score += 10;
+            updateScore();
+            triggerSalute();
+            document.querySelectorAll('#l2-options button').forEach(b => b.disabled = true);
+            l2Index++;
+            setTimeout(initLevel2, 1100);
+        } else {
+            btn.style.background = '#f44336';
+            btn.style.boxShadow = '0 4px 0 #c62828';
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            setTimeout(() => {
+                btn.style.background = '#9b59b6';
+                btn.style.boxShadow = '0 4px 0 #6c3483';
+            }, 700);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // LEVEL 3
+    // ─────────────────────────────────────────────
+    let l3Index = 0;
+
+    function initLevel3() {
+        if (l3Index >= level3Data.length) return showWin();
+        const item = level3Data[l3Index];
+        document.getElementById('l3-sentence').innerHTML = 
+            `${item.before}<span class="blank" id="l3-blank">_____</span>${item.after}`;
+        document.getElementById('l3-feedback').innerText = "";
+
+        const box = document.getElementById('l3-words');
+        box.innerHTML = '<div class="wb-label">📘 WORD BOX</div>';
+
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach(w => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-word';
+            btn.innerText = w;
+            btn.onclick = () => checkL3(w, item.ans, btn);
+            box.appendChild(btn);
+        });
+    }
+
+    function checkL3(choice, correct, btn) {
+        const feed = document.getElementById('l3-feedback');
+        if (choice === correct) {
+            btn.style.background = '#4caf50';
+            btn.style.boxShadow = '0 4px 0 #2e7d32';
+            document.getElementById('l3-blank').innerText = choice;
+            document.getElementById('l3-blank').style.color = '#2e7d32';
+            document.getElementById('l3-blank').style.borderBottomColor = '#2e7d32';
+            feed.innerText = "Correct! ✅";
+            feed.style.color = "#2e7d32";
+            score += 10;
+            updateScore();
+            triggerSalute();
+            document.querySelectorAll('#l3-words button').forEach(b => b.disabled = true);
+            l3Index++;
+            setTimeout(initLevel3, 1100);
+        } else {
+            btn.style.background = '#f44336';
+            btn.style.boxShadow = '0 4px 0 #c62828';
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            setTimeout(() => {
+                btn.style.background = '#e67e22';
+                btn.style.boxShadow = '0 4px 0 #d35400';
+            }, 700);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // NAVIGATION
+    // ─────────────────────────────────────────────
+    function updateScore() { 
+        document.getElementById('score').innerText = score; 
+    }
+
+    function nextLevel() {
+        document.getElementById(`level${currentLvl}`).classList.remove('active');
+        currentLvl++;
+        document.getElementById('current-level').innerText = currentLvl;
+
+        if (currentLvl === 2) initLevel2();
+        if (currentLvl === 3) initLevel3();
+        if (currentLvl > 3) return showWin();
+
+        document.getElementById(`level${currentLvl}`).classList.add('active');
+    }
+
+    function showWin() {
+        document.querySelectorAll('.level').forEach(l => l.classList.remove('active'));
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // START
+    initLevel1();
+</script>
+</body>
+</html>

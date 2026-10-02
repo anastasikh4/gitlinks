@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Quiz: Reading & Writing (Phonetics & Alphabetical Order)</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+    padding: 20px;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .quiz-container {
+    max-width: 700px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    border: 3px solid transparent;
+    border-image: linear-gradient(45deg, #ff0000, #ff9900, #ffff00, #33cc33, #3333ff, #9900cc);
+    border-image-slice: 1;
+  }
+  h1 {
+    color: #4a4a4a;
+    font-size: 2.5em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  }
+  .question-area h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    background: -webkit-linear-gradient(right, #ff0000, #ff9900, #ffff00, #33cc33, #3333ff, #9900cc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .question-area .visual {
+    font-size: 5em;
+    margin-bottom: 25px;
+    animation: pulse 1s infinite alternate;
+  }
+  .sentence-builder {
+      min-height: 3em;
+      border: 2px dashed #999;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.1em;
+      color: #555;
+      text-transform: capitalize;
+  }
+  .sentence-builder .word-token {
+      background-color: #fff;
+      padding: 5px 10px;
+      border: 1px solid #007bff;
+      border-radius: 5px;
+      cursor: pointer;
+  }
+  .word-bank button, .options button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #f093fb, #f5576c);
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  .word-bank button:hover:enabled, .options button:hover:enabled {
+    opacity: 0.8;
+  }
+  .word-bank button:disabled, .options button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+  }
+  .feedback {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .correct { background-color: #e8fadf; color: #28a745; }
+  .wrong { background-color: #f8d7da; color: #dc3545; }
+  #nextButton {
+    margin-top: 20px;
+    padding: 15px 30px;
+    background: linear-gradient(45deg, #2ed573, #1e90ff);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 1.1em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  #results {
+    font-size: 1.8em;
+    color: #ff4757;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+  <h1 id="quiz-title">📖 Reading & Writing Quiz</h1>
+  <div id="quiz-area">
+    <div class="question-area">
+      <h2 id="question-text"></h2>
+      <div class="visual" id="question-visual"></div>
+      
+      <div class="sentence-builder" id="sentence-builder-area">
+          <span id="builder-placeholder">Build sentence here...</span>
+      </div>
+      
+      <div class="word-bank" id="word-bank-area"></div>
+      <div class="options" id="options-container"></div>
+      
+    </div>
+    <div class="feedback" id="feedback-area"></div>
+    <button id="nextButton" onclick="nextAction()">Next Question</button>
+  </div>
+  <div id="results"></div>
+</div>
+
+<script>
+  const questions = [
+    // ========== LEVEL 1: Read Phonetic Script and Write Sentence ==========
+    {
+      id: 1,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➕',
+      questionText: ' [faɪv ənd faɪv ɪz ten]',
+      targetSentence: 'Five and five is ten.',
+      bank: ['Five', 'and', 'five', 'is', 'ten', '.']
+    },
+    {
+      id: 2,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➖',
+      questionText: ' [\'sevən \'maɪnəs θri: ɪz fɔ:]',
+      targetSentence: 'Seven minus three is four.',
+      bank: ['Seven', 'minus', 'three', 'is', 'four', '.']
+    },
+    {
+      id: 3,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➕',
+      questionText: ' [θri: ənd θri: ɪz sɪks]',
+      targetSentence: 'Three and three is six.',
+      bank: ['Three', 'and', 'three', 'is', 'six', '.']
+    },
+    {
+      id: 4,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➖',
+      questionText: ' [ten \'maɪnəs tu: ɪz eɪt]',
+      targetSentence: 'Ten minus two is eight.',
+      bank: ['Ten', 'minus', 'two', 'is', 'eight', '.']
+    },
+
+    // ========== LEVEL 2: More Phonetic Transcription (new) ==========
+    {
+      id: 5,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➕',
+      questionText: '[wʌn ənd fɔ: ɪz faɪv]',
+      targetSentence: 'One and four is five.',
+      bank: ['One', 'and', 'four', 'is', 'five', '.']
+    },
+    {
+      id: 6,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➖',
+      questionText: ' [naɪn \'maɪnəs sɪks ɪz θri:]',
+      targetSentence: 'Nine minus six is three.',
+      bank: ['Nine', 'minus', 'six', 'is', 'three', '.']
+    },
+    {
+      id: 7,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '➕',
+      questionText: ' [tu: ənd eɪt ɪz ten]',
+      targetSentence: 'Two and eight is ten.',
+      bank: ['Two', 'and', 'eight', 'is', 'ten', '.']
+    },
+
+    // ========== LEVEL 3: Alphabetical Order ==========
+    {
+      id: 8,
+      type: 'level3',
+      phase: 'sentence',
+      visual: '🔤',
+      questionText: 'Расставь в алфавитном порядке.',
+      targetSentence: 'Alvin Emma five Harry Mona nine one seven ten two Willow',
+      bank: ['two', 'Willow', 'five', 'Alvin', 'ten', 'seven', 'Harry', 'one', 'Emma', 'nine', 'Mona']
+    },
+    
+  ];
+
+  let currentQuestionIndex = 0;
+  let score = 0;
+  let answered = false;
+  let builtSentence = [];
+
+  const quizTitle = document.getElementById('quiz-title');
+  const questionTextElem = document.getElementById('question-text');
+  const questionVisualElem = document.getElementById('question-visual');
+  const optionsContainer = document.getElementById('options-container');
+  const sentenceBuilderArea = document.getElementById('sentence-builder-area');
+  const wordBankArea = document.getElementById('word-bank-area');
+  const feedbackArea = document.getElementById('feedback-area');
+  const nextButton = document.getElementById('nextButton');
+
+  function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+      showResults();
+      return;
+    }
+
+    answered = false;
+    nextButton.style.display = 'none';
+    feedbackArea.style.display = 'none';
+    feedbackArea.className = 'feedback';
+
+    optionsContainer.style.display = 'none';
+    wordBankArea.style.display = 'none';
+    sentenceBuilderArea.style.display = 'none';
+
+    sentenceBuilderArea.innerHTML = '';
+    builtSentence = [];
+    showPlaceholder();
+
+    const currentQ = questions[currentQuestionIndex];
+    questionVisualElem.textContent = currentQ.visual;
+    
+    optionsContainer.innerHTML = '';
+    wordBankArea.innerHTML = '';
+
+    // All our new questions use the level3 (sentence builder) logic
+    wordBankArea.style.display = 'block';
+    sentenceBuilderArea.style.display = 'flex';
+    questionTextElem.textContent = currentQ.questionText;
+    
+    // Shuffle the word bank for the builder
+    const shuffledBank = [...currentQ.bank].sort(() => Math.random() - 0.5);
+    shuffledBank.forEach(word => {
+        const button = document.createElement('button');
+        button.textContent = word;
+        button.onclick = () => addWord(word, button);
+        wordBankArea.appendChild(button);
+    });
+
+    quizTitle.textContent = `📖 Question ${currentQuestionIndex + 1} of ${questions.length}`;
+  }
+
+  function showPlaceholder() {
+      if (builtSentence.length === 0) {
+          sentenceBuilderArea.innerHTML = '<span id="builder-placeholder">Build sentence here...</span>';
+      }
+  }
+
+  function addWord(word, buttonElement) {
+      if (answered) return;
+
+      if (builtSentence.length === 0) {
+          sentenceBuilderArea.innerHTML = '';
+      }
+      
+      builtSentence.push(word);
+      
+      const token = document.createElement('span');
+      token.textContent = word;
+      token.classList.add('word-token');
+      token.onclick = () => removeWord(word, token, buttonElement);
+      sentenceBuilderArea.appendChild(token);
+      
+      buttonElement.disabled = true;
+      
+      if (builtSentence.length === questions[currentQuestionIndex].bank.length) {
+          checkAnswerBuilder();
+      }
+  }
+
+  function removeWord(word, tokenElement, buttonElement) {
+      if (answered) return;
+
+      const index = builtSentence.indexOf(word);
+      if (index > -1) {
+          builtSentence.splice(index, 1);
+          tokenElement.remove();
+          if (buttonElement) buttonElement.disabled = false;
+      }
+      showPlaceholder();
+  }
+
+  function checkAnswerBuilder() {
+      if (answered) return;
+
+      const currentQ = questions[currentQuestionIndex];
+      // Format the built sentence correctly with spacing (except for punctuation)
+      const userSentence = builtSentence
+        .join(' ')
+        .replace(/\s([,?.!])/g, '$1')
+        .replace(/([,?.!])(\S)/g, '$1 $2');
+        
+      // Case-insensitive comparison
+      if (userSentence.toLowerCase() === currentQ.targetSentence.toLowerCase()) {
+          handleCorrect();
+      } else {
+          handleWrong(`Correct sentence: "${currentQ.targetSentence}"`);
+      }
+  }
+
+  function handleCorrect() {
+      answered = true;
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = '✅ Great!';
+      feedbackArea.classList.add('correct');
+      nextButton.style.display = 'block';
+      score++;
+      disableAllOptions();
+  }
+
+  function handleWrong(message) {
+      answered = true;
+      feedbackArea.style.display = 'block';
+      feedbackArea.innerHTML = `❌ Oops! ${message}`;
+      feedbackArea.classList.add('wrong');
+      nextButton.style.display = 'block';
+      disableAllOptions();
+  }
+
+  function disableAllOptions() {
+      document.querySelectorAll('.word-bank button').forEach(button => {
+          button.disabled = true;
+      });
+  }
+
+  function nextAction() {
+    currentQuestionIndex++;
+    loadQuestion();
+  }
+
+  function showResults() {
+    document.getElementById('quiz-area').style.display = 'none';
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = `🌟 Quiz Finished! Your score: ${score} out of ${questions.length}! 🎉 Great job!`;
+  }
+  
+  window.onload = loadQuestion;
+
+</script>
+
+</body>
+</html>

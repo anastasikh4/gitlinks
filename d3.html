@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Quest: My Family Master</title>
+    <style>
+        :root { 
+            --main-bg: #f0f8ff; 
+            --card-bg: #ffffff; 
+            --gold: #f39c12; 
+            --text: #2c3e50; 
+            --primary: #3498db;
+        }
+        body { 
+            font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; 
+            background: var(--main-bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .game-ui { 
+            background: #2c3e50; 
+            color: white; 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            border: 3px solid var(--gold); 
+            margin-bottom: 20px; 
+            font-size: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+            width: fit-content; 
+        }
+
+        /* ── FAMILY TREE SECTION ── */
+        .family-tree {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 0 #bdc3c7;
+            border: 2px solid #f39c12;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tree-node {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tree-node.children {
+            gap: 50px;
+        }
+        .person {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #fff;
+            border: 2px solid #3498db;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c3e50;
+            box-shadow: 0 3px 0 #cbd5e1;
+            z-index: 2;
+            min-width: 70px;
+            justify-content: center;
+            margin: 4px 0;
+        }
+        .person .icon {
+            font-size: 18px;
+        }
+        .line-h {
+            width: 40px;
+            height: 2px;
+            background: #3498db;
+            z-index: 1;
+        }
+        .line-v {
+            width: 2px;
+            height: 22px;
+            background: #3498db;
+            margin: 0 auto;
+        }
+        
+        .card { 
+            background: var(--card-bg); 
+            width: 100%; 
+            max-width: 500px; 
+            padding: 20px; 
+            border-radius: 20px; 
+            text-align: center; 
+            box-shadow: 0 10px 0 #bdc3c7; 
+            border: 1px solid #eee;
+        }
+        
+        .image-container { 
+            width: 100%; 
+            height: 180px; 
+            background: #fdfbfb; 
+            border-radius: 15px; 
+            margin-bottom: 15px; 
+            overflow: hidden; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 80px; 
+            border: 2px dashed #f39c12;
+        }
+        
+        .sentence { 
+            font-size: 22px; 
+            font-weight: bold; 
+            margin: 15px 0; 
+            min-height: 50px; 
+            color: #2c3e50;
+        }
+        
+        .options { 
+            display: flex; 
+            gap: 10px; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            margin-top: 15px; 
+        }
+        
+        /* Кнопки */
+        .btn { 
+            padding: 12px 20px; 
+            font-size: 18px; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            color: white; 
+            transition: 0.2s; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+        }
+        .btn-choice { background: #3498db; box-shadow: 0 5px 0 #2980b9; }
+        .btn-letter { background: #e67e22; box-shadow: 0 4px 0 #d35400; margin: 5px; min-width: 45px; }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+        .btn:disabled { background: #bdc3c7; box-shadow: none; cursor: default; }
+
+        /* Поле для скрамблинга */
+        .scramble-slots { display: flex; justify-content: center; gap: 8px; margin: 20px 0; min-height: 45px; flex-wrap: wrap; }
+        .slot { 
+            width: 40px; 
+            height: 40px; 
+            border-bottom: 4px solid #2c3e50; 
+            font-size: 24px; 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-transform: uppercase; 
+        }
+
+        .hidden { display: none; }
+        .win-screen { font-size: 30px; color: var(--gold); }
+        .badge { 
+            background: var(--gold); 
+            color: #fff; 
+            padding: 5px 15px; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            margin-bottom: 10px; 
+            display: inline-block; 
+        }
+
+        @media (max-width: 480px) {
+            .tree-node.children { gap: 25px; }
+            .person { font-size: 11px; padding: 3px 8px; min-width: 55px; }
+            .person .icon { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-ui">
+    ⭐ <span id="score">0</span> | Task: <span id="current">1</span>/10
+</div>
+
+<!-- ── FAMILY TREE DIAGRAM ── -->
+<div class="family-tree">
+    <!-- Row 1: Grandparents -->
+    <div class="tree-node">
+        <div class="person"><span class="icon">👴</span>Ben</div>
+        <div class="line-h"></div>
+        <div class="person"><span class="icon">👵</span>Ann</div>
+    </div>
+    <div class="line-v"></div>
+    
+    <!-- Row 2: Parents -->
+    <div class="tree-node">
+        <div class="person"><span class="icon">👨</span>Rob</div>
+        <div class="line-h"></div>
+        <div class="person"><span class="icon">👩</span>Liz</div>
+    </div>
+    <div class="line-v"></div>
+    
+    <!-- Row 3: Children -->
+    <div class="tree-node children">
+        <div class="person"><span class="icon">👧</span>Mimi</div>
+        <div class="person"><span class="icon">👦</span>Joe</div>
+    </div>
+</div>
+
+<div class="card" id="game-card">
+    <div id="mission-badge" class="badge">MISSION 1: WHO IS THIS?</div>
+    <div class="image-container" id="img-box">👨‍👩‍👧‍👦</div>
+    <div class="sentence" id="task-text">Read and answer.</div>
+    
+    <!-- Контейнер для 1 этапа (Выбор) -->
+    <div id="choice-mode" class="options"></div>
+
+    <!-- Контейнер для 2 этапа (Буквы) -->
+    <div id="scramble-mode" class="hidden">
+        <div class="scramble-slots" id="slots"></div>
+        <div class="options" id="letters-box"></div>
+        <button class="btn" style="background:#95a5a6; margin-top:15px; font-size:14px;" onclick="resetWord()">RESET</button>
+    </div>
+</div>
+
+<div id="finish" class="hidden">
+    <div class="card">
+        <h1 class="win-screen">🏆 AWESOME!</h1>
+        <p>You are a real family expert!</p>
+        <div style="font-size: 80px;">👨‍👩‍👧‍👦🚀🏆</div>
+        <button class="btn btn-choice" onclick="location.reload()" style="margin-top:20px;">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let step = 0;
+    let currentGuess = "";
+
+    // ─────────────────────────────────────────────
+    // MISSION 1: Choice (Based on the family tree)
+    // ─────────────────────────────────────────────
+    const choiceData = [
+        { q: "Who is Joe's grandpa?", a: "Ben", img: "👴", options: ["Ben", "Rob", "Joe"] },
+        { q: "Who is Joe's grandma?", a: "Ann", img: "👵", options: ["Ann", "Liz", "Mimi"] },
+        { q: "Who is Joe's dad?", a: "Rob", img: "👨", options: ["Rob", "Ben", "Joe"] },
+        { q: "Who is Joe's mum?", a: "Liz", img: "👩", options: ["Liz", "Ann", "Mimi"] },
+        { q: "Who is Joe's sister?", a: "Mimi", img: "👧", options: ["Mimi", "Liz", "Ann"] }
+    ];
+
+    // ─────────────────────────────────────────────
+    // MISSION 2: Scramble (Based on vocabulary)
+    // ─────────────────────────────────────────────
+    const scrambleWords = [
+        { word: "mum", img: "👩" },
+        { word: "dad", img: "👨" },
+        { word: "sister", img: "👧" },
+        { word: "brother", img: "👦" },
+        { word: "grandpa", img: "👴" }
+    ];
+
+    function update() {
+        document.getElementById('current').innerText = step + 1;
+
+        if (step < 5) {
+            // ЭТАП 1: ВЫБОР
+            renderChoiceMode();
+        } else if (step < 10) {
+            // ЭТАП 2: БУКВЫ
+            renderScrambleMode();
+        } else {
+            // КОНЕЦ
+            document.getElementById('game-card').classList.add('hidden');
+            document.getElementById('finish').classList.remove('hidden');
+        }
+    }
+
+    function renderChoiceMode() {
+        const item = choiceData[step];
+        document.getElementById('mission-badge').innerText = "MISSION 1: WHO IS THIS?";
+        document.getElementById('mission-badge').style.background = "#f39c12";
+        document.getElementById('task-text').innerText = item.q;
+        document.getElementById('img-box').innerText = item.img;
+        
+        // Показываем выбор, скрываем скрамбл
+        document.getElementById('choice-mode').classList.remove('hidden');
+        document.getElementById('scramble-mode').classList.add('hidden');
+
+        const box = document.getElementById('choice-mode');
+        box.innerHTML = '';
+        
+        // Перемешиваем варианты ответов
+        const shuffledOptions = [...item.options].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-choice';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if(opt === item.a) nextStep();
+                else alert("❌ Try again!");
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function renderScrambleMode() {
+        const item = scrambleWords[step - 5];
+        document.getElementById('mission-badge').innerText = "MISSION 2: SPELL THE WORD";
+        document.getElementById('mission-badge').style.background = "#e67e22";
+        document.getElementById('task-text').innerText = "Unscramble the family word:";
+        document.getElementById('img-box').innerText = item.img;
+        
+        // Скрываем выбор, показываем скрамбл
+        document.getElementById('choice-mode').classList.add('hidden');
+        document.getElementById('scramble-mode').classList.remove('hidden');
+
+        currentGuess = "";
+        renderSlots(item.word);
+        renderLetters(item.word);
+    }
+
+    function renderSlots(word) {
+        const box = document.getElementById('slots');
+        box.innerHTML = '';
+        for(let i=0; i < word.length; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            slot.id = 'slot-' + i;
+            box.appendChild(slot);
+        }
+    }
+
+    function renderLetters(word) {
+        const box = document.getElementById('letters-box');
+        box.innerHTML = '';
+        const letters = word.split('').sort(() => Math.random() - 0.5);
+        
+        letters.forEach((char) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-letter';
+            btn.innerText = char;
+            btn.onclick = () => addLetter(char, btn, word);
+            box.appendChild(btn);
+        });
+    }
+
+    function addLetter(char, btn, targetWord) {
+        const nextSlot = document.getElementById('slot-' + currentGuess.length);
+        if(nextSlot) {
+            nextSlot.innerText = char;
+            currentGuess += char;
+            btn.disabled = true;
+            btn.style.opacity = "0.3";
+        }
+
+        if(currentGuess.length === targetWord.length) {
+            if(currentGuess === targetWord) {
+                setTimeout(nextStep, 500);
+            } else {
+                alert("❌ Wrong spelling! Try again.");
+                resetWord();
+            }
+        }
+    }
+
+    function resetWord() {
+        if (step < 5) return;
+        currentGuess = "";
+        const targetWord = scrambleWords[step - 5].word;
+        renderSlots(targetWord);
+        renderLetters(targetWord);
+    }
+
+    function nextStep() {
+        score += 10;
+        document.getElementById('score').innerText = score;
+        step++;
+        update();
+    }
+
+    // Start
+    update();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Family & Numbers Puzzle: Easy Sentences 👨‍👩‍👧‍👦</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: #fff9f0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0;
+        }
+        .game-card {
+            background: white; padding: 30px; border-radius: 35px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center; width: 480px; border: 6px solid #ffbe76;
+        }
+        .visuals {
+            font-size: 60px; height: 100px; display: flex; 
+            justify-content: center; align-items: center; gap: 20px;
+            background: #fdfbfb; border-radius: 20px; margin-bottom: 20px;
+            border: 2px dashed #ffbe76;
+        }
+        .question-text { color: #ff793f; font-size: 22px; font-weight: bold; margin-bottom: 10px; }
+        
+        .word-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0; min-height: 50px; }
+        .answer-zone { 
+            background: #f1f2f6; border: 3px dashed #ced6e0; 
+            padding: 15px; border-radius: 15px; min-height: 60px;
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+        }
+        .word-btn {
+            background: #48dbfb; color: white; padding: 10px 18px;
+            border-radius: 12px; cursor: pointer; font-size: 18px;
+            font-weight: bold; border: none; box-shadow: 0 4px #2e86de;
+            transition: 0.1s;
+        }
+        .word-btn:active { transform: translateY(2px); box-shadow: 0 2px; }
+        .word-btn.used { opacity: 0.3; pointer-events: none; }
+
+        .controls { margin-top: 25px; display: flex; gap: 10px; }
+        button#checkBtn { 
+            background: #1dd1a1; flex: 2; padding: 15px; 
+            color: white; border: none; border-radius: 15px; 
+            font-size: 20px; font-weight: bold; cursor: pointer;
+        }
+        button#clearBtn { 
+            background: #ff6b6b; flex: 1; padding: 15px; 
+            color: white; border: none; border-radius: 15px; 
+            font-size: 20px; font-weight: bold; cursor: pointer;
+        }
+        #result-msg { margin-top: 15px; font-size: 22px; font-weight: bold; min-height: 30px; }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <h1>🧩 Easy Sentence Puzzle</h1>
+    <div class="visuals">
+        <span id="char1">👩</span>
+        <span id="char2">🗣️</span>
+    </div>
+
+    <div class="question-text" id="questionText">Question: "Who's this?"</div>
+    <div style="font-size: 18px; color: #777;">Tap the words to answer:</div>
+
+    <div class="answer-zone" id="answerZone"></div>
+
+    <div class="word-bank" id="wordBank"></div>
+
+    <div class="controls">
+        <button id="clearBtn" onclick="clearAnswer()">Reset 🔄</button>
+        <button id="checkBtn" onclick="checkAnswer()">Check! ✅</button>
+    </div>
+
+    <div id="result-msg"></div>
+</div>
+
+<script>
+    // ---- Simple sentences, no punctuation ----
+    // extra: one distractor word added to the bank (not needed for the answer)
+    const levels = [
+        // Family
+        { char1: "👩", char2: "🗣️", question: "Who's this?", sentence: ["She's", "my", "mum"] },
+        { char1: "👨", char2: "🗣️", question: "Who's this?", sentence: ["He's", "my", "dad"] },
+        { char1: "👧", char2: "🗣️", question: "Who's this?", sentence: ["She's", "my", "sister"] },
+        { char1: "👦", char2: "🗣️", question: "Who's this?", sentence: ["He's", "my", "brother"] },
+        
+        // Numbers — with one extra distractor number in the bank
+        { char1: "🔢", char2: "1️⃣1️⃣", question: "What number is it?", sentence: ["It", "is", "eleven"], extra: "thirteen" },
+        { char1: "🔢", char2: "1️⃣2️⃣", question: "What number is it?", sentence: ["It", "is", "twelve"], extra: "eighteen" },
+        { char1: "🔢", char2: "1️⃣5️⃣", question: "What number is it?", sentence: ["It", "is", "fifteen"], extra: "fourteen" },
+        { char1: "🔢", char2: "2️⃣0️⃣", question: "What number is it?", sentence: ["It", "is", "twenty"], extra: "nineteen" }
+    ];
+
+    let currentLvl = 0;
+    let selectedWords = [];
+
+    function initLevel() {
+        const lvl = levels[currentLvl];
+        
+        document.getElementById('char1').innerText = lvl.char1;
+        document.getElementById('char2').innerText = lvl.char2;
+        document.getElementById('questionText').innerText = `Question: "${lvl.question}"`;
+        document.getElementById('result-msg').innerText = "";
+        
+        selectedWords = [];
+        render();
+
+        // Build the bank: required words + optional distractor
+        let bankWords = [...lvl.sentence];
+        if (lvl.extra) bankWords.push(lvl.extra);
+
+        const shuffled = bankWords.sort(() => Math.random() - 0.5);
+        const bank = document.getElementById('wordBank');
+        bank.innerHTML = "";
+        
+        shuffled.forEach((word) => {
+            const btn = document.createElement('button');
+            btn.className = 'word-btn';
+            btn.innerText = word;
+            btn.onclick = () => selectWord(word, btn);
+            bank.appendChild(btn);
+        });
+    }
+
+    function selectWord(word, btn) {
+        selectedWords.push(word);
+        btn.classList.add('used');
+        renderAnswer();
+    }
+
+    function renderAnswer() {
+        const zone = document.getElementById('answerZone');
+        zone.innerHTML = "";
+        selectedWords.forEach(word => {
+            const span = document.createElement('span');
+            span.className = 'word-btn';
+            span.style.background = "#ffbe76";
+            span.style.boxShadow = "0 4px #e67e22";
+            span.innerText = word;
+            zone.appendChild(span);
+        });
+    }
+
+    function clearAnswer() {
+        selectedWords = [];
+        const btns = document.querySelectorAll('.word-bank .word-btn');
+        btns.forEach(b => b.classList.remove('used'));
+        renderAnswer();
+        document.getElementById('result-msg').innerText = "";
+    }
+
+    function checkAnswer() {
+        const correct = levels[currentLvl].sentence.join(" ");
+        const user = selectedWords.join(" ");
+        const msg = document.getElementById('result-msg');
+
+        if (user === correct) {
+            msg.innerText = "Fantastic! 🌟 You did it!";
+            msg.style.color = "#1dd1a1";
+            setTimeout(() => {
+                currentLvl = (currentLvl + 1) % levels.length;
+                initLevel();
+            }, 2000);
+        } else {
+            msg.innerText = "Not quite... try again! 🧩";
+            msg.style.color = "#ff6b6b";
+        }
+    }
+
+    function render() {
+        document.getElementById('answerZone').innerHTML = "";
+    }
+
+    initLevel();
+</script>
+
+</body>
+</html>

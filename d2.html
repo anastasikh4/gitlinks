@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Family — am / is / are Quiz 🎓✨</title>
+    <style>
+        :root {
+            --primary: #ffeb3b;
+            --secondary: #ff5722;
+            --bg: #e1f5fe;
+            --card: #fff176;
+        }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #222;
+        }
+        h1 {
+            font-size: 30px;
+            color: #d81b60;
+            margin: 8px 0;
+            text-shadow: 2px 2px 0 white;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 680px;
+            margin: 0 auto;
+        }
+        .level-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 12px 0 20px;
+        }
+        .big-emoji {
+            font-size: 70px;
+            margin: 15px 0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .card {
+            height: 85px;
+            background: var(--card);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            border: 4px solid #fff59d;
+            transition: all 0.25s;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+            padding: 4px;
+            text-align: center;
+            line-height: 1.15;
+        }
+        .card:hover {
+            transform: scale(1.08);
+        }
+        .card.flipped {
+            background: white;
+            border-color: #ffeb3b;
+            font-size: 20px;
+        }
+        .card.matched {
+            background: #c8e6c9;
+            visibility: hidden;
+        }
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .option-btn {
+            font-size: 18px;
+            padding: 14px 24px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            transform: scale(1.06);
+            background: #fb8c00;
+        }
+        .sentence-box {
+            font-size: 22px;
+            padding: 18px;
+            background: #fff8e1;
+            border-radius: 16px;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.6;
+        }
+        .blank {
+            display: inline-block;
+            min-width: 60px;
+            border-bottom: 3px solid #ff5722;
+            color: #ff5722;
+            font-weight: bold;
+        }
+        .verb-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 15px 0 5px;
+            flex-wrap: wrap;
+        }
+        .verb-btn {
+            font-size: 20px;
+            padding: 12px 28px;
+            background: #42a5f5;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .verb-btn:hover {
+            background: #1e88e5;
+            transform: scale(1.06);
+        }
+        .verb-btn.correct {
+            background: #4caf50 !important;
+            transform: scale(1.1);
+        }
+        .verb-btn.wrong {
+            background: #ef5350 !important;
+        }
+        #next-level-btn {
+            font-size: 28px;
+            font-weight: bold;
+            padding: 22px 60px;
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            margin: 30px auto 10px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            display: none;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%   { transform: scale(1);   }
+            50%  { transform: scale(1.07); }
+            100% { transform: scale(1);   }
+        }
+        #next-level-btn:hover {
+            background: linear-gradient(135deg, #43a047, #81c784);
+            transform: scale(1.08);
+        }
+        .centered {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        .hidden { display: none; }
+        .progress {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1 id="game-title">My Family — am / is / are 🎓✨</h1>
+    <div id="level-indicator" class="level-info">Level 1 — Find the pair! 🎭</div>
+
+    <!-- Level 1: Memory Match -->
+    <div id="level1">
+        <div class="progress">Match the picture with the correct sentence.</div>
+        <div class="grid" id="card-grid"></div>
+        <div class="big-emoji">🎤 😄 👦 👩‍🏫</div>
+    </div>
+
+    <!-- Level 2: Choose the correct sentence -->
+    <div id="level2" class="hidden">
+        <div class="progress" id="l2-progress">Question 1 of 5</div>
+        <div id="l2-emoji" class="big-emoji"></div>
+        <div class="options-container" id="l2-options"></div>
+    </div>
+
+    <!-- Level 3: Complete with am / is / are -->
+    <div id="level3" class="hidden">
+        <div class="progress" id="l3-progress">Sentence 1 of 8</div>
+        <div class="sentence-box" id="l3-sentence"></div>
+        <div class="verb-row" id="l3-verbs"></div>
+    </div>
+
+    <div class="centered">
+        <button id="next-level-btn">YAY! NEXT LEVEL! 🚀</button>
+    </div>
+</div>
+
+<script>
+    // ─────────────────────────────────────────────
+    // LEVEL 1 — Jobs: match sentence ↔ emoji
+    // From page: "Look and match the pictures to the sentences"
+    // ─────────────────────────────────────────────
+    const level1Data = [
+        { text: "I am a singer.",         emoji: "🎤"  },
+        { text: "You are funny.",         emoji: "😄"  },
+        { text: "He is my brother.",      emoji: "👦"  },
+        { text: "She is a teacher.",      emoji: "👩‍🏫" }
+    ];
+
+    // ─────────────────────────────────────────────
+    // LEVEL 2 — Feelings: which sentence matches?
+    // From page: "Make the sentences and read them"
+    // ─────────────────────────────────────────────
+    const questions2 = [
+        { emoji: "😢", correct: "I am sad.",        all: ["I am sad.", "We are happy.", "You are cute.", "They are lovely."] },
+        { emoji: "😊", correct: "We are happy.",    all: ["I am sad.", "We are happy.", "You are cute.", "They are lovely."] },
+        { emoji: "🥰", correct: "You are cute.",    all: ["I am sad.", "We are happy.", "You are cute.", "They are lovely."] },
+        { emoji: "💐", correct: "They are lovely.", all: ["I am sad.", "We are happy.", "You are cute.", "They are lovely."] },
+        { emoji: "😴", correct: "It is sleepy.",    all: ["I am sad.", "We are happy.", "It is sleepy.", "They are lovely."] }
+    ];
+
+    // ─────────────────────────────────────────────
+    // LEVEL 3 — Inga text: choose am / is / are
+    // From page: "Inga is from Russia..."
+    // ─────────────────────────────────────────────
+    const questions3 = [
+        { before: "I ",                    after: " a student from Moscow.",   correct: "am",  options: ["am","is","are"] },
+        { before: "It ",                   after: " a very big city.",         correct: "is",  options: ["am","is","are"] },
+        { before: "My father and mother ", after: " teachers.",                correct: "are", options: ["am","is","are"] },
+        { before: "My mother ",            after: " a teacher.",               correct: "is",  options: ["am","is","are"] },
+        { before: "It ",                   after: " (not) from Russia.",       correct: "is",  options: ["am","is","are"] },
+        { before: "I ",                    after: " from Poland.",             correct: "am",  options: ["am","is","are"] },
+        { before: "I ",                    after: " ten years old.",           correct: "am",  options: ["am","is","are"] },
+        { before: "My brother's name ",    after: " Sergey.",                  correct: "is",  options: ["am","is","are"] },
+        { before: "He ",                   after: " ten years old.",           correct: "is",  options: ["am","is","are"] },
+        { before: "We ",                   after: " twins.",                   correct: "are", options: ["am","is","are"] }
+    ];
+
+    let currentLevel = 1;
+    let selectedCards = [];
+    let currentL2Index = 0;
+    let currentL3Index = 0;
+
+    // ─── LEVEL 1: Memory Match ───
+    function initLevel1() {
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        let cards = [];
+
+        level1Data.forEach(item => {
+            cards.push({ val: item.text,  match: item.text });
+            cards.push({ val: item.emoji, match: item.text });
+        });
+
+        cards.sort(() => Math.random() - 0.5);
+
+        cards.forEach(data => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.match = data.match;
+            card.onclick = () => {
+                if (selectedCards.length < 2 && !card.classList.contains('flipped')) {
+                    card.classList.add('flipped');
+                    card.innerText = data.val;
+                    selectedCards.push(card);
+                    if (selectedCards.length === 2) setTimeout(checkMatch, 700);
+                }
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    function checkMatch() {
+        const [a, b] = selectedCards;
+        if (a.dataset.match === b.dataset.match) {
+            a.classList.add('matched');
+            b.classList.add('matched');
+            selectedCards = [];
+            if (document.querySelectorAll('.matched').length === level1Data.length * 2) {
+                setTimeout(showNextLevelButton, 900);
+            }
+        } else {
+            a.classList.remove('flipped');
+            b.classList.remove('flipped');
+            a.innerText = '';
+            b.innerText = '';
+            selectedCards = [];
+        }
+    }
+
+    // ─── LEVEL 2: Choose correct sentence ───
+    function initLevel2() {
+        if (currentL2Index >= questions2.length) {
+            setTimeout(showNextLevelButton, 800);
+            return;
+        }
+
+        const q = questions2[currentL2Index];
+        document.getElementById('l2-emoji').innerText = q.emoji;
+        document.getElementById('l2-progress').innerText = `Question ${currentL2Index + 1} of ${questions2.length}`;
+
+        const opts = document.getElementById('l2-options');
+        opts.innerHTML = '';
+
+        [...q.all]
+            .sort(() => Math.random() - 0.5)
+            .forEach(text => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = text;
+                btn.onclick = () => {
+                    if (text === q.correct) {
+                        btn.style.background = '#4caf50';
+                        currentL2Index++;
+                        setTimeout(initLevel2, 700);
+                    } else {
+                        btn.style.background = '#ef5350';
+                        setTimeout(() => { btn.style.background = ''; }, 600);
+                    }
+                };
+                opts.appendChild(btn);
+            });
+    }
+
+    // ─── LEVEL 3: Complete with am / is / are ───
+    function initLevel3() {
+        if (currentL3Index >= questions3.length) {
+            setTimeout(showNextLevelButton, 800);
+            return;
+        }
+
+        const q = questions3[currentL3Index];
+        document.getElementById('l3-progress').innerText = `Sentence ${currentL3Index + 1} of ${questions3.length}`;
+        document.getElementById('l3-sentence').innerHTML =
+            `${q.before}<span class="blank" id="l3-blank">_____</span>${q.after}`;
+
+        const verbs = document.getElementById('l3-verbs');
+        verbs.innerHTML = '';
+
+        q.options.forEach(v => {
+            const btn = document.createElement('button');
+            btn.className = 'verb-btn';
+            btn.textContent = v;
+            btn.onclick = () => {
+                if (v === q.correct) {
+                    btn.classList.add('correct');
+                    document.getElementById('l3-blank').innerText = v;
+                    currentL3Index++;
+                    setTimeout(initLevel3, 900);
+                } else {
+                    btn.classList.add('wrong');
+                    setTimeout(() => btn.classList.remove('wrong'), 600);
+                }
+            };
+            verbs.appendChild(btn);
+        });
+    }
+
+    // ─── Navigation ───
+    function showNextLevelButton() {
+        document.getElementById('next-level-btn').style.display = 'block';
+    }
+
+    document.getElementById('next-level-btn').onclick = () => {
+        document.getElementById('next-level-btn').style.display = 'none';
+        document.getElementById(`level${currentLevel}`).classList.add('hidden');
+
+        currentLevel++;
+
+        if (currentLevel <= 3) {
+            document.getElementById(`level${currentLevel}`).classList.remove('hidden');
+
+            const titles = [
+                "",
+                "Level 1 — Find the pair! 🎭",
+                "Level 2 — Choose the correct sentence! 🤔",
+                "Level 3 — Complete with am / is / are! ✏️"
+            ];
+            document.getElementById('level-indicator').textContent = titles[currentLevel];
+
+            if (currentLevel === 2) { currentL2Index = 0; initLevel2(); }
+            if (currentLevel === 3) { currentL3Index = 0; initLevel3(); }
+        } else {
+            document.getElementById('level-indicator').innerHTML = "Wow! You did it all! 🏆✨";
+            document.getElementById('game-title').innerHTML = "Super! You're the best! 🎈🎓";
+        }
+    };
+
+    // Start
+    initLevel1();
+</script>
+
+</body>
+</html>
