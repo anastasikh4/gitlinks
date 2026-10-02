@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FNAF: When Did Mission?</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    body {
+        background-color: #050505;
+        color: #1aff1a;
+        font-family: 'Courier New', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    #game-container {
+        width: 700px;
+        max-width: 100%;
+        background: #111;
+        border: 8px solid #333;
+        padding: 20px;
+        box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 10px;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        color: #1aff1a;
+    }
+
+    .question-display {
+        background: #000;
+        border: 2px solid #ff0000;
+        padding: 15px;
+        margin-bottom: 15px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 11px;
+        color: #ff3333;
+        text-align: center;
+        line-height: 1.6;
+        box-shadow: 0 0 15px rgba(255, 0, 0, 0.3) inset;
+        letter-spacing: 1px;
+    }
+
+    .question-display::before {
+        content: "▶ QUERY: ";
+        color: #666;
+        font-size: 9px;
+    }
+
+    /* ── DAY BADGE before emoji — NUMBER ONLY ── */
+    .day-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        border: 3px solid #1aff1a;
+        border-radius: 12px;
+        padding: 10px 30px;
+        margin: 0 auto 15px;
+        width: fit-content;
+        font-family: 'Press Start 2P', cursive;
+        box-shadow: 0 0 20px rgba(26, 255, 26, 0.4);
+    }
+    .day-badge .num {
+        color: #ff4500;
+        font-size: 26px;
+        text-shadow: 0 0 12px #ff4500;
+        letter-spacing: 2px;
+    }
+
+    .question-area {
+        min-height: 200px;
+    }
+
+    .emoji-display {
+        font-size: 70px;
+        text-align: center;
+        margin-bottom: 15px;
+        filter: drop-shadow(0 0 10px #1aff1a);
+    }
+
+    .sentence-drop-area {
+        background: #000;
+        border: 2px dashed #444;
+        min-height: 60px;
+        padding: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sentence-drop-area:empty::after {
+        content: "DROP SEQUENCE HERE";
+        color: #333;
+        font-size: 10px;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    .word-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+        min-height: 50px;
+    }
+
+    /* ── ALL TOKENS SAME COLOR ── */
+    .word-token {
+        background: #00ff00;
+        color: #000;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-weight: bold;
+        border: 1px solid #1aff1a;
+        user-select: none;
+        transition: 0.15s;
+        font-size: 14px;
+    }
+
+    .word-token:hover:not(.placed) {
+        background: #1aff1a;
+        box-shadow: 0 0 10px #1aff1a;
+    }
+
+    .word-token.placed {
+        background: #333;
+        color: #00ff00;
+        border-color: #555;
+    }
+
+    .word-token.placed:hover {
+        background: #444;
+        box-shadow: 0 0 10px #ff0000;
+    }
+
+    .check-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 12px;
+        background: #ff0000;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.8em;
+        letter-spacing: 1px;
+        transition: 0.2s;
+    }
+
+    .check-btn:hover {
+        background: #cc0000;
+        box-shadow: 0 0 15px #ff0000;
+    }
+
+    #feedback {
+        height: 40px;
+        margin-top: 10px;
+        text-align: center;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 9px;
+        line-height: 1.5;
+        padding-top: 8px;
+    }
+
+    .hidden { display: none !important; }
+
+    .score-display {
+        color: #ff0000;
+    }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="header">
+        <span>MISSION: <span id="progress">1/7</span></span>
+        <span class="score-display">SCORE: <span id="score">0</span></span>
+        <span>STATUS: <span id="status">ACTIVE</span></span>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-area">
+            <div class="question-display" id="question-text"></div>
+
+            <!-- Number only -->
+            <div class="day-badge" id="day-badge">
+                <span class="num" id="day-num">5</span>
+            </div>
+
+            <div class="emoji-display" id="emoji"></div>
+            <div class="sentence-drop-area" id="drop-area"></div>
+            <div class="word-bank" id="word-bank"></div>
+        </div>
+        
+        <button class="check-btn" onclick="checkSentence()">CHECK SEQUENCE</button>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-screen" class="hidden" style="text-align: center;">
+        <h1 style="font-family: 'Press Start 2P'; font-size: 20px; color: #ff0000;">MISSION COMPLETE</h1>
+        <div style="font-size: 60px; margin: 20px 0;">🏆</div>
+        <p id="final-stats" style="color: #fff; font-family: 'Press Start 2P'; font-size: 12px;"></p>
+        <button onclick="location.reload()" class="check-btn" style="background: #00ff00; color: black; margin-top: 20px;">REBOOT SYSTEM</button>
+    </div>
+</div>
+
+<script>
+    // ─────────────────────────────────────────────
+    // MISSION DATA
+    // num: day number (Mon=1, Tue=2, Wed=3, Thu=4, Fri=5, Sat=6, Sun=7)
+    // extraDay: distractor day added to the word bank
+    // ─────────────────────────────────────────────
+    const questions = [
+        {
+            num: 5,
+            extraDay: "Monday",
+            emoji: "🛋️",
+            question: "When did they buy new sofa for the flat?",
+            scrambled: ["It", "was", "on", "Friday", "Monday"],
+            correct: "It was on Friday"
+        },
+        {
+            num: 4,
+            extraDay: "Sunday",
+            emoji: "🏆",
+            question: "When was he the winner?",
+            scrambled: ["It", "was", "on", "Thursday", "Sunday"],
+            correct: "It was on Thursday"
+        },
+        {
+            num: 2,
+            extraDay: "Saturday",
+            emoji: "🪖",
+            question: "When did he drive in helmet?",
+            scrambled: ["It", "was", "on", "Tuesday", "Saturday"],
+            correct: "It was on Tuesday"
+        },
+        {
+            num: 7,
+            extraDay: "Wednesday",
+            emoji: "🚗",
+            question: "When did he have a car inside?",
+            scrambled: ["It", "was", "on", "Sunday", "Wednesday"],
+            correct: "It was on Sunday"
+        },
+        {
+            num: 1,
+            extraDay: "Friday",
+            emoji: "🌧️",
+            question: "When was the weather rainy?",
+            scrambled: ["It", "was", "on", "Monday", "Friday"],
+            correct: "It was on Monday"
+        },
+        {
+            num: 3,
+            extraDay: "Tuesday",
+            emoji: "👥",
+            question: "When did they see many people?",
+            scrambled: ["It", "was", "on", "Wednesday", "Tuesday"],
+            correct: "It was on Wednesday"
+        },
+        {
+            num: 6,
+            extraDay: "Thursday",
+            emoji: "☀️",
+            question: "When was the bright sun?",
+            scrambled: ["It", "was", "on", "Saturday", "Thursday"],
+            correct: "It was on Saturday"
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        if (currentQ >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const data = questions[currentQ];
+
+        // Header info
+        document.getElementById("progress").innerText = (currentQ + 1) + "/" + questions.length;
+        document.getElementById("question-text").innerText = data.question;
+        document.getElementById("emoji").innerText = data.emoji;
+        document.getElementById("feedback").innerText = "";
+        document.getElementById("status").innerText = "ACTIVE";
+
+        // Number badge — only the number
+        document.getElementById("day-num").innerText = data.num;
+
+        // Reset areas
+        const dropArea = document.getElementById("drop-area");
+        const wordBank = document.getElementById("word-bank");
+        dropArea.innerHTML = "";
+        wordBank.innerHTML = "";
+
+        // Shuffle word bank words
+        const shuffledWords = [...data.scrambled].sort(() => Math.random() - 0.5);
+
+        shuffledWords.forEach((word) => {
+            const token = document.createElement("div");
+            token.classList.add("word-token");
+            token.innerText = word;
+            token.onclick = () => moveToken(token, wordBank, dropArea);
+            wordBank.appendChild(token);
+        });
+    }
+
+    function moveToken(token, fromArea, toArea) {
+        if (toArea.id === 'drop-area') {
+            token.classList.add('placed');
+        } else {
+            token.classList.remove('placed');
+        }
+        toArea.appendChild(token);
+    }
+
+    function checkSentence() {
+        const dropArea = document.getElementById("drop-area");
+        const userSentence = Array.from(dropArea.children).map(token => token.innerText).join(' ');
+        const feedbackEl = document.getElementById("feedback");
+        
+        if (userSentence === questions[currentQ].correct) {
+            feedbackEl.style.color = "#1aff1a";
+            feedbackEl.innerText = ">> ACCESS GRANTED <<";
+            document.getElementById("status").innerText = "PASSED";
+            score++;
+            document.getElementById("score").innerText = score;
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 1500);
+        } else {
+            feedbackEl.style.color = "#ff0000";
+            feedbackEl.innerText = ">> ACCESS DENIED: RETRY <<";
+            document.getElementById("status").innerText = "ERROR";
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        document.getElementById("final-stats").innerText = `Final Score: ${score}/${questions.length}`;
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

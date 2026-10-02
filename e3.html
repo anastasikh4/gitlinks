@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Racing Terminal — Complete the Sentence</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+        body { background: #050505; color: #1aff1a; font-family: 'VT323', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow: auto; padding: 20px; }
+        .crt::before { content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 255, 0, 0.06)); z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none; }
+        #quiz-container { width: 620px; max-width: 100%; border: 3px solid #1aff1a; padding: 30px; box-shadow: 0 0 20px #1aff1a; background: #000; position: relative; z-index: 1; transition: transform 0.1s; }
+        h2 { text-align: center; color: #ff3333; text-shadow: 0 0 5px #ff3333; margin-top: 0; font-size: 1.6rem; letter-spacing: 2px; }
+
+        .variant-tag {
+            text-align: center;
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+        .variant-tag span {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        /* ── SENTENCE WITH GAP ── */
+        .sentence-box {
+            background: #0a0a0a;
+            border: 3px solid #1aff1a;
+            border-radius: 12px;
+            padding: 25px 20px;
+            margin: 15px 0 22px;
+            text-align: center;
+            font-size: 1.6rem;
+            line-height: 1.6;
+            box-shadow: 0 0 15px rgba(26, 255, 26, 0.25) inset;
+            position: relative;
+            color: #ffaa00;
+            letter-spacing: 1px;
+        }
+        .sentence-box::before {
+            content: "▶ INCOMING TRANSMISSION";
+            position: absolute;
+            top: 6px;
+            left: 12px;
+            font-size: 0.75rem;
+            color: #ff3333;
+            letter-spacing: 1px;
+            font-family: 'VT323', monospace;
+        }
+        .gap {
+            display: inline-block;
+            min-width: 130px;
+            border-bottom: 3px solid #1aff1a;
+            margin: 0 8px;
+            padding: 0 6px;
+            color: #1aff1a;
+            font-weight: bold;
+        }
+        .gap.filled {
+            color: #00ff00;
+            border-bottom-color: #00ff00;
+            text-shadow: 0 0 8px #00ff00;
+        }
+        .gap.wrong-answer {
+            color: #ff3333;
+            border-bottom-color: #ff3333;
+            text-shadow: 0 0 8px #ff3333;
+        }
+
+        .options button { display: block; width: 100%; background: none; border: 1px solid #1aff1a; color: #1aff1a; padding: 12px 15px; margin: 8px 0; font-family: 'VT323', monospace; font-size: 1.25rem; cursor: pointer; transition: 0.2s; text-align: left; line-height: 1.3; }
+        .options button:hover:not(:disabled) { background: #1aff1a; color: #000; }
+        .options button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        #status { margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; display: flex; justify-content: space-between; font-size: 1.2rem; }
+        .hidden { display: none !important; }
+        .jumpscare { animation: shake 0.2s infinite; border-color: red !important; box-shadow: 0 0 40px red !important; }
+        @keyframes shake { 0% { transform: translate(5px, 5px); } 50% { transform: translate(-5px, -5px); } 100% { transform: translate(5px, -5px); } }
+
+        #result-screen { text-align: center; }
+        #result-screen button { width: 100%; background: #ff3333; color: #000; border: none; padding: 15px; cursor: pointer; font-family: 'VT323'; font-size: 1.5rem; margin-top: 15px; letter-spacing: 2px; }
+        #result-screen button:hover { background: #ff5555; }
+
+        .feedback-flash { animation: flash 0.4s; }
+        @keyframes flash { 0%, 100% { background: transparent; } 50% { background: #1aff1a22; } }
+
+        @media (max-width: 500px) {
+            #quiz-container { padding: 20px; }
+            .sentence-box { font-size: 1.2rem; padding: 20px 12px; }
+            .gap { min-width: 90px; }
+            .options button { font-size: 1.1rem; padding: 10px 12px; }
+            #status { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body class="crt">
+
+<div id="quiz-container">
+    <h2 id="header-text">COMPLETE THE SENTENCE</h2>
+    <div class="variant-tag">VARIANT: <span id="variant-display">A</span></div>
+    <div id="quiz-content">
+        <div class="sentence-box" id="sentence-box">
+            <span id="sentence-text">Loading transmission...</span>
+        </div>
+
+        <div class="options" id="options-container"></div>
+    </div>
+    <div id="status">
+        <span id="power-display">POWER: 100%</span>
+        <span id="score-display">LAP: 1/8</span>
+    </div>
+    <div id="result-screen" class="hidden">
+        <h2 id="final-msg">🏁 RACE COMPLETE</h2>
+        <p id="final-score" style="font-size: 1.5rem; color: #ffaa00;"></p>
+        <button onclick="location.reload()">🔄 NEXT VARIANT</button>
+    </div>
+</div>
+
+<script>
+    // ─────────────────────────────────────────────
+    // 3 VARIANTS — each has 8 fill-in-the-blank questions
+    // Each question has 3 options (not 4)
+    // ─────────────────────────────────────────────
+    const VARIANTS = [
+        // ══════════════ VARIANT A ══════════════
+        {
+            name: "A",
+            questions: [
+                {
+                    before: "Yesterday he didn't drink but he",
+                    after: "now.",
+                    options: ["drinks", "is drinking", "drank"],
+                    correctIndex: 1
+                },
+                {
+                    before: "He was at the winter party with",
+                    after: ".",
+                    options: ["firework", "fireworks", "fires"],
+                    correctIndex: 1
+                },
+                {
+                    before: "She is standing",
+                    after: "to the car now.",
+                    options: ["near", "next", "close"],
+                    correctIndex: 1
+                },
+                {
+                    before: "Her friend is",
+                    after: "in the car.",
+                    options: ["drive", "driving", "drives"],
+                    correctIndex: 1
+                },
+                {
+                    before: "Tomorrow he",
+                    after: "buy new sunglasses and gloves.",
+                    options: ["will", "is", "does"],
+                    correctIndex: 0
+                },
+                {
+                    before: "And in the afternoon he will",
+                    after: "on the interview.",
+                    options: ["speaks", "speak", "spoke"],
+                    correctIndex: 1
+                },
+                {
+                    before: "The race car",
+                    after: "very fast on the track.",
+                    options: ["go", "goes", "going"],
+                    correctIndex: 1
+                },
+                {
+                    before: "She",
+                    after: "a red helmet at every race.",
+                    options: ["wear", "wears", "wore"],
+                    correctIndex: 1
+                }
+            ]
+        },
+
+        // ══════════════ VARIANT B ══════════════
+        {
+            name: "B",
+            questions: [
+                {
+                    before: "Last Sunday the driver",
+                    after: "the race.",
+                    options: ["win", "won", "wins"],
+                    correctIndex: 1
+                },
+                {
+                    before: "Look! The mechanic",
+                    after: "the tyre right now.",
+                    options: ["changes", "is changing", "change"],
+                    correctIndex: 1
+                },
+                {
+                    before: "The car is",
+                    after: "the two red flags.",
+                    options: ["on", "between", "behind"],
+                    correctIndex: 1
+                },
+                {
+                    before: "There",
+                    after: "many people at the track today.",
+                    options: ["is", "are", "am"],
+                    correctIndex: 1
+                },
+                {
+                    before: "She usually",
+                    after: "her helmet before the race.",
+                    options: ["puts on", "put on", "putting on"],
+                    correctIndex: 0
+                },
+                {
+                    before: "We",
+                    after: "to the circuit every Friday.",
+                    options: ["go", "goes", "gone"],
+                    correctIndex: 0
+                },
+                {
+                    before: "The engineer",
+                    after: "on the radio at the moment.",
+                    options: ["talk", "is talking", "talked"],
+                    correctIndex: 1
+                },
+                {
+                    before: "The new sunglasses",
+                    after: "on the table.",
+                    options: ["is", "are", "was"],
+                    correctIndex: 1
+                }
+            ]
+        },
+
+        // ══════════════ VARIANT C ══════════════
+        {
+            name: "C",
+            questions: [
+                {
+                    before: "Tomorrow morning the team",
+                    after: "a new car.",
+                    options: ["tests", "will test", "is testing"],
+                    correctIndex: 1
+                },
+                {
+                    before: "There is a photo",
+                    after: "the wall in the garage.",
+                    options: ["in", "on", "at"],
+                    correctIndex: 1
+                },
+                {
+                    before: "The driver",
+                    after: "from Italy, but he lives in Monaco.",
+                    options: ["come", "comes", "came"],
+                    correctIndex: 1
+                },
+                {
+                    before: "Yesterday we",
+                    after: "the race on TV.",
+                    options: ["watch", "watches", "watched"],
+                    correctIndex: 2
+                },
+                {
+                    before: "Right now the cars",
+                    after: "around the track.",
+                    options: ["drive", "are driving", "drove"],
+                    correctIndex: 1
+                },
+                {
+                    before: "My favourite driver",
+                    after: "a red helmet.",
+                    options: ["have", "has", "had"],
+                    correctIndex: 1
+                },
+                {
+                    before: "The trophy is",
+                    after: "the two drivers.",
+                    options: ["between", "on", "under"],
+                    correctIndex: 0
+                },
+                {
+                    before: "Next weekend they",
+                    after: "a big party.",
+                    options: ["have", "will have", "had"],
+                    correctIndex: 1
+                }
+            ]
+        }
+    ];
+
+    // ─── Pick a random variant ───
+    const chosenVariant = VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+    const questions = chosenVariant.questions;
+
+    // Show variant name
+    document.getElementById("variant-display").innerText = chosenVariant.name;
+
+    let currentIdx = 0;
+    let score = 0;
+    let power = 100;
+
+    function loadQuestion() {
+        if (currentIdx >= questions.length) {
+            showResults();
+            return;
+        }
+        const q = questions[currentIdx];
+
+        document.getElementById("score-display").innerText = `LAP: ${currentIdx + 1}/${questions.length}`;
+
+        // Build sentence with gap
+        const sentenceBox = document.getElementById("sentence-text");
+        sentenceBox.innerHTML = `${q.before} <span class="gap" id="gap-slot">______</span> ${q.after}`;
+
+        // Options — shuffled display order
+        const optionsDiv = document.getElementById("options-container");
+        optionsDiv.innerHTML = "";
+
+        const displayOptions = q.options.map((text, i) => ({
+            text: text,
+            isCorrect: i === q.correctIndex
+        }));
+        displayOptions.sort(() => Math.random() - 0.5);
+
+        displayOptions.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(opt.isCorrect, opt.text, btn);
+            optionsDiv.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(isCorrect, chosenText, clickedBtn) {
+        const container = document.getElementById("quiz-container");
+        const gap = document.getElementById("gap-slot");
+
+        if (isCorrect) {
+            score++;
+            container.style.borderColor = "#1aff1a";
+            container.classList.add("feedback-flash");
+            setTimeout(() => container.classList.remove("feedback-flash"), 400);
+
+            // Fill the gap
+            gap.innerText = chosenText;
+            gap.classList.add("filled");
+
+            // Lock all buttons
+            document.querySelectorAll(".options button").forEach(b => b.disabled = true);
+            clickedBtn.style.background = "#1aff1a";
+            clickedBtn.style.color = "#000";
+
+            currentIdx++;
+            document.getElementById("power-display").innerText = `POWER: ${power}%`;
+            setTimeout(loadQuestion, 1100);
+        } else {
+            power -= 10;
+            if (power < 0) power = 0;
+            triggerJumpscare();
+            document.getElementById("power-display").innerText = `POWER: ${power}%`;
+
+            // Show wrong answer briefly in gap
+            gap.innerText = chosenText;
+            gap.classList.add("wrong-answer");
+
+            clickedBtn.style.background = "#ff3333";
+            clickedBtn.style.color = "#000";
+            clickedBtn.disabled = true;
+
+            setTimeout(() => {
+                gap.innerText = "______";
+                gap.classList.remove("wrong-answer");
+                clickedBtn.style.background = "";
+                clickedBtn.style.color = "";
+                clickedBtn.disabled = false;
+            }, 900);
+        }
+    }
+
+    function triggerJumpscare() {
+        const container = document.getElementById("quiz-container");
+        container.classList.add("jumpscare");
+        setTimeout(() => container.classList.remove("jumpscare"), 500);
+    }
+
+    function showResults() {
+        document.getElementById("quiz-content").classList.add("hidden");
+        document.getElementById("status").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+
+        const perfect = score === questions.length;
+        const passed = score >= 4 && power > 0;
+
+        if (!passed) {
+            document.getElementById("final-msg").innerText = "💥 CRASHED OUT";
+            document.getElementById("final-score").innerText =
+                `Variant ${chosenVariant.name} · Score: ${score}/${questions.length} — DNF`;
+        } else if (perfect) {
+            document.getElementById("final-msg").innerText = "🏆 PODIUM FINISH!";
+            document.getElementById("final-score").innerText =
+                `Variant ${chosenVariant.name} · Score: ${score}/${questions.length} — PERFECT RACE`;
+        } else {
+            document.getElementById("final-msg").innerText = "🏁 RACE COMPLETE";
+            document.getElementById("final-score").innerText =
+                `Variant ${chosenVariant.name} · Score: ${score}/${questions.length} — Shift Complete`;
+        }
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>
