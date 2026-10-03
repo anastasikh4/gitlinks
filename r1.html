@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Duolingo Quiz — Progress Check 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Nunito', 'Segoe UI', sans-serif;
+        background: #f7f7f7;
+        color: #3c3c3c;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 14px 30px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* ============ TOP BAR ============ */
+    .top-bar {
+        width: 100%;
+        max-width: 720px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 26px;
+        color: #afafaf;
+        cursor: pointer;
+        font-weight: 900;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        transition: 0.15s;
+    }
+    .close-btn:hover { background: #eeeeee; color: #777; }
+
+    .progress-bar {
+        flex: 1;
+        height: 16px;
+        background: #e5e5e5;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+    }
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #58cc02, #89e219);
+        border-radius: 20px;
+        transition: width 0.5s cubic-bezier(0.4, 1.4, 0.5, 1);
+        box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1);
+    }
+
+    .hearts {
+        display: flex;
+        gap: 3px;
+        font-size: 22px;
+    }
+    .hearts .heart { transition: 0.3s; }
+    .hearts .heart.lost { opacity: 0.2; filter: grayscale(1); transform: scale(0.85); }
+
+    /* ============ MAIN CONTENT ============ */
+    .content {
+        width: 100%;
+        max-width: 720px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ============ START SCREEN ============ */
+    .start-screen {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px 32px;
+        text-align: center;
+        box-shadow: 0 4px 0 #d0d0d0, 0 10px 30px rgba(0,0,0,0.06);
+        animation: fadeIn 0.5s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .start-screen .mascot {
+        font-size: 90px;
+        margin-bottom: 12px;
+        display: inline-block;
+        animation: bob 2s ease-in-out infinite;
+    }
+    @keyframes bob {
+        0%, 100% { transform: translateY(0) rotate(-3deg); }
+        50% { transform: translateY(-10px) rotate(3deg); }
+    }
+    .start-screen h1 {
+        font-size: 30px;
+        font-weight: 900;
+        color: #58cc02;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+    }
+    .start-screen h2 {
+        font-size: 20px;
+        font-weight: 800;
+        color: #3c3c3c;
+        margin-bottom: 16px;
+    }
+    .start-screen p {
+        font-size: 16px;
+        font-weight: 700;
+        color: #777;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+    .info-chips {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 26px;
+    }
+    .chip {
+        background: #f0f7ff;
+        color: #1cb0f6;
+        font-weight: 800;
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid #d4ebff;
+    }
+    .chip.green { background: #f0fff0; color: #58cc02; border-color: #d4f4c2; }
+    .chip.yellow { background: #fffbf0; color: #ffc800; border-color: #fceed4; }
+
+    .btn-primary {
+        background: #58cc02;
+        color: white;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 18px;
+        letter-spacing: 1px;
+        border: none;
+        border-bottom: 5px solid #48a302;
+        border-radius: 16px;
+        padding: 16px 40px;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.1s;
+        min-width: 240px;
+    }
+    .btn-primary:hover { background: #61d800; }
+    .btn-primary:active { transform: translateY(3px); border-bottom-width: 2px; }
+
+    /* ============ QUESTION CARD ============ */
+    .question-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 28px 26px;
+        box-shadow: 0 4px 0 #d0d0d0, 0 10px 30px rgba(0,0,0,0.06);
+        animation: slideIn 0.35s ease-out;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    .question-card.shake { animation: shake 0.4s; }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-8px); }
+        40%, 80% { transform: translateX(8px); }
+    }
+
+    .q-label {
+        font-size: 13px;
+        font-weight: 800;
+        color: #afafaf;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .q-prompt {
+        font-size: 22px;
+        font-weight: 800;
+        color: #3c3c3c;
+        margin-bottom: 18px;
+        line-height: 1.4;
+    }
+    .q-sentence {
+        font-size: 19px;
+        font-weight: 700;
+        color: #3c3c3c;
+        background: #f7f7f7;
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 18px;
+        line-height: 1.7;
+        border-left: 4px solid #1cb0f6;
+    }
+    .q-sentence .hl-blank {
+        display: inline-block;
+        min-width: 120px;
+        border-bottom: 3px solid #1cb0f6;
+        color: #1cb0f6;
+        text-align: center;
+        padding: 0 8px;
+        font-weight: 900;
+    }
+    .q-emoji {
+        font-size: 60px;
+        text-align: center;
+        margin: 6px 0 18px;
+        letter-spacing: 6px;
+    }
+
+    /* ============ CHOICE OPTIONS ============ */
+    .options-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .option-btn {
+        background: #fff;
+        border: 2px solid #e5e5e5;
+        border-bottom-width: 4px;
+        border-radius: 14px;
+        padding: 15px 18px;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 16.5px;
+        color: #3c3c3c;
+        text-align: left;
+        cursor: pointer;
+        transition: 0.1s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        line-height: 1.4;
+    }
+    .option-btn:hover:not(:disabled) {
+        background: #f7f7f7;
+        border-color: #d0d0d0;
+    }
+    .option-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; }
+    .option-btn .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        color: #afafaf;
+        font-weight: 900;
+        font-size: 14px;
+        flex-shrink: 0;
+        transition: 0.15s;
+    }
+    .option-btn.selected {
+        background: #ddf4ff;
+        border-color: #1cb0f6;
+        color: #1899d6;
+    }
+    .option-btn.selected .badge { background: #1cb0f6; color: #fff; }
+    .option-btn.correct {
+        background: #d7ffb8;
+        border-color: #58cc02;
+        color: #4a9c00;
+    }
+    .option-btn.correct .badge { background: #58cc02; color: #fff; }
+    .option-btn.wrong {
+        background: #ffdfe0;
+        border-color: #ff4b4b;
+        color: #ea2b2b;
+    }
+    .option-btn.wrong .badge { background: #ff4b4b; color: #fff; }
+    .option-btn:disabled { cursor: default; }
+
+    /* ============ FEEDBACK BANNER ============ */
+    .feedback-banner {
+        border-radius: 16px;
+        padding: 18px 22px;
+        margin-top: 20px;
+        display: none;
+        animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .feedback-banner.show { display: block; }
+    .feedback-banner.correct {
+        background: #d7ffb8;
+        color: #4a9c00;
+        border-top: 3px solid #58cc02;
+    }
+    .feedback-banner.wrong {
+        background: #ffdfe0;
+        color: #ea2b2b;
+        border-top: 3px solid #ff4b4b;
+    }
+    .feedback-header {
+        font-size: 20px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    .feedback-header .icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .feedback-banner.correct .feedback-header .icon { background: #58cc02; color: #fff; }
+    .feedback-banner.wrong .feedback-header .icon { background: #ff4b4b; color: #fff; }
+    .feedback-text {
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.5;
+    }
+    .feedback-text .answer {
+        background: rgba(255,255,255,0.6);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-weight: 800;
+    }
+
+    /* ============ BOTTOM BUTTONS ============ */
+    .bottom-area {
+        width: 100%;
+        max-width: 720px;
+        margin-top: 16px;
+        display: flex;
+        gap: 12px;
+    }
+    .btn-skip {
+        flex: 1;
+        background: #fff;
+        color: #afafaf;
+        font-family: inherit;
+        font-weight: 800;
+        font-size: 16px;
+        letter-spacing: 1px;
+        border: 2px solid #e5e5e5;
+        border-bottom-width: 4px;
+        border-radius: 14px;
+        padding: 14px;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.1s;
+    }
+    .btn-skip:hover { background: #f7f7f7; }
+    .btn-skip:active { transform: translateY(3px); border-bottom-width: 2px; }
+    .btn-skip:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-continue {
+        flex: 2;
+        background: #58cc02;
+        color: #fff;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 16px;
+        letter-spacing: 1px;
+        border: none;
+        border-bottom: 5px solid #48a302;
+        border-radius: 14px;
+        padding: 14px;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: 0.1s;
+    }
+    .btn-continue:hover:not(:disabled) { background: #61d800; }
+    .btn-continue:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 2px; }
+    .btn-continue:disabled {
+        background: #e5e5e5;
+        border-bottom-color: #d0d0d0;
+        color: #b0b0b0;
+        cursor: not-allowed;
+    }
+
+    /* ============ RESULT SCREEN ============ */
+    .result-screen {
+        background: #fff;
+        border-radius: 20px;
+        padding: 40px 32px;
+        text-align: center;
+        box-shadow: 0 4px 0 #d0d0d0, 0 10px 30px rgba(0,0,0,0.06);
+        animation: fadeIn 0.5s ease-out;
+    }
+    .result-screen .trophy {
+        font-size: 100px;
+        margin-bottom: 12px;
+        display: inline-block;
+        animation: bob 2s ease-in-out infinite;
+    }
+    .result-screen h1 {
+        font-size: 32px;
+        font-weight: 900;
+        color: #58cc02;
+        margin-bottom: 6px;
+    }
+    .result-screen .sub {
+        font-size: 18px;
+        font-weight: 800;
+        color: #777;
+        margin-bottom: 22px;
+    }
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 26px;
+    }
+    .stat-box {
+        background: #f7f7f7;
+        border-radius: 14px;
+        padding: 16px 10px;
+    }
+    .stat-box .num {
+        font-size: 28px;
+        font-weight: 900;
+        color: #58cc02;
+        display: block;
+        line-height: 1;
+    }
+    .stat-box .num.xp { color: #ffc800; }
+    .stat-box .num.acc { color: #1cb0f6; }
+    .stat-box .lbl {
+        font-size: 12px;
+        font-weight: 800;
+        color: #777;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 6px;
+        display: block;
+    }
+
+    /* ============ CONFETTI ============ */
+    .confetti {
+        position: fixed;
+        top: -10px;
+        width: 10px;
+        height: 14px;
+        pointer-events: none;
+        z-index: 999;
+        animation: fall linear forwards;
+    }
+    @keyframes fall {
+        0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(105vh) rotate(720deg); opacity: 0.5; }
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 520px) {
+        .start-screen, .question-card, .result-screen { padding: 24px 18px; }
+        .start-screen h1 { font-size: 24px; }
+        .q-prompt { font-size: 17px; }
+        .q-sentence { font-size: 16px; padding: 12px 14px; }
+        .option-btn { font-size: 15px; padding: 13px 14px; }
+        .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <button class="close-btn" onclick="restartQuiz()" title="Restart">✕</button>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="hearts" id="hearts">
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content"></div>
+
+<!-- BOTTOM BUTTONS -->
+<div class="bottom-area" id="bottomArea" style="display: none;">
+    <button class="btn-skip" id="skipBtn" onclick="skipQuestion()">Skip</button>
+    <button class="btn-continue" id="continueBtn" onclick="continueQuestion()" disabled>Check</button>
+</div>
+
+<script>
+/* =====================================================
+   QUIZ DATA — 15 MULTIPLE CHOICE QUESTIONS
+   Progress Check 2 — Disasters, Accidents, Tenses,
+   Quantifiers, Phrasal Verbs, Word Formation
+   ===================================================== */
+const questions = [
+    // ── 1 — Vocabulary (mine collapsed) ──
+    {
+        prompt: 'Complete the sentence with the correct word.',
+        sentence: '33 men were trapped underground when a mine ___ in Chile.',
+        options: [
+            'collapsed',
+            'survived',
+            'grabbed',
+            'admitted'
+        ],
+        correct: 0
+    },
+    // ── 2 — Vocabulary (fainted) ──
+    {
+        prompt: 'Choose the correct word to complete the sentence.',
+        sentence: 'Annie ___ with exhaustion after walking all day in the hot sun.',
+        options: [
+            'grabbed',
+            'fainted',
+            'collapsed',
+            'admitted'
+        ],
+        correct: 1
+    },
+    // ── 3 — Vocabulary (remote) ──
+    {
+        prompt: 'What does the word "remote" mean?',
+        options: [
+            'Very crowded and busy',
+            'Far away from other places',
+            'Very modern and new',
+            'Full of people and noise'
+        ],
+        correct: 1
+    },
+    // ── 4 — Vocabulary (survivors) ──
+    {
+        prompt: 'Complete the sentence with the correct word.',
+        sentence: 'There were five ___ of the plane crash; it\'s amazing!',
+        options: [
+            'demands',
+            'survivors',
+            'collapses',
+            'faints'
+        ],
+        correct: 1
+    },
+    // ── 5 — Vocabulary (predictable) ──
+    {
+        prompt: 'Choose the correct word to complete the sentence.',
+        sentence: 'You always know what\'s going to happen in that soap opera; it\'s so ___!',
+        options: [
+            'remote',
+            'stable',
+            'predictable',
+            'demanded'
+        ],
+        correct: 2
+    },
+    // ── 6 — Grammar (Past Continuous) ──
+    {
+        prompt: 'Put the verb in brackets into the correct past tense form.',
+        sentence: 'Amy ___ (sleep) when the earthquake happened.',
+        options: [
+            'slept',
+            'was sleeping',
+            'has slept',
+            'is sleeping'
+        ],
+        correct: 1
+    },
+    // ── 7 — Grammar (Past Continuous for parallel action) ──
+    {
+        prompt: 'Choose the correct verb form.',
+        sentence: 'They ___ (look) at the fire as it was quickly spreading.',
+        options: [
+            'looked',
+            'were looking',
+            'have looked',
+            'look'
+        ],
+        correct: 1
+    },
+    // ── 8 — Grammar (Past Perfect Continuous) ──
+    {
+        prompt: 'Complete the sentence with the correct past tense form.',
+        sentence: 'Brian was angry because he ___ (wait) for Hannah for an hour.',
+        options: [
+            'waited',
+            'was waiting',
+            'had been waiting',
+            'has waited'
+        ],
+        correct: 2
+    },
+    // ── 9 — Grammar (Past Simple after "by the time") ──
+    {
+        prompt: 'Choose the correct past tense form.',
+        sentence: 'By the time we arrived at the beach, it ___ (start) to pour with rain.',
+        options: [
+            'was starting',
+            'has started',
+            'had started',
+            'starts'
+        ],
+        correct: 2
+    },
+    // ── 10 — Quantifiers ──
+    {
+        prompt: 'Choose the correct quantifier to complete the sentence.',
+        sentence: '___ the world joined in to help the victims of the earthquake.',
+        options: [
+            'Whole',
+            'All',
+            'Both',
+            'Every'
+        ],
+        correct: 1
+    },
+    // ── 11 — Quantifiers ──
+    {
+        prompt: 'Choose the correct word to complete the sentence.',
+        sentence: '___ Sandy nor Sam went to Japan.',
+        options: [
+            'Both',
+            'Either',
+            'Neither',
+            'All'
+        ],
+        correct: 2
+    },
+    // ── 12 — Quantifiers ──
+    {
+        prompt: 'Choose the correct quantifier to complete the sentence.',
+        sentence: 'There was very ___ to be done after the disaster.',
+        options: [
+            'few',
+            'little',
+            'many',
+            'a lot'
+        ],
+        correct: 1
+    },
+    // ── 13 — Phrasal Verbs ──
+    {
+        prompt: 'Complete the sentence with the correct phrasal verb.',
+        sentence: 'The meeting was ___ due to the accident.',
+        options: [
+            'called back',
+            'called off',
+            'called in',
+            'called up'
+        ],
+        correct: 1
+    },
+    // ── 14 — Phrasal Verbs ──
+    {
+        prompt: 'Choose the correct phrasal verb to complete the sentence.',
+        sentence: 'No one ___ him and he was very disappointed.',
+        options: [
+            'backed down',
+            'backed up',
+            'backed in',
+            'backed off'
+        ],
+        correct: 1
+    },
+    // ── 15 — Word Formation ──
+    {
+        prompt: 'Form the correct word from the word in bold: "The earthquake was very ___ (POWER)."',
+        options: [
+            'power',
+            'powerful',
+            'powerfully',
+            'powering'
+        ],
+        correct: 1
+    },
+    // ── 16 — Word Formation ──
+    {
+        prompt: 'Form the correct word from the word in bold: "A ___ (TROPIC) storm formed above the islands."',
+        options: [
+            'tropic',
+            'tropical',
+            'tropically',
+            'tropics'
+        ],
+        correct: 1
+    },
+    // ── 17 — Word Formation ──
+    {
+        prompt: 'Form the correct word from the word in bold: "He spent three days in ___ (FREEZE) temperatures before they found him."',
+        options: [
+            'freeze',
+            'frozen',
+            'freezing',
+            'froze'
+        ],
+        correct: 2
+    },
+    // ── 18 — Word Formation ──
+    {
+        prompt: 'Form the correct word from the word in bold: "The city is making a slow ___ (RECOVER)."',
+        options: [
+            'recover',
+            'recovered',
+            'recovery',
+            'recovering'
+        ],
+        correct: 2
+    },
+    // ── 19 — Dialogue (TV) ──
+    {
+        prompt: 'Choose the correct response: "Do we have to watch this?" — "___"',
+        options: [
+            "Sure, here you are.",
+            "I'm tired of this.",
+            "Oh, yes, isn't it awful?",
+            "I don't like the sound of that."
+        ],
+        correct: 1
+    },
+    // ── 20 — Dialogue (TV) ──
+    {
+        prompt: 'Choose the correct response: "Can you pass me the TV guide?" — "___"',
+        options: [
+            "I'm tired of this.",
+            "Sure, here you are.",
+            "Oh, yes, isn't it awful?",
+            "I don't like the sound of that."
+        ],
+        correct: 1
+    }
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+const state = {
+    currentIndex: 0,
+    score: 0,
+    hearts: 3,
+    answered: false,
+    selectedOption: null
+};
+
+const contentEl = document.getElementById('content');
+const bottomArea = document.getElementById('bottomArea');
+const skipBtn = document.getElementById('skipBtn');
+const continueBtn = document.getElementById('continueBtn');
+const progressFill = document.getElementById('progressFill');
+const heartsEl = document.getElementById('hearts');
+
+/* =====================================================
+   START SCREEN
+   ===================================================== */
+function renderStart() {
+    bottomArea.style.display = 'none';
+    progressFill.style.width = '0%';
+    contentEl.innerHTML = `
+        <div class="start-screen">
+            <div class="mascot">🌪️</div>
+            <h1>Progress Check 2</h1>
+            <h2>Disasters, Accidents &amp; Tenses Quiz</h2>
+            <p>Test your English skills with this multiple choice quiz!<br>
+               You have <b>3 hearts</b> ❤️ and <b>${questions.length} questions</b>.</p>
+            <div class="info-chips">
+                <span class="chip green">⭐ +10 XP per correct answer</span>
+                <span class="chip yellow">🔥 Level B1</span>
+                <span class="chip">📝 ${questions.length} questions</span>
+            </div>
+            <button class="btn-primary" onclick="startQuiz()">Start Lesson</button>
+        </div>
+    `;
+}
+
+/* =====================================================
+   START QUIZ
+   ===================================================== */
+function startQuiz() {
+    state.currentIndex = 0;
+    state.score = 0;
+    state.hearts = 3;
+    state.answered = false;
+    state.selectedOption = null;
+    updateHearts();
+    renderQuestion();
+    bottomArea.style.display = 'flex';
+}
+
+/* =====================================================
+   RENDER QUESTION
+   ===================================================== */
+function renderQuestion() {
+    const q = questions[state.currentIndex];
+    if (!q) { renderResult(); return; }
+
+    state.answered = false;
+    state.selectedOption = null;
+
+    // Progress bar
+    const progress = (state.currentIndex / questions.length) * 100;
+    progressFill.style.width = progress + '%';
+
+    // Reset buttons
+    continueBtn.disabled = true;
+    continueBtn.textContent = 'Check';
+    skipBtn.disabled = false;
+    skipBtn.style.display = 'block';
+
+    // Build HTML
+    let html = '<div class="question-card" id="questionCard">';
+    html += `<div class="q-label">Question ${state.currentIndex + 1} of ${questions.length}</div>`;
+    html += `<div class="q-prompt">${q.prompt}</div>`;
+
+    if (q.sentence) {
+        const sentenceHtml = q.sentence.replace('___', '<span class="hl-blank">___</span>');
+        html += `<div class="q-sentence">${sentenceHtml}</div>`;
+    }
+
+    html += '<div class="options-list">';
+    const letters = ['A', 'B', 'C', 'D'];
+    q.options.forEach((opt, i) => {
+        html += `<button class="option-btn" data-idx="${i}" onclick="selectOption(${i})">
+            <span class="badge">${letters[i]}</span>
+            <span>${opt}</span>
+        </button>`;
+    });
+    html += '</div>';
+
+    html += `<div class="feedback-banner" id="feedbackBanner"></div>`;
+    html += '</div>';
+
+    contentEl.innerHTML = html;
+}
+
+/* =====================================================
+   SELECT OPTION
+   ===================================================== */
+function selectOption(idx) {
+    if (state.answered) return;
+    state.selectedOption = idx;
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach((b, i) => {
+        b.classList.toggle('selected', i === idx);
+    });
+    continueBtn.disabled = false;
+}
+
+/* =====================================================
+   CHECK / CONTINUE
+   ===================================================== */
+function continueQuestion() {
+    const q = questions[state.currentIndex];
+
+    if (!state.answered) {
+        // ==== CHECK ANSWER ====
+        const isCorrect = state.selectedOption === q.correct;
+        const correctAnswerText = q.options[q.correct];
+
+        // Mark buttons
+        document.querySelectorAll('.option-btn').forEach((b, i) => {
+            b.disabled = true;
+            b.classList.remove('selected');
+            if (i === q.correct) b.classList.add('correct');
+            else if (i === state.selectedOption) b.classList.add('wrong');
+        });
+
+        if (isCorrect) {
+            state.score++;
+            showFeedback(true, correctAnswerText);
+        } else {
+            loseHeart();
+            showFeedback(false, correctAnswerText);
+        }
+
+        state.answered = true;
+        continueBtn.textContent = 'Continue';
+        skipBtn.style.display = 'none';
+
+        // If out of hearts, finish
+        if (state.hearts <= 0) {
+            setTimeout(() => renderResult(), 1900);
+        }
+
+    } else {
+        // ==== NEXT QUESTION ====
+        state.currentIndex++;
+        if (state.currentIndex >= questions.length) {
+            renderResult();
+        } else {
+            renderQuestion();
+        }
+    }
+}
+
+/* =====================================================
+   FEEDBACK
+   ===================================================== */
+function showFeedback(isCorrect, correctAnswer) {
+    const banner = document.getElementById('feedbackBanner');
+    if (!banner) return;
+
+    if (isCorrect) {
+        const praise = ['Nice!', 'Excellent!', 'Great job!', 'Perfect!', 'Well done!', 'Awesome!'];
+        const word = praise[Math.floor(Math.random() * praise.length)];
+        banner.className = 'feedback-banner correct show';
+        banner.innerHTML = `
+            <div class="feedback-header">
+                <span class="icon">✓</span>
+                <span>${word}</span>
+            </div>
+            <div class="feedback-text">Great work! Keep it up! ⭐ +10 XP</div>
+        `;
+    } else {
+        banner.className = 'feedback-banner wrong show';
+        banner.innerHTML = `
+            <div class="feedback-header">
+                <span class="icon">✕</span>
+                <span>Not quite...</span>
+            </div>
+            <div class="feedback-text">Correct answer: <span class="answer">${correctAnswer}</span></div>
+        `;
+        const card = document.getElementById('questionCard');
+        if (card) {
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 500);
+        }
+    }
+}
+
+/* =====================================================
+   SKIP
+   ===================================================== */
+function skipQuestion() {
+    state.currentIndex++;
+    if (state.currentIndex >= questions.length) {
+        renderResult();
+    } else {
+        renderQuestion();
+    }
+}
+
+/* =====================================================
+   HEARTS
+   ===================================================== */
+function loseHeart() {
+    state.hearts = Math.max(0, state.hearts - 1);
+    updateHearts();
+}
+function updateHearts() {
+    const hearts = heartsEl.querySelectorAll('.heart');
+    hearts.forEach((h, i) => {
+        if (i < state.hearts) h.classList.remove('lost');
+        else h.classList.add('lost');
+    });
+}
+
+/* =====================================================
+   RESULT SCREEN
+   ===================================================== */
+function renderResult() {
+    bottomArea.style.display = 'none';
+    progressFill.style.width = '100%';
+
+    const total = questions.length;
+    const correct = state.score;
+    const percent = Math.round((correct / total) * 100);
+    const xp = correct * 10;
+
+    let emoji = '💪', title = 'Keep practising!', msg = 'You can do better — try again!';
+    if (percent >= 50) { emoji = '👍'; title = 'Good job!'; msg = 'Not bad at all!'; }
+    if (percent >= 75) { emoji = '🎉'; title = 'Great work!'; msg = 'You really know your English!'; }
+    if (percent >= 90) { emoji = '🏆'; title = 'Amazing!'; msg = 'You are a star!'; }
+    if (percent === 100) { emoji = '👑'; title = 'Perfect!'; msg = 'A flawless performance!'; }
+    if (state.hearts <= 0) { emoji = '💔'; title = 'Out of hearts'; msg = 'Try again to keep your streak!'; }
+
+    contentEl.innerHTML = `
+        <div class="result-screen">
+            <div class="trophy">${emoji}</div>
+            <h1>${title}</h1>
+            <p class="sub">${msg}</p>
+
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <span class="num">${correct}/${total}</span>
+                    <span class="lbl">Correct</span>
+                </div>
+                <div class="stat-box">
+                    <span class="num xp">${xp}</span>
+                    <span class="lbl">XP earned</span>
+                </div>
+                <div class="stat-box">
+                    <span class="num acc">${percent}%</span>
+                    <span class="lbl">Accuracy</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="restartQuiz()">Try Again</button>
+        </div>
+    `;
+
+    if (percent >= 75) launchConfetti();
+}
+
+/* =====================================================
+   RESTART
+   ===================================================== */
+function restartQuiz() {
+    state.currentIndex = 0;
+    state.score = 0;
+    state.hearts = 3;
+    state.answered = false;
+    state.selectedOption = null;
+    updateHearts();
+    progressFill.style.width = '0%';
+    renderStart();
+}
+
+/* =====================================================
+   CONFETTI
+   ===================================================== */
+function launchConfetti() {
+    const colors = ['#58cc02', '#1cb0f6', '#ffc800', '#ff4b4b', '#ce82ff', '#ff9600'];
+    for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        c.style.animationDelay = (Math.random() * 0.8) + 's';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+    }
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+renderStart();
+</script>
+
+</body>
+</html>
