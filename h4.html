@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Simple Adventure Worksheet</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #9b59b6; padding-bottom: 10px; }
+        h2 { color: #8e44ad; font-size: 1.3rem; margin-top: 30px; border-left: 4px solid #9b59b6; padding-left: 10px; }
+        .monologue { background: #faf5ff; padding: 20px; border-left: 5px solid #9b59b6; margin: 20px 0; font-style: italic; border-radius: 4px; }
+        .monologue b { color: #8e44ad; }
+        .word-bank { background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px dashed #ffc107; text-align: center; font-weight: bold; color: #856404; line-height: 2; }
+        .question-block { margin-bottom: 15px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; transition: 0.3s; background: #fff; }
+        .question-block select { padding: 10px; border-radius: 6px; border: 2px solid #ccc; font-size: 1rem; width: 100%; max-width: 260px; margin-top: 8px; }
+        .question-block label { margin-right: 15px; cursor: pointer; }
+        .verb-form { display: inline-block; min-width: 90px; padding: 6px 14px; background: #f8f5ff; border-radius: 6px; font-weight: bold; color: #8e44ad; margin: 4px 2px; text-align: center; }
+        .verb-form.blank { background: #fff3cd; color: #856404; border: 2px dashed #ffc107; }
+
+        /* Result Styles */
+        .correct-bg { background-color: #d4edda !important; border-color: #c3e6cb !important; }
+        .incorrect-bg { background-color: #f8d7da !important; border-color: #f5c6cb !important; }
+
+        button { display: block; width: 100%; background: #9b59b6; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 25px; transition: 0.2s; }
+        button:hover { background: #8e44ad; }
+        #score-display { text-align: center; margin-top: 20px; font-size: 22px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚔️ Past Simple Adventure</h1>
+
+    <div class="monologue">
+        "Yesterday I <b>went</b> to the market. I <b>saw</b> a strange man. He <b>had</b> a weapon. He <b>said</b>: 'You need to trade.' I <b>heard</b> a noise. I <b>ran</b> away. He <b>did</b> nothing. She <b>bought</b> a new phone. They <b>came</b> to the party. He <b>drank</b> all the water."
+    </div>
+
+    <div class="word-bank">
+        💡 Irregular verbs: go → went · see → saw · have → had · say → said · hear → heard · run → ran · do → did · buy → bought · come → came · drink → drank
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PART 1 — FILL IN THE BLANKS (Past Simple)
+         ══════════════════════════════════════════════ -->
+    <h2>Part 1: Fill in the blanks (Past Simple)</h2>
+    <p style="font-size: 0.95rem; color: #555; margin-bottom: 15px;">Choose the correct Past Simple form of the verb in brackets.</p>
+
+    <div class="question-block" id="block1">
+        <p>1. Yesterday I ___ to the market. <i>(go)</i></p>
+        <select id="q1">
+            <option value="">--Select--</option>
+            <option value="wrong">goed</option>
+            <option value="correct">went</option>
+            <option value="wrong">gone</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block2">
+        <p>2. I ___ a strange man. <i>(see)</i></p>
+        <select id="q2">
+            <option value="">--Select--</option>
+            <option value="wrong">seed</option>
+            <option value="wrong">seen</option>
+            <option value="correct">saw</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block3">
+        <p>3. He ___ a weapon. <i>(have)</i></p>
+        <select id="q3">
+            <option value="">--Select--</option>
+            <option value="correct">had</option>
+            <option value="wrong">haved</option>
+            <option value="wrong">has</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block4">
+        <p>4. He ___ : "You need to trade." <i>(say)</i></p>
+        <select id="q4">
+            <option value="">--Select--</option>
+            <option value="wrong">sayed</option>
+            <option value="correct">said</option>
+            <option value="wrong">says</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block5">
+        <p>5. I ___ a noise. <i>(hear)</i></p>
+        <select id="q5">
+            <option value="">--Select--</option>
+            <option value="wrong">heared</option>
+            <option value="correct">heard</option>
+            <option value="wrong">hears</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block6">
+        <p>6. I ___ away. <i>(run)</i></p>
+        <select id="q6">
+            <option value="">--Select--</option>
+            <option value="wrong">runned</option>
+            <option value="correct">ran</option>
+            <option value="wrong">running</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block7">
+        <p>7. He ___ nothing. <i>(do)</i></p>
+        <select id="q7">
+            <option value="">--Select--</option>
+            <option value="wrong">doed</option>
+            <option value="wrong">doing</option>
+            <option value="correct">did</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block8">
+        <p>8. She ___ a new phone. <i>(buy)</i></p>
+        <select id="q8">
+            <option value="">--Select--</option>
+            <option value="wrong">buyed</option>
+            <option value="correct">bought</option>
+            <option value="wrong">buying</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block9">
+        <p>9. They ___ to the party. <i>(come)</i></p>
+        <select id="q9">
+            <option value="">--Select--</option>
+            <option value="wrong">comed</option>
+            <option value="correct">came</option>
+            <option value="wrong">coming</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block10">
+        <p>10. He ___ all the water. <i>(drink)</i></p>
+        <select id="q10">
+            <option value="">--Select--</option>
+            <option value="wrong">drinked</option>
+            <option value="wrong">drinking</option>
+            <option value="correct">drank</option>
+        </select>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         PART 2 — THREE FORMS: Complete the missing form
+         ══════════════════════════════════════════════ -->
+    <h2>Part 2: Find the Three Forms</h2>
+    <p style="font-size: 0.95rem; color: #555; margin-bottom: 15px;">Complete each row. Choose the missing form (infinitive, past simple, or past participle).</p>
+
+    <div class="question-block" id="block11">
+        <p><b>11.</b> <span class="verb-form">go</span> → <span class="verb-form blank">?</span> → <span class="verb-form">gone</span></p>
+        <select id="q11">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">goed</option>
+            <option value="correct">went</option>
+            <option value="wrong">going</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block12">
+        <p><b>12.</b> <span class="verb-form blank">?</span> → <span class="verb-form">saw</span> → <span class="verb-form">seen</span></p>
+        <select id="q12">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">sew</option>
+            <option value="correct">see</option>
+            <option value="wrong">sees</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block13">
+        <p><b>13.</b> <span class="verb-form">have</span> → <span class="verb-form">had</span> → <span class="verb-form blank">?</span></p>
+        <select id="q13">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">haved</option>
+            <option value="correct">had</option>
+            <option value="wrong">having</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block14">
+        <p><b>14.</b> <span class="verb-form">say</span> → <span class="verb-form blank">?</span> → <span class="verb-form">said</span></p>
+        <select id="q14">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">sayed</option>
+            <option value="correct">said</option>
+            <option value="wrong">saying</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block15">
+        <p><b>15.</b> <span class="verb-form blank">?</span> → <span class="verb-form">heard</span> → <span class="verb-form">heard</span></p>
+        <select id="q15">
+            <option value="">--Select the missing form--</option>
+            <option value="correct">hear</option>
+            <option value="wrong">here</option>
+            <option value="wrong">heared</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block16">
+        <p><b>16.</b> <span class="verb-form">run</span> → <span class="verb-form">ran</span> → <span class="verb-form blank">?</span></p>
+        <select id="q16">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">runned</option>
+            <option value="wrong">running</option>
+            <option value="correct">run</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block17">
+        <p><b>17.</b> <span class="verb-form">do</span> → <span class="verb-form blank">?</span> → <span class="verb-form">done</span></p>
+        <select id="q17">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">doed</option>
+            <option value="correct">did</option>
+            <option value="wrong">doing</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block18">
+        <p><b>18.</b> <span class="verb-form">buy</span> → <span class="verb-form">bought</span> → <span class="verb-form blank">?</span></p>
+        <select id="q18">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">buyed</option>
+            <option value="correct">bought</option>
+            <option value="wrong">buying</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block19">
+        <p><b>19.</b> <span class="verb-form blank">?</span> → <span class="verb-form">came</span> → <span class="verb-form">come</span></p>
+        <select id="q19">
+            <option value="">--Select the missing form--</option>
+            <option value="correct">come</option>
+            <option value="wrong">comed</option>
+            <option value="wrong">coming</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block20">
+        <p><b>20.</b> <span class="verb-form">drink</span> → <span class="verb-form blank">?</span> → <span class="verb-form">drunk</span></p>
+        <select id="q20">
+            <option value="">--Select the missing form--</option>
+            <option value="wrong">drinked</option>
+            <option value="correct">drank</option>
+            <option value="wrong">drinking</option>
+        </select>
+    </div>
+
+    <button onclick="checkAnswers()">Check My Answers</button>
+    <div id="score-display"></div>
+</div>
+
+<script>
+    function checkAnswers() {
+        let score = 0;
+        let total = 20;
+
+        const validate = (id, isCorrect) => {
+            const block = document.getElementById(id);
+            if (isCorrect) {
+                block.className = "question-block correct-bg";
+                score++;
+            } else {
+                block.className = "question-block incorrect-bg";
+            }
+        };
+
+        // Part 1 — Fill in the blanks (10 points)
+        validate("block1",  document.getElementById('q1').value === "correct");
+        validate("block2",  document.getElementById('q2').value === "correct");
+        validate("block3",  document.getElementById('q3').value === "correct");
+        validate("block4",  document.getElementById('q4').value === "correct");
+        validate("block5",  document.getElementById('q5').value === "correct");
+        validate("block6",  document.getElementById('q6').value === "correct");
+        validate("block7",  document.getElementById('q7').value === "correct");
+        validate("block8",  document.getElementById('q8').value === "correct");
+        validate("block9",  document.getElementById('q9').value === "correct");
+        validate("block10", document.getElementById('q10').value === "correct");
+
+        // Part 2 — Three forms: complete the missing form (10 points)
+        validate("block11", document.getElementById('q11').value === "correct");
+        validate("block12", document.getElementById('q12').value === "correct");
+        validate("block13", document.getElementById('q13').value === "correct");
+        validate("block14", document.getElementById('q14').value === "correct");
+        validate("block15", document.getElementById('q15').value === "correct");
+        validate("block16", document.getElementById('q16').value === "correct");
+        validate("block17", document.getElementById('q17').value === "correct");
+        validate("block18", document.getElementById('q18').value === "correct");
+        validate("block19", document.getElementById('q19').value === "correct");
+        validate("block20", document.getElementById('q20').value === "correct");
+
+        const scoreDiv = document.getElementById('score-display');
+        scoreDiv.style.display = "block";
+        scoreDiv.innerHTML = `Your Score: ${score} / ${total}`;
+        scoreDiv.style.color = score === total ? "green" : "#e74c3c";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm Story Quiz: Be Going To & Irregular Verbs</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --success: #1dd1a1;
+            --error: #ff9ff3;
+            --bg: #f9f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #a29bfe 0%, #fab1a0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .quiz-card {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 25px; }
+        .progress-container { height: 8px; background: #eee; border-radius: 4px; margin-bottom: 20px; }
+        #progress-fill { height: 100%; width: 0%; background: var(--primary); border-radius: 4px; transition: 0.4s; }
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: #2d3436; line-height: 1.5; }
+        .question-text strong { color: var(--primary); }
+        .options-grid { display: grid; gap: 12px; }
+        .opt-btn {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #fdfdfd;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .opt-btn:hover { border-color: var(--primary); background: #ffeae8; }
+        .correct { background: #e0fcf2 !important; border-color: var(--success) !important; color: #079992; }
+        .wrong { background: #fee8f6 !important; border-color: var(--error) !important; color: #eb4d4b; }
+        #next-btn {
+            margin-top: 25px;
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        #next-btn:hover { background: #ee5a5a; }
+        .results { text-align: center; display: none; }
+        .hidden { display: none; }
+        .score-badge {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+        .question-type {
+            display: inline-block;
+            background: #ffeae8;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div id="quiz-ui">
+        <h1>🌾 Farm Story Quiz</h1>
+        <div class="progress-container"><div id="progress-fill"></div></div>
+        <div id="question-area">
+            <div id="q-type" class="question-type">Multiple Choice</div>
+            <div id="q-text" class="question-text"></div>
+            <div id="options" class="options-grid"></div>
+        </div>
+        <button id="next-btn" onclick="nextQuestion()">Next Question ➔</button>
+    </div>
+
+    <div id="result-ui" class="results">
+        <div id="emoji" class="score-badge">🎉</div>
+        <h2>Quiz Complete!</h2>
+        <p id="score-text" style="font-size: 1.2rem; color: #555; margin: 15px 0;"></p>
+        <button onclick="location.reload()" class="opt-btn" style="text-align:center; width:100%; border-color: var(--primary); font-weight: bold; padding: 15px;">🔄 Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    /* =========================================================
+       FARM STORY QUIZ — Answer positions MIXED UP
+       Correct index (c) is scattered across 0, 1, 2 randomly.
+       ========================================================= */
+    const questions = [
+
+        // ══════════════════════════════════════════════
+        // PART 1: MATCHING (EN → RU)
+        // ══════════════════════════════════════════════
+
+        {
+            type: "Matching",
+            q: 'What does "<strong>We\'re going to lose the farm.</strong>" mean in Russian?',
+            a: [
+                '"Что случилось в банке?"',
+                '"Мы потеряем ферму."',
+                '"Всё ценное придётся продать."'
+            ],
+            c: 1
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>What happened at the bank?</strong>" mean in Russian?',
+            a: [
+                '"Будь в безопасности."',
+                '"Мы потеряем ферму."',
+                '"Что случилось в банке?"'
+            ],
+            c: 2
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>Welcome home, dear ones.</strong>" mean in Russian?',
+            a: [
+                '"Добро пожаловать домой, дорогие."',
+                '"Всё ценное придётся продать."',
+                '"Я не нуждаюсь в твоей помощи."'
+            ],
+            c: 0
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>I really don\'t need your help.</strong>" mean in Russian?',
+            a: [
+                '"Я желаю, чтобы у меня было что-то ценное."',
+                '"Будь в безопасности."',
+                '"Я не нуждаюсь в твоей помощи."'
+            ],
+            c: 2
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>Be safe.</strong>" mean in Russian?',
+            a: [
+                '"Добро пожаловать домой, дорогие."',
+                '"Будь в безопасности."',
+                '"Что случилось в банке?"'
+            ],
+            c: 1
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>Everything of value will have to be sold.</strong>" mean in Russian?',
+            a: [
+                '"Всё ценное придётся продать."',
+                '"Мы потеряем ферму."',
+                '"Я желаю, чтобы у меня было что-то ценное."'
+            ],
+            c: 0
+        },
+        {
+            type: "Matching",
+            q: 'What does "<strong>I wish I had something of value.</strong>" mean in Russian?',
+            a: [
+                '"Будь в безопасности."',
+                '"Я не нуждаюсь в твоей помощи."',
+                '"Я желаю, чтобы у меня было что-то ценное."'
+            ],
+            c: 2
+        },
+
+        // ══════════════════════════════════════════════
+        // PART 2: BE GOING TO
+        // ══════════════════════════════════════════════
+
+        {
+            type: "Be going to",
+            q: 'We ________ lose the farm. The bank will take it tomorrow.',
+            a: [
+                "is going to",
+                "am going to",
+                "are going to"
+            ],
+            c: 2
+        },
+        {
+            type: "Be going to",
+            q: 'She ________ buy a new phone next week.',
+            a: [
+                "is going to",
+                "are going to",
+                "am going to"
+            ],
+            c: 0
+        },
+        {
+            type: "Be going to",
+            q: 'I ________ help my father at the farm tomorrow.',
+            a: [
+                "are going to",
+                "am going to",
+                "is going to"
+            ],
+            c: 1
+        },
+        {
+            type: "Be going to",
+            q: 'They ________ come to the party on Saturday.',
+            a: [
+                "is going to",
+                "am going to",
+                "are going to"
+            ],
+            c: 2
+        },
+        {
+            type: "Be going to",
+            q: 'He ________ drink all the water — look at him!',
+            a: [
+                "are going to",
+                "is going to",
+                "am going to"
+            ],
+            c: 1
+        },
+        {
+            type: "Be going to",
+            q: 'We ________ sell everything of value.',
+            a: [
+                "am going to",
+                "are going to",
+                "is going to"
+            ],
+            c: 1
+        },
+
+        // ══════════════════════════════════════════════
+        // PART 3: PAST SIMPLE IRREGULAR VERBS
+        // ══════════════════════════════════════════════
+
+        {
+            type: "Past Simple",
+            q: 'Yesterday I ________ to the market. <i>(go)</i>',
+            a: ["goed", "went", "gone"],
+            c: 1
+        },
+        {
+            type: "Past Simple",
+            q: 'I ________ a strange man at the market. <i>(see)</i>',
+            a: ["seed", "seen", "saw"],
+            c: 2
+        },
+        {
+            type: "Past Simple",
+            q: 'He ________ a weapon in his hand. <i>(have)</i>',
+            a: ["had", "haved", "has"],
+            c: 0
+        },
+        {
+            type: "Past Simple",
+            q: 'He ________: "You need to trade." <i>(say)</i>',
+            a: ["sayed", "says", "said"],
+            c: 2
+        },
+        {
+            type: "Past Simple",
+            q: 'I ________ a noise behind me. <i>(hear)</i>',
+            a: ["heared", "heard", "hears"],
+            c: 1
+        },
+        {
+            type: "Past Simple",
+            q: 'I ________ away as fast as I could. <i>(run)</i>',
+            a: ["ran", "runned", "running"],
+            c: 0
+        },
+        {
+            type: "Past Simple",
+            q: 'He ________ nothing. He just stood there. <i>(do)</i>',
+            a: ["doed", "doing", "did"],
+            c: 2
+        },
+        {
+            type: "Past Simple",
+            q: 'She ________ a new phone yesterday. <i>(buy)</i>',
+            a: ["buyed", "bought", "buying"],
+            c: 1
+        },
+        {
+            type: "Past Simple",
+            q: 'They ________ to the party last night. <i>(come)</i>',
+            a: ["came", "comed", "coming"],
+            c: 0
+        },
+        {
+            type: "Past Simple",
+            q: 'He ________ all the water in the bottle. <i>(drink)</i>',
+            a: ["drinked", "drinking", "drank"],
+            c: 2
+        },
+        {
+            type: "Past Simple",
+            q: 'She ________ her car to the city yesterday. <i>(drive)</i>',
+            a: ["drived", "drove", "driven"],
+            c: 1
+        },
+        {
+            type: "Past Simple",
+            q: 'The bird ________ over the farm this morning. <i>(fly)</i>',
+            a: ["flew", "flied", "flown"],
+            c: 0
+        },
+        {
+            type: "Past Simple",
+            q: 'The boy ________ the ball in the garden. <i>(catch)</i>',
+            a: ["catched", "catching", "caught"],
+            c: 2
+        },
+        {
+            type: "Past Simple",
+            q: 'She ________ tired after the long day. <i>(feel)</i>',
+            a: ["feeled", "felt", "feeling"],
+            c: 1
+        },
+        {
+            type: "Past Simple",
+            q: 'He ________ the window with a ball. <i>(break)</i>',
+            a: ["broke", "breaked", "broking"],
+            c: 0
+        },
+        {
+            type: "Past Simple",
+            q: 'The wind ________ hard last night. <i>(blow)</i>',
+            a: ["blewed", "blew", "blown"],
+            c: 1
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    const totalQuestions = questions.length;
+
+    function loadQuestion() {
+        if (currentQ >= totalQuestions) {
+            showResults();
+            return;
+        }
+        const data = questions[currentQ];
+
+        document.getElementById('q-type').innerText = data.type;
+        document.getElementById('q-text').innerHTML = data.q;
+
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        data.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerHTML = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsDiv.appendChild(btn);
+        });
+        document.getElementById('next-btn').style.display = 'none';
+        updateProgress();
+    }
+
+    function checkAnswer(idx, btn) {
+        const correct = questions[currentQ].c;
+        const allBtns = document.querySelectorAll('.opt-btn');
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if (idx === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correct].classList.add('correct');
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        loadQuestion();
+    }
+
+    function updateProgress() {
+        const progress = ((currentQ) / totalQuestions) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+    }
+
+    function showResults() {
+        document.getElementById('quiz-ui').classList.add('hidden');
+        document.getElementById('result-ui').style.display = 'block';
+        document.getElementById('score-text').innerText = `You scored ${score} out of ${totalQuestions} correct!`;
+
+        const percent = (score / totalQuestions) * 100;
+        let emoji = '📚';
+        if (percent === 100) emoji = '🏆';
+        else if (percent >= 80) emoji = '🎉';
+        else if (percent >= 60) emoji = '👍';
+        else if (percent >= 40) emoji = '💪';
+        document.getElementById('emoji').innerText = emoji;
+        updateProgress();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
