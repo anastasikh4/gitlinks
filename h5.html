@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Adjectives & Degrees of Comparison</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 800px; margin: 20px auto; padding: 20px; background-color: #f0f2f5; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #2980b9; font-size: 1.3rem; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 10px; }
+        .monologue { background: #f8fbff; padding: 20px; border-left: 5px solid #3498db; margin: 20px 0; font-style: italic; border-radius: 4px; }
+        .word-bank { background: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px dashed #ffc107; text-align: center; font-weight: bold; color: #856404; }
+        .question-block { margin-bottom: 15px; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; transition: 0.3s; background: #fff; }
+        .question-block select { padding: 10px; border-radius: 6px; border: 2px solid #ccc; font-size: 1rem; width: 100%; max-width: 300px; margin-top: 8px; }
+        
+        /* Result Styles */
+        .correct-bg { background-color: #d4edda !important; border-color: #c3e6cb !important; }
+        .incorrect-bg { background-color: #f8d7da !important; border-color: #f5c6cb !important; }
+        
+        button { display: block; width: 100%; background: #3498db; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 25px; transition: 0.2s; }
+        button:hover { background: #2980b9; }
+        #score-display { text-align: center; margin-top: 20px; font-size: 22px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧠 Personality Adjectives</h1>
+    
+    <div class="monologue">
+        "Hi! We all have different personalities. Some people are easy-going and sociable, while others are shy or stubborn. Read the sentences below and choose the correct adjective for each gap. Then, try the bonus task about comparing people!"
+    </div>
+
+    <div class="word-bank">
+        selfish · sociable · pessimistic · easy-going · flexible · patient · reliable · stubborn · shy · insincere
+    </div>
+
+    <h2>Part 1: Complete the sentences</h2>
+
+    <div class="question-block" id="block1">
+        <p>1. My father is ______ and doesn't get upset about things easily.</p>
+        <select id="q1">
+            <option value="">--Select--</option>
+            <option value="wrong">pessimistic</option>
+            <option value="correct">easy-going</option>
+            <option value="wrong">insincere</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block2">
+        <p>2. Rachel has many friends because she's very ______.</p>
+        <select id="q2">
+            <option value="">--Select--</option>
+            <option value="correct">sociable</option>
+            <option value="wrong">shy</option>
+            <option value="wrong">selfish</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block3">
+        <p>3. ______ people always see the negative side of things.</p>
+        <select id="q3">
+            <option value="">--Select--</option>
+            <option value="wrong">Reliable</option>
+            <option value="wrong">Flexible</option>
+            <option value="correct">Pessimistic</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block4">
+        <p>4. Penny doesn't get angry easily. She's very ______.</p>
+        <select id="q4">
+            <option value="">--Select--</option>
+            <option value="correct">patient</option>
+            <option value="wrong">stubborn</option>
+            <option value="wrong">insincere</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block5">
+        <p>5. Thomas is very ______. He won't let you down.</p>
+        <select id="q5">
+            <option value="">--Select--</option>
+            <option value="wrong">selfish</option>
+            <option value="correct">reliable</option>
+            <option value="wrong">shy</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block6">
+        <p>6. Don't believe everything Helen says. She's a bit ______.</p>
+        <select id="q6">
+            <option value="">--Select--</option>
+            <option value="correct">insincere</option>
+            <option value="wrong">patient</option>
+            <option value="wrong">easy-going</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block7">
+        <p>7. A ______ person doesn't care about other people's feelings.</p>
+        <select id="q7">
+            <option value="">--Select--</option>
+            <option value="wrong">sociable</option>
+            <option value="wrong">reliable</option>
+            <option value="correct">selfish</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block8">
+        <p>8. Jane is very ______ and blushes when strangers talk to her.</p>
+        <select id="q8">
+            <option value="">--Select--</option>
+            <option value="correct">shy</option>
+            <option value="wrong">flexible</option>
+            <option value="wrong">pessimistic</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block9">
+        <p>9. Maria is ______ and can deal with changes in life.</p>
+        <select id="q9">
+            <option value="">--Select--</option>
+            <option value="wrong">stubborn</option>
+            <option value="correct">flexible</option>
+            <option value="wrong">insincere</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block10">
+        <p>10. Listen to me! Don't be so ______.</p>
+        <select id="q10">
+            <option value="">--Select--</option>
+            <option value="wrong">easy-going</option>
+            <option value="wrong">sociable</option>
+            <option value="correct">stubborn</option>
+        </select>
+    </div>
+
+    <h2>Part 2: Degrees of Comparison (Bonus)</h2>
+    <p style="font-size: 0.95rem; color: #555; margin-bottom: 15px;">Use the correct form of the adjective in brackets (comparative or superlative).</p>
+
+    <div class="question-block" id="block11">
+        <p>11. Ben is ____________ (sociable) than his brother.</p>
+        <select id="q11">
+            <option value="">--Select--</option>
+            <option value="wrong">sociableer</option>
+            <option value="correct">more sociable</option>
+            <option value="wrong">most sociable</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block12">
+        <p>12. Maria is the ____________ (flexible) person in the team.</p>
+        <select id="q12">
+            <option value="">--Select--</option>
+            <option value="wrong">more flexible</option>
+            <option value="correct">most flexible</option>
+            <option value="wrong">flexiblest</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block13">
+        <p>13. Tom is ____________ (stubborn) than his sister.</p>
+        <select id="q13">
+            <option value="">--Select--</option>
+            <option value="correct">more stubborn</option>
+            <option value="wrong">stubbornest</option>
+            <option value="wrong">most stubborn</option>
+        </select>
+    </div>
+
+    <div class="question-block" id="block14">
+        <p>14. She is the ____________ (patient) teacher I know.</p>
+        <select id="q14">
+            <option value="">--Select--</option>
+            <option value="wrong">more patient</option>
+            <option value="wrong">patientest</option>
+            <option value="correct">most patient</option>
+        </select>
+    </div>
+
+    <button onclick="checkAnswers()">Check My Answers</button>
+    <div id="score-display"></div>
+</div>
+
+<script>
+    function checkAnswers() {
+        let score = 0;
+
+        // Validation Logic Helper
+        const validate = (id, isCorrect) => {
+            const block = document.getElementById(id);
+            if (isCorrect) {
+                block.className = "question-block correct-bg";
+                score++;
+            } else {
+                block.className = "question-block incorrect-bg";
+            }
+        };
+
+        // Part 1: Vocabulary (10 points)
+        validate("block1", document.getElementById('q1').value === "correct");
+        validate("block2", document.getElementById('q2').value === "correct");
+        validate("block3", document.getElementById('q3').value === "correct");
+        validate("block4", document.getElementById('q4').value === "correct");
+        validate("block5", document.getElementById('q5').value === "correct");
+        validate("block6", document.getElementById('q6').value === "correct");
+        validate("block7", document.getElementById('q7').value === "correct");
+        validate("block8", document.getElementById('q8').value === "correct");
+        validate("block9", document.getElementById('q9').value === "correct");
+        validate("block10", document.getElementById('q10').value === "correct");
+
+        // Part 2: Degrees of Comparison (4 points)
+        validate("block11", document.getElementById('q11').value === "correct");
+        validate("block12", document.getElementById('q12').value === "correct");
+        validate("block13", document.getElementById('q13').value === "correct");
+        validate("block14", document.getElementById('q14').value === "correct");
+
+        // Display Score
+        const scoreDiv = document.getElementById('score-display');
+        scoreDiv.style.display = "block";
+        scoreDiv.innerHTML = `Your Score: ${score} / 14`;
+        scoreDiv.style.color = score === 14 ? "green" : "#e74c3c";
+    }
+</script>
+
+</body>
+</html>

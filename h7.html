@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Etiquette in the UK</title>
+    <style>
+        :root { --primary: #0984e3; --success: #00b894; --error: #d63031; --bg: #fdfdfd; }
+        * { box-sizing: border-box; font-family: 'Comic Sans MS', sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 15px; margin: 0; font-size: 11px; }
+        .quiz-container { background: white; width: 100%; max-width: 720px; padding: 20px; border-radius: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.1); text-align: center; border: 3px solid #eee; min-height: 520px; }
+
+        .progress-header { font-weight: bold; color: #aaa; text-transform: uppercase; margin-bottom: 8px; font-size: 1rem; }
+        .visual-box { font-size: 3.5rem; margin: 15px 0; display: flex; justify-content: center; gap: 20px; align-items: center; min-height: 120px; }
+
+        .sentence-builder { border-bottom: 3px dashed #ddd; min-height: 70px; margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px; background: #f9fbfc; border-radius: 10px; font-size: 1.2rem; }
+        .word-tag { background: var(--primary); color: white; padding: 8px 16px; border-radius: 10px; font-weight: bold; font-size: 1.1rem; animation: pop 0.3s; box-shadow: 0 3px 0 #076bb3; }
+
+        .btn-pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        .action-btn { background: #fff; padding: 14px 24px; border: 2px solid #ddd; border-radius: 14px; cursor: pointer; font-weight: bold; font-size: 1.3rem; box-shadow: 0 4px 0 #ccc; transition: all 0.15s; min-width: 180px; }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 0 #bbb; }
+        .action-btn:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+
+        .feedback { margin-top: 20px; font-size: 1.6rem; font-weight: bold; min-height: 50px; }
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Exercise 1 of 8</div>
+    <h2 id="q-title">Title</h2>
+    <div id="visual-content" class="visual-box"></div>
+    <div id="game-ui">
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let userParts = [];
+
+    /* =========================================================
+       SOCIAL ETIQUETTE IN THE UK — KEY WORDS ONLY
+       Simple 2-part phrases based on bolded words in the text.
+       ========================================================= */
+    const data = [
+        {
+            title: "First meeting?",
+            visual: "🤝",
+            parts: ["a handshake"],
+            correct: "a handshake"
+        },
+        {
+            title: "Close friends?",
+            visual: "😘",
+            parts: ["kiss on the cheek"],
+            correct: "kiss on the cheek"
+        },
+        {
+            title: "Or maybe...",
+            visual: "🤗",
+            parts: ["give them a hug"],
+            correct: "give them a hug"
+        },
+        {
+            title: "Don't be...",
+            visual: "😊",
+            parts: ["offended"],
+            correct: "offended"
+        },
+        {
+            title: "The British like their...",
+            visual: "🔒",
+            parts: ["privacy"],
+            correct: "privacy"
+        },
+        {
+            title: "Safe topic #1:",
+            visual: "☀️ 💬",
+            parts: ["small talk"],
+            correct: "small talk"
+        },
+        {
+            title: "NOT safe topics:",
+            visual: "🚫 🗣️",
+            parts: ["age, religion, politics"],
+            correct: "age, religion, politics"
+        },
+        {
+            title: "When you visit someone...",
+            visual: "⏰ 🏠",
+            parts: ["be on time"],
+            correct: "be on time"
+        }
+    ];
+
+    function loadGame() {
+        if (currentStep >= data.length) {
+            document.getElementById('q-title').innerText = "Well done! 🎉";
+            document.getElementById('visual-content').innerHTML = "🏆🇬🇧";
+            document.getElementById('game-ui').innerHTML = `
+                <h2 style='color:#00b894; font-size:1.6rem; line-height:1.5;'>
+                    You know British etiquette!
+                </h2>
+                <p style='color:#666; font-size:1.1rem; margin-top:15px; line-height:1.8;'>
+                    🤝 <b>Handshake</b> for first meeting<br>
+                    😘 <b>Kiss on the cheek</b> for close friends<br>
+                    ☀️ <b>Small talk</b>: weather is always safe<br>
+                    🚫 Avoid <b>age, religion, politics</b><br>
+                    ⏰ Always <b>be on time</b>
+                </p>
+            `;
+            document.getElementById('feedback').innerText = "";
+            return;
+        }
+
+        const q = data[currentStep];
+        document.getElementById('progress').innerText = `Exercise ${currentStep + 1} of ${data.length}`;
+        document.getElementById('q-title').innerText = q.title;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        document.getElementById('feedback').innerText = "";
+
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = '<span class="gap" style="color:#aaa; font-size:1.5rem;">. . .</span>';
+        pool.innerHTML = "";
+        userParts = [];
+
+        // Show the correct phrase PLUS 2 wrong distractors (shuffled)
+        const allOptions = shuffle([
+            q.correct,
+            ...getDistractors(q.correct)
+        ]);
+
+        allOptions.forEach(part => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = part;
+            btn.onclick = () => {
+                if (!btn.disabled) {
+                    userParts.push(part);
+                    btn.disabled = true;
+                    if (builder.querySelector('.gap')) builder.innerHTML = '';
+                    builder.innerHTML += `<span class="word-tag">${part}</span>`;
+                    setTimeout(checkAnswer, 400);
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    // Simple distractor pool
+    const distractorsPool = [
+        "a bow",
+        "say hello",
+        "hug them",
+        "ask about money",
+        "talk about politics",
+        "be late",
+        "kiss on the cheek",
+        "give them a hug",
+        "offended",
+        "privacy",
+        "small talk",
+        "age, religion, politics",
+        "be on time"
+    ];
+
+    function getDistractors(correct) {
+        const available = distractorsPool.filter(d => d !== correct);
+        return shuffle(available).slice(0, 2);
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function checkAnswer() {
+        const joined = userParts.join(" ").trim();
+        const correct = data[currentStep].correct.trim();
+
+        if (joined.toLowerCase() === correct.toLowerCase()) {
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--success)'>🌟 WELL DONE! 🌟</span>";
+            speak(correct);
+            setTimeout(() => {
+                currentStep++;
+                loadGame();
+            }, 1600);
+        } else {
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--error)'>❌ Try again!</span>";
+            setTimeout(() => {
+                loadGame();
+            }, 1400);
+        }
+    }
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.lang = 'en-GB';
+            msg.rate = 0.9;
+            msg.pitch = 1.1;
+            window.speechSynthesis.speak(msg);
+        }
+    }
+
+    // Start
+    loadGame();
+</script>
+</body>
+</html>

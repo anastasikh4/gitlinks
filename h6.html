@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Etiquette in the UK • Easy Quiz (A1+)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body {
+            font-family:'Fredoka One', cursive;
+            background:linear-gradient(135deg,#667eea,#764ba2);
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+        .wordwall {
+            width:92vw;
+            height:92vh;
+            background:white;
+            border-radius:24px;
+            box-shadow:0 15px 45px rgba(0,0,0,0.35);
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            position:relative;
+        }
+        .header {
+            background:#0984e3;
+            color:white;
+            padding:12px;
+            text-align:center;
+            font-size:1.8vw;
+        }
+        .question-area {
+            flex:1;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            padding:25px;
+            background:#f8f9fa;
+        }
+        .prompt-label {
+            font-size:1.3vw;
+            color:#888;
+            text-transform:uppercase;
+            margin-bottom:14px;
+            letter-spacing:2px;
+        }
+        .prompt {
+            font-size:4vw;
+            color:#d63031;
+            margin-bottom:12px;
+            text-shadow:2px 2px 8px rgba(0,0,0,0.15);
+            text-align:center;
+            line-height:1.2;
+        }
+        .prompt-emoji {
+            font-size:5vw;
+            margin-bottom:20px;
+        }
+        .options {
+            display:grid;
+            grid-template-columns:1fr;
+            gap:14px;
+            width:70%;
+            max-width:700px;
+            margin-top:10px;
+        }
+        .card {
+            background:#fff;
+            padding:18px 20px;
+            border-radius:16px;
+            font-size:1.6vw;
+            text-align:center;
+            cursor:pointer;
+            box-shadow:0 10px 30px rgba(0,0,0,0.12);
+            transition:all 0.3s;
+            border:5px solid #dfe6e9;
+            line-height:1.3;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .card:hover {
+            transform:translateY(-6px);
+            box-shadow:0 16px 40px rgba(0,0,0,0.2);
+        }
+        .card.correct {
+            background:#55efc4 !important;
+            border-color:#00b894 !important;
+            color:white !important;
+            transform:scale(1.05);
+        }
+        .card.wrong {
+            background:#fab1a0 !important;
+            border-color:#e17055 !important;
+        }
+        .score {
+            position:absolute;
+            top:12px;
+            right:20px;
+            background:#ffeaa7;
+            color:#2d3436;
+            padding:10px 24px;
+            border-radius:40px;
+            font-size:1.6vw;
+            font-weight:bold;
+            box-shadow:0 6px 20px rgba(0,0,0,0.15);
+            z-index:5;
+        }
+        .final-screen {
+            position:absolute;
+            inset:0;
+            background:#6c5ce7;
+            display:none;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            text-align:center;
+            padding:20px;
+        }
+        .final-score {
+            font-size:8vw;
+            margin-bottom:20px;
+        }
+        .emoji {
+            font-size:10vw;
+        }
+        @media (max-width: 768px) {
+            .prompt { font-size: 8vw; }
+            .prompt-emoji { font-size: 12vw; }
+            .card     { font-size: 4.5vw; padding: 14px 12px; }
+            .options   { gap: 12px; width: 95%; }
+            .header    { font-size: 3.5vw; }
+            .score     { font-size: 3vw; padding: 8px 18px; }
+            .prompt-label { font-size: 3vw; }
+        }
+    </style>
+</head>
+<body>
+<div class="wordwall">
+    <div class="score">Score: <span id="score">0</span>/10</div>
+    <div class="header">🇬🇧 SOCIAL ETIQUETTE IN THE UK</div>
+
+    <div class="question-area" id="question"></div>
+
+    <div class="final-screen" id="final">
+        <div class="final-score" id="result"></div>
+        <div class="emoji">🇬🇧</div>
+        <div style="font-size:3vw; margin-top:15px;">Well done!</div>
+    </div>
+</div>
+
+<script>
+    /* =========================================================
+       SOCIAL ETIQUETTE IN THE UK — EASY VERSION (A1+)
+       Simple words, short definitions, 3 options, no icons.
+       ========================================================= */
+    const items = [
+        {
+            word: "a handshake",
+            emoji: "🤝",
+            options: [
+                "Saying hello with your hand",
+                "Saying hello with a kiss",
+                "Saying goodbye with a wave"
+            ],
+            correct: "Saying hello with your hand"
+        },
+        {
+            word: "kiss on the cheek",
+            emoji: "😘",
+            options: [
+                "For close friends and family",
+                "For your boss at work",
+                "For a stranger in the street"
+            ],
+            correct: "For close friends and family"
+        },
+        {
+            word: "privacy",
+            emoji: "🔒",
+            options: [
+                "Your personal life",
+                "A big public park",
+                "A shop in the city"
+            ],
+            correct: "Your personal life"
+        },
+        {
+            word: "small talk",
+            emoji: "☀️",
+            options: [
+                "Polite chat about the weather",
+                "A loud argument",
+                "A very long speech"
+            ],
+            correct: "Polite chat about the weather"
+        },
+        {
+            word: "offended",
+            emoji: "😢",
+            options: [
+                "Sad or upset",
+                "Happy and proud",
+                "Tired and sleepy"
+            ],
+            correct: "Sad or upset"
+        },
+        {
+            word: "on time",
+            emoji: "⏰",
+            options: [
+                "Not late",
+                "Very late",
+                "Very early"
+            ],
+            correct: "Not late"
+        },
+        {
+            word: "a hug",
+            emoji: "🤗",
+            options: [
+                "Arms around someone",
+                "A dance move",
+                "A type of food"
+            ],
+            correct: "Arms around someone"
+        },
+        {
+            word: "a gift",
+            emoji: "🎁",
+            options: [
+                "A present for a friend",
+                "A ticket to a movie",
+                "A letter to a teacher"
+            ],
+            correct: "A present for a friend"
+        },
+        {
+            word: "respect",
+            emoji: "🙏",
+            options: [
+                "Being polite to people",
+                "Being angry with people",
+                "Being funny with people"
+            ],
+            correct: "Being polite to people"
+        },
+        {
+            word: "Greeting people",
+            emoji: "👋",
+            options: [
+                "Saying hello to someone",
+                "Saying goodbye to someone",
+                "Cooking dinner for someone"
+            ],
+            correct: "Saying hello to someone"
+        }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function showQuestion() {
+        if (current >= items.length) {
+            endGame();
+            return;
+        }
+
+        const item = items[current];
+        const shuffled = [...item.options].sort(() => Math.random() - 0.5);
+
+        document.getElementById('question').innerHTML = `
+            <div class="prompt-label">What does it mean?</div>
+            <div class="prompt">${item.word}</div>
+            <div class="prompt-emoji">${item.emoji}</div>
+            <div class="options">
+                ${shuffled.map((opt) => {
+                    const isCorrect = opt === item.correct;
+                    return `<div class="card" data-correct="${isCorrect}" onclick="checkAnswer(this)">
+                        <span>${opt}</span>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function checkAnswer(clickedCard) {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.style.pointerEvents = 'none';
+            if (card.dataset.correct === 'true') card.classList.add('correct');
+            else if (card === clickedCard) card.classList.add('wrong');
+        });
+
+        const isCorrect = clickedCard.dataset.correct === 'true';
+
+        if (isCorrect) {
+            score++;
+            document.getElementById('score').textContent = score;
+            setTimeout(() => { current++; showQuestion(); }, 1400);
+        } else {
+            setTimeout(() => { current++; showQuestion(); }, 2300);
+        }
+    }
+
+    function endGame() {
+        document.querySelector('.question-area').style.display = 'none';
+        document.getElementById('final').style.display = 'flex';
+
+        let msg = score === 10 ? "PERFECT!<br>10/10" :
+                  score >= 8  ? `EXCELLENT!<br>${score}/10` :
+                  score >= 6  ? `GREAT!<br>${score}/10` :
+                  `NICE TRY!<br>${score}/10`;
+
+        document.getElementById('result').innerHTML = msg;
+    }
+
+    showQuestion();
+</script>
+</body>
+</html>
