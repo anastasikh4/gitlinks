@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality & Appearance Quiz</title>
+
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --primary-dark: #2f6fad;
+            --secondary: #52c41a;
+            --secondary-dark: #32990f;
+            --danger: #ff4b4b;
+            --danger-dark: #bf2e2e;
+            --bg: #f0f2f5;
+            --ink: #243b53;
+            --muted: #61778a;
+            --line: #d9e2ec;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 10%, rgba(74, 144, 226, 0.14), transparent 24%),
+                radial-gradient(circle at 88% 18%, rgba(82, 196, 26, 0.12), transparent 25%),
+                linear-gradient(135deg, #eef7ff, var(--bg));
+            font-family: "Segoe UI", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quiz-container {
+            width: 95%;
+            max-width: 590px;
+            padding: 28px;
+            background: #ffffff;
+            border: 2px solid #e2ebf2;
+            border-radius: 22px;
+            box-shadow: 0 12px 30px rgba(36, 59, 83, 0.13);
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0 0 19px;
+            color: var(--primary);
+            font-size: clamp(1.45rem, 4vw, 2rem);
+        }
+
+        .progress-bar {
+            height: 11px;
+            overflow: hidden;
+            margin-bottom: 18px;
+            background: #e7edf3;
+            border: 1px solid #d2dce6;
+            border-radius: 10px;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #78b9f4);
+            border-radius: 10px;
+            transition: width 0.35s ease;
+        }
+
+        .level-label {
+            min-height: 24px;
+            margin-bottom: 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        .emoji-display {
+            min-height: 75px;
+            margin: 12px 0 8px;
+            font-size: 4rem;
+        }
+
+        .question-text {
+            min-height: 56px;
+            margin-bottom: 18px;
+            color: var(--ink);
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 13px 12px;
+            color: var(--ink);
+            background: #ffffff;
+            border: 2px solid #dce5ed;
+            border-radius: 11px;
+            box-shadow: 0 4px 0 #c9d5df;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: transform 0.12s ease, background 0.12s ease, border 0.12s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: #f0f7ff;
+            border-color: var(--primary);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #c9d5df;
+        }
+
+        .btn.correct {
+            color: #14532d;
+            background: #e8f8ee;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 0 var(--secondary-dark);
+        }
+
+        .btn.wrong {
+            color: #7f1d1d;
+            background: #fde8e8;
+            border-color: var(--danger);
+            box-shadow: 0 4px 0 var(--danger-dark);
+        }
+
+        .btn.selected {
+            color: #173b67;
+            background: #e6f3ff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 0 var(--primary-dark);
+        }
+
+        .btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .gap-fill-container {
+            color: var(--ink);
+            background: #fafcff;
+            border: 2px solid #e0e8f0;
+            border-radius: 13px;
+            padding: 18px;
+            text-align: left;
+            font-size: 1.08rem;
+            line-height: 2.25;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 95px;
+            margin: 0 4px;
+            padding: 0 6px 1px;
+            color: var(--primary);
+            background: #f0f7ff;
+            border-bottom: 3px solid var(--primary);
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-weight: 800;
+            text-align: center;
+            transition: 0.15s ease;
+        }
+
+        .gap:hover {
+            background: #dfefff;
+        }
+
+        .gap.active-gap {
+            outline: 3px solid rgba(74, 144, 226, 0.20);
+            border-bottom-color: #1e63ab;
+            background: #d8ebff;
+        }
+
+        .gap.correct-gap {
+            color: #14532d;
+            background: #e8f8ee;
+            border-bottom-color: var(--secondary);
+        }
+
+        .gap.wrong-gap {
+            color: #7f1d1d;
+            background: #fde8e8;
+            border-bottom-color: var(--danger);
+        }
+
+        .gap-emoji {
+            margin-right: 4px;
+            font-size: 1.4rem;
+            vertical-align: middle;
+        }
+
+        .word-bank {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 20px;
+        }
+
+        .word-bank .btn {
+            min-width: 110px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .check-btn,
+        .next-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 13px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #5ed026, var(--secondary));
+            border: none;
+            border-radius: 11px;
+            box-shadow: 0 5px 0 var(--secondary-dark);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 800;
+            transition: transform 0.12s ease;
+        }
+
+        .check-btn:active,
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 var(--secondary-dark);
+        }
+
+        .check-btn:disabled,
+        .next-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .feedback {
+            display: none;
+            margin-top: 17px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.good {
+            color: #14532d;
+            background: #e8f8ee;
+            border: 2px solid var(--secondary);
+        }
+
+        .feedback.bad {
+            color: #7f1d1d;
+            background: #fde8e8;
+            border: 2px solid var(--danger);
+        }
+
+        .result-zone {
+            padding: 25px 8px 5px;
+        }
+
+        .result-zone h2 {
+            margin: 0;
+            color: var(--secondary-dark);
+            font-size: 2rem;
+        }
+
+        .result-zone p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .score {
+            margin: 15px 0;
+            color: var(--primary);
+            font-size: 3rem;
+            font-weight: 900;
+        }
+
+        .result-zone .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 0;
+                align-items: flex-start;
+            }
+
+            .quiz-container {
+                width: 100%;
+                min-height: 100vh;
+                padding: 24px 16px;
+                border-radius: 0;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .emoji-display {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+    <h1>🕵️ Personality & Appearance Quiz</h1>
+
+    <div class="progress-bar">
+        <div id="progress" class="progress"></div>
+    </div>
+
+    <div id="game-zone">
+        <div id="level-label" class="level-label">Level 1</div>
+
+        <div id="emoji-box" class="emoji-display"></div>
+
+        <div id="question-text" class="question-text"></div>
+
+        <div id="options" class="options-grid"></div>
+
+        <div id="gap-zone" class="hidden">
+            <div class="gap-fill-container" id="dialogue-text"></div>
+
+            <div class="word-bank" id="word-bank"></div>
+
+            <div id="gap-feedback" class="feedback"></div>
+
+            <button class="check-btn" id="check-gap-btn">
+                Check Answers
+            </button>
+        </div>
+
+        <div id="choice-feedback" class="feedback"></div>
+
+        <button id="next-btn" class="next-btn hidden">
+            Next →
+        </button>
+    </div>
+
+    <div id="result-zone" class="result-zone hidden">
+        <h2>Great Job! 🌟</h2>
+        <div id="final-score" class="score">0 / 0</div>
+        <p id="final-message">
+            You have completed the quiz.
+        </p>
+
+        <button class="btn" id="restart-btn">
+            Play Again
+        </button>
+    </div>
+
+</div>
+
+<script>
+    const questions = [
+        /* LEVEL 1: Personality Vocabulary */
+        {
+            l: 1,
+            e: "👑",
+            q: "He tells everybody what to do.",
+            opt: ["bossy", "patient"],
+            a: "bossy"
+        },
+        {
+            l: 1,
+            e: "📢",
+            q: "They make a lot of noise.",
+            opt: ["quiet", "loud"],
+            a: "loud"
+        },
+        {
+            l: 1,
+            e: "🧦",
+            q: "There are clothes on the floor and books on the bed.",
+            opt: ["messy", "tidy"],
+            a: "messy"
+        },
+        {
+            l: 1,
+            e: "⏳",
+            q: "He waits for all the students to finish.",
+            opt: ["organised", "patient"],
+            a: "patient"
+        },
+        {
+            l: 1,
+            e: "🤫",
+            q: "She never makes a noise.",
+            opt: ["loud", "quiet"],
+            a: "quiet"
+        },
+        {
+            l: 1,
+            e: "📁",
+            q: "He uploads his photos to his tablet every day.",
+            opt: ["organised", "messy"],
+            a: "organised"
+        },
+        {
+            l: 1,
+            e: "😎",
+            q: "She does not tell us what to do or when to do it.",
+            opt: ["bossy", "easy-going"],
+            a: "easy-going"
+        },
+        {
+            l: 1,
+            e: "🧸",
+            q: "They always put away their clothes and toys.",
+            opt: ["messy", "tidy"],
+            a: "tidy"
+        },
+
+        /* LEVEL 2: Appearance Sentences */
+        {
+            l: 2,
+            e: "👱‍♀️",
+            q: "She is tall. She is slim.",
+            opt: [
+                "She is tall and slim.",
+                "She is tall with slim."
+            ],
+            a: "She is tall and slim."
+        },
+        {
+            l: 2,
+            e: "🧔",
+            q: "He is short. He is fat.",
+            opt: [
+                "He is short with fat.",
+                "He is short and fat."
+            ],
+            a: "He is short and fat."
+        },
+        {
+            l: 2,
+            e: "👨‍🦱",
+            q: "They are tall. They have got dark hair.",
+            opt: [
+                "They are tall and dark hair.",
+                "They are tall with dark hair."
+            ],
+            a: "They are tall with dark hair."
+        },
+        {
+            l: 2,
+            e: "👩‍🦰",
+            q: "We have got straight, brown hair. We have got green eyes.",
+            opt: [
+                "We have got straight, brown hair with green eyes.",
+                "We have got straight, brown hair and green eyes."
+            ],
+            a: "We have got straight, brown hair and green eyes."
+        },
+
+        /* LEVEL 3: Gap Fill */
+        {
+            l: 3,
+            text:
+                "My brother Tom is very " +
+                "<span class='gap-emoji'>📁</span>" +
+                "<span class='gap' data-idx='0'>___</span>. " +
+                "He uploads his photos to his tablet every day.<br><br>" +
+
+                "My sister Susan is " +
+                "<span class='gap-emoji'>🤫</span>" +
+                "<span class='gap' data-idx='1'>___</span>. " +
+                "She never makes a noise.<br><br>" +
+
+                "My aunt Jane is " +
+                "<span class='gap-emoji'>😎</span>" +
+                "<span class='gap' data-idx='2'>___</span>. " +
+                "She does not tell us what to do.",
+
+            bank: ["organised", "quiet", "easy-going"],
+            answers: ["organised", "quiet", "easy-going"]
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let currentGapAnswers = ["", "", ""];
+    let activeGapIndex = 0;
+    let questionLocked = false;
+
+    const progress = document.getElementById("progress");
+    const levelLabel = document.getElementById("level-label");
+    const emojiBox = document.getElementById("emoji-box");
+    const questionText = document.getElementById("question-text");
+    const options = document.getElementById("options");
+    const gapZone = document.getElementById("gap-zone");
+    const dialogueText = document.getElementById("dialogue-text");
+    const wordBank = document.getElementById("word-bank");
+    const checkGapBtn = document.getElementById("check-gap-btn");
+    const gapFeedback = document.getElementById("gap-feedback");
+    const choiceFeedback = document.getElementById("choice-feedback");
+    const nextBtn = document.getElementById("next-btn");
+    const gameZone = document.getElementById("game-zone");
+    const resultZone = document.getElementById("result-zone");
+    const finalScore = document.getElementById("final-score");
+    const finalMessage = document.getElementById("final-message");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function shuffle(array) {
+        const copy = [...array];
+
+        for (let i = copy.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[randomIndex]] = [copy[randomIndex], copy[i]];
+        }
+
+        return copy;
+    }
+
+    function showFeedback(element, type, message) {
+        element.className = "feedback show " + type;
+        element.textContent = message;
+    }
+
+    function hideFeedback(element) {
+        element.className = "feedback";
+        element.textContent = "";
+    }
+
+    function updateProgress() {
+        const percent = (currentQuestion / questions.length) * 100;
+        progress.style.width = percent + "%";
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+
+        questionLocked = false;
+        updateProgress();
+
+        levelLabel.textContent = "Level " + q.l;
+        nextBtn.classList.add("hidden");
+        hideFeedback(choiceFeedback);
+        hideFeedback(gapFeedback);
+
+        if (q.l < 3) {
+            renderChoiceQuestion(q);
+        } else {
+            renderGapQuestion(q);
+        }
+    }
+
+    function renderChoiceQuestion(q) {
+        emojiBox.classList.remove("hidden");
+        questionText.classList.remove("hidden");
+        options.classList.remove("hidden");
+        gapZone.classList.add("hidden");
+
+        emojiBox.textContent = q.e;
+        questionText.textContent = q.q;
+
+        options.innerHTML = "";
+
+        const mixedOptions = shuffle(q.opt);
+
+        mixedOptions.forEach(option => {
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "btn";
+            button.textContent = option;
+
+            button.addEventListener("click", function () {
+                checkChoice(option, button);
+            });
+
+            options.appendChild(button);
+        });
+    }
+
+    function checkChoice(selectedAnswer, selectedButton) {
+        if (questionLocked) return;
+
+        questionLocked = true;
+
+        const correctAnswer = questions[currentQuestion].a;
+        const allButtons = options.querySelectorAll(".btn");
+
+        allButtons.forEach(button => {
+            button.disabled = true;
+
+            if (button.textContent === correctAnswer) {
+                button.classList.add("correct");
+            }
+        });
+
+        if (selectedAnswer === correctAnswer) {
+            score++;
+            selectedButton.classList.add("correct");
+            showFeedback(choiceFeedback, "good", "✅ Correct! Well done!");
+        } else {
+            selectedButton.classList.add("wrong");
+            showFeedback(
+                choiceFeedback,
+                "bad",
+                "❌ Not quite. The correct answer is: " + correctAnswer
+            );
+        }
+
+        nextBtn.textContent =
+            currentQuestion === questions.length - 1 ? "See Results" : "Next →";
+
+        nextBtn.classList.remove("hidden");
+    }
+
+    function renderGapQuestion(q) {
+        emojiBox.classList.add("hidden");
+        questionText.classList.add("hidden");
+        options.classList.add("hidden");
+        gapZone.classList.remove("hidden");
+
+        dialogueText.innerHTML = q.text;
+
+        const gaps = dialogueText.querySelectorAll(".gap");
+
+        gaps.forEach(gap => {
+            const index = Number(gap.dataset.idx);
+
+            gap.textContent = currentGapAnswers[index] || "___";
+
+            gap.classList.remove("active-gap", "correct-gap", "wrong-gap");
+
+            if (index === activeGapIndex && !questionLocked) {
+                gap.classList.add("active-gap");
+            }
+
+            gap.addEventListener("click", function () {
+                if (questionLocked) return;
+
+                activeGapIndex = index;
+                renderGapQuestion(q);
+            });
+        });
+
+        wordBank.innerHTML = "";
+
+        const availableWords = shuffle(
+            q.bank.filter(word => !currentGapAnswers.includes(word))
+        );
+
+        availableWords.forEach(word => {
+            const button = document.createElement("button");
+
+            button.type = "button";
+            button.className = "btn";
+            button.textContent = word;
+
+            button.addEventListener("click", function () {
+                fillGap(word);
+            });
+
+            wordBank.appendChild(button);
+        });
+
+        checkGapBtn.disabled = questionLocked;
+    }
+
+    function fillGap(word) {
+        if (questionLocked) return;
+
+        currentGapAnswers[activeGapIndex] = word;
+
+        const nextEmpty = currentGapAnswers.indexOf("");
+
+        if (nextEmpty !== -1) {
+            activeGapIndex = nextEmpty;
+        }
+
+        renderGapQuestion(questions[currentQuestion]);
+    }
+
+    function checkGapFill() {
+        if (questionLocked) return;
+
+        const q = questions[currentQuestion];
+        const allFilled = currentGapAnswers.every(answer => answer !== "");
+
+        if (!allFilled) {
+            showFeedback(
+                gapFeedback,
+                "bad",
+                "❌ Please choose a word for every gap first."
+            );
+            return;
+        }
+
+        questionLocked = true;
+
+        const gaps = dialogueText.querySelectorAll(".gap");
+        let correctCount = 0;
+
+        gaps.forEach(gap => {
+            const index = Number(gap.dataset.idx);
+            const isCorrect = currentGapAnswers[index] === q.answers[index];
+
+            gap.classList.remove("active-gap");
+
+            if (isCorrect) {
+                correctCount++;
+                gap.classList.add("correct-gap");
+            } else {
+                gap.classList.add("wrong-gap");
+                gap.textContent = q.answers[index];
+            }
+        });
+
+        wordBank.querySelectorAll(".btn").forEach(button => {
+            button.disabled = true;
+        });
+
+        if (correctCount === q.answers.length) {
+            score++;
+            showFeedback(gapFeedback, "good", "✅ Perfect! All answers are correct!");
+        } else {
+            showFeedback(
+                gapFeedback,
+                "bad",
+                "❌ You have " + correctCount + " correct answer(s). Look at the green words."
+            );
+        }
+
+        checkGapBtn.disabled = true;
+
+        nextBtn.textContent = "See Results";
+        nextBtn.classList.remove("hidden");
+    }
+
+    function goNext() {
+        currentQuestion++;
+
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        progress.style.width = "100%";
+
+        gameZone.classList.add("hidden");
+        resultZone.classList.remove("hidden");
+
+        finalScore.textContent = score + " / " + questions.length;
+
+        const percentage = Math.round((score / questions.length) * 100);
+
+        if (percentage === 100) {
+            finalMessage.textContent =
+                "Perfect! You have mastered personality and appearance adjectives!";
+        } else if (percentage >= 70) {
+            finalMessage.textContent =
+                "Great work! Review the answers and try again for a perfect score.";
+        } else {
+            finalMessage.textContent =
+                "Good try! Play again and practise the words one more time.";
+        }
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        currentGapAnswers = ["", "", ""];
+        activeGapIndex = 0;
+        questionLocked = false;
+
+        resultZone.classList.add("hidden");
+        gameZone.classList.remove("hidden");
+
+        loadQuestion();
+    }
+
+    nextBtn.addEventListener("click", goNext);
+    checkGapBtn.addEventListener("click", checkGapFill);
+    restartBtn.addEventListener("click", restartQuiz);
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

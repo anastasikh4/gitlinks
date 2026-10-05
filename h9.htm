@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordwall Style: Andy & His Family</title>
+
+    <style>
+        :root {
+            --ww-blue: #0071ba;
+            --ww-light-blue: #e8f4fd;
+            --ww-dark: #2d3e50;
+            --ww-correct: #46a049;
+            --ww-wrong: #e91e63;
+            --ww-yellow: #ffcc00;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: var(--ww-dark);
+            background-color: var(--ww-light-blue);
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 850px;
+            margin-bottom: 20px;
+            padding: 25px;
+            background: white;
+            border: 3px solid var(--ww-blue);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: var(--ww-blue);
+            font-size: 1.6rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            color: var(--ww-blue);
+            border-bottom: 2px dashed #cce4f5;
+            font-size: 1.2rem;
+        }
+
+        .subtitle {
+            margin-top: -8px;
+            margin-bottom: 18px;
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        /* WORD BANK */
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 22px;
+            padding: 15px;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+        }
+
+        .word-item {
+            padding: 8px 14px;
+            color: white;
+            background: var(--ww-blue);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            user-select: none;
+            transition: 0.15s;
+        }
+
+        .word-item:hover {
+            background: #005a96;
+            transform: scale(1.06);
+        }
+
+        .word-item.used {
+            pointer-events: none;
+            opacity: 0.35;
+        }
+
+        .word-item.active {
+            background: #005a96;
+            outline: 3px solid var(--ww-yellow);
+            transform: scale(1.06);
+        }
+
+        /* SENTENCES */
+        .dialogue-section {
+            font-size: 1.05rem;
+            line-height: 2.2;
+        }
+
+        .sentence {
+            padding: 8px 0;
+        }
+
+        .num {
+            display: inline-block;
+            width: 26px;
+            height: 26px;
+            margin-right: 6px;
+            color: white;
+            background: var(--ww-blue);
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: bold;
+            line-height: 26px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .drop-zone {
+            display: inline-block;
+            min-width: 130px;
+            padding: 0 8px;
+            color: var(--ww-blue);
+            border-bottom: 2.5px solid var(--ww-blue);
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: middle;
+            transition: 0.2s;
+        }
+
+        .drop-zone.filled {
+            background: #eaf4fd;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .drop-zone:empty::before {
+            content: "...........";
+            color: #ccc;
+            letter-spacing: 1px;
+        }
+
+        .drop-zone:hover {
+            background: #f5faff;
+        }
+
+        /* TRUE / FALSE */
+        .tf-section {
+            margin-top: 10px;
+        }
+
+        .tf-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            background: #f8fbff;
+            border-left: 4px solid var(--ww-blue);
+            border-radius: 10px;
+        }
+
+        .tf-row .tf-text {
+            flex: 1;
+            min-width: 220px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .tf-btn {
+            padding: 8px 20px;
+            color: #666;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: bold;
+            transition: 0.15s;
+        }
+
+        .tf-btn:hover {
+            color: var(--ww-blue);
+            border-color: var(--ww-blue);
+        }
+
+        .tf-btn.selected {
+            color: white;
+            background: var(--ww-blue);
+            border-color: var(--ww-blue);
+        }
+
+        .tf-btn.correct {
+            color: white;
+            background: var(--ww-correct);
+            border-color: var(--ww-correct);
+        }
+
+        .tf-btn.wrong {
+            color: white;
+            background: var(--ww-wrong);
+            border-color: var(--ww-wrong);
+        }
+
+        /* CONTROLS */
+        .controls {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .btn-check {
+            padding: 15px 40px;
+            color: white;
+            background: var(--ww-blue);
+            border: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 0 #005a96;
+            cursor: pointer;
+            font-size: 1.15rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: 0.1s;
+        }
+
+        .btn-check:hover {
+            background: #0085d6;
+        }
+
+        .btn-check:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        .btn-reset {
+            margin-left: 10px;
+            padding: 13px 30px;
+            color: var(--ww-blue);
+            background: white;
+            border: 2px solid var(--ww-blue);
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .btn-reset:hover {
+            background: #eaf4fd;
+        }
+
+        .feedback {
+            min-height: 30px;
+            margin-top: 20px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* STORY */
+        .story-block {
+            margin-bottom: 16px;
+            padding: 16px 20px;
+            background: #f8fbff;
+            border-left: 4px solid var(--ww-blue);
+            border-radius: 10px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .story-block p {
+            margin: 0 0 8px;
+        }
+
+        .story-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .story-block b {
+            color: var(--ww-blue);
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+
+            .game-container {
+                padding: 18px 15px;
+            }
+
+            .drop-zone {
+                min-width: 100px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+            }
+
+            .btn-check,
+            .btn-reset {
+                width: 100%;
+                margin: 8px 0 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ==========================================
+     PART 1: FAMILY ACTIVITIES
+     ========================================== -->
+<div class="game-container">
+    <h1>🧩 Andy & His Family · Part 1</h1>
+
+    <p class="subtitle">
+        Click a phrase in the word bank. Then click the correct blank.
+    </p>
+
+    <h2>1️⃣ Family Activities</h2>
+
+    <!-- The words are now shuffled automatically on every page load. -->
+    <div class="word-bank" id="wordBank1"></div>
+
+    <div class="dialogue-section" id="sentences1">
+        <div class="sentence">
+            <span class="num">1</span>
+            Every morning, I
+            <span class="drop-zone" data-ans="have breakfast"></span>
+            with my family.
+        </div>
+
+        <div class="sentence">
+            <span class="num">2</span>
+            My sister and I
+            <span class="drop-zone" data-ans="go to school"></span>
+            by bus.
+        </div>
+
+        <div class="sentence">
+            <span class="num">3</span>
+            In the evening, I
+            <span class="drop-zone" data-ans="chat online"></span>
+            with my friends.
+        </div>
+
+        <div class="sentence">
+            <span class="num">4</span>
+            I always
+            <span class="drop-zone" data-ans="feed the dog"></span>
+            before dinner.
+        </div>
+
+        <div class="sentence">
+            <span class="num">5</span>
+            My dad likes to
+            <span class="drop-zone" data-ans="watch TV"></span>
+            after work.
+        </div>
+
+        <div class="sentence">
+            <span class="num">6</span>
+            At weekends, we
+            <span class="drop-zone" data-ans="go to the cinema"></span>
+            together.
+        </div>
+
+        <div class="sentence">
+            <span class="num">7</span>
+            My brother and I
+            <span class="drop-zone" data-ans="play football"></span>
+            in the park.
+        </div>
+
+        <div class="sentence">
+            <span class="num">8</span>
+            On Sundays, I
+            <span class="drop-zone" data-ans="tidy my room"></span>.
+        </div>
+
+        <div class="sentence">
+            <span class="num">9</span>
+            I love to
+            <span class="drop-zone" data-ans="ride my bike"></span>
+            in the park.
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-check" id="checkPart1Btn">Check</button>
+        <button class="btn-reset" id="resetPart1Btn">Reset</button>
+    </div>
+
+    <div id="result1" class="feedback"></div>
+</div>
+
+<!-- ==========================================
+     PART 2: TRUE / FALSE
+     ========================================== -->
+<div class="game-container">
+    <h1>🎧 Andy's Story · Part 2</h1>
+
+    <p class="subtitle">
+        Read the story. Choose True or False.
+    </p>
+
+    <h2>2️⃣ True or False?</h2>
+
+    <div class="story-block">
+        <p>
+            It is <b>Saturday afternoon</b>. Andy and his family always spend time
+            <b>together on Sundays</b>.
+        </p>
+
+        <p>
+            Today, his <b>mum is driving the car</b>. She
+            <b>gives Sue a sandwich</b>.
+        </p>
+
+        <p>
+            Andy <b>helps his sisters with their homework</b> in the evening.
+        </p>
+    </div>
+
+    <div class="tf-section" id="tfSection">
+        <div class="tf-row" data-correct="True">
+            <span class="num">1</span>
+            <span class="tf-text">It is Saturday afternoon.</span>
+            <button class="tf-btn" data-answer="False">False</button>
+            <button class="tf-btn" data-answer="True">True</button>
+        </div>
+
+        <div class="tf-row" data-correct="False">
+            <span class="num">2</span>
+            <span class="tf-text">
+                Andy and his family always spend time together on Mondays.
+            </span>
+            <button class="tf-btn" data-answer="True">True</button>
+            <button class="tf-btn" data-answer="False">False</button>
+        </div>
+
+        <div class="tf-row" data-correct="True">
+            <span class="num">3</span>
+            <span class="tf-text">Andy's mum is driving the car.</span>
+            <button class="tf-btn" data-answer="False">False</button>
+            <button class="tf-btn" data-answer="True">True</button>
+        </div>
+
+        <div class="tf-row" data-correct="False">
+            <span class="num">4</span>
+            <span class="tf-text">Andy's dad gives Sue a sandwich.</span>
+            <button class="tf-btn" data-answer="True">True</button>
+            <button class="tf-btn" data-answer="False">False</button>
+        </div>
+
+        <div class="tf-row" data-correct="False">
+            <span class="num">5</span>
+            <span class="tf-text">
+                Andy helps his sisters with their homework in the morning.
+            </span>
+            <button class="tf-btn" data-answer="False">False</button>
+            <button class="tf-btn" data-answer="True">True</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-check" id="checkPart2Btn">Check</button>
+        <button class="btn-reset" id="resetPart2Btn">Reset</button>
+    </div>
+
+    <div id="result2" class="feedback"></div>
+</div>
+
+<script>
+    /* ==========================================
+       HELPER: SHUFFLE ARRAY
+       ========================================== */
+    function shuffle(array) {
+        const copy = [...array];
+
+        for (let i = copy.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[randomIndex]] = [copy[randomIndex], copy[i]];
+        }
+
+        return copy;
+    }
+
+    /* ==========================================
+       PART 1: WORD BANK + GAP FILL
+       ========================================== */
+    const familyActivities = [
+        "have breakfast",
+        "go to school",
+        "chat online",
+        "feed the dog",
+        "watch TV",
+        "go to the cinema",
+        "play football",
+        "tidy my room",
+        "ride my bike"
+    ];
+
+    let selectedWord = null;
+
+    const wordBank = document.getElementById("wordBank1");
+    const result1 = document.getElementById("result1");
+
+    function renderWordBank() {
+        wordBank.innerHTML = "";
+
+        shuffle(familyActivities).forEach(word => {
+            const wordButton = document.createElement("div");
+
+            wordButton.className = "word-item";
+            wordButton.textContent = word;
+            wordButton.dataset.word = word;
+
+            wordButton.addEventListener("click", function () {
+                if (wordButton.classList.contains("used")) return;
+
+                document.querySelectorAll("#wordBank1 .word-item").forEach(item => {
+                    item.classList.remove("active");
+                });
+
+                selectedWord = word;
+                wordButton.classList.add("active");
+            });
+
+            wordBank.appendChild(wordButton);
+        });
+    }
+
+    function makeWordAvailable(word) {
+        document.querySelectorAll("#wordBank1 .word-item").forEach(item => {
+            if (item.dataset.word === word) {
+                item.classList.remove("used", "active");
+            }
+        });
+    }
+
+    function makeWordUsed(word) {
+        document.querySelectorAll("#wordBank1 .word-item").forEach(item => {
+            if (item.dataset.word === word) {
+                item.classList.add("used");
+                item.classList.remove("active");
+            }
+        });
+    }
+
+    document.querySelectorAll("#sentences1 .drop-zone").forEach(zone => {
+        zone.addEventListener("click", function () {
+            const oldWord = zone.textContent.trim();
+
+            if (selectedWord) {
+                if (oldWord) {
+                    makeWordAvailable(oldWord);
+                }
+
+                zone.textContent = selectedWord;
+                zone.classList.add("filled");
+
+                zone.style.color = "var(--ww-blue)";
+                zone.style.borderBottomColor = "var(--ww-blue)";
+
+                makeWordUsed(selectedWord);
+
+                selectedWord = null;
+
+                document.querySelectorAll("#wordBank1 .word-item").forEach(item => {
+                    item.classList.remove("active");
+                });
+            } else if (oldWord) {
+                makeWordAvailable(oldWord);
+
+                zone.textContent = "";
+                zone.classList.remove("filled");
+
+                zone.style.color = "var(--ww-blue)";
+                zone.style.borderBottomColor = "var(--ww-blue)";
+            }
+        });
+    });
+
+    document.getElementById("checkPart1Btn").addEventListener("click", function () {
+        const zones = document.querySelectorAll("#sentences1 .drop-zone");
+        let correctCount = 0;
+
+        zones.forEach(zone => {
+            const answer = zone.dataset.ans;
+            const selected = zone.textContent.trim();
+
+            if (selected === answer) {
+                correctCount++;
+                zone.style.color = "var(--ww-correct)";
+                zone.style.borderBottomColor = "var(--ww-correct)";
+            } else {
+                zone.style.color = "var(--ww-wrong)";
+                zone.style.borderBottomColor = "var(--ww-wrong)";
+            }
+        });
+
+        if (correctCount === zones.length) {
+            result1.textContent = "🎉 Perfect! You are a family activities star!";
+            result1.style.color = "var(--ww-correct)";
+        } else {
+            result1.textContent =
+                "Score: " + correctCount + " / " + zones.length + ". Try again!";
+            result1.style.color = "var(--ww-wrong)";
+        }
+    });
+
+    document.getElementById("resetPart1Btn").addEventListener("click", function () {
+        selectedWord = null;
+
+        document.querySelectorAll("#sentences1 .drop-zone").forEach(zone => {
+            zone.textContent = "";
+            zone.classList.remove("filled");
+            zone.style.color = "var(--ww-blue)";
+            zone.style.borderBottomColor = "var(--ww-blue)";
+        });
+
+        result1.textContent = "";
+        renderWordBank();
+    });
+
+    /* ==========================================
+       PART 2: TRUE / FALSE
+       ========================================== */
+    const result2 = document.getElementById("result2");
+
+    document.querySelectorAll("#tfSection .tf-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const row = button.closest(".tf-row");
+
+            row.querySelectorAll(".tf-btn").forEach(item => {
+                item.classList.remove("selected", "correct", "wrong");
+            });
+
+            button.classList.add("selected");
+        });
+    });
+
+    document.getElementById("checkPart2Btn").addEventListener("click", function () {
+        const rows = document.querySelectorAll("#tfSection .tf-row");
+        let correctCount = 0;
+
+        rows.forEach(row => {
+            const correctAnswer = row.dataset.correct;
+            const selectedButton = row.querySelector(".tf-btn.selected");
+
+            row.querySelectorAll(".tf-btn").forEach(button => {
+                button.classList.remove("correct", "wrong");
+            });
+
+            if (selectedButton && selectedButton.dataset.answer === correctAnswer) {
+                correctCount++;
+                selectedButton.classList.add("correct");
+            } else {
+                if (selectedButton) {
+                    selectedButton.classList.add("wrong");
+                }
+
+                row.querySelectorAll(".tf-btn").forEach(button => {
+                    if (button.dataset.answer === correctAnswer) {
+                        button.classList.add("correct");
+                    }
+                });
+            }
+        });
+
+        if (correctCount === rows.length) {
+            result2.textContent = "🎉 Perfect! You understand Andy's story!";
+            result2.style.color = "var(--ww-correct)";
+        } else {
+            result2.textContent =
+                "Score: " + correctCount + " / " + rows.length + ". Read the story again!";
+            result2.style.color = "var(--ww-wrong)";
+        }
+    });
+
+    document.getElementById("resetPart2Btn").addEventListener("click", function () {
+        document.querySelectorAll("#tfSection .tf-btn").forEach(button => {
+            button.classList.remove("selected", "correct", "wrong");
+        });
+
+        result2.textContent = "";
+    });
+
+    /* Start */
+    renderWordBank();
+</script>
+
+</body>
+</html>
