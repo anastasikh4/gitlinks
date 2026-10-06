@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Yes/No Questions Quest 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 700px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #FFD700;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #FF8C00; font-size: 2em; margin-bottom: 10px; }
+
+        /* ═══════ READING SCREEN ═══════ */
+        .reading-card {
+            background: #FFF9E6;
+            border: 5px solid #FFB74D;
+            border-radius: 25px;
+            padding: 24px 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .reading-card h1 {
+            color: #EF6C00;
+            font-size: 1.6em;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .reading-text {
+            background: #ffffff;
+            border-left: 6px solid #FFB74D;
+            border-radius: 14px;
+            padding: 18px 20px;
+            font-size: 1.2em;
+            line-height: 2;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .reading-text p { margin-bottom: 10px; }
+        .reading-text p:last-child { margin-bottom: 0; }
+        .highlight {
+            background: #FFF59D;
+            padding: 0 6px;
+            border-radius: 5px;
+            font-weight: 700;
+        }
+        .emoji { font-size: 1.35em; margin: 0 3px; }
+
+        .start-btn {
+            width: 100%;
+            padding: 16px;
+            border: 3px solid #2E7D32;
+            border-bottom-width: 6px;
+            background: #66BB6A;
+            color: white;
+            font-weight: 900;
+            font-size: 1.1em;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .start-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        /* ═══════ QUIZ SCREEN ═══════ */
+        .story-box {
+            background: #FFF9E6;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 1.15em;
+            color: #444;
+            border-left: 5px solid #FFD700;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            color: #2E8B57;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .scene-emoji {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: 6px;
+            animation: pop 0.4s ease-out;
+        }
+        @keyframes pop {
+            0%   { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .btn {
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.15em;
+            font-weight: bold;
+            font-family: inherit;
+            transition: all 0.2s;
+            color: #2c3e50;
+        }
+        .btn:hover:not(:disabled) { border-color: #FF8C00; background: #FFF4E6; transform: translateY(-2px); }
+        .btn:active:not(:disabled) { transform: translateY(2px); }
+        .btn:disabled { cursor: default; opacity: 0.5; }
+        .btn.correct {
+            background: #90EE90 !important;
+            border-color: #2E8B57 !important;
+            color: #1b5e20 !important;
+            opacity: 1 !important;
+            animation: pulse 0.4s ease;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        .btn.wrong {
+            background: #FFB6C1 !important;
+            border-color: #DC143C !important;
+            color: #b71c1c !important;
+            opacity: 1 !important;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .progress-bar {
+            width: 100%; height: 12px; background: #eee;
+            border-radius: 8px; margin-bottom: 20px; overflow: hidden;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.06);
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #81C784, #2E8B57);
+            width: 0%;
+            transition: 0.4s;
+            border-radius: 8px;
+        }
+
+        .score-badge {
+            display: inline-block;
+            background: #FFD700;
+            color: #8B4500;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            border: 2px solid #FF8C00;
+        }
+
+        .win-screen { display: none; text-align: center; }
+        .win-screen .emoji {
+            font-size: 4em;
+            margin-bottom: 15px;
+            animation: bob 2s ease-in-out infinite;
+        }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50%      { transform: translateY(-10px) rotate(3deg); }
+        }
+        .win-screen h1 { color: #FF8C00; margin-bottom: 10px; }
+        .win-screen p { font-size: 1.2em; margin: 15px 0; color: #555; }
+        .win-screen button {
+            padding: 14px 36px;
+            border: 3px solid #2E8B57;
+            border-bottom-width: 6px;
+            background: #81C784;
+            color: white;
+            font-weight: 900;
+            font-size: 1.05em;
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .win-screen button:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+        .final-stars {
+            font-size: 2rem;
+            letter-spacing: 6px;
+            margin: 10px 0 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .card { padding: 20px; }
+            .title { font-size: 1.5em; }
+            .question-text { font-size: 1.15em; }
+            .scene-emoji { font-size: 2.6em; letter-spacing: 4px; }
+            .btn { font-size: 0.95em; padding: 12px 8px; }
+            .story-box { font-size: 1em; padding: 14px; }
+            .reading-text { font-size: 1.05em; padding: 14px; line-height: 1.9; }
+            .reading-card h1 { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- ═══════════════════════════════════════════
+         READING SCREEN — very short intro
+         ═══════════════════════════════════════════ -->
+    <div id="readingScreen" class="reading-card">
+        <h1>📖 My Friends</h1>
+
+        <div class="reading-text">
+            <p>Hi! I am Ben. <span class="emoji">👦</span></p>
+            <p>Emma <span class="emoji">👧</span> is my sister. She is <span class="highlight">happy</span>. 😊</p>
+            <p>Tom <span class="emoji">🧑</span> is my friend. He is <span class="highlight">not Alvin</span>.</p>
+            <p>Mrs Bell <span class="emoji">👩‍🏫</span> is a <span class="highlight">teacher</span>. She is not a singer. 🎤</p>
+            <p>Look! This is a <span class="highlight">ruler</span> 📏 and this is a <span class="highlight">lemon</span> 🍋.</p>
+            <p>We are <span class="highlight">not brothers</span> — we are friends! 👦👦👦</p>
+        </div>
+
+        <button class="start-btn" onclick="startQuiz()">▶ Start the Quiz</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         QUIZ SCREEN
+         ═══════════════════════════════════════════ -->
+    <div id="gameUI" class="hidden">
+        <div class="header">
+            <div class="title">🌟 Yes/No Questions Quest</div>
+            <div class="score-badge">⭐ Score: <span id="scoreVal">0</span></div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div id="storySection" class="story-box"></div>
+            <div id="sceneBox" class="scene-emoji"></div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         WIN SCREEN
+         ═══════════════════════════════════════════ -->
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆🌻🎉</div>
+        <h1>EXCELLENT!</h1>
+        <p>You finished the Yes/No Questions Quest!</p>
+        <div class="final-stars" id="finalStars">⭐⭐⭐</div>
+        <button onclick="location.reload()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════
+       YES / NO QUESTIONS QUEST
+       ═══════════════════════════════════════════ */
+    const questions = [
+
+        /* ─────── PART 1 ─────── */
+        {
+            story: 'Ben is Emma\'s brother.',
+            scene: '👦❓',
+            q: '1. Are you Emma\'s brother?',
+            a: ['Yes, I am.', 'Yes, I am not.'],
+            c: 'Yes, I am.'
+        },
+        {
+            story: 'Mrs Bell is a teacher. She is not a singer.',
+            scene: '🎤👩',
+            q: '2. Is she a singer?',
+            a: ['No, she is.', 'No, she isn\'t.'],
+            c: 'No, she isn\'t.'
+        },
+        {
+            story: 'It is a ruler. 📏',
+            scene: '📏❓',
+            q: '3. Is it a ruler?',
+            a: ['Yes, it is.', 'Yes, I am.'],
+            c: 'Yes, it is.'
+        },
+        {
+            story: 'His name is Tom. He is not Alvin.',
+            scene: '🧑❓',
+            q: '4. Is he Alvin?',
+            a: ['No, you aren\'t.', 'No, he isn\'t.'],
+            c: 'No, he isn\'t.'
+        },
+
+        /* ─────── PART 2 ─────── */
+        {
+            story: 'They are smiling. They are happy! 😊',
+            scene: '😊👧👦😊',
+            q: '1. Are they happy?',
+            a: ['Yes, they are.', 'No, they aren\'t.'],
+            c: 'Yes, they are.'
+        },
+        {
+            story: 'They are friends. They are not brothers.',
+            scene: '👦👦👦',
+            q: '2. Are we brothers?',
+            a: ['Yes, we are.', 'No, we are not.'],
+            c: 'No, we are not.'
+        },
+        {
+            story: 'She is sad. She is crying. 😢',
+            scene: '😢👧',
+            q: '3. Is she sad?',
+            a: ['Yes, she is.', 'No, she isn\'t.'],
+            c: 'Yes, she is.'
+        },
+        {
+            story: 'They are flowers. They are yellow! 🌼🌼',
+            scene: '🌼🌼',
+            q: '4. Are they flowers?',
+            a: ['Yes, they are.', 'No, they aren\'t.'],
+            c: 'Yes, they are.'
+        },
+        {
+            story: 'Lily and Kate are sisters. 👧👧',
+            scene: '👧👧',
+            q: '5. Are you sisters?',
+            a: ['Yes, we are.', 'No, we are not.'],
+            c: 'Yes, we are.'
+        },
+        {
+            story: 'It is yellow. It is a lemon, not an orange. 🍋',
+            scene: '🍋',
+            q: '6. Is it an orange?',
+            a: ['Yes, it is.', 'No, it isn\'t.'],
+            c: 'No, it isn\'t.'
+        }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function startQuiz() {
+        document.getElementById('readingScreen').classList.add('hidden');
+        document.getElementById('gameUI').classList.remove('hidden');
+        load();
+    }
+
+    function load() {
+        if (current >= questions.length) {
+            showWin();
+            return;
+        }
+
+        const data = questions[current];
+
+        document.getElementById('storySection').innerText = data.story;
+        document.getElementById('sceneBox').innerText = data.scene;
+        document.getElementById('qText').innerText = data.q;
+
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+
+        const shuffled = [...data.a].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        const data = questions[current];
+        const allBtns = document.querySelectorAll('.btn');
+
+        if (choice === data.c) {
+            btn.classList.add('correct');
+            allBtns.forEach(b => b.disabled = true);
+
+            score += 10;
+            document.getElementById('scoreVal').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            setTimeout(() => {
+                current++;
+                load();
+            }, 900);
+        } else {
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                btn.disabled = false;
+            }, 700);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('gameUI').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+        document.getElementById('pFill').style.width = '100%';
+
+        let stars = '⭐';
+        if (score >= 90) stars = '⭐⭐⭐';
+        else if (score >= 60) stars = '⭐⭐';
+        document.getElementById('finalStars').innerText = stars;
+
+        launchConfetti();
+    }
+
+    function launchConfetti() {
+        const colors = ['#FFD700', '#FF8C00', '#81C784', '#2E8B57', '#FFB6C1', '#87CEEB'];
+        for (let i = 0; i < 60; i++) {
+            const c = document.createElement('div');
+            c.style.position = 'fixed';
+            c.style.top = '-12px';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.width = '10px';
+            c.style.height = '14px';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.pointerEvents = 'none';
+            c.style.zIndex = '999';
+            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            c.style.animation = `fall ${Math.random() * 2 + 2}s linear ${Math.random() * 0.8}s forwards`;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 5000);
+        }
+
+        if (!document.getElementById('confetti-style')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-style';
+            style.textContent = `@keyframes fall {
+                0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(105vh) rotate(720deg); opacity: 0.4; }
+            }`;
+            document.head.appendChild(style);
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARLIGHT 3: TO BE QUEST</title>
+    <style>
+        :root {
+            --park-green: #2e7d32;
+            --sky-blue: #03a9f4;
+            --sun-yellow: #ffeb3b;
+            --ball-white: #ffffff;
+            --grass: #81c784;
+            --rose: #e91e63;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: #f1f8e9;
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        #game-card {
+            width: 95%;
+            max-width: 560px;
+            background: #fff;
+            border-radius: 40px;
+            border: 8px solid var(--park-green);
+            box-shadow: 0 12px 0px rgba(0,0,0,0.1);
+            padding: 28px;
+            text-align: center;
+        }
+
+        .header { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 8px; }
+        .stars-pill {
+            background: var(--sun-yellow);
+            padding: 8px 18px;
+            border-radius: 25px;
+            border: 3px solid var(--park-green);
+            font-weight: 900;
+            font-size: 14px;
+        }
+        .mode-tag {
+            background: var(--sky-blue);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .display-area {
+            background: #e3f2fd;
+            min-height: 170px;
+            border-radius: 30px;
+            border: 4px dashed var(--sky-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 18px 15px;
+        }
+
+        .big-emoji { font-size: 52px; margin-bottom: 10px; animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+        .sentence-text {
+            font-size: 1.35rem;
+            color: #333;
+            line-height: 1.5;
+            font-weight: 700;
+        }
+        .gap {
+            color: var(--rose);
+            font-weight: 900;
+            text-decoration: underline wavy var(--rose);
+            padding: 0 4px;
+        }
+        .gap.filled {
+            color: var(--park-green);
+            text-decoration: underline solid var(--park-green);
+        }
+
+        .btn-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+
+        .btn-action {
+            background: white;
+            border: 3px solid var(--grass);
+            border-bottom-width: 5px;
+            border-radius: 20px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            cursor: pointer;
+            font-family: inherit;
+            color: #2c3e50;
+            transition: 0.1s;
+        }
+        .btn-action:hover:not(:disabled) { background: #f1f8e9; border-color: var(--park-green); }
+        .btn-action:active:not(:disabled) { transform: translateY(3px); border-bottom-width: 2px; }
+        .btn-action:disabled { cursor: default; opacity: 0.45; }
+        .btn-action.correct {
+            background: #d7ffb1 !important;
+            border-color: #58cc02 !important;
+            color: #4a9c00 !important;
+            opacity: 1 !important;
+        }
+        .btn-action.wrong {
+            background: #ffdfe0 !important;
+            border-color: #ff4b4b !important;
+            color: #ea2b2b !important;
+            opacity: 1 !important;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 25px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.06);
+        }
+        #progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--grass), var(--park-green));
+            transition: 0.4s;
+            border-radius: 10px;
+        }
+
+        #win-screen { display: none; }
+        #win-screen h1 {
+            color: var(--park-green);
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        #win-screen p {
+            font-size: 1.15rem;
+            color: #666;
+            margin-bottom: 22px;
+        }
+        #win-screen .final-stars {
+            font-size: 2.2rem;
+            letter-spacing: 6px;
+            margin-bottom: 22px;
+        }
+        #win-screen button {
+            width: 100%;
+            padding: 16px;
+            border-radius: 20px;
+            border: 3px solid var(--park-green);
+            border-bottom-width: 6px;
+            background: var(--grass);
+            color: white;
+            font-weight: 900;
+            font-size: 1.05rem;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #win-screen button:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        @media (max-width: 480px) {
+            .sentence-text { font-size: 1.1rem; }
+            .big-emoji { font-size: 44px; }
+            .btn-action { font-size: 1.05rem; padding: 13px; }
+            .mode-tag, .stars-pill { font-size: 12px; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-card">
+    <div id="play-area">
+        <div class="header">
+            <div class="mode-tag" id="mission-title">Mission: Jobs</div>
+            <div class="stars-pill">✨ <span id="score-val">0</span></div>
+        </div>
+
+        <div class="display-area">
+            <div class="big-emoji" id="main-emoji">🎤</div>
+            <div class="sentence-text" id="sentence-box">Loading...</div>
+        </div>
+
+        <div class="btn-grid" id="choices-box"></div>
+
+        <div id="progress-bar">
+            <div id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div id="win-screen">
+        <h1>🏆 TO BE MASTER!</h1>
+        <p>You know am, is, are! Well done! 🌟</p>
+        <div class="final-stars" id="final-stars">⭐⭐⭐</div>
+        <button onclick="location.reload()">PLAY AGAIN 🔄</button>
+    </div>
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════
+       TO BE QUEST — am / is / are
+       Based on the textbook page:
+       • Match jobs/descriptions with pronouns
+       • Build simple sentences
+       • Inga's story
+       ═══════════════════════════════════════════ */
+    let score = 0;
+    let current = 0;
+
+    const missions = [
+        /* ─────── EXERCISE 3 — Jobs & pronouns ─────── */
+        { emoji: "🎤", text: "I _____ a singer.",              opts: ["am", "is", "are"], ans: "am",  type: "Jobs" },
+        { emoji: "😄", text: "You _____ funny.",               opts: ["am", "is", "are"], ans: "are", type: "Jobs" },
+        { emoji: "👦", text: "He _____ my brother.",           opts: ["am", "is", "are"], ans: "is",  type: "Jobs" },
+        { emoji: "👩‍🏫", text: "She _____ a teacher.",          opts: ["am", "is", "are"], ans: "is",  type: "Jobs" },
+
+        /* ─────── EXERCISE 4 — Build the sentences ─────── */
+        { emoji: "😢", text: "I _____ sad.",                   opts: ["am", "is", "are"], ans: "am",  type: "Feelings" },
+        { emoji: "😊😊", text: "We _____ happy.",              opts: ["am", "is", "are"], ans: "are", type: "Feelings" },
+        { emoji: "👵🧸", text: "You _____ cute.",              opts: ["am", "is", "are"], ans: "are", type: "Feelings" },
+        { emoji: "💐👩", text: "They _____ lovely.",           opts: ["am", "is", "are"], ans: "are", type: "Feelings" },
+
+        /* ─────── EXERCISE 5 — Inga's story ─────── */
+        { emoji: "👧🇷🇺", text: "I _____ a student from Moscow.", opts: ["am", "is", "are"], ans: "am",  type: "Inga" },
+        { emoji: "🏙️",    text: "It _____ a very big city.",      opts: ["am", "is", "are"], ans: "is",  type: "Inga" },
+        { emoji: "👨‍👩",   text: "My father and mother _____ teachers.", opts: ["am", "is", "are"], ans: "are", type: "Inga" },
+        { emoji: "👨‍🏫",   text: "My father _____ a teacher.",     opts: ["am", "is", "are"], ans: "is",  type: "Inga" },
+        { emoji: "👩‍🦰🇷🇺", text: "My mother _____ (not) from Russia.", opts: ["is not", "are not", "am not"], ans: "is not", type: "Inga" },
+        { emoji: "🇵🇱", text: "She _____ from Poland.",         opts: ["am", "is", "are"], ans: "is",  type: "Inga" },
+        { emoji: "🔟",  text: "I _____ ten years old.",         opts: ["am", "is", "are"], ans: "am",  type: "Inga" },
+        { emoji: "👦",  text: "My brother's name _____ Sergey.", opts: ["am", "is", "are"], ans: "is",  type: "Inga" },
+        { emoji: "👬",  text: "We _____ twins.",                opts: ["am", "is", "are"], ans: "are", type: "Inga" }
+    ];
+
+    function loadMission() {
+        const m = missions[current];
+
+        document.getElementById('mission-title').innerText = "Mission: " + m.type;
+        document.getElementById('main-emoji').innerText = m.emoji;
+
+        // Replace the blank with a styled gap
+        document.getElementById('sentence-box').innerHTML =
+            m.text.replace("_____", "<span class='gap' id='gapSlot'>???</span>");
+
+        const box = document.getElementById('choices-box');
+        box.innerHTML = '';
+
+        // Shuffle options each mission
+        const shuffled = [...m.opts].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(o => {
+            const b = document.createElement('button');
+            b.className = 'btn-action';
+            b.innerText = o;
+            b.onclick = () => check(o, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('progress-fill').style.width =
+            (current / missions.length * 100) + '%';
+    }
+
+    function check(choice, btn) {
+        const m = missions[current];
+        const gap = document.getElementById('gapSlot');
+        const allBtns = document.querySelectorAll('.btn-action');
+
+        if (choice === m.ans) {
+            // Correct
+            btn.classList.add('correct');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (gap) {
+                gap.innerText = m.ans;
+                gap.classList.add('filled');
+            }
+
+            score += 10;
+            document.getElementById('score-val').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            current++;
+
+            setTimeout(() => {
+                if (current < missions.length) {
+                    loadMission();
+                } else {
+                    document.getElementById('progress-fill').style.width = '100%';
+                    showWin();
+                }
+            }, 900);
+
+        } else {
+            // Wrong — shake, disable briefly
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                btn.disabled = false;
+            }, 700);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-area').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+
+        let stars = '⭐';
+        if (score >= 130) stars = '⭐⭐⭐';
+        else if (score >= 90) stars = '⭐⭐';
+        document.getElementById('final-stars').innerText = stars;
+
+        launchConfetti();
+    }
+
+    /* ═══════════════════════════════════════════
+       CONFETTI
+       ═══════════════════════════════════════════ */
+    function launchConfetti() {
+        const colors = ['#ffeb3b', '#03a9f4', '#81c784', '#2e7d32', '#e91e63', '#ff9800'];
+        for (let i = 0; i < 60; i++) {
+            const c = document.createElement('div');
+            c.style.position = 'fixed';
+            c.style.top = '-12px';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.width = '10px';
+            c.style.height = '14px';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.pointerEvents = 'none';
+            c.style.zIndex = '999';
+            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            c.style.animation = `fall ${Math.random() * 2 + 2}s linear ${Math.random() * 0.8}s forwards`;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 5000);
+        }
+
+        if (!document.getElementById('confetti-style')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-style';
+            style.textContent = `@keyframes fall {
+                0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(105vh) rotate(720deg); opacity: 0.4; }
+            }`;
+            document.head.appendChild(style);
+        }
+    }
+
+    loadMission();
+</script>
+</body>
+</html>
