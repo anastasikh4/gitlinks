@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Квиз: Проверка перед поездкой</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+        }
+        .quiz-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 480px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h2, h3 { color: #1c1e21; margin-top: 0; }
+        .input-group { margin: 25px 0; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4b4f56; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            background-color: #f5f6f7;
+            border: 1px solid #dadde1;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            color: #4b4f56;
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover { background-color: #ebedf0; border-color: #bcd0e7; color: #1c1e21; }
+        .start-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .start-btn:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+        #status-message {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-align: center;
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <!-- ЭКРАН 1: Приветствие и Ввод имени -->
+    <div id="start-screen">
+        <h2>Английский для поездок ✈️</h2>
+        <p>Добро пожаловать на мини-тестирование! Давай проверим базовые фразы для выживания в путешествии.</p>
+        <div class="input-group">
+            <label for="username">Введи своё имя:</label>
+            <input type="text" id="username" placeholder="Например, Александр" required>
+        </div>
+        <button class="start-btn" onclick="startQuiz()">Начать квиз</button>
+    </div>
+
+    <!-- ЭКРАН 2: Вопросы -->
+    <div id="quiz-screen" class="hidden">
+        <h3 id="question-text">Текст вопроса</h3>
+        <div id="options-container">
+            <!-- Сюда JS подставит кнопки с ответами -->
+        </div>
+    </div>
+
+    <!-- ЭКРАН 3: Финал -->
+    <div id="result-screen" class="hidden">
+        <h2>Отличная работа! 🎉</h2>
+        <p>Тест успешно пройден. Твой преподаватель уже изучает результаты, чтобы составить идеальный план первого урока.</p>
+        <div id="status-message">⏳ Отправка ответов в систему...</div>
+    </div>
+</div>
+
+<script>
+    // Твои личные данные из скопированной ссылки Google Формы
+    const GOOGLE_FORM_ID = "1FAIpQLSf5LPuQktdp44mOtDLPpuCyVxYCT-jD4UAgnK5LkDmoCrxvHg"; 
+    const ENTRY_ID_NAME = "entry.1018321990";        
+    const ENTRY_ID_ANSWERS = "entry.698158560";     
+
+    // Пул вопросов для проверки (здесь 3 базовые ситуации для 40-летнего студента)
+    const questions = [
+        {
+            q: "Администратор на стойке отеля говорит: 'Can I have your passport, please?'. Твое действие?",
+            options: ["Отвечу: 'Yes, here you are' и передам паспорт.", "Отвечу: 'No, thank you' и пойду искать лифт.", "Скажу: 'I prefer single room'."],
+            correct: 0
+        },
+        {
+            q: "Как вежливо и правильно попросить меню у официанта в ресторане?",
+            options: ["Give me text, please!", "Could we have the menu, please?", "Where is food list?"],
+            correct: 1
+        },
+        {
+            q: "Какую вывеску нужно искать в аэропорту, если тебе нужно срочно сдать чемоданы и получить посадочный билет?",
+            options: ["Baggage Claim", "Customs", "Check-in"],
+            correct: 2
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let studentName = "";
+    const loggedAnswers = {}; // Сюда складываем клики
+
+    function startQuiz() {
+        const nameInput = document.getElementById("username");
+        if (!nameInput.value.trim()) {
+            alert("Пожалуйста, введи свое имя!");
+            return;
+        }
+        studentName = nameInput.value.trim();
+        document.getElementById("start-screen").classList.add("hidden");
+        document.getElementById("quiz-screen").classList.remove("hidden");
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const currentQuestion = questions[currentQuestionIndex];
+        document.getElementById("question-text").innerText = `Вопрос ${currentQuestionIndex + 1}: ${currentQuestion.q}`;
+        
+        const container = document.getElementById("options-container");
+        container.innerHTML = ""; 
+
+        currentQuestion.options.forEach((option, index) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = option;
+            btn.onclick = () => handleAnswer(index, option);
+            container.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selectedIndex, selectedText) {
+        const currentQuestion = questions[currentQuestionIndex];
+        const isCorrect = selectedIndex === currentQuestion.correct;
+        
+        // Логируем клик: записываем текст вопроса и что выбрал студент
+        loggedAnswers[`Вопрос ${currentQuestionIndex + 1}`] = {
+            "Вопрос": currentQuestion.q,
+            "Выбранный ответ": selectedText,
+            "Результат": isCorrect ? "ВЕРНО" : "НЕВЕРНО"
+        };
+
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            showQuestion();
+        } else {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+
+        const statusBlock = document.getElementById("status-message");
+
+        // Формируем URL для фоновой отправки ответов
+        const targetUrl = `https://google.com{GOOGLE_FORM_ID}/formResponse`;
+        
+        const formData = new FormData();
+        formData.append(ENTRY_ID_NAME, studentName);
+        
+        // Превращаем накопленный объект с кликами в красивую текстовую строку
+        const textPayload = Object.keys(loggedAnswers).map(key => {
+            return `${key}\nQ: ${loggedAnswers[key]["Вопрос"]}\nA: ${loggedAnswers[key]["Выбранный ответ"]}\n[${loggedAnswers[key]["Результат"]}]`;
+        }).join("\n\n");
+        
+        formData.append(ENTRY_ID_ANSWERS, textPayload);
+
+        // Отправляем POST-запрос в Google Форму
+        fetch(targetUrl, {
+            method: "POST",
+            mode: "no-cors", // Позволяет обойти CORS и сделать тихую отправку
+            body: formData
+        })
+        .then(() => {
+            statusBlock.style.backgroundColor = "#d4edda";
+            statusBlock.style.color = "#155724";
+            statusBlock.innerText = "✅ Ответы успешно доставлены!";
+        })
+        .catch((err) => {
+            statusBlock.style.backgroundColor = "#f8d7da";
+            statusBlock.style.color = "#721c24";
+            statusBlock.innerText = "❌ Ошибка сети при отправке.";
+            console.error(err);
+        });
+    }
+</script>
+
+</body>
+</html>
