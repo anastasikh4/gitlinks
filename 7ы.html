@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Квиз: Проверка перед поездкой</title>
+    <title>Survival English Quiz</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f9fa;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -15,37 +15,37 @@
             align-items: center;
             min-height: 90vh;
         }
-        .quiz-container {
-            background-color: #ffffff;
+        .quiz-card {
+            background: #ffffff;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            max-width: 480px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            max-width: 450px;
             width: 100%;
             box-sizing: border-box;
         }
-        h2, h3 { color: #1c1e21; margin-top: 0; }
-        .input-group { margin: 25px 0; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #4b4f56; }
-        .input-group input { width: 100%; padding: 12px; border: 1px solid #ccd0d5; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
-        .option-btn {
+        h2 { color: #212529; margin-top: 0; font-size: 22px; }
+        .input-box { margin: 20px 0; }
+        .input-box label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+        .input-box input { width: 100%; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
+        .option-link {
             display: block;
             width: 100%;
             padding: 14px;
-            margin: 12px 0;
-            background-color: #f5f6f7;
-            border: 1px solid #dadde1;
+            margin: 10px 0;
+            background-color: #f1f3f5;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             text-align: left;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 500;
-            color: #4b4f56;
-            transition: all 0.2s ease;
+            color: #343a40;
+            transition: all 0.2s;
+            box-sizing: border-box;
         }
-        .option-btn:hover { background-color: #ebedf0; border-color: #bcd0e7; color: #1c1e21; }
-        .start-btn {
-            background-color: #007bff;
+        .option-link:hover { background-color: #e9ecef; border-color: #ced4da; }
+        .action-btn {
+            background-color: #198754;
             color: white;
             border: none;
             padding: 14px 20px;
@@ -54,154 +54,158 @@
             font-size: 16px;
             font-weight: bold;
             width: 100%;
+            margin-top: 15px;
         }
-        .start-btn:hover { background-color: #0056b3; }
+        .action-btn:hover { background-color: #157347; }
         .hidden { display: none; }
-        #status-message {
-            margin-top: 25px;
+        .results-preview {
+            background: #f1f3f5;
             padding: 15px;
             border-radius: 6px;
-            font-weight: 600;
-            text-align: center;
-            background-color: #d4edda;
-            color: #155724;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            margin: 15px 0;
+            border-left: 4px solid #198754;
         }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
-    <!-- ЭКРАН 1: Приветствие и Ввод имени -->
-    <div id="start-screen">
+<div class="quiz-card">
+    <!-- ЭКРАН 1: Начало -->
+    <div id="screen-start">
         <h2>Английский для поездок ✈️</h2>
-        <p>Добро пожаловать на мини-тестирование! Давай проверим базовые фразы для выживания в путешествии.</p>
-        <div class="input-group">
-            <label for="username">Введи своё имя:</label>
-            <input type="text" id="username" placeholder="Например, Александр" required>
+        <p>Короткий ИИ-тест для проверки ключевых фраз перед путешествием в Китай.</p>
+        <div class="input-box">
+            <label for="student-name">Ваше имя:</label>
+            <input type="text" id="student-name" placeholder="Введите имя и фамилию" required>
         </div>
-        <button class="start-btn" onclick="startQuiz()">Начать квиз</button>
+        <button class="action-btn" onclick="startQuiz()">Начать тест</button>
     </div>
 
     <!-- ЭКРАН 2: Вопросы -->
-    <div id="quiz-screen" class="hidden">
-        <h3 id="question-text">Текст вопроса</h3>
-        <div id="options-container">
-            <!-- Сюда JS подставит кнопки с ответами -->
-        </div>
+    <div id="screen-quiz" class="hidden">
+        <h3 id="question-title">Текст вопроса</h3>
+        <div id="options-list"></div>
     </div>
 
     <!-- ЭКРАН 3: Финал -->
-    <div id="result-screen" class="hidden">
-        <h2>Отличная работа! 🎉</h2>
-        <p>Тест успешно пройден. Твой преподаватель уже изучает результаты, чтобы составить идеальный план первого урока.</p>
-        <div id="status-message">✅ Ответы успешно доставлены!</div>
+    <div id="screen-result" class="hidden">
+        <h2>Тест завершен! 🎉</h2>
+        <p>Ваш отчет по ответам сформирован автоматически. Нажмите на кнопку ниже, чтобы отправить его преподавателю на проверку.</p>
+        
+        <div id="results-log" class="results-preview"></div>
+        
+        <button class="action-btn" onclick="sendViaEmail()">📧 Отправить преподавателю на Email</button>
+        <button class="action-btn" style="background-color: #0d6efd;" onclick="sendViaTelegram()">💬 Отправить в Telegram</button>
     </div>
 </div>
 
-<!-- ================= СКРЫТЫЙ МЕХАНИЗМ ОТПРАВКИ ================= -->
-<!-- Скрытый iframe, в который будет незаметно перезагружаться Google Форма -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
-
-<!-- Реальная HTML-форма Google. Она полностью скрыта от пользователя -->
-<form action="https://google.com" 
-      method="POST" 
-      target="hidden_iframe" 
-      id="real-google-form" 
-      style="display:none;">
-    <input type="text" name="entry.1018321990" id="google-field-name">
-    <input type="text" name="entry.698158560" id="google-field-answers">
-    <input type="submit" id="submit-form-btn">
-</form>
-<!-- ============================================================= -->
-
 <script>
-    const questions = [
+    // ПОДСТАВЬТЕ СВОЙ EMAIL СЮДА ДЛЯ ПОЛУЧЕНИЯ ОТЧЕТОВ
+    const TEACHER_EMAIL = "anastasiallen@ya.ru"; 
+
+    // Набор вопросов ИИ по теме Travel English
+    const quizData = [
         {
-            q: "Администратор на стойке отеля говорит: 'Can I have your passport, please?'. Твое действие?",
-            options: ["Отвечу: 'Yes, here you are' и передам паспорт.", "No, thank you' и пойду искать лифт.", "Скажу: 'I prefer single room'."],
+            q: "Вы заселяетесь в отель. Администратор спрашивает паспорт. Что вы ответите, передавая документ?",
+            options: ["Yes, here you are.", "No, thank you.", "I want to check-in."],
             correct: 0
         },
         {
-            q: "Как вежливо и правильно попросить меню у официанта в ресторане?",
-            options: ["Give me text, please!", "Could we have the menu, please?", "Where is food list?"],
+            q: "Как вежливо попросить счёт у официанта в ресторане?",
+            options: ["Give me money list!", "Could I have the bill, please?", "How much for food?"],
             correct: 1
         },
         {
-            q: "Какую вывеску нужно искать в аэропорту, если тебе нужно срочно сдать чемоданы и получить посадочный билет?",
-            options: ["Baggage Claim", "Customs", "Check-in"],
+            q: "Какую стойку вы будете искать в аэропорту для сдачи багажа и получения билета?",
+            options: ["Baggage Claim", "Information Desk", "Check-in counter"],
             correct: 2
         }
     ];
 
-    let currentQuestionIndex = 0;
-    let studentName = "";
-    const loggedAnswers = {}; 
+    let currentStep = 0;
+    let nameOfStudent = "";
+    const reportData = {}; 
+    let finalPlainTextReport = "";
 
     function startQuiz() {
-        const nameInput = document.getElementById("username");
-        if (!nameInput.value.trim()) {
-            alert("Пожалуйста, введи свое имя!");
+        const input = document.getElementById("student-name");
+        if (!input.value.trim()) {
+            alert("Пожалуйста, введите имя!");
             return;
         }
-        studentName = nameInput.value.trim();
-        document.getElementById("start-screen").classList.add("hidden");
-        document.getElementById("quiz-screen").classList.remove("hidden");
-        showQuestion();
+        nameOfStudent = input.value.trim();
+        document.getElementById("screen-start").classList.add("hidden");
+        document.getElementById("screen-quiz").classList.remove("hidden");
+        renderStep();
     }
 
-    function showQuestion() {
-        const currentQuestion = questions[currentQuestionIndex];
-        document.getElementById("question-text").innerText = `Вопрос ${currentQuestionIndex + 1}: ${currentQuestion.q}`;
+    function renderStep() {
+        const currentData = quizData[currentStep];
+        document.getElementById("question-title").innerText = `Вопрос ${currentStep + 1}: ${currentData.q}`;
         
-        const container = document.getElementById("options-container");
-        container.innerHTML = ""; 
+        const list = document.getElementById("options-list");
+        list.innerHTML = ""; 
 
-        currentQuestion.options.forEach((option, index) => {
+        currentData.options.forEach((opt, idx) => {
             const btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = option;
-            btn.onclick = () => handleAnswer(index, option);
-            container.appendChild(btn);
+            btn.className = "option-link";
+            btn.innerText = opt;
+            btn.onclick = () => saveStepSelection(idx, opt);
+            list.appendChild(btn);
         });
     }
 
-    function handleAnswer(selectedIndex, selectedText) {
-        const currentQuestion = questions[currentQuestionIndex];
-        const isCorrect = selectedIndex === currentQuestion.correct;
+    function saveStepSelection(idx, text) {
+        const currentData = quizData[currentStep];
+        const success = idx === currentData.correct;
         
-        loggedAnswers[`Вопрос ${currentQuestionIndex + 1}`] = {
-            "Вопрос": currentQuestion.q,
-            "Выбранный ответ": selectedText,
-            "Результат": isCorrect ? "ВЕРНО" : "НЕВЕРНО"
+        reportData[`Вопрос ${currentStep + 1}`] = {
+            "Вопрос": currentData.q,
+            "Ответ студента": text,
+            "Статус": success ? "✅ Правильно" : "❌ Неправильно"
         };
 
-        currentQuestionIndex++;
+        currentStep++;
 
-        if (currentQuestionIndex < questions.length) {
-            showQuestion();
+        if (currentStep < quizData.length) {
+            renderStep();
         } else {
-            finishQuiz();
+            showFinalScreen();
         }
     }
 
-    function finishQuiz() {
-        // Переключаем экраны квиза на финальный результат
-        document.getElementById("quiz-screen").classList.add("hidden");
-        document.getElementById("result-screen").classList.remove("hidden");
+    function showFinalScreen() {
+        document.getElementById("screen-quiz").classList.add("hidden");
+        document.getElementById("screen-result").classList.remove("hidden");
 
-        // 1. Заполняем данными скрытую настоящую HTML-форму
-        document.getElementById("google-field-name").value = studentName;
-        
-        // Форматируем текст ответов
-        const textPayload = Object.keys(loggedAnswers).map(key => {
-            return `${key}\nQ: ${loggedAnswers[key]["Вопрос"]}\nA: ${loggedAnswers[key]["Выбранный ответ"]}\n[${loggedAnswers[key]["Результат"]}]`;
-        }).join("\n\n");
-        
-        document.getElementById("google-field-answers").value = textPayload;
+        // Формируем красивый текстовый блок результатов
+        finalPlainTextReport = `Студент: ${nameOfStudent}\n\n` + 
+            Object.keys(reportData).map(key => {
+                return `${key}\nQ: ${reportData[key]["Вопрос"]}\nA: ${reportData[key]["Ответ студента"]}\n[${reportData[key]["Статус"]}]`;
+            }).join("\n\n");
 
-        // 2. Имитируем нажатие физической кнопки Submit на форме
-        // Браузер отправит форму стандартным образом, перенаправив результат в скрытый iframe
-        document.getElementById("submit-form-btn").click();
+        // Показываем превью ученику на экране
+        document.getElementById("results-log").innerText = finalPlainTextReport;
+    }
+
+    // Способ 1: Отправка через встроенную почту
+    function sendViaEmail() {
+        const subject = encodeURIComponent(`Результаты квиза Travel English - ${nameOfStudent}`);
+        const body = encodeURIComponent(finalPlainTextReport);
+        
+        // Открывает установленный почтовый клиент (Outlook, Mail.ru, Gmail и т.д.) с готовым текстом
+        window.location.href = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+    }
+
+    // Способ 2: Быстрая отправка через Telegram-поделиться
+    function sendViaTelegram() {
+        const text = encodeURIComponent(`Привет! Я прошел вводный квиз.\n\n${finalPlainTextReport}`);
+        
+        // Открывает Телеграм, где ученик просто выбирает ваш чат и отправляет готовое сообщение в 1 клик
+        window.open(`https://t.me{encodeURIComponent(window.location.href)}&text=${text}`);
     }
 </script>
 
