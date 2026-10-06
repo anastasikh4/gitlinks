@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duo Practice: To Be — Different Set</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+            --duo-yellow: #ffc800;
+            --duo-purple: #ce82ff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 15px 12px 120px;
+            font-size: 14px;
+        }
+
+        /* ═══════ PROGRESS BAR ═══════ */
+        .progress-container {
+            width: 100%;
+            max-width: 520px;
+            height: 14px;
+            background-color: var(--duo-gray);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.06);
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--duo-green), #89e219);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+            border-radius: 8px;
+        }
+
+        /* ═══════ CARD ═══════ */
+        .card {
+            max-width: 520px;
+            width: 100%;
+            padding: 20px 18px 22px;
+            background: #fff;
+            border-radius: 18px;
+            border: 2px solid var(--duo-gray);
+            box-shadow: 0 4px 0 var(--duo-gray);
+            margin-bottom: 20px;
+        }
+
+        .ex-badge {
+            display: inline-block;
+            background: var(--duo-blue);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 900;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .ex-badge.green  { background: var(--duo-green); }
+        .ex-badge.yellow { background: var(--duo-yellow); color: #4b4b4b; }
+        .ex-badge.purple { background: var(--duo-purple); }
+
+        h1 {
+            font-weight: 900;
+            font-size: 20px;
+            margin: 0 0 6px 0;
+            line-height: 1.25;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #8b8b8b;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        /* ═══════ LIST OF ITEMS ═══════ */
+        .item-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .item-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-bottom: 1px dashed var(--duo-gray);
+            font-size: 15px;
+            font-weight: 700;
+            flex-wrap: wrap;
+        }
+        .item-list li:last-child { border-bottom: none; }
+        .item-list .num {
+            color: var(--duo-blue);
+            font-weight: 900;
+            min-width: 20px;
+        }
+        .item-list .source {
+            color: var(--duo-text);
+            min-width: 110px;
+        }
+        .item-list .arrow {
+            color: #b0b0b0;
+            font-weight: 900;
+        }
+
+        /* ═══════ SELECT ═══════ */
+        select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            padding: 6px 12px;
+            border: 2px solid var(--duo-gray);
+            border-bottom-width: 4px;
+            border-radius: 10px;
+            cursor: pointer;
+            outline: none;
+            color: var(--duo-blue);
+            font-size: 14px;
+            transition: all 0.2s;
+            background: #fff;
+            min-width: 110px;
+        }
+        select:hover:not(:disabled) {
+            background: #f7f7f7;
+            border-color: #d0d0d0;
+        }
+        select:focus {
+            border-color: var(--duo-blue);
+            background: #f0f9ff;
+        }
+        select.correct {
+            border-color: var(--duo-green);
+            background: var(--duo-light-green);
+            color: var(--duo-green-dark);
+        }
+        select.wrong {
+            border-color: var(--duo-red);
+            background: var(--duo-light-red);
+            color: var(--duo-red);
+        }
+        select:disabled { cursor: default; }
+
+        /* ═══════ LETTER / STORY BOX ═══════ */
+        .story-box {
+            border: 2px solid var(--duo-gray);
+            border-radius: 14px;
+            padding: 20px;
+            line-height: 2.2;
+            font-size: 15px;
+            margin-top: 4px;
+            background: #fdfbf7;
+            box-shadow: 0 3px 0 var(--duo-gray);
+            font-weight: 600;
+        }
+        .story-box .greeting,
+        .story-box .signature {
+            font-weight: 800;
+            color: var(--duo-text);
+        }
+        .story-box .signature {
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* ═══════ FOOTER ═══════ */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 2px solid var(--duo-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+        }
+
+        #check-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--duo-green-dark);
+            padding: 12px 50px;
+            border-radius: 14px;
+            font-weight: 900;
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: inherit;
+            transition: 0.1s;
+        }
+        #check-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+        #check-btn:disabled {
+            background: #ddd;
+            border-bottom-color: #bbb;
+            cursor: default;
+        }
+
+        /* ═══════ FEEDBACK BAR ═══════ */
+        .feedback-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            padding: 0 8%;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 101;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+        .feedback-text {
+            font-size: 18px;
+            font-weight: 900;
+        }
+        .continue-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--duo-green-dark);
+            padding: 12px 30px;
+            border-radius: 14px;
+            font-weight: 900;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .continue-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 1px;
+        }
+        .feedback-bar.correct-ui { display: flex; background-color: var(--duo-light-green); color: var(--duo-green-dark); }
+        .feedback-bar.incorrect-ui { display: flex; background-color: var(--duo-light-red); color: var(--duo-red); }
+        .feedback-bar.correct-ui .continue-btn { background-color: var(--duo-green); }
+        .feedback-bar.incorrect-ui .continue-btn { background-color: var(--duo-red); border-bottom-color: #c93a3a; }
+
+        @media (max-width: 420px) {
+            h1 { font-size: 18px; }
+            .item-list li { font-size: 14px; padding: 6px 8px; }
+            select { font-size: 13px; padding: 5px 10px; min-width: 95px; }
+            .story-box { font-size: 14px; padding: 16px; line-height: 2.1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <!-- ══════════ EXERCISE A ══════════ -->
+    <div class="card">
+        <span class="ex-badge green">Exercise A</span>
+        <h1>Match full form → short form</h1>
+        <div class="subtitle">Pick the correct contraction for each phrase.</div>
+
+        <ul class="item-list">
+            <li>
+                <span class="num">1</span>
+                <span class="source">It is</span>
+                <span class="arrow">→</span>
+                <select id="s1" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="It's">It's</option>
+                    <option value="Its">Its</option>
+                    <option value="It're">It're</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">2</span>
+                <span class="source">I am not</span>
+                <span class="arrow">→</span>
+                <select id="s2" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="I amn't">I amn't</option>
+                    <option value="I'm not">I'm not</option>
+                    <option value="I aren't">I aren't</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">3</span>
+                <span class="source">He is not</span>
+                <span class="arrow">→</span>
+                <select id="s3" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="He'sn't">He'sn't</option>
+                    <option value="He aren't">He aren't</option>
+                    <option value="He isn't">He isn't</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">4</span>
+                <span class="source">We are not</span>
+                <span class="arrow">→</span>
+                <select id="s4" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="We aren't">We aren't</option>
+                    <option value="We isn't">We isn't</option>
+                    <option value="We're not not">We're not not</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">5</span>
+                <span class="source">You are not</span>
+                <span class="arrow">→</span>
+                <select id="s5" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="You isn't">You isn't</option>
+                    <option value="You're not">You're not</option>
+                    <option value="You's not">You's not</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">6</span>
+                <span class="source">They are</span>
+                <span class="arrow">→</span>
+                <select id="s6" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="They're">They're</option>
+                    <option value="They's">They's</option>
+                    <option value="They'm">They'm</option>
+                </select>
+            </li>
+            <li>
+                <span class="num">7</span>
+                <span class="source">That is</span>
+                <span class="arrow">→</span>
+                <select id="s7" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="That're">That're</option>
+                    <option value="That's">That's</option>
+                    <option value="Thats">Thats</option>
+                </select>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ══════════ EXERCISE B ══════════ -->
+    <div class="card">
+        <span class="ex-badge">Exercise B</span>
+        <h1>Read Ben's postcard</h1>
+        <div class="subtitle">Use: 'm, 's, 're, isn't, aren't.</div>
+
+        <div class="story-box">
+            <div class="greeting">Hi Grandma!</div>
+            <p>
+                How are you? I 
+                <select id="q1" onchange="updateProgress()">
+                    <option value="">[1]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                on holiday in Spain. The weather
+                <select id="q2" onchange="updateProgress()">
+                    <option value="">[2]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                sunny and warm. My hotel
+                <select id="q3" onchange="updateProgress()">
+                    <option value="">[3]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                near the sea. It
+                <select id="q4" onchange="updateProgress()">
+                    <option value="">[4]</option>
+                    <option value="isn't">isn't</option>
+                    <option value="aren't">aren't</option>
+                </select>
+                very big, but it's nice. The beaches
+                <select id="q5" onchange="updateProgress()">
+                    <option value="">[5]</option>
+                    <option value="isn't">isn't</option>
+                    <option value="aren't">aren't</option>
+                </select>
+                crowded in the morning. My parents
+                <select id="q6" onchange="updateProgress()">
+                    <option value="">[6]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                happy here. My little brother
+                <select id="q7" onchange="updateProgress()">
+                    <option value="">[7]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                in the pool all day. We
+                <select id="q8" onchange="updateProgress()">
+                    <option value="">[8]</option>
+                    <option value="'m">'m</option>
+                    <option value="'s">'s</option>
+                    <option value="'re">'re</option>
+                </select>
+                having a great time!
+            </p>
+            <div class="signature">See you soon,<br>Ben</div>
+        </div>
+    </div>
+
+    <!-- ══════════ EXERCISE C ══════════ -->
+    <div class="card">
+        <span class="ex-badge purple">Exercise C</span>
+        <h1>Make the questions</h1>
+        <div class="subtitle">Choose the correct question form and the correct short answer.</div>
+
+        <ul class="item-list" style="line-height: 2.8;">
+            <li style="display:block;">
+                <span class="num">1</span>
+                A:
+                <select id="a1" onchange="updateProgress()">
+                    <option value="">-- ? --</option>
+                    <option value="Is it a">Is it a</option>
+                    <option value="Are they">Are they</option>
+                    <option value="Is it an">Is it an</option>
+                </select>
+                rubber? +
+                <br>
+                <span class="num" style="visibility:hidden;">1</span>
+                B: +
+                <select id="b1" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="Yes, it is.">Yes, it is.</option>
+                    <option value="No, it isn't.">No, it isn't.</option>
+                    <option value="Yes, they are.">Yes, they are.</option>
+                </select>
+            </li>
+            <li style="display:block;">
+                <span class="num">2</span>
+                A:
+                <select id="a2" onchange="updateProgress()">
+                    <option value="">-- ? --</option>
+                    <option value="Is it a">Is it a</option>
+                    <option value="Are they">Are they</option>
+                    <option value="Is it an">Is it an</option>
+                </select>
+                erasers? -
+                <br>
+                <span class="num" style="visibility:hidden;">2</span>
+                B: -
+                <select id="b2" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="Yes, it is.">Yes, it is.</option>
+                    <option value="No, they aren't.">No, they aren't.</option>
+                    <option value="Yes, they are.">Yes, they are.</option>
+                </select>
+            </li>
+            <li style="display:block;">
+                <span class="num">3</span>
+                A:
+                <select id="a3" onchange="updateProgress()">
+                    <option value="">-- ? --</option>
+                    <option value="Is she a">Is she a</option>
+                    <option value="Is he a">Is he a</option>
+                    <option value="Are they">Are they</option>
+                </select>
+                doctor? +
+                <br>
+                <span class="num" style="visibility:hidden;">3</span>
+                B:+
+                <select id="b3" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="Yes, he is.">Yes, he is.</option>
+                    <option value="Yes, she is.">Yes, she is.</option>
+                    <option value="No, she isn't.">No, she isn't.</option>
+                </select>
+            </li>
+            <li style="display:block;">
+                <span class="num">4</span>
+                A:
+                <select id="a4" onchange="updateProgress()">
+                    <option value="">-- ? --</option>
+                    <option value="Is it a">Is it a</option>
+                    <option value="Are they">Are they</option>
+                    <option value="Is it an">Is it an</option>
+                </select>
+                umbrella? +
+                <br>
+                <span class="num" style="visibility:hidden;">4</span>
+                B: +
+                <select id="b4" onchange="updateProgress()">
+                    <option value="">-- pick --</option>
+                    <option value="Yes, it is.">Yes, it is.</option>
+                    <option value="No, it isn't.">No, it isn't.</option>
+                    <option value="Yes, they are.">Yes, they are.</option>
+                </select>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ══════════ FEEDBACK BAR ══════════ -->
+    <div id="feedback-bar" class="feedback-bar">
+        <div class="feedback-text" id="feedback-message">Correct!</div>
+        <button class="continue-btn" onclick="resetUI()">CONTINUE</button>
+    </div>
+
+    <!-- ══════════ FOOTER ══════════ -->
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()">Check</button>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════════
+           ANSWER KEY — 23 gaps total
+           ═══════════════════════════════════════════ */
+        const ANSWERS = {
+            // Exercise A — short forms (7)
+            s1: "It's",
+            s2: "I'm not",
+            s3: "He isn't",
+            s4: "We aren't",
+            s5: "You're not",
+            s6: "They're",
+            s7: "That's",
+
+            // Exercise B — Ben's postcard (8)
+            q1: "'m",
+            q2: "'s",
+            q3: "'s",
+            q4: "isn't",
+            q5: "aren't",
+            q6: "'re",
+            q7: "'s",
+            q8: "'re",
+
+            // Exercise C — questions & answers (4 × 2 = 8)
+            a1: "Is it a",
+            b1: "Yes, it is.",
+            a2: "Are they",
+            b2: "No, they aren't.",
+            a3: "Is she a",
+            b3: "Yes, she is.",
+            a4: "Is it an",
+            b4: "Yes, it is."
+        };
+
+        /* ═══════════════════════════════════════════
+           PROGRESS
+           ═══════════════════════════════════════════ */
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if (s.value !== "") filled++; });
+            document.getElementById('progress-bar').style.width = (filled / selects.length) * 100 + '%';
+            document.getElementById('check-btn').disabled = filled < selects.length;
+        }
+
+        /* ═══════════════════════════════════════════
+           CHECK ANSWERS
+           ═══════════════════════════════════════════ */
+        function checkAnswers() {
+            let correctCount = 0;
+            const total = Object.keys(ANSWERS).length;
+
+            for (let id in ANSWERS) {
+                const select = document.getElementById(id);
+                if (!select) continue;
+                select.disabled = true;
+                if (select.value === ANSWERS[id]) {
+                    correctCount++;
+                    select.classList.add('correct');
+                    select.classList.remove('wrong');
+                } else {
+                    select.classList.add('wrong');
+                    select.classList.remove('correct');
+                }
+            }
+
+            const bar = document.getElementById('feedback-bar');
+            const msg = document.getElementById('feedback-message');
+            const footer = document.getElementById('footer');
+
+            footer.style.display = 'none';
+
+            if (correctCount === total) {
+                bar.className = "feedback-bar correct-ui";
+                msg.innerHTML = "✔️ Perfect! You're a grammar star!";
+            } else if (correctCount >= total * 0.7) {
+                bar.className = "feedback-bar correct-ui";
+                msg.innerHTML = `👍 Great! ${correctCount}/${total}`;
+            } else {
+                bar.className = "feedback-bar incorrect-ui";
+                msg.innerHTML = `❌ ${correctCount}/${total} correct`;
+            }
+
+            if (navigator.vibrate) {
+                if (correctCount === total) navigator.vibrate(50);
+                else navigator.vibrate([40, 40, 80]);
+            }
+        }
+
+        /* ═══════════════════════════════════════════
+           RESET UI
+           ═══════════════════════════════════════════ */
+        function resetUI() {
+            document.getElementById('feedback-bar').className = "feedback-bar";
+            document.getElementById('footer').style.display = 'flex';
+
+            document.querySelectorAll('select').forEach(s => {
+                s.disabled = false;
+                s.classList.remove('correct', 'wrong');
+            });
+
+            updateProgress();
+        }
+
+        /* Init */
+        updateProgress();
+    </script>
+</body>
+</html>

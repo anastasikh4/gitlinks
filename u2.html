@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Hero: Pronouns & Prepositions</title>
+<style>
+  :root { --blue: #00f2ff; --pink: #ff007b; --green: #39ff14; --purple: #b14aff; --yellow: #ffd93d; --bg: #0d1117; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: #e6edf3; text-align: center; padding: 20px; margin: 0; min-height: 100vh; }
+  h1 { color: var(--blue); text-transform: uppercase; text-shadow: 0 0 12px var(--blue); font-size: 22px; letter-spacing: 2px; }
+  h2 { color: var(--yellow); font-size: 18px; letter-spacing: 1px; }
+  .box { max-width: 720px; margin: 20px auto; background: #161b22; padding: 24px; border-radius: 20px; border: 2px solid #30363d; }
+  .hidden { display: none !important; }
+
+  /* ═══════ LEVEL 1 GRID ═══════ */
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+  .card { background: #21262d; border: 2px solid #30363d; border-radius: 12px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; font-weight: 700; padding: 8px; transition: 0.2s; user-select: none; text-align: center; line-height: 1.3; }
+  .card.emoji { font-size: 44px; }
+  .card.selected { border-color: var(--blue); background: #30363d; box-shadow: 0 0 15px var(--blue); }
+  .card.matched { background: rgba(57, 255, 20, 0.15); border-color: var(--green); cursor: default; color: var(--green); box-shadow: 0 0 10px rgba(57,255,20,0.5); }
+  .card.wrong { border-color: var(--pink); background: rgba(255,0,123,0.15); animation: shake 0.4s; }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+  /* ═══════ CHOICE BUTTONS ═══════ */
+  .choice-btn { background: #21262d; color: #e6edf3; border: 2px solid #30363d; padding: 15px; margin: 8px auto; border-radius: 12px; cursor: pointer; width: 100%; max-width: 520px; font-size: 17px; text-align: left; display: block; font-family: inherit; font-weight: 600; transition: 0.15s; }
+  .choice-btn:hover:not(:disabled) { border-color: var(--blue); box-shadow: 0 0 10px rgba(0,242,255,0.35); }
+  .choice-btn:disabled { cursor: default; }
+  .choice-btn.correct { background: #238636 !important; border-color: var(--green) !important; color: #fff; }
+  .choice-btn.wrong { background: #da3633 !important; border-color: var(--pink) !important; color: #fff; }
+
+  /* ═══════ EMOJI + STATUS ═══════ */
+  .emoji-display { font-size: 80px; margin: 18px; filter: drop-shadow(0 0 12px var(--purple)); }
+  .status { margin-top: 15px; font-size: 1.25rem; font-weight: 800; min-height: 32px; }
+  .status.ok { color: var(--green); text-shadow: 0 0 8px var(--green); }
+  .status.bad { color: var(--pink); text-shadow: 0 0 8px var(--pink); }
+
+  #next-btn, #next-btn3 { background: var(--blue); color: #000; padding: 14px 44px; border-radius: 50px; border: none; font-size: 17px; font-weight: 900; cursor: pointer; margin-top: 16px; letter-spacing: 1px; display: none; }
+  #next-btn:active, #next-btn3:active { transform: translateY(2px); }
+
+  .question-sentence { font-size: 18px; font-weight: 700; color: var(--yellow); margin: 14px 0; line-height: 1.5; }
+  .question-sentence .hl { color: var(--pink); text-decoration: underline wavy; }
+
+  /* ═══════════════════════════════════════════
+     LEVEL 3 SCENE — VISUAL PREPOSITIONS
+     ═══════════════════════════════════════════ */
+  .scene {
+    background: linear-gradient(180deg, #1a2332 0%, #21262d 100%);
+    border: 2px solid #30363d;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px auto;
+    max-width: 340px;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+
+  .scene .item {
+    font-size: 70px;
+    line-height: 1;
+    filter: drop-shadow(0 0 10px rgba(177, 74, 255, 0.5));
+    transition: 0.3s;
+  }
+
+  /* ON — item sits on top of the object */
+  .scene.on {
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 20px;
+  }
+  .scene.on .item-top { margin-bottom: -8px; }         /* slight overlap to "sit" on */
+  .scene.on .item-bottom { margin-top: 0; }
+
+  /* UNDER — object on top, item below */
+  .scene.under {
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 20px;
+  }
+  .scene.under .item-top { margin-bottom: 0; }
+  .scene.under .item-bottom { margin-top: -8px; }      /* item peeks from underneath */
+
+  /* NEXT TO — item on the left, object on the right */
+  .scene.next-to {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+  }
+  .scene.next-to .item-left { margin-right: 0; }
+  .scene.next-to .item-right { margin-left: 0; }
+
+  /* IN — item is INSIDE a container outline */
+  .scene.in {
+    padding: 20px;
+  }
+  .scene.in .container-box {
+    position: relative;
+    width: 180px;
+    height: 160px;
+    border: 6px dashed var(--blue);
+    border-radius: 14px;
+    background: rgba(0, 242, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 0 25px rgba(0, 242, 255, 0.25), 0 0 15px rgba(0, 242, 255, 0.3);
+  }
+  .scene.in .container-box::before {
+    content: "INSIDE";
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    color: var(--blue);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 2px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--blue);
+  }
+  .scene.in .item {
+    font-size: 80px;
+    opacity: 0.9;                                       /* slightly faded to feel "inside" */
+  }
+
+  /* labels under scene */
+  .scene-label {
+    font-size: 12px;
+    color: #8b949e;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 500px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .card { font-size: 12px; min-height: 88px; }
+    .choice-btn { font-size: 15px; padding: 12px; }
+    h1 { font-size: 18px; }
+    .scene { min-height: 180px; padding: 14px; }
+    .scene .item { font-size: 55px; }
+    .scene.in .container-box { width: 150px; height: 130px; }
+    .scene.in .item { font-size: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🦸 MISSION: PRONOUNS & PREPOSITIONS</h1>
+<div style="color: var(--blue); font-weight: 800; margin-bottom: 10px;">XP SCORE: <span id="xp">0</span></div>
+
+<!-- ═════════ LEVEL 1: MATCHING ═════════ -->
+<div class="box" id="level1">
+  <h2>LEVEL 1 · MEMORY MATCH</h2>
+  <p>Match the noun phrase with the correct pronoun.</p>
+  <div class="grid" id="grid1"></div>
+  <div class="status" id="status1"></div>
+</div>
+
+<!-- ═════════ LEVEL 2: CHOOSE THE PRONOUN ═════════ -->
+<div class="box hidden" id="level2">
+  <h2>LEVEL 2 · CHOOSE THE PRONOUN</h2>
+  <div class="emoji-display" id="emoji2"></div>
+  <div class="question-sentence" id="sentence2"></div>
+  <div id="options2" style="display: flex; flex-direction: column; align-items: center;"></div>
+  <div class="status" id="status2"></div>
+  <button id="next-btn" onclick="nextL2()">NEXT ▶</button>
+</div>
+
+<!-- ═════════ LEVEL 3: PREPOSITIONS ═════════ -->
+<div class="box hidden" id="level3">
+  <h2>LEVEL 3 · PREPOSITION RADAR</h2>
+  <p>Look at the picture and pick the correct preposition.</p>
+  <div id="scene3"></div>
+  <div class="question-sentence" id="sentence3"></div>
+  <div id="options3" style="display: flex; flex-direction: column; align-items: center;"></div>
+  <div class="status" id="status3"></div>
+  <button id="next-btn3" onclick="nextL3()">NEXT ▶</button>
+</div>
+
+<!-- ═════════ FINAL SCREEN ═════════ -->
+<div class="box hidden" id="final">
+  <h1>🏆 GRAND MASTER!</h1>
+  <p style="font-size: 20px;">Final XP: <span id="finalXp" style="color: var(--yellow); font-weight: 900;"></span></p>
+  <button class="choice-btn" style="text-align:center; max-width:300px;" onclick="location.reload()">PLAY AGAIN 🔄</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   LEVEL 1 — Matching pairs (7 unique pronouns)
+   ═══════════════════════════════════════════ */
+const pairData = [
+  { phrase: "John and I are 10",              pronoun: "WE",    emoji: "👦👧" },
+  { phrase: "The pencil is on the desk",      pronoun: "IT",    emoji: "✏️" },
+  { phrase: "You and Clara are classmates",   pronoun: "YOU",   emoji: "👫" },
+  { phrase: "Mrs Smith is my Art teacher",    pronoun: "SHE",   emoji: "👩‍🏫" },
+  { phrase: "The balls are in the wardrobe",  pronoun: "THEY",  emoji: "⚽⚽" },
+  { phrase: "Tom can play the guitar",        pronoun: "HE",    emoji: "👦" },
+  { phrase: "I am a student",                 pronoun: "I",     emoji: "🧑" }
+];
+
+/* ═══════════════════════════════════════════
+   LEVEL 2 — Choose the pronoun
+   ═══════════════════════════════════════════ */
+const testData = [
+  { e: "🎸", s: "The guitar is in the wardrobe.", c: "It", o: ["He", "It", "She", "They"] },
+  { e: "👩‍🏫", s: "Mrs Smith is my Art teacher.", c: "She", o: ["He", "It", "She", "We"] },
+  { e: "👦👧", s: "John and I are ten years old.", c: "We", o: ["They", "We", "You", "It"] },
+  { e: "👫", s: "You and Clara are classmates.", c: "You", o: ["We", "They", "You", "He"] },
+  { e: "✏️📚", s: "The pencils are on the desk.", c: "They", o: ["It", "They", "She", "I"] },
+  { e: "👦", s: "Tom can play the guitar.", c: "He", o: ["He", "She", "It", "We"] }
+];
+
+/* ═══════════════════════════════════════════
+   LEVEL 3 — Prepositions with VISUAL scenes
+   Each item has: subject, object, prep, sentence, options
+   ═══════════════════════════════════════════ */
+const prepData = [
+  {
+    prep: "on",
+    subject: "⚽",
+    object: "📦",
+    s: "The ball is ___ the box.",
+    c: "on",
+    o: ["in", "on", "under", "next to"]
+  },
+  {
+    prep: "in",
+    subject: "👕",
+    object: "🚪",
+    s: "The clothes are ___ the wardrobe.",
+    c: "in",
+    o: ["on", "in", "next to", "under"]
+  },
+  {
+    prep: "under",
+    subject: "🐱",
+    object: "🛏️",
+    s: "The cat is ___ the bed.",
+    c: "under",
+    o: ["on", "next to", "under", "in"]
+  },
+  {
+    prep: "next-to",
+    subject: "🎸",
+    object: "🚪",
+    s: "The guitar is ___ the wardrobe.",
+    c: "next to",
+    o: ["on", "in", "next to", "under"]
+  },
+  {
+    prep: "on",
+    subject: "🎒",
+    object: "🪑",
+    s: "The schoolbag is ___ the chair.",
+    c: "on",
+    o: ["in", "on", "under", "next to"]
+  },
+  {
+    prep: "in",
+    subject: "✏️",
+    object: "📦",
+    s: "The pencil is ___ the pencil case.",
+    c: "in",
+    o: ["on", "in", "next to", "under"]
+  }
+];
+
+/* ═══════════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════════ */
+let xp = 0;
+let matchedCount = 0;
+let firstCard = null;
+let cur2 = 0;
+let cur3 = 0;
+
+function updateXP() {
+  document.getElementById('xp').textContent = xp;
+}
+
+/* ═══════════════════════════════════════════
+   LEVEL 1 — MEMORY MATCH
+   ═══════════════════════════════════════════ */
+function initL1() {
+  const grid = document.getElementById('grid1');
+  grid.innerHTML = '';
+  let cards = [];
+
+  pairData.forEach((d, i) => {
+    cards.push({ id: i, text: d.phrase,  type: 'phrase' });
+    cards.push({ id: i, text: d.pronoun, type: 'pronoun' });
+  });
+
+  cards.sort(() => Math.random() - 0.5);
+
+  cards.forEach(cardInfo => {
+    const el = document.createElement('div');
+    el.className = 'card' + (cardInfo.type === 'pronoun' ? ' emoji' : '');
+    el.textContent = cardInfo.text;
+    el.dataset.pairId = cardInfo.id;
+    el.dataset.kind = cardInfo.type;
+
+    el.onclick = () => {
+      if (el.classList.contains('matched') || el === firstCard) return;
+      el.classList.add('selected');
+
+      if (!firstCard) { firstCard = el; return; }
+
+      const sameP = firstCard.dataset.pairId === el.dataset.pairId;
+      const diffK = firstCard.dataset.kind !== el.dataset.kind;
+
+      if (sameP && diffK) {
+        el.classList.replace('selected', 'matched');
+        firstCard.classList.replace('selected', 'matched');
+        matchedCount++;
+        xp += 50; updateXP();
+        document.getElementById('status1').textContent = "MATCH! ✅ +50 XP";
+        document.getElementById('status1').className = 'status ok';
+
+        if (matchedCount === pairData.length) {
+          setTimeout(() => {
+            document.getElementById('level1').classList.add('hidden');
+            document.getElementById('level2').classList.remove('hidden');
+            initL2();
+          }, 800);
+        }
+      } else {
+        el.classList.add('wrong');
+        firstCard.classList.add('wrong');
+        document.getElementById('status1').textContent = "TRY AGAIN ❌";
+        document.getElementById('status1').className = 'status bad';
+        const temp = firstCard;
+        setTimeout(() => {
+          temp.classList.remove('selected', 'wrong');
+          el.classList.remove('selected', 'wrong');
+        }, 500);
+      }
+      firstCard = null;
+    };
+
+    grid.appendChild(el);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   LEVEL 2 — CHOOSE PRONOUN
+   ═══════════════════════════════════════════ */
+function initL2() {
+  if (cur2 >= testData.length) {
+    document.getElementById('level2').classList.add('hidden');
+    document.getElementById('level3').classList.remove('hidden');
+    initL3();
+    return;
+  }
+
+  const d = testData[cur2];
+  document.getElementById('emoji2').textContent = d.e;
+  document.getElementById('sentence2').innerHTML = d.s;
+
+  const box = document.getElementById('options2');
+  box.innerHTML = '';
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('status2').textContent = '';
+  document.getElementById('status2').className = 'status';
+
+  d.o.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = opt;
+    b.onclick = () => {
+      const btns = box.querySelectorAll('button');
+      btns.forEach(btn => btn.disabled = true);
+
+      if (opt === d.c) {
+        b.classList.add('correct');
+        xp += 100; updateXP();
+        document.getElementById('status2').textContent = "SUPER! +100 XP";
+        document.getElementById('status2').className = 'status ok';
+      } else {
+        b.classList.add('wrong');
+        document.getElementById('status2').textContent = "NOT QUITE ❌";
+        document.getElementById('status2').className = 'status bad';
+        btns.forEach(btn => { if (btn.textContent === d.c) btn.classList.add('correct'); });
+      }
+      document.getElementById('next-btn').style.display = 'block';
+    };
+    box.appendChild(b);
+  });
+}
+
+function nextL2() {
+  cur2++;
+  initL2();
+}
+
+/* ═══════════════════════════════════════════
+   LEVEL 3 — PREPOSITIONS (VISUAL)
+   Renders a scene based on the preposition:
+   • on      → item sits ON TOP of the object
+   • in      → item is INSIDE a bordered container
+   • under   → item is BELOW the object
+   • next to → item is on the LEFT of the object
+   ═══════════════════════════════════════════ */
+function renderScene(d) {
+  const s = d.subject;
+  const o = d.object;
+
+  if (d.prep === 'on') {
+    return `
+      <div class="scene on">
+        <div class="item item-top">${s}</div>
+        <div class="item item-bottom">${o}</div>
+      </div>
+    `;
+  }
+
+  if (d.prep === 'under') {
+    return `
+      <div class="scene under">
+        <div class="item item-top">${o}</div>
+        <div class="item item-bottom">${s}</div>
+      </div>
+    `;
+  }
+
+  if (d.prep === 'next-to') {
+    return `
+      <div class="scene next-to">
+        <div class="item item-left">${s}</div>
+        <div class="item item-right">${o}</div>
+      </div>
+    `;
+  }
+
+  if (d.prep === 'in') {
+    return `
+      <div class="scene in">
+        <div class="container-box">
+          <div class="item">${s}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  return '';
+}
+
+function initL3() {
+  if (cur3 >= prepData.length) {
+    showFinal();
+    return;
+  }
+
+  const d = prepData[cur3];
+
+  document.getElementById('scene3').innerHTML = renderScene(d);
+  document.getElementById('sentence3').innerHTML = d.s.replace('___', '<span class="hl">___</span>');
+
+  const box = document.getElementById('options3');
+  box.innerHTML = '';
+  document.getElementById('next-btn3').style.display = 'none';
+  document.getElementById('status3').textContent = '';
+  document.getElementById('status3').className = 'status';
+
+  d.o.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.textContent = opt;
+    b.onclick = () => {
+      const btns = box.querySelectorAll('button');
+      btns.forEach(btn => btn.disabled = true);
+
+      if (opt === d.c) {
+        b.classList.add('correct');
+        xp += 150; updateXP();
+        document.getElementById('status3').textContent = "PERFECT! +150 XP";
+        document.getElementById('status3').className = 'status ok';
+      } else {
+        b.classList.add('wrong');
+        document.getElementById('status3').textContent = "OOPS ❌";
+        document.getElementById('status3').className = 'status bad';
+        btns.forEach(btn => { if (btn.textContent === d.c) btn.classList.add('correct'); });
+      }
+      document.getElementById('next-btn3').style.display = 'block';
+    };
+    box.appendChild(b);
+  });
+}
+
+function nextL3() {
+  cur3++;
+  initL3();
+}
+
+/* ═══════════════════════════════════════════
+   FINAL
+   ═══════════════════════════════════════════ */
+function showFinal() {
+  document.getElementById('level3').classList.add('hidden');
+  document.getElementById('final').classList.remove('hidden');
+  document.getElementById('finalXp').textContent = xp;
+}
+
+/* ═══════════════════════════════════════════
+   START
+   ═══════════════════════════════════════════ */
+initL1();
+</script>
+</body>
+</html>
