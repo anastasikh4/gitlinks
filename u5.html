@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Grammar Worksheet: Present Simple vs Continuous</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; max-width: 850px; margin: 20px auto; padding: 20px; background-color: #fdf6f0; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #c0392b; text-align: center; border-bottom: 3px solid #e67e22; padding-bottom: 10px; }
+        h2 { color: #d35400; font-size: 1.15rem; margin-top: 30px; border-left: 4px solid #e67e22; padding-left: 10px; }
+
+        /* ═══════ READING TEXT ═══════ */
+        .reading {
+            background: #fff9f3;
+            padding: 22px 24px;
+            border-left: 5px solid #e67e22;
+            margin: 20px 0;
+            border-radius: 4px;
+            line-height: 2.1;
+            font-size: 1rem;
+            color: #2c3e50;
+        }
+        .reading .label {
+            display: block;
+            font-size: 1.15rem;
+            color: #c0392b;
+            margin-bottom: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed #f0c9a0;
+        }
+        .reading .time {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin: 8px 6px 4px 0;
+            letter-spacing: 0.5px;
+        }
+        .reading b {
+            color: #c0392b;
+            background: #ffe4c4;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .reading .ps {
+            background: #d4edda;
+            color: #155724;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .reading .pc {
+            background: #cce5ff;
+            color: #004085;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .legend {
+            background: #fff3e0;
+            border: 1.5px dashed #e67e22;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin: 14px 0 0 0;
+            font-size: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+        .legend .dot { display: inline-block; width: 14px; height: 14px; border-radius: 4px; }
+
+        /* ═══════ QUESTIONS ═══════ */
+        .question-block { margin-bottom: 12px; padding: 16px 20px; border: 1px solid #f0e0d0; border-radius: 8px; transition: 0.3s; background: #fffaf5; }
+        .question-block .num { display: inline-block; background: #e67e22; color: white; border-radius: 50%; width: 26px; height: 26px; line-height: 26px; text-align: center; font-weight: bold; font-size: 0.85rem; margin-right: 8px; }
+        .question-block p { margin: 0 0 8px 0; font-weight: 600; }
+        .question-block em { color: #888; font-size: 0.92rem; display: block; margin-top: 4px; }
+
+        .question-block select {
+            border: 2px solid #f0e0d0;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            font-family: inherit;
+            min-width: 240px;
+            transition: 0.15s;
+        }
+        .question-block select:focus { border-color: #e67e22; }
+
+        .question-block label {
+            display: inline-block;
+            margin-right: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .question-block label:hover { background: #fff2e0; }
+        .question-block input[type="radio"] { margin-right: 4px; }
+
+        .correct-bg { background-color: #d4edda !important; border-color: #c3e6cb !important; }
+        .incorrect-bg { background-color: #f8d7da !important; border-color: #f5c6cb !important; }
+
+        /* ═══════ CHECK BUTTON ═══════ */
+        button.btn-check {
+            display: block;
+            width: 100%;
+            background: #e67e22;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            margin-top: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+        button.btn-check:hover { background: #d35400; }
+        button.btn-check:active { transform: translateY(2px); }
+
+        .section-score {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 19px;
+            font-weight: bold;
+            display: none;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff9f3;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Present Simple vs Present Continuous</h1>
+
+    <!-- ═══════════════════════════════════════════
+         READING TEXT — already completed
+         ═══════════════════════════════════════════ -->
+    <div class="reading">
+        <span class="label">☕ A DAY IN THE LIFE OF A FLIGHT ATTENDANT</span>
+
+        I work as a flight attendant for a big international airline. That means I
+        <span class="ps">travel</span> all over the world, but I
+        <span class="ps">don't work</span> in an office.
+        Most people think my job is easy, but I
+        <span class="ps">do</span> a lot of training every year.<br><br>
+
+        <span class="time">6:00 a.m.</span><br>
+        I usually <span class="ps">get up</span> very early. Today, I
+        <span class="pc">am getting up</span> at 4:00 a.m. because we
+        <span class="pc">are flying</span> to Tokyo.<br><br>
+
+        <span class="time">10:30 a.m.</span><br>
+        We <span class="pc">are serving</span> meals and drinks right now. A passenger
+        <span class="pc">is asking</span> me for water. Another one
+        <span class="pc">is watching</span> a film.<br><br>
+
+        <span class="time">2:00 p.m.</span><br>
+        Most passengers <span class="pc">are sleeping</span> now. I
+        <span class="pc">am checking</span> the cabin quietly. My colleague
+        <span class="pc">is talking</span> to the pilot.<br><br>
+
+        <span class="time">7:00 p.m.</span><br>
+        We <span class="ps">usually arrive</span> in Tokyo in the evening.
+        This week we <span class="pc">are staying</span> in a new hotel. I love my job!
+
+        <div class="legend">
+            <span><span class="dot" style="background:#d4edda; border:1px solid #c3e6cb;"></span> Present Simple = routine</span>
+            <span><span class="dot" style="background:#cce5ff; border:1px solid #b8daff;"></span> Present Continuous = now / temporary</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 1 — TRUE / FALSE
+         ═══════════════════════════════════════════ -->
+    <h2>📌 Exercise 1 · True or False? (About the reading text)</h2>
+
+    <div class="question-block" id="block14">
+        <p><span class="num">1</span> The flight attendant works in an office.</p>
+        <label><input type="radio" name="q14" value="false"> True</label>
+        <label><input type="radio" name="q14" value="true"> False</label>
+    </div>
+
+    <div class="question-block" id="block15">
+        <p><span class="num">2</span> She does a lot of training every year.</p>
+        <label><input type="radio" name="q15" value="true"> True</label>
+        <label><input type="radio" name="q15" value="false"> False</label>
+    </div>
+
+    <div class="question-block" id="block16">
+        <p><span class="num">3</span> Today she got up at 6:00 a.m.</p>
+        <label><input type="radio" name="q16" value="false"> True</label>
+        <label><input type="radio" name="q16" value="true"> False</label>
+    </div>
+
+    <div class="question-block" id="block17">
+        <p><span class="num">4</span> She and her colleagues are flying to Tokyo.</p>
+        <label><input type="radio" name="q17" value="true"> True</label>
+        <label><input type="radio" name="q17" value="false"> False</label>
+    </div>
+
+    <div class="question-block" id="block18">
+        <p><span class="num">5</span> Right now all passengers are watching films.</p>
+        <label><input type="radio" name="q18" value="false"> True</label>
+        <label><input type="radio" name="q18" value="true"> False</label>
+    </div>
+
+    <div class="question-block" id="block19">
+        <p><span class="num">6</span> They usually arrive in Tokyo in the evening.</p>
+        <label><input type="radio" name="q19" value="true"> True</label>
+        <label><input type="radio" name="q19" value="false"> False</label>
+    </div>
+
+    <button class="btn-check" onclick="checkSection1()">Check Exercise 1</button>
+    <div class="section-score" id="score1"></div>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 2 — CHOOSE THE CORRECT FORM
+         ═══════════════════════════════════════════ -->
+    <h2>📌 Exercise 2 · Choose the correct form</h2>
+
+    <div class="question-block" id="block1">
+        <p><span class="num">1</span> A: What <select id="q1">
+            <option value="">-- choose --</option>
+            <option value="wrong">do you read / are you reading</option>
+            <option value="correct">are you reading</option>
+            <option value="wrong">do you reading</option>
+        </select> at the moment?</p>
+    </div>
+
+    <div class="question-block" id="block2">
+        <p><span class="num">2</span> B: It's a novel about Japan. I <select id="q2">
+            <option value="">-- choose --</option>
+            <option value="wrong">am reading / read</option>
+            <option value="correct">read</option>
+            <option value="wrong">reading</option>
+        </select> two or three books a month.</p>
+    </div>
+
+    <div class="question-block" id="block3">
+        <p><span class="num">3</span> My sister <select id="q3">
+            <option value="">-- choose --</option>
+            <option value="wrong">is usually / usually is</option>
+            <option value="correct">usually</option>
+            <option value="wrong">usually is being</option>
+        </select> works from home, but this week she <select id="q3b">
+            <option value="">-- choose --</option>
+            <option value="wrong">commutes / is commuting</option>
+            <option value="correct">is commuting</option>
+            <option value="wrong">commute</option>
+        </select> to the office.</p>
+    </div>
+
+    <div class="question-block" id="block4">
+        <p><span class="num">4</span> Look! Those dogs <select id="q4">
+            <option value="">-- choose --</option>
+            <option value="correct">are chasing</option>
+            <option value="wrong">chase / are chasing</option>
+            <option value="wrong">chase</option>
+        </select> a cat in the garden.</p>
+    </div>
+
+    <div class="question-block" id="block5">
+        <p><span class="num">5</span> Where <select id="q5">
+            <option value="">-- choose --</option>
+            <option value="wrong">does she work / is she working</option>
+            <option value="correct">does she work</option>
+            <option value="wrong">is she work</option>
+        </select>? — She's a teacher. She <select id="q5b">
+            <option value="">-- choose --</option>
+            <option value="wrong">is working / works</option>
+            <option value="correct">works</option>
+            <option value="wrong">work</option>
+        </select> in a primary school.</p>
+    </div>
+
+    <div class="question-block" id="block6">
+        <p><span class="num">6</span> A: <select id="q6">
+            <option value="">-- choose --</option>
+            <option value="wrong">Do you know / Are you knowing</option>
+            <option value="correct">Do you know</option>
+            <option value="wrong">Are you know</option>
+        </select> her phone number?<br>
+           B: Yes, I <select id="q6b">
+            <option value="">-- choose --</option>
+            <option value="correct">know it</option>
+            <option value="wrong">am knowing it</option>
+            <option value="wrong">knowing it</option>
+        </select> by heart.</p>
+    </div>
+
+    <button class="btn-check" onclick="checkSection2()">Check Exercise 2</button>
+    <div class="section-score" id="score2"></div>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 3 — SENTENCE ORDER
+         ═══════════════════════════════════════════ -->
+    <h2>📌 Exercise 3 · Put the words in the correct order</h2>
+
+    <div class="question-block" id="block9">
+        <p><span class="num">1</span> <select id="q9">
+            <option value="">-- choose --</option>
+            <option value="correct">What / do you / usually / do on Sundays</option>
+            <option value="wrong">What / usually / do you / do on Sundays</option>
+            <option value="wrong">What / you do / usually / do on Sundays</option>
+        </select>?
+           <em>— I usually go to the gym, but today I'm resting.</em></p>
+    </div>
+
+    <div class="question-block" id="block10">
+        <p><span class="num">2</span> <select id="q10">
+            <option value="">-- choose --</option>
+            <option value="wrong">are you / what / listening / to</option>
+            <option value="correct">What / are you / listening / to</option>
+            <option value="wrong">What / you are / listening / to</option>
+        </select>?
+           <em>— Some jazz. I love it.</em></p>
+    </div>
+
+    <div class="question-block" id="block11">
+        <p><span class="num">3</span> <select id="q11">
+            <option value="">-- choose --</option>
+            <option value="wrong">How often / she / is / going / to yoga</option>
+            <option value="correct">How often / does she / go / to yoga</option>
+            <option value="wrong">How often / is she / going / to yoga</option>
+        </select>?
+           <em>— Twice a week.</em></p>
+    </div>
+
+    <div class="question-block" id="block12">
+        <p><span class="num">4</span> <select id="q12">
+            <option value="">-- choose --</option>
+            <option value="correct">Why / are you / wearing / a coat</option>
+            <option value="wrong">Why / you are / wearing / a coat</option>
+            <option value="wrong">Why / do you / wearing / a coat</option>
+        </select>?
+           <em>— Because it's snowing outside.</em></p>
+    </div>
+
+    <div class="question-block" id="block13">
+        <p><span class="num">5</span> <select id="q13">
+            <option value="">-- choose --</option>
+            <option value="wrong">What time / you / get up / do</option>
+            <option value="correct">What time / do you / get up</option>
+            <option value="wrong">What time / are you / getting up</option>
+        </select>?
+           <em>— Around seven o'clock on weekdays.</em></p>
+    </div>
+
+    <button class="btn-check" onclick="checkSection3()">Check Exercise 3</button>
+    <div class="section-score" id="score3"></div>
+
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════
+       CHECK ANSWERS — Section by section
+       ═══════════════════════════════════════════ */
+    function validate(id, isCorrect) {
+        const block = document.getElementById(id);
+        if (isCorrect) {
+            block.classList.remove('incorrect-bg');
+            block.classList.add('correct-bg');
+            return 1;
+        } else {
+            block.classList.remove('correct-bg');
+            block.classList.add('incorrect-bg');
+            return 0;
+        }
+    }
+
+    function showScore(elementId, score, total) {
+        const el = document.getElementById(elementId);
+        el.style.display = "block";
+        el.innerHTML = `Your Score: ${score} / ${total}`;
+        el.style.color = score === total ? "#27ae60" : (score >= total * 0.6 ? "#f39c12" : "#e74c3c");
+    }
+
+    /* ═══════ EXERCISE 1 — TRUE / FALSE ═══════ */
+    function checkSection1() {
+        let score = 0;
+
+        score += validate("block14", document.querySelector('input[name="q14"]:checked')?.value === "true");
+        score += validate("block15", document.querySelector('input[name="q15"]:checked')?.value === "true");
+        score += validate("block16", document.querySelector('input[name="q16"]:checked')?.value === "true");
+        score += validate("block17", document.querySelector('input[name="q17"]:checked')?.value === "true");
+        score += validate("block18", document.querySelector('input[name="q18"]:checked')?.value === "true");
+        score += validate("block19", document.querySelector('input[name="q19"]:checked')?.value === "true");
+
+        showScore("score1", score, 6);
+    }
+
+    /* ═══════ EXERCISE 2 — CHOOSE THE FORM ═══════ */
+    function checkSection2() {
+        let score = 0;
+
+        score += validate("block1", document.getElementById('q1').value === "correct");
+        score += validate("block2", document.getElementById('q2').value === "correct");
+
+        score += validate("block3",
+            document.getElementById('q3').value  === "correct" &&
+            document.getElementById('q3b').value === "correct"
+        );
+
+        score += validate("block4", document.getElementById('q4').value === "correct");
+
+        score += validate("block5",
+            document.getElementById('q5').value  === "correct" &&
+            document.getElementById('q5b').value === "correct"
+        );
+
+        score += validate("block6",
+            document.getElementById('q6').value  === "correct" &&
+            document.getElementById('q6b').value === "correct"
+        );
+
+        showScore("score2", score, 6);
+    }
+
+    /* ═══════ EXERCISE 3 — SENTENCE ORDER ═══════ */
+    function checkSection3() {
+        let score = 0;
+
+        score += validate("block9",  document.getElementById('q9').value  === "correct");
+        score += validate("block10", document.getElementById('q10').value === "correct");
+        score += validate("block11", document.getElementById('q11').value === "correct");
+        score += validate("block12", document.getElementById('q12').value === "correct");
+        score += validate("block13", document.getElementById('q13').value === "correct");
+
+        showScore("score3", score, 5);
+    }
+</script>
+
+</body>
+</html>

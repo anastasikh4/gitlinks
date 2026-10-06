@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs · Vocabulary in Action · Present Simple vs Continuous</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --vocab-gold: #fdcb6e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 90%;
+            max-width: 660px;
+            padding: 26px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* ═══════ HEADER ═══════ */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .progress-container {
+            flex: 1;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            white-space: nowrap;
+        }
+
+        /* ═══════ BADGES ═══════ */
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .verb-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #7a5500;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 0 #d4a017;
+        }
+
+        .vocab-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #d4f5e9, #a8e6cf);
+            color: #0f5132;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 0 #6db890;
+        }
+
+        /* ═══════ EXERCISE INFO ═══════ */
+        .ex-info {
+            font-size: 0.82rem;
+            color: #888;
+            margin-bottom: 14px;
+            font-style: italic;
+        }
+
+        /* ═══════ QUESTION ═══════ */
+        .question-box h2 {
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            line-height: 1.85;
+            font-weight: 600;
+        }
+
+        .question-box h2 .gap {
+            display: inline-block;
+            min-width: 160px;
+            border-bottom: 2.5px solid var(--quiz-light-purple);
+            text-align: center;
+            color: var(--quiz-light-purple);
+            font-weight: 900;
+            padding: 0 6px;
+        }
+
+        .question-box h2 .vocab {
+            background: #fff8dc;
+            color: #7a5500;
+            padding: 1px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.95em;
+            border-bottom: 1px dashed #d4a017;
+        }
+
+        .question-box h2 .clue {
+            background: #e0f3ff;
+            color: #004085;
+            padding: 1px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.92em;
+        }
+
+        /* ═══════ VOCABULARY NOTE ═══════ */
+        .vocab-note {
+            background: #f0fdf4;
+            border-left: 4px solid #26de81;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            color: #155724;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .vocab-note b {
+            color: #0f5132;
+        }
+        .vocab-note .icon {
+            margin-right: 6px;
+        }
+
+        /* ═══════ OPTIONS ═══════ */
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #f1f2f6;
+            border: 2px solid #dfe4ea;
+            padding: 15px 18px;
+            border-radius: 12px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+            font-family: inherit;
+            line-height: 1.4;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #e1e2e6;
+            border-color: #ced6e0;
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled { cursor: default; }
+
+        .correct {
+            background: var(--quiz-green) !important;
+            color: white !important;
+            border-color: #20bf6b !important;
+        }
+
+        .wrong {
+            background: var(--quiz-red) !important;
+            color: white !important;
+            border-color: #cf304a !important;
+        }
+
+        /* ═══════ FEEDBACK ═══════ */
+        #feedback {
+            margin-top: 18px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* ═══════ NEXT BUTTON ═══════ */
+        .footer-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 12px;
+            background: var(--quiz-light-purple);
+            color: white;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #6c44a3;
+            font-family: inherit;
+            letter-spacing: 1px;
+            transition: 0.1s;
+        }
+
+        .footer-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #6c44a3;
+        }
+
+        /* ═══════ FINAL ═══════ */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .final-screen h1 { font-size: 4rem; margin: 0 0 10px; }
+        .final-screen h2 { margin-bottom: 10px; color: var(--quiz-light-purple); }
+        .final-screen p { font-size: 1.2rem; margin-bottom: 20px; }
+        .final-screen .strong-score { color: var(--quiz-purple); font-size: 1.4rem; }
+
+        @media (max-width: 500px) {
+            .question-box h2 { font-size: 1rem; line-height: 1.75; }
+            .option-btn { font-size: 0.92rem; padding: 13px; }
+            .verb-badge, .vocab-badge { font-size: 0.7rem; padding: 4px 11px; }
+            .question-box h2 .gap { min-width: 120px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <div class="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Vocabulary in Action</div>
+    </div>
+
+    <div id="content">
+        <div class="badge-row">
+            <span class="verb-badge" id="verbBadge">VERB · RUN</span>
+            <span class="vocab-badge" id="vocabBadge">VOCAB · family business</span>
+        </div>
+        <div class="ex-info">Practice present simple vs present continuous — while building up your work vocabulary.</div>
+        <div class="question-box">
+            <h2 id="question">Loading...</h2>
+        </div>
+        <div class="vocab-note" id="vocabNote">
+            <span class="icon">💡</span><b>Vocabulary:</b> loading...
+        </div>
+        <div class="options-grid" id="options"></div>
+    </div>
+
+    <div id="feedback"></div>
+    <button id="next-btn" class="footer-btn" onclick="handleNext()">NEXT SENTENCE</button>
+</div>
+
+<script>
+    /* ═══════════════════════════════════════════
+       JOBS · VOCABULARY IN ACTION
+       6 pairs × 2 sentences = 12 questions
+       Each pair tests one verb + one vocabulary area
+       ═══════════════════════════════════════════ */
+    const questions = [
+
+        /* ═══ PAIR 1 · RUN · Family business ═══ */
+        {
+            verb: "RUN",
+            vocabTag: "family business",
+            vocabNote: "<b>run a hotel / café / business</b> = manage it as a business",
+            hint: "a · permanent fact",
+            q: "My parents <span class='gap'>_____</span> a small <span class='vocab'>family hotel</span> in Kyoto.",
+            options: ["run", "are running"],
+            correct: 0
+        },
+        {
+            verb: "RUN",
+            vocabTag: "temporary cover",
+            vocabNote: "<b>run the shop</b> = manage it temporarily; <b>on holiday</b> = away from work",
+            hint: "b · temporary cover",
+            q: "I <span class='gap'>_____</span> the shop while my boss is <span class='vocab'>on holiday</span>.",
+            options: ["run", "am running"],
+            correct: 1
+        },
+
+        /* ═══ PAIR 2 · DEAL WITH · Customer service ═══ */
+        {
+            verb: "DEAL WITH",
+            vocabTag: "customer service",
+            vocabNote: "<b>deal with complaints / enquiries / customers</b> = handle a problem or request",
+            hint: "a · routine responsibility",
+            q: "A receptionist <span class='gap'>_____</span> customer <span class='vocab'>complaints</span> every day.",
+            options: ["deals with", "is dealing with"],
+            correct: 0
+        },
+        {
+            verb: "DEAL WITH",
+            vocabTag: "right now",
+            vocabNote: "When we say <b>right now / at the moment</b>, use the continuous form.",
+            hint: "b · happening now",
+            q: "The manager <span class='gap'>_____</span> an angry customer <span class='clue'>at the moment</span>.",
+            options: ["deals with", "is dealing with"],
+            correct: 1
+        },
+
+        /* ═══ PAIR 3 · WORK · Shifts & schedules ═══ */
+        {
+            verb: "WORK",
+            vocabTag: "night shifts",
+            vocabNote: "<b>work night shifts</b> = work at night as part of a schedule; <b>nurses</b> often do this",
+            hint: "a · routine shift pattern",
+            q: "Nurses often <span class='gap'>_____</span> <span class='vocab'>night shifts</span> in this hospital.",
+            options: ["work", "are working"],
+            correct: 0
+        },
+        {
+            verb: "WORK",
+            vocabTag: "double shift",
+            vocabNote: "<b>work a double shift</b> = work two shifts in a row — usually for one week only",
+            hint: "b · this week",
+            q: "She <span class='gap'>_____</span> a <span class='vocab'>double shift</span> <span class='clue'>this week</span> because of the staff shortage.",
+            options: ["works", "is working"],
+            correct: 1
+        },
+
+        /* ═══ PAIR 4 · TAKE ON · Hiring & staffing ═══ */
+        {
+            verb: "TAKE ON",
+            vocabTag: "hiring staff",
+            vocabNote: "<b>take on staff / employees</b> = hire new people",
+            hint: "a · regular hiring policy",
+            q: "We <span class='gap'>_____</span> new <span class='vocab'>employees</span> every September.",
+            options: ["take on", "are taking on"],
+            correct: 0
+        },
+        {
+            verb: "TAKE ON",
+            vocabTag: "peak season",
+            vocabNote: "<b>extra staff for the summer</b> = temporary workers during the busy season",
+            hint: "b · temporary peak season",
+            q: "The company <span class='gap'>_____</span> <span class='vocab'>extra staff</span> for the summer.",
+            options: ["takes on", "is taking on"],
+            correct: 1
+        },
+
+        /* ═══ PAIR 5 · EARN · Wages & salary ═══ */
+        {
+            verb: "EARN",
+            vocabTag: "minimum wage",
+            vocabNote: "<b>earn minimum wage</b> = the lowest legal pay per hour; <b>baristas</b> often earn this",
+            hint: "a · general fact",
+            q: "Baristas usually <span class='gap'>_____</span> <span class='vocab'>minimum wage</span> in most cafés.",
+            options: ["earn", "are earning"],
+            correct: 0
+        },
+        {
+            verb: "EARN",
+            vocabTag: "salary",
+            vocabNote: "<b>earn a salary</b> = receive monthly pay (usually for professional jobs)",
+            hint: "b · new situation, ongoing",
+            q: "She <span class='gap'>_____</span> a good <span class='vocab'>salary</span> in her new position.",
+            options: ["earns", "is earning"],
+            correct: 1
+        },
+
+        /* ═══ PAIR 6 · APPLY FOR · Job search ═══ */
+        {
+            verb: "APPLY FOR",
+            vocabTag: "job search",
+            vocabNote: "<b>apply for a job / position</b> = officially send your CV to get a job",
+            hint: "a · habitual behaviour",
+            q: "Graduates <span class='gap'>_____</span> dozens of <span class='vocab'>positions</span> before they get their first job.",
+            options: ["apply for", "are applying for"],
+            correct: 0
+        },
+        {
+            verb: "APPLY FOR",
+            vocabTag: "right now",
+            vocabNote: "Use the continuous form when the action is happening now — <b>right now</b>.",
+            hint: "b · happening now",
+            q: "She <span class='gap'>_____</span> a <span class='vocab'>position</span> at a marketing agency <span class='clue'>right now</span>.",
+            options: ["applies for", "is applying for"],
+            correct: 1
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    /* ═══════════════════════════════════════════
+       LOAD QUESTION
+       ═══════════════════════════════════════════ */
+    function loadQuestion() {
+        const q = questions[currentQ];
+
+        document.getElementById('verbBadge').innerText = "VERB · " + q.verb;
+        document.getElementById('vocabBadge').innerText = "VOCAB · " + q.vocabTag;
+        document.getElementById('question').innerHTML = q.q + "<span class='sub' style='display:block;font-size:0.85rem;color:#888;margin-top:8px;font-weight:500'>" + q.hint + "</span>";
+        document.getElementById('vocabNote').innerHTML = "<span class='icon'>💡</span>" + q.vocabNote;
+        document.getElementById('progress-bar').style.width = (currentQ / questions.length) * 100 + "%";
+
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsEl.appendChild(btn);
+        });
+
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    /* ═══════════════════════════════════════════
+       CHECK ANSWER
+       ═══════════════════════════════════════════ */
+    function checkAnswer(idx, btn) {
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (idx === questions[currentQ].correct) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerHTML =
+                "<span style='color:var(--quiz-green)'>✓ Correct! +100 XP</span>";
+            score++;
+            if (navigator.vibrate) navigator.vibrate(25);
+        } else {
+            btn.classList.add('wrong');
+            allBtns[questions[currentQ].correct].classList.add('correct');
+            document.getElementById('feedback').innerHTML =
+                "<span style='color:var(--quiz-red)'>✗ Not quite — is it a routine or happening now?</span>";
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    /* ═══════════════════════════════════════════
+       NEXT
+       ═══════════════════════════════════════════ */
+    function handleNext() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    /* ═══════════════════════════════════════════
+       FINAL
+       ═══════════════════════════════════════════ */
+    function showResults() {
+        document.getElementById('progress-bar').style.width = "100%";
+
+        const percent = Math.round((score / questions.length) * 100);
+        let emoji = "📚", title = "Keep practising!";
+        if (percent >= 50) { emoji = "👍"; title = "Good effort!"; }
+        if (percent >= 75) { emoji = "🎉"; title = "Great work!"; }
+        if (percent === 100) { emoji = "🏆"; title = "Vocabulary Master!"; }
+
+        document.getElementById('quiz-box').innerHTML = `
+            <div class="final-screen">
+                <h1>${emoji}</h1>
+                <h2>${title}</h2>
+                <p class="strong-score">Your Score: <strong>${score} / ${questions.length}</strong></p>
+                <button class="footer-btn" style="display:block" onclick="location.reload()">TRY AGAIN</button>
+            </div>
+        `;
+    }
+
+    /* Start */
+    loadQuestion();
+</script>
+
+</body>
+</html>
