@@ -69,7 +69,7 @@
 <body>
 
 <div class="quiz-card">
-    <!-- ЭКРАН 1: Накапливаем данные (Имя ученика) -->
+    <!-- ЭКРАН 1: Приветствие и Ввод имени -->
     <div id="screen-start">
         <h2>Английский для поездок ✈️</h2>
         <p>Короткий ИИ-тест для проверки ключевых фраз перед путешествием.</p>
@@ -80,13 +80,13 @@
         <button class="action-btn" onclick="startQuiz()">Начать тест</button>
     </div>
 
-    <!-- ЭКРАН 2: Динамические ИИ вопросы -->
+    <!-- ЭКРАН 2: Вопросы квиза -->
     <div id="screen-quiz" class="hidden">
         <h3 id="question-title">Текст вопроса</h3>
         <div id="options-list"></div>
     </div>
 
-    <!-- ЭКРАН 3: Финал + Индикатор автомата -->
+    <!-- ЭКРАН 3: Финал -->
     <div id="screen-result" class="hidden">
         <h2>Тест завершен! 🎉</h2>
         <p>Результаты обрабатываются и сохраняются.</p>
@@ -95,10 +95,7 @@
 </div>
 
 <script>
-    // Твой личный рабочий токен формы Formcarry
-    const FORMCARRY_ID = "dfFvRQ5Gzyi"; 
-
-    // Базовый пул ИИ-вопросов по теме Travel English
+    // Пул ИИ-вопросов по теме Basic Survival English
     const quizData = [
         {
             q: "Вы хотите заказать номер на одну ночь. Какую фразу вы выберете?",
@@ -153,7 +150,6 @@
         const currentData = quizData[currentStep];
         const success = idx === currentData.correct;
         
-        // Логируем каждый клик в красивый отчет
         reportData[`Вопрос ${currentStep + 1}`] = {
             "Вопрос": currentData.q,
             "Выбор ученика": text,
@@ -176,13 +172,13 @@
 
         const statusLabel = document.getElementById("status-info");
 
-        // Формируем плоскую красивую строку, чтобы в панели Formcarry отчет читался идеально
+        // Формируем красивую строку отчета для панели Formcarry
         const plainTextSummary = Object.keys(reportData).map(key => {
             return `${key}\nQ: ${reportData[key]["Вопрос"]}\nA: ${reportData[key]["Выбор ученика"]}\n[${reportData[key]["Результат"]}]`;
         }).join("\n\n");
 
         // Прямой AJAX-запрос автомата на сервера Formcarry
-        fetch(`https://formcarry.com{FORMCARRY_ID}`, {
+        fetch("https://formcarry.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -214,3 +210,4 @@
 
 </body>
 </html>
+
