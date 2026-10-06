@@ -45,7 +45,7 @@
         }
         .option-link:hover { background-color: #e9ecef; border-color: #ced4da; }
         .action-btn {
-            background-color: #198754;
+            background-color: #0d6efd;
             color: white;
             border: none;
             padding: 14px 20px;
@@ -54,86 +54,77 @@
             font-size: 16px;
             font-weight: bold;
             width: 100%;
-            margin-top: 15px;
         }
-        .action-btn:hover { background-color: #157347; }
+        .action-btn:hover { background-color: #0b5ed7; }
         .hidden { display: none; }
-        .results-preview {
-            background: #f1f3f5;
+        .alert-box {
+            margin-top: 20px;
             padding: 15px;
             border-radius: 6px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            font-size: 14px;
-            margin: 15px 0;
-            border-left: 4px solid #198754;
+            font-weight: 600;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
 <div class="quiz-card">
-    <!-- ЭКРАН 1: Начало -->
+    <!-- ЭКРАН 1: Накапливаем данные (Имя ученика) -->
     <div id="screen-start">
         <h2>Английский для поездок ✈️</h2>
-        <p>Короткий ИИ-тест для проверки ключевых фраз перед путешествием в Китай.</p>
+        <p>Короткий ИИ-тест для проверки ключевых фраз перед путешествием.</p>
         <div class="input-box">
-            <label for="student-name">Ваше имя:</label>
-            <input type="text" id="student-name" placeholder="Введите имя и фамилию" required>
+            <label for="student-name">Имя ученика:</label>
+            <input type="text" id="student-name" placeholder="Введите имя" required>
         </div>
         <button class="action-btn" onclick="startQuiz()">Начать тест</button>
     </div>
 
-    <!-- ЭКРАН 2: Вопросы -->
+    <!-- ЭКРАН 2: Динамические ИИ вопросы -->
     <div id="screen-quiz" class="hidden">
         <h3 id="question-title">Текст вопроса</h3>
         <div id="options-list"></div>
     </div>
 
-    <!-- ЭКРАН 3: Финал -->
+    <!-- ЭКРАН 3: Финал + Индикатор автомата -->
     <div id="screen-result" class="hidden">
         <h2>Тест завершен! 🎉</h2>
-        <p>Ваш отчет по ответам сформирован автоматически. Нажмите на кнопку ниже, чтобы отправить его преподавателю на проверку.</p>
-        
-        <div id="results-log" class="results-preview"></div>
-        
-        <button class="action-btn" onclick="sendViaEmail()">📧 Отправить преподавателю на Email</button>
-        <button class="action-btn" style="background-color: #0d6efd;" onclick="sendViaTelegram()">💬 Отправить в Telegram</button>
+        <p>Результаты обрабатываются и сохраняются.</p>
+        <div id="status-info" class="alert-box" style="background-color: #fff3cd; color: #664d03;">⏳ Сохранение результатов преподавателю...</div>
     </div>
 </div>
 
 <script>
-    // ПОДСТАВЬТЕ СВОЙ EMAIL СЮДА ДЛЯ ПОЛУЧЕНИЯ ОТЧЕТОВ
-    const TEACHER_EMAIL = "anastasiallen@ya.ru"; 
+    // Твой личный рабочий токен формы Formcarry
+    const FORMCARRY_ID = "dfFvRQ5Gzyi"; 
 
-    // Набор вопросов ИИ по теме Travel English
+    // Базовый пул ИИ-вопросов по теме Travel English
     const quizData = [
         {
-            q: "Вы заселяетесь в отель. Администратор спрашивает паспорт. Что вы ответите, передавая документ?",
-            options: ["Yes, here you are.", "No, thank you.", "I want to check-in."],
+            q: "Вы хотите заказать номер на одну ночь. Какую фразу вы выберете?",
+            options: ["I'd like to book a room for one night, please.", "Give me one bed room.", "I stay here tonight."],
             correct: 0
         },
         {
-            q: "Как вежливо попросить счёт у официанта в ресторане?",
-            options: ["Give me money list!", "Could I have the bill, please?", "How much for food?"],
-            correct: 1
+            q: "Вам принесли счет в ресторане, но вы хотите расплатиться картой. Что нужно спросить?",
+            options: ["Do you take credit cards?", "Where is my card money?", "Can I give you plastic?"],
+            correct: 0
         },
         {
-            q: "Какую стойку вы будете искать в аэропорту для сдачи багажа и получения билета?",
-            options: ["Baggage Claim", "Information Desk", "Check-in counter"],
-            correct: 2
+            q: "Как вежливо спросить дорогу до отеля у прохожего?",
+            options: ["Where is hotel? Tell me.", "Excuse me, could you tell me the way to the hotel?", "I look for my hotel now."],
+            correct: 1
         }
     ];
 
     let currentStep = 0;
     let nameOfStudent = "";
     const reportData = {}; 
-    let finalPlainTextReport = "";
 
     function startQuiz() {
         const input = document.getElementById("student-name");
         if (!input.value.trim()) {
-            alert("Пожалуйста, введите имя!");
+            alert("Пожалуйста, укажите имя!");
             return;
         }
         nameOfStudent = input.value.trim();
@@ -162,10 +153,11 @@
         const currentData = quizData[currentStep];
         const success = idx === currentData.correct;
         
+        // Логируем каждый клик в красивый отчет
         reportData[`Вопрос ${currentStep + 1}`] = {
             "Вопрос": currentData.q,
-            "Ответ студента": text,
-            "Статус": success ? "✅ Правильно" : "❌ Неправильно"
+            "Выбор ученика": text,
+            "Результат": success ? "Правильно" : "Неправильно"
         };
 
         currentStep++;
@@ -173,39 +165,50 @@
         if (currentStep < quizData.length) {
             renderStep();
         } else {
-            showFinalScreen();
+            submitReport();
         }
     }
 
-    function showFinalScreen() {
+    function submitReport() {
+        // Мгновенно переключаем интерфейс на экран финала
         document.getElementById("screen-quiz").classList.add("hidden");
         document.getElementById("screen-result").classList.remove("hidden");
 
-        // Формируем красивый текстовый блок результатов
-        finalPlainTextReport = `Студент: ${nameOfStudent}\n\n` + 
-            Object.keys(reportData).map(key => {
-                return `${key}\nQ: ${reportData[key]["Вопрос"]}\nA: ${reportData[key]["Ответ студента"]}\n[${reportData[key]["Статус"]}]`;
-            }).join("\n\n");
+        const statusLabel = document.getElementById("status-info");
 
-        // Показываем превью ученику на экране
-        document.getElementById("results-log").innerText = finalPlainTextReport;
-    }
+        // Формируем плоскую красивую строку, чтобы в панели Formcarry отчет читался идеально
+        const plainTextSummary = Object.keys(reportData).map(key => {
+            return `${key}\nQ: ${reportData[key]["Вопрос"]}\nA: ${reportData[key]["Выбор ученика"]}\n[${reportData[key]["Результат"]}]`;
+        }).join("\n\n");
 
-    // Способ 1: Отправка через встроенную почту
-    function sendViaEmail() {
-        const subject = encodeURIComponent(`Результаты квиза Travel English - ${nameOfStudent}`);
-        const body = encodeURIComponent(finalPlainTextReport);
-        
-        // Открывает установленный почтовый клиент (Outlook, Mail.ru, Gmail и т.д.) с готовым текстом
-        window.location.href = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
-    }
-
-    // Способ 2: Быстрая отправка через Telegram-поделиться
-    function sendViaTelegram() {
-        const text = encodeURIComponent(`Привет! Я прошел вводный квиз.\n\n${finalPlainTextReport}`);
-        
-        // Открывает Телеграм, где ученик просто выбирает ваш чат и отправляет готовое сообщение в 1 клик
-        window.open(`https://t.me{encodeURIComponent(window.location.href)}&text=${text}`);
+        // Прямой AJAX-запрос автомата на сервера Formcarry
+        fetch(`https://formcarry.com{FORMCARRY_ID}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                student_name: nameOfStudent,
+                quiz_report: plainTextSummary
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                // Если Formcarry принял данные — красим плашку в зеленый
+                statusLabel.style.backgroundColor = "#d4edda";
+                statusLabel.style.color = "#155724";
+                statusLabel.innerText = "✅ Успешно! Результаты отправлены преподавателю.";
+            } else {
+                throw new Error("Formcarry Error");
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка при отправке пакета:", error);
+            statusLabel.style.backgroundColor = "#f8d7da";
+            statusLabel.style.color = "#721c24";
+            statusLabel.innerText = "❌ Ошибка при автоматической отправке.";
+        });
     }
 </script>
 
