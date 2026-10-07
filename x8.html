@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Call Quest · Present Continuous</title>
+    <style>
+        :root {
+            --hero-blue: #3498db;
+            --hero-red: #e74c3c;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #2ecc71;
+            --orange: #e67e22;
+            --purple: #9b59b6;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--hero-blue);
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            padding: 20px;
+        }
+
+        #academy-card {
+            background-color: white;
+            width: 95%;
+            max-width: 580px;
+            padding: 25px;
+            border: 6px solid var(--comic-black);
+            border-radius: 15px;
+            box-shadow: 12px 12px 0px var(--hero-yellow);
+        }
+
+        .header { text-align: center; border-bottom: 4px solid var(--comic-black); margin-bottom: 20px; padding-bottom: 12px; }
+        .lvl-badge { background: var(--hero-red); color: white; padding: 5px 15px; display: inline-block; transform: rotate(-2deg); font-size: 0.85rem; border: 3px solid var(--comic-black); letter-spacing: 1px; }
+        .score-row { margin: 10px 0 4px; font-size: 1rem; }
+        .score-row span { color: var(--orange); font-size: 1.2rem; }
+
+        /* ═══════ CHAT WINDOW (Level 0) ═══════ */
+        .chat-window {
+            background: #f4f7fb;
+            border: 4px solid var(--comic-black);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 18px;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-bubble {
+            background: #ffffff;
+            border: 3px solid var(--comic-black);
+            border-radius: 15px;
+            padding: 12px 16px;
+            font-size: 0.98rem;
+            line-height: 1.85;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+            animation: slideIn 0.35s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-bubble .speaker {
+            display: inline-block;
+            background: var(--hero-blue);
+            color: #fff;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.72rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-right: 6px;
+            letter-spacing: 1px;
+        }
+
+        .chat-bubble.beth .speaker { background: var(--purple); }
+        .chat-bubble.fred .speaker { background: var(--orange); }
+
+        .gap {
+            display: inline-block;
+            min-width: 135px;
+            padding: 3px 10px;
+            margin: 0 3px;
+            background: #fff8e1;
+            border: 2px dashed var(--hero-red);
+            border-radius: 8px;
+            color: var(--hero-red);
+            font-weight: 900;
+            text-align: center;
+            vertical-align: middle;
+            font-family: 'Courier New', monospace;
+            transition: 0.3s;
+        }
+
+        .gap.active {
+            background: #ffeaa7;
+            color: var(--comic-black);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 4px rgba(241,196,15,0.4);
+            animation: pulse 1.4s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% { box-shadow: 0 0 0 4px rgba(241,196,15,0.4); }
+            50%     { box-shadow: 0 0 0 8px rgba(241,196,15,0.15); }
+        }
+
+        .gap.filled {
+            background: var(--success);
+            color: white;
+            border-style: solid;
+            border-color: var(--comic-black);
+            animation: none;
+        }
+
+        /* ═══════ OPTIONS PANEL ═══════ */
+        .option-panel {
+            background: #fff8e1;
+            border: 3px dashed var(--hero-yellow);
+            border-radius: 15px;
+            padding: 14px 16px;
+        }
+
+        .option-panel .panel-title {
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.85rem;
+            color: var(--orange);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ═══════ LEVEL 1 · MEMORY ═══════ */
+        .memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .card { height: 130px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: 0.5s; }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            border: 3px solid #333; border-radius: 10px;
+            text-align: center;
+        }
+        .card-front { background: var(--comic-black); color: var(--hero-yellow); font-size: 2rem; }
+        .card-back  { background: white; transform: rotateY(180deg); padding: 5px; }
+        .card-back span { font-size: 3rem; }
+        .card-back b { font-size: 0.85rem; text-transform: uppercase; margin-top: 5px; }
+
+        /* ═══════ LEVEL 2 · YES/NO ═══════ */
+        .trial-zone { text-align: center; margin: 20px 0; }
+        .question-text { font-size: 1.4rem; margin-bottom: 25px; line-height: 1.4; color: var(--comic-black); }
+        .scene-emoji { font-size: 3.6rem; text-align: center; margin-bottom: 10px; letter-spacing: 8px; animation: pop 0.4s ease-out; }
+        @keyframes pop {
+            0%   { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ═══════ SHARED BUTTONS ═══════ */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .hero-btn {
+            background: var(--hero-yellow);
+            border: 3px solid var(--comic-black);
+            padding: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 10px;
+            transition: 0.2s;
+            font-family: 'Arial Black', sans-serif;
+            color: var(--comic-black);
+        }
+        .hero-btn:hover:not(:disabled) { transform: scale(1.03); background: #ffeaa7; }
+        .hero-btn:active:not(:disabled) { transform: translateY(2px); }
+        .hero-btn:disabled { opacity: 0.45; cursor: default; }
+        .hero-btn.correct-flash { background: var(--success) !important; color: #fff; }
+        .hero-btn.wrong-flash   { background: var(--hero-red) !important; color: #fff; animation: shake 0.4s; }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25%     { transform: translateX(-6px); }
+            75%     { transform: translateX(6px); }
+        }
+
+        .btn-yes { background: var(--success); color: white; }
+        .btn-no  { background: var(--hero-red); color: white; }
+
+        /* ═══════ LEVEL 3 · GAP FILL ═══════ */
+        .chat-bubble-static {
+            background: #fdfdfd;
+            border: 3px solid var(--comic-black);
+            border-radius: 15px;
+            padding: 14px 16px;
+            margin: 10px 0;
+            font-size: 1.05rem;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            line-height: 1.9;
+        }
+        .chat-bubble-static .gap2 {
+            font-weight: bold;
+            color: var(--hero-red);
+            border-bottom: 3px dashed var(--hero-red);
+            padding: 0 6px;
+            min-width: 70px;
+            display: inline-block;
+            text-align: center;
+        }
+        .chat-bubble-static .gap2.filled {
+            color: var(--success);
+            border-bottom-color: var(--success);
+            border-bottom-style: solid;
+        }
+
+        .hidden { display: none; }
+
+        /* ═══════ PROGRESS ═══════ */
+        .progress-bar { height: 12px; background: #eee; border: 2px solid #333; margin-top: 20px; border-radius: 6px; overflow: hidden; }
+        #fill { height: 100%; background: var(--success); width: 0%; transition: 0.4s; }
+        .progress-label { text-align: center; font-size: 0.78rem; color: #888; margin-top: 6px; letter-spacing: 1px; }
+
+        /* ═══════ WIN ═══════ */
+        #win { text-align: center; }
+        #win h1 { font-size: 4rem; margin: 0; }
+        #win h2 { color: var(--orange); margin: 10px 0; }
+        #win p  { font-size: 1rem; color: #555; }
+
+        @media (max-width: 520px) {
+            .chat-bubble, .chat-bubble-static { font-size: 0.88rem; padding: 11px; }
+            .gap { min-width: 100px; font-size: 0.82rem; }
+            .btn-grid { grid-template-columns: 1fr; }
+            .hero-btn { font-size: 0.9rem; padding: 12px; }
+            .question-text { font-size: 1.15rem; }
+            .scene-emoji { font-size: 2.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="academy-card">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-badge">LEVEL 0: PHONE CALL</div>
+        <div class="score-row">⭐ POINTS: <span id="score">0</span></div>
+    </div>
+
+    <!-- ══════════ LEVEL 0 · CHAT ══════════ -->
+    <div id="lvl0" class="screen">
+        <div class="chat-window" id="chatBox"></div>
+        <div class="option-panel" id="optionPanel">
+            <div class="panel-title" id="panelTitle">🎯 Choose the correct Present Continuous form</div>
+            <div class="btn-grid" id="chatBtnBox"></div>
+        </div>
+    </div>
+
+    <!-- ══════════ LEVEL 1 · MEMORY ══════════ -->
+    <div id="lvl1" class="hidden">
+        <p style="text-align:center; margin-bottom:14px;">Match the activity with its emoji!</p>
+        <div id="memory-grid" class="memory-grid"></div>
+    </div>
+
+    <!-- ══════════ LEVEL 2 · YES/NO ══════════ -->
+    <div id="lvl2" class="hidden">
+        <div class="trial-zone">
+            <div class="scene-emoji" id="l2-emoji">📞</div>
+            <div id="q-sentence" class="question-text">Is Beth playing a video game?</div>
+            <div class="btn-grid">
+                <button class="hero-btn btn-yes" id="l2-yes-btn" onclick="checkL2(true, this)">YES, SHE IS ✓</button>
+                <button class="hero-btn btn-no"  id="l2-no-btn"  onclick="checkL2(false, this)">NO, SHE ISN'T ✗</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ LEVEL 3 · GAP FILL ══════════ -->
+    <div id="lvl3" class="hidden">
+        <div class="chat-bubble-static">A: What are you doing? </div>
+        <div class="chat-bubble-static">B: I <span id="gap3-1" class="gap2">____</span> my room. 🧹</div>
+        <div class="chat-bubble-static">A: I <span id="gap3-2" class="gap2">____</span> TV with Bob. 📺</div>
+        <div id="l3-btns" class="btn-grid" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- ══════════ WIN ══════════ -->
+    <div id="win" class="hidden">
+        <h1>📞✨</h1>
+        <h2>PRESENT CONTINUOUS MASTER!</h2>
+        <p>You completed the whole phone call!</p>
+        <p style="margin-top:12px; font-size:1.15rem; font-weight:900; color:var(--orange);">
+            Final score: <span id="finalScore">0</span> points
+        </p>
+        <button class="hero-btn" onclick="location.reload()"
+                style="width:100%; background: var(--hero-blue); color:white; margin-top:18px; padding:15px;">
+            PLAY AGAIN 🔄
+        </button>
+    </div>
+
+    <div class="progress-bar"><div id="fill"></div></div>
+    <div class="progress-label">PROGRESS: <span id="progressTxt">1 / 4 levels</span></div>
+</div>
+
+<script>
+    /* ══════════════════════════════════════════════
+       LEVEL 0 · PHONE CONVERSATION
+       ══════════════════════════════════════════════ */
+    const steps = [
+        {
+            speaker: "andy",
+            html: `<b>Are you doing</b> (you / do) your chores?`
+        },
+        {
+            speaker: "beth",
+            html: `No, <span class="gap" id="gap0-1">_____</span>. <span class="gap" id="gap0-2">_____</span> (I / play) a new video game.`,
+            gaps: [
+                {
+                    id: "gap0-1",
+                    options: ["I am not", "I do not", "I am not doing", "I don't"],
+                    correct: "I am not",
+                    display: "I am not"
+                },
+                {
+                    id: "gap0-2",
+                    options: ["I play", "I am playing", "I playing", "I is playing"],
+                    correct: "I am playing",
+                    display: "I am playing"
+                }
+            ]
+        },
+        { speaker: "andy", html: `Oh. Is Fred there?` },
+        { speaker: "beth", html: `Yes. Do you want to speak to him?` },
+        { speaker: "andy", html: `Yes, please.` },
+        {
+            speaker: "beth",
+            html: `Just a minute. <span class="gap" id="gap0-3">_____</span> (he / tidy) his room. Fred! It's Andy on the phone.`,
+            gaps: [
+                {
+                    id: "gap0-3",
+                    options: ["He tidies", "He is tidying", "He tidy", "He are tidying"],
+                    correct: "He is tidying",
+                    display: "He is tidying"
+                }
+            ]
+        },
+        { speaker: "fred", html: `Hi, Andy.` },
+        {
+            speaker: "andy",
+            html: `Hi. I'm with Bob and <span class="gap" id="gap0-4">_____</span> (we / watch) TV, but it's boring. Do you want to go to the park with us?`,
+            gaps: [
+                {
+                    id: "gap0-4",
+                    options: ["we watch", "we are watching", "we is watching", "we watching"],
+                    correct: "we are watching",
+                    display: "we are watching"
+                }
+            ]
+        },
+        {
+            speaker: "fred",
+            html: `Sure. <span class="gap" id="gap0-5">_____</span> (I / do not do) anything important right now. Let's meet in five minutes.`,
+            gaps: [
+                {
+                    id: "gap0-5",
+                    options: ["I not do", "I am not doing", "I don't do", "I am not do"],
+                    correct: "I am not doing",
+                    display: "I am not doing"
+                }
+            ]
+        },
+        { speaker: "andy", html: `Great!` }
+    ];
+
+    let currentStep = 0;
+    let gapIndex = 0;
+    let score = 0;
+    let currentLvl = 0;
+    const totalLevels = 4;
+
+    const chatBox = document.getElementById('chatBox');
+    const chatBtnBox = document.getElementById('chatBtnBox');
+    const optionPanel = document.getElementById('optionPanel');
+
+    /* ══════════════════════════════════════════════
+       LEVEL 0 · REVEAL BUBBLES
+       ══════════════════════════════════════════════ */
+    function revealBubble(stepIdx) {
+        const step = steps[stepIdx];
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble ' + step.speaker;
+        bubble.innerHTML = `<span class="speaker">${step.speaker.toUpperCase()}</span>${step.html}`;
+        chatBox.appendChild(bubble);
+
+        if (step.gaps && step.gaps.length > 0) {
+            gapIndex = 0;
+            activateGap(step.gaps[0]);
+        } else {
+            optionPanel.style.display = 'none';
+            setTimeout(() => {
+                currentStep++;
+                if (currentStep < steps.length) revealBubble(currentStep);
+                else nextLevel();
+            }, 600);
+        }
+    }
+
+    function activateGap(gapData) {
+        optionPanel.style.display = 'block';
+        document.querySelectorAll('.gap').forEach(g => g.classList.remove('active'));
+        const activeEl = document.getElementById(gapData.id);
+        if (activeEl) activeEl.classList.add('active');
+
+        chatBtnBox.innerHTML = '';
+        const shuffled = [...gapData.options].sort(() => Math.random() - 0.5);
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'hero-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkGap(gapData, opt, btn);
+            chatBtnBox.appendChild(btn);
+        });
+    }
+
+    function checkGap(gapData, chosen, btn) {
+        const allBtns = chatBtnBox.querySelectorAll('.hero-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (chosen === gapData.correct) {
+            btn.classList.add('correct-flash');
+            const gapEl = document.getElementById(gapData.id);
+            gapEl.innerText = gapData.display;
+            gapEl.classList.remove('active');
+            gapEl.classList.add('filled');
+
+            score += 100;
+            document.getElementById('score').innerText = score;
+            updateProgress();
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            const step = steps[currentStep];
+            if (step.gaps && gapIndex < step.gaps.length - 1) {
+                gapIndex++;
+                setTimeout(() => activateGap(step.gaps[gapIndex]), 700);
+            } else {
+                currentStep++;
+                setTimeout(() => {
+                    if (currentStep < steps.length) revealBubble(currentStep);
+                    else nextLevel();
+                }, 800);
+            }
+        } else {
+            btn.classList.add('wrong-flash');
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+            setTimeout(() => {
+                btn.classList.remove('wrong-flash');
+                btn.disabled = false;
+            }, 600);
+        }
+    }
+
+    /* ══════════════════════════════════════════════
+       LEVEL SWITCHING
+       ══════════════════════════════════════════════ */
+    function nextLevel() {
+        document.querySelectorAll('.screen, #lvl1, #lvl2, #lvl3').forEach(s => s.classList.add('hidden'));
+
+        currentLvl++;
+        if (currentLvl === 1) {
+            document.getElementById('lvl1').classList.remove('hidden');
+            document.getElementById('lvl-tag').innerText = "LEVEL 1: MEMORY MATCH";
+            loadL1();
+        } else if (currentLvl === 2) {
+            document.getElementById('lvl2').classList.remove('hidden');
+            document.getElementById('lvl-tag').innerText = "LEVEL 2: TRUE OR FALSE";
+            loadL2();
+        } else if (currentLvl === 3) {
+            document.getElementById('lvl3').classList.remove('hidden');
+            document.getElementById('lvl-tag').innerText = "LEVEL 3: SENTENCE HUNT";
+            loadL3();
+        } else {
+            document.getElementById('win').classList.remove('hidden');
+            document.getElementById('lvl-tag').innerText = "FINISH!";
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('progressTxt').innerText = totalLevels + " / " + totalLevels + " levels";
+        }
+        updateProgress();
+    }
+
+    /* ══════════════════════════════════════════════
+       LEVEL 1 · MEMORY
+       ══════════════════════════════════════════════ */
+    const memData = [
+        { w: "Tidy the room", e: "🧹", id: 1 },
+        { w: "Play video games", e: "🎮", id: 2 },
+        { w: "Watch TV", e: "📺", id: 3 }
+    ];
+    let flipped = [], matches = 0;
+
+    function loadL1() {
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        let cards = [...memData, ...memData].sort(() => Math.random() - 0.5);
+        cards.forEach(c => {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.innerHTML = `
+                <div class="card-face card-front">?</div>
+                <div class="card-face card-back"><span>${c.e}</span><b>${c.w}</b></div>
+            `;
+            el.onclick = () => {
+                if (flipped.length < 2 && !el.classList.contains('flipped')) {
+                    el.classList.add('flipped');
+                    flipped.push({ el, id: c.id });
+                    if (flipped.length === 2) {
+                        if (flipped[0].id === flipped[1].id) {
+                            matches++;
+                            score += 100;
+                            document.getElementById('score').innerText = score;
+                            flipped = [];
+                            if (matches === 3) setTimeout(nextLevel, 800);
+                        } else {
+                            setTimeout(() => {
+                                flipped.forEach(f => f.el.classList.remove('flipped'));
+                                flipped = [];
+                            }, 800);
+                        }
+                    }
+                }
+            };
+            grid.appendChild(el);
+        });
+    }
+
+    /* ══════════════════════════════════════════════
+       LEVEL 2 · YES/NO QUESTIONS
+       Each trial has a matching yesText and noText
+       so the pronouns in the answers match the question.
+       ══════════════════════════════════════════════ */
+    const trials = [
+        {
+            emoji: "🎮👧",
+            s: "Is Beth playing a video game?",
+            can: true,
+            yesText: "YES, SHE IS ✓",
+            noText:  "NO, SHE ISN'T ✗"
+        },
+        {
+            emoji: "🧹👦",
+            s: "Is Fred tidying his room?",
+            can: true,
+            yesText: "YES, HE IS ✓",
+            noText:  "NO, HE ISN'T ✗"
+        },
+        {
+            emoji: "📺👦👦",
+            s: "Are Andy and Bob watching TV?",
+            can: true,
+            yesText: "YES, THEY ARE ✓",
+            noText:  "NO, THEY AREN'T ✗"
+        },
+        {
+            emoji: "😴👧",
+            s: "Is Beth doing her chores right now?",
+            can: false,
+            yesText: "YES, SHE IS ✓",
+            noText:  "NO, SHE ISN'T ✗"
+        },
+        {
+            emoji: "🎮🧹",
+            s: "Are the children tidying the garden?",
+            can: false,
+            yesText: "YES, THEY ARE ✓",
+            noText:  "NO, THEY AREN'T ✗"
+        }
+    ];
+    let currentIdx = 0;
+
+    function loadL2() {
+        const t = trials[currentIdx];
+        document.getElementById('q-sentence').innerText = t.s;
+        document.getElementById('l2-emoji').innerText = t.emoji;
+        document.getElementById('l2-yes-btn').innerText = t.yesText;
+        document.getElementById('l2-no-btn').innerText  = t.noText;
+    }
+
+    function checkL2(choice, btn) {
+        if (choice === trials[currentIdx].can) {
+            btn.classList.add('correct-flash');
+            score += 200;
+            document.getElementById('score').innerText = score;
+            if (navigator.vibrate) navigator.vibrate(25);
+            setTimeout(() => {
+                btn.classList.remove('correct-flash');
+                currentIdx++;
+                if (currentIdx >= trials.length) nextLevel();
+                else loadL2();
+                updateProgress();
+            }, 600);
+        } else {
+            btn.classList.add('wrong-flash');
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+            setTimeout(() => btn.classList.remove('wrong-flash'), 500);
+        }
+    }
+
+    /* ══════════════════════════════════════════════
+       LEVEL 3 · GAP FILL
+       ══════════════════════════════════════════════ */
+    const l3Data = {
+        g1: "am tidying",
+        g2: "am watching",
+        options: ["am tidying", "am watching", "tidy", "watch"]
+    };
+    let l3Step = 0;
+
+    function loadL3() {
+        const btnBox = document.getElementById('l3-btns');
+        btnBox.innerHTML = '';
+        l3Data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'hero-btn';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                const target = l3Step === 0 ? l3Data.g1 : l3Data.g2;
+                if (opt === target) {
+                    document.getElementById('gap3-' + (l3Step + 1)).innerText = opt;
+                    document.getElementById('gap3-' + (l3Step + 1)).classList.add('filled');
+                    l3Step++;
+                    score += 300;
+                    document.getElementById('score').innerText = score;
+                    if (navigator.vibrate) navigator.vibrate(25);
+                    if (l3Step === 2) setTimeout(nextLevel, 900);
+                } else {
+                    btn.classList.add('wrong-flash');
+                    setTimeout(() => btn.classList.remove('wrong-flash'), 500);
+                }
+            };
+            btnBox.appendChild(btn);
+        });
+    }
+
+    /* ══════════════════════════════════════════════
+       PROGRESS
+       ══════════════════════════════════════════════ */
+    function updateProgress() {
+        document.getElementById('fill').style.width = (currentLvl / totalLevels * 100) + '%';
+        document.getElementById('progressTxt').innerText =
+            Math.min(currentLvl + 1, totalLevels) + " / " + totalLevels + " levels";
+    }
+
+    /* ══════════════════════════════════════════════
+       INIT
+       ══════════════════════════════════════════════ */
+    revealBubble(0);
+    updateProgress();
+</script>
+
+</body>
+</html>

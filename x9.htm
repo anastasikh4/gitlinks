@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Everyday English & Possessives · Duolingo Quiz</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;700;800;900&family=Luckiest+Guy&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-dark-green: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb8;
+            --duo-light-red: #ffdfe0;
+            --text-dark: #3c3c3c;
+            --bg-gray: #f7f7f7;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 0 20px 40px;
+            color: var(--text-dark);
+            background:
+                radial-gradient(circle at 10% 10%, rgba(28, 176, 246, 0.12), transparent 24%),
+                radial-gradient(circle at 88% 15%, rgba(88, 204, 2, 0.12), transparent 25%),
+                var(--bg-gray);
+            font-family: "Raleway", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 620px;
+            height: 16px;
+            margin: 30px 0;
+            overflow: hidden;
+            background: #e5e5e5;
+            border: 1px solid #d7d7d7;
+            border-radius: 10px;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--duo-green), #7ce52b);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 620px;
+            margin-bottom: 20px;
+            padding: 30px;
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-bottom: 6px solid #e5e5e5;
+            border-radius: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            color: var(--duo-green);
+            font-family: "Luckiest Guy", cursive;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            margin-bottom: 14px;
+            padding: 3px 12px;
+            color: var(--duo-blue);
+            background: #e5f4ff;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .question-text {
+            min-height: 60px;
+            margin-bottom: 24px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .question-text .blank {
+            display: inline-block;
+            min-width: 90px;
+            padding: 0 6px;
+            color: var(--duo-blue);
+            border-bottom: 3px solid var(--duo-blue);
+            text-align: center;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            color: var(--text-dark);
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-bottom: 4px solid #e5e5e5;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: "Raleway", sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-align: left;
+            transition: all 0.1s;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f0f7ff;
+            border-color: #c3dcf3;
+        }
+
+        .option-btn:active:not(:disabled) {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            color: var(--duo-dark-green);
+            background-color: var(--duo-light-green);
+            border-color: var(--duo-green);
+            opacity: 1;
+        }
+
+        .option-btn.wrong {
+            color: var(--duo-red);
+            background-color: var(--duo-light-red);
+            border-color: var(--duo-red);
+            opacity: 1;
+        }
+
+        .feedback {
+            min-height: 24px;
+            margin-top: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .feedback.good {
+            color: var(--duo-dark-green);
+        }
+
+        .feedback.bad {
+            color: var(--duo-red);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e5e5e5;
+        }
+
+        .next-btn {
+            padding: 12px 30px;
+            color: white;
+            background-color: var(--duo-green);
+            border: none;
+            border-bottom: 4px solid var(--duo-dark-green);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .next-btn:disabled {
+            cursor: not-allowed;
+            background-color: #e5e5e5;
+            border-bottom: 4px solid #afafaf;
+        }
+
+        .next-btn:active:not(:disabled) {
+            border-bottom-width: 0;
+            transform: translateY(4px);
+        }
+
+        .done-card {
+            display: none;
+            text-align: center;
+        }
+
+        .done-card.active {
+            display: block;
+        }
+
+        .done-card h1 {
+            margin-bottom: 12px;
+            font-size: 32px;
+        }
+
+        .done-card .score {
+            margin-bottom: 20px;
+            color: var(--duo-blue);
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        details {
+            width: 100%;
+            max-width: 620px;
+            margin-top: 10px;
+            padding: 12px 20px;
+            background: #eef9e8;
+            border: 2px solid var(--duo-green);
+            border-radius: 14px;
+        }
+
+        summary {
+            color: var(--duo-dark-green);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            list-style: none;
+            text-transform: uppercase;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::before {
+            content: "🔑 ";
+        }
+
+        details[open] summary {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed #a5d6a7;
+        }
+
+        .answer-box {
+            color: var(--duo-dark-green);
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.9;
+        }
+
+        @media (max-width: 500px) {
+            body {
+                padding: 0;
+            }
+
+            .card {
+                min-height: 100vh;
+                padding: 25px 16px;
+                border-radius: 0;
+            }
+
+            .progress-container {
+                margin: 20px 16px;
+                width: calc(100% - 32px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="progress-container">
+        <div class="progress-fill" id="pBar"></div>
+    </div>
+
+    <!-- QUESTION 1 -->
+    <div class="card" id="q1">
+        <h1>Question 1 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “I'd like to introduce you to Harry.” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">Thank you very much.</button>
+            <button class="option-btn" data-correct="true">Pleased to meet you.</button>
+            <button class="option-btn" data-correct="false">How can I help you?</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 2 -->
+    <div class="card" id="q2" style="display:none;">
+        <h1>Question 2 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “What's your postcode?” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">A-D-A-M-S.</button>
+            <button class="option-btn" data-correct="true">WM3 5GH.</button>
+            <button class="option-btn" data-correct="false">Not bad, thanks.</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 3 -->
+    <div class="card" id="q3" style="display:none;">
+        <h1>Question 3 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “How do you spell that?” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="true">A-D-A-M-S.</button>
+            <button class="option-btn" data-correct="false">Pleased to meet you.</button>
+            <button class="option-btn" data-correct="false">Oh, hi! How are you?</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 4 -->
+    <div class="card" id="q4" style="display:none;">
+        <h1>Question 4 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “How can I help you?” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">Thank you very much.</button>
+            <button class="option-btn" data-correct="true">I'd like to join the club, please.</button>
+            <button class="option-btn" data-correct="false">Oh, hi! How are you?</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 5 -->
+    <div class="card" id="q5" style="display:none;">
+        <h1>Question 5 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “Hi there, David.” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="true">Oh, hi! How are you?</button>
+            <button class="option-btn" data-correct="false">Not bad, thanks.</button>
+            <button class="option-btn" data-correct="false">WM3 5GH.</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 6 -->
+    <div class="card" id="q6" style="display:none;">
+        <h1>Question 6 of 11</h1>
+        <div class="section-tag">Section G · Everyday English</div>
+
+        <div class="question-text">
+            “Here's your card.” — Choose the correct response:
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">Pleased to meet you.</button>
+            <button class="option-btn" data-correct="false">Not bad, thanks.</button>
+            <button class="option-btn" data-correct="true">Thank you very much.</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 7 -->
+    <div class="card" id="q7" style="display:none;">
+        <h1>Question 7 of 11</h1>
+        <div class="section-tag">Section F · Possessives</div>
+
+        <div class="question-text">
+            Whose camera is this? It's <span class="blank">?</span>.
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">her</button>
+            <button class="option-btn" data-correct="true">hers</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 8 -->
+    <div class="card" id="q8" style="display:none;">
+        <h1>Question 8 of 11</h1>
+        <div class="section-tag">Section F · Possessives</div>
+
+        <div class="question-text">
+            Mike is <span class="blank">?</span> son.
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="true">Peter and Sue's</button>
+            <button class="option-btn" data-correct="false">Peter's and Sue's</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 9 -->
+    <div class="card" id="q9" style="display:none;">
+        <h1>Question 9 of 11</h1>
+        <div class="section-tag">Section F · Possessives</div>
+
+        <div class="question-text">
+            This football isn't mine. It's my <span class="blank">?</span>.
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">cousins</button>
+            <button class="option-btn" data-correct="true">cousin's</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 10 -->
+    <div class="card" id="q10" style="display:none;">
+        <h1>Question 10 of 11</h1>
+        <div class="section-tag">Section F · Possessives</div>
+
+        <div class="question-text">
+            Is this <span class="blank">?</span> card?
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="true">Rose's</button>
+            <button class="option-btn" data-correct="false">Roses'</button>
+        </div>
+    </div>
+
+    <!-- QUESTION 11 -->
+    <div class="card" id="q11" style="display:none;">
+        <h1>Question 11 of 11</h1>
+        <div class="section-tag">Section F · Possessives</div>
+
+        <div class="question-text">
+            These are <span class="blank">?</span> pencils.
+        </div>
+
+        <div class="options-list">
+            <button class="option-btn" data-correct="false">Emilys</button>
+            <button class="option-btn" data-correct="true">Emily's</button>
+        </div>
+    </div>
+
+    <!-- DONE SCREEN -->
+    <div class="card done-card" id="qDone">
+        <h1>Lesson Complete!</h1>
+
+        <p class="score">
+            Your Score: <span id="scoreVal">0</span> / 11
+        </p>
+
+        <p style="font-weight:700; color:#666; margin-bottom:20px;">
+            Great job! Try again to get a perfect score.
+        </p>
+
+        <button class="next-btn" id="retryBtn">Retry</button>
+    </div>
+
+   
+
+<script>
+    const TOTAL = 11;
+
+    let currentQuestion = 1;
+    let score = 0;
+    let locked = false;
+
+    function shuffle(array) {
+        const copy = [...array];
+
+        for (let i = copy.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[randomIndex]] = [copy[randomIndex], copy[i]];
+        }
+
+        return copy;
+    }
+
+    function shuffleOptions() {
+        document.querySelectorAll(".options-list").forEach(list => {
+            const options = Array.from(list.querySelectorAll(".option-btn"));
+
+            shuffle(options).forEach(option => {
+                list.appendChild(option);
+            });
+        });
+    }
+
+    function checkAnswer(questionNumber, button) {
+        if (locked) return;
+
+        locked = true;
+
+        const block = document.getElementById("q" + questionNumber);
+        const allOptions = block.querySelectorAll(".option-btn");
+        const isCorrect = button.dataset.correct === "true";
+
+        allOptions.forEach(option => {
+            option.disabled = true;
+
+            if (option.dataset.correct === "true") {
+                option.classList.add("correct");
+            }
+        });
+
+        const feedback = document.createElement("div");
+        feedback.className = "feedback";
+
+        if (isCorrect) {
+            score++;
+            button.classList.add("correct");
+            feedback.textContent = "✓ Correct!";
+            feedback.classList.add("good");
+
+            if (navigator.vibrate) {
+                navigator.vibrate(25);
+            }
+        } else {
+            button.classList.add("wrong");
+            feedback.textContent = "✗ Not quite — the correct answer is green.";
+            feedback.classList.add("bad");
+
+            if (navigator.vibrate) {
+                navigator.vibrate([40, 40, 80]);
+            }
+        }
+
+        block.appendChild(feedback);
+
+        const controls = document.createElement("div");
+        controls.className = "controls";
+
+        const nextButton = document.createElement("button");
+        nextButton.className = "next-btn";
+        nextButton.textContent =
+            questionNumber === TOTAL ? "Finish" : "Continue";
+
+        nextButton.addEventListener("click", function () {
+            advance(questionNumber);
+        });
+
+        controls.appendChild(nextButton);
+        block.appendChild(controls);
+    }
+
+    function advance(questionNumber) {
+        document.getElementById("q" + questionNumber).style.display = "none";
+
+        const completed = questionNumber;
+        const percent = Math.round((completed / TOTAL) * 100);
+
+        document.getElementById("pBar").style.width = percent + "%";
+
+        const nextQuestion = questionNumber + 1;
+
+        if (nextQuestion > TOTAL) {
+            document.getElementById("qDone").style.display = "block";
+            document.getElementById("scoreVal").textContent = score;
+        } else {
+            document.getElementById("q" + nextQuestion).style.display = "block";
+            currentQuestion = nextQuestion;
+            locked = false;
+        }
+    }
+
+    function addListeners() {
+        document.querySelectorAll(".option-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                const questionCard = button.closest(".card");
+                const questionNumber = Number(
+                    questionCard.id.replace("q", "")
+                );
+
+                checkAnswer(questionNumber, button);
+            });
+        });
+    }
+
+    document.getElementById("retryBtn").addEventListener("click", function () {
+        location.reload();
+    });
+
+    shuffleOptions();
+    addListeners();
+</script>
+
+</body>
+</html>
