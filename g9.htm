@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 Racing Mission — Unscramble Chunks</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    /* BRIGHT F1 THEME */
+    * { box-sizing: border-box; }
+
+    body {
+        background: linear-gradient(135deg, #FFE9B0 0%, #FFB5B5 45%, #B5E8FF 100%);
+        background-attachment: fixed;
+        color: #1A1A2E;
+        font-family: 'Space Mono', 'Courier New', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%),
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    #game-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 780px;
+        background: #FFFFFF;
+        border: 8px solid #E10600;
+        border-radius: 24px;
+        padding: 25px;
+        box-shadow: 0 20px 45px -12px rgba(225, 6, 0, 0.35), 0 0 0 8px #FFFFFF;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px dashed #FFD166;
+        color: #E10600;
+    }
+
+    .header span span { color: #1A1A2E; }
+
+    .question-area { min-height: 260px; }
+
+    .emoji-display {
+        font-size: 60px;
+        text-align: center;
+        margin-bottom: 12px;
+        line-height: 1.2;
+    }
+
+    .prompt-text {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        color: #4B5675;
+        margin-bottom: 15px;
+    }
+
+    .sentence-drop-area {
+        background: #F5F8FF;
+        border: 3px dashed #DCE7FF;
+        border-radius: 14px;
+        min-height: 100px;
+        padding: 12px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-content: flex-start;
+        transition: border-color 0.2s;
+    }
+
+    .sentence-drop-area:empty::before {
+        content: "Tap the chunks below in the correct order...";
+        color: #B5B5C7;
+        font-family: 'Space Mono', monospace;
+        font-size: 13px;
+        font-style: italic;
+        padding: 14px;
+        display: block;
+    }
+
+    .word-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        min-height: 50px;
+        padding: 14px;
+        background: #FFF8E0;
+        border: 2px dashed #FFD166;
+        border-radius: 14px;
+        justify-content: center;
+    }
+
+    .word-token {
+        background: #FFD166;
+        color: #6A4B00;
+        padding: 12px 20px;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        border: 2px solid #E8B84A;
+        box-shadow: 0 3px 0 #E8B84A;
+        user-select: none;
+        transition: all 0.15s ease;
+        line-height: 1.3;
+        max-width: 100%;
+    }
+
+    .word-token:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 #E8B84A;
+    }
+
+    .word-token.placed {
+        background: #E2F8E5;
+        color: #1B7A47;
+        border-color: #00D26A;
+        box-shadow: 0 3px 0 #A7E5BE;
+    }
+
+    .word-token.placed:hover { background: #C7F0D0; }
+
+    .check-btn {
+        margin-top: 20px;
+        width: 100%;
+        padding: 14px;
+        background: #E10600;
+        color: #FFF;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1.5px;
+        box-shadow: 0 5px 0 #B00500;
+        transition: all 0.15s ease;
+    }
+
+    .check-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #B00500; }
+    .check-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #B00500; }
+
+    #feedback {
+        min-height: 40px;
+        margin-top: 15px;
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 0.5px;
+        padding: 10px;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    #feedback.success {
+        background: #E2F8E5;
+        color: #1B7A47;
+        border: 2px solid #00D26A;
+    }
+
+    #feedback.error {
+        background: #FFE5E5;
+        color: #D6336C;
+        border: 2px solid #FF7AA2;
+    }
+
+    #result-screen { text-align: center; padding: 20px; }
+
+    #result-screen h1 {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 32px;
+        color: #E10600;
+        text-shadow: 3px 3px 0 #FFD166;
+        margin-bottom: 15px;
+    }
+
+    #final-stats {
+        font-family: 'Space Mono', monospace;
+        font-size: 18px;
+        color: #1A1A2E;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 560px) {
+        #game-container { padding: 18px; border-width: 6px; }
+        .header { font-size: 12px; }
+        .emoji-display { font-size: 45px; }
+        .word-token { padding: 10px 16px; font-size: 13px; }
+        .check-btn { font-size: 14px; padding: 12px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="header">
+        <span>MISSION: <span id="progress">1/7</span></span>
+        <span>STATUS: <span id="time">RACE DAY</span></span>
+    </div>
+
+    <div id="quiz-screen">
+        <div class="question-area">
+            <div class="emoji-display" id="emoji"></div>
+            <div class="prompt-text">Tap the chunks in the correct order to build the sentence!</div>
+            <div class="sentence-drop-area" id="drop-area"></div>
+            <div class="word-bank" id="word-bank"></div>
+        </div>
+
+        <button class="check-btn" onclick="checkSentence()">CHECK SEQUENCE</button>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>🏁 MISSION COMPLETE 🏁</h1>
+        <p id="final-stats"></p>
+        <button onclick="location.reload()" class="check-btn" style="background: #00D26A; box-shadow: 0 5px 0 #00A854;">REBOOT RACE</button>
+    </div>
+</div>
+
+<script>
+    /* ================================================================
+       Each question is broken into CHUNKS (groups of words).
+       Q1 was rebuilt into a proper traffic-light rule sentence.
+       ================================================================ */
+    const questions = [
+        {
+            emoji: "🚦🛑",
+            chunks: ["You can only", "cross the street", "when the light is green"],
+            correct: "You can only cross the street when the light is green"
+        },
+        {
+            emoji: "🎆🌆",
+            chunks: ["There are many", "fireworks in the evening", "at ten to seven"],
+            correct: "There are many fireworks in the evening at ten to seven"
+        },
+        {
+            emoji: "🚫🏎️💨",
+            chunks: ["You can't drive", "more than eighty", "it's the speed limit"],
+            correct: "You can't drive more than eighty it's the speed limit"
+        },
+        {
+            emoji: "↩️🛣️",
+            chunks: ["You can only", "turn right", "on that road"],
+            correct: "You can only turn right on that road"
+        },
+        {
+            emoji: "🛋️🏎️🏎️",
+            chunks: ["The drivers", "are sitting", "on the sofa"],
+            correct: "The drivers are sitting on the sofa"
+        },
+        {
+            emoji: "🚗💨",
+            chunks: ["The cars", "don't have", "a speed limit"],
+            correct: "The cars don't have a speed limit"
+        },
+        {
+            emoji: "📏➡️",
+            chunks: ["They drive", "straight every day", "here"],
+            correct: "They drive straight every day here"
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        if (currentQ >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const data = questions[currentQ];
+        document.getElementById("progress").innerText = (currentQ + 1) + "/7";
+        document.getElementById("emoji").innerText = data.emoji;
+
+        const feedbackEl = document.getElementById("feedback");
+        feedbackEl.className = "";
+        feedbackEl.innerText = "";
+
+        const dropArea = document.getElementById("drop-area");
+        const wordBank = document.getElementById("word-bank");
+        dropArea.innerHTML = "";
+        wordBank.innerHTML = "";
+
+        const shuffledChunks = [...data.chunks].sort(() => Math.random() - 0.5);
+
+        shuffledChunks.forEach((chunk) => {
+            const token = document.createElement("div");
+            token.classList.add("word-token");
+            token.innerText = chunk;
+            token.onclick = () => moveToken(token, dropArea, wordBank);
+            wordBank.appendChild(token);
+        });
+    }
+
+    function moveToken(token, dropArea, wordBank) {
+        if (token.parentElement.id === "word-bank") {
+            token.classList.add("placed");
+            dropArea.appendChild(token);
+        } else {
+            token.classList.remove("placed");
+            wordBank.appendChild(token);
+        }
+    }
+
+    function checkSentence() {
+        const dropArea = document.getElementById("drop-area");
+        const userSentence = Array.from(dropArea.children)
+            .map(token => token.innerText)
+            .join(" ");
+        const feedbackEl = document.getElementById("feedback");
+
+        if (userSentence === questions[currentQ].correct) {
+            feedbackEl.className = "success";
+            feedbackEl.innerText = "SUCCESS: Sequence Correct! +1 Point";
+            score++;
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 1800);
+        } else {
+            feedbackEl.className = "error";
+            feedbackEl.innerText = "ERROR: Sequence Incorrect. Try again!";
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quiz-screen").classList.add("hidden");
+        document.getElementById("result-screen").classList.remove("hidden");
+        document.getElementById("final-stats").innerText = `Final Score: ${score}/7. Perfect racing! 🏆`;
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

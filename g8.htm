@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Racing Mission — English Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Space+Mono:wght@400;700&family=Black+Ops+One&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --racing-red: #E10600;
+        --racing-yellow: #FFD166;
+        --racing-green: #00D26A;
+        --racing-blue: #1A1A2E;
+        --racing-cream: #FFFDF5;
+        --racing-pink: #FF7AA2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        background: linear-gradient(135deg, #FFE9B0 0%, #FFB5B5 45%, #B5E8FF 100%);
+        background-attachment: fixed;
+        color: var(--racing-blue);
+        font-family: 'Space Mono', monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        margin: 0;
+        min-height: 100vh;
+    }
+
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%),
+            linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.15) 75%);
+        background-size: 40px 40px;
+        background-position: 0 0, 20px 20px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .tablet {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 720px;
+        border: 8px solid var(--racing-red);
+        background: var(--racing-cream);
+        padding: 28px;
+        border-radius: 24px;
+        box-shadow: 0 20px 45px -12px rgba(225, 6, 0, 0.35), 0 0 0 8px #FFFFFF;
+    }
+
+    h1 {
+        font-family: 'Black Ops One', cursive;
+        color: var(--racing-red);
+        text-align: center;
+        margin: 0 0 22px;
+        font-size: 26px;
+        letter-spacing: 1.5px;
+        text-shadow: 2px 2px 0 var(--racing-yellow);
+    }
+
+    h1::before { content: "🏎️ "; }
+    h1::after { content: " 🏁"; }
+
+    /* ================================================================
+       MISSION CARD
+       ================================================================ */
+    .mission {
+        display: none;
+        border: 3px dashed var(--racing-yellow);
+        border-radius: 18px;
+        padding: 20px 22px;
+        background: #FFFFFF;
+        box-shadow: 0 6px 0 #E2E8F0, 0 10px 24px -10px rgba(225, 6, 0, 0.15);
+        animation: cardIn 0.4s ease;
+    }
+
+    .mission.active { display: block; }
+
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ================================================================
+       OPTIONS
+       ================================================================ */
+    .option {
+        display: block;
+        width: 100%;
+        text-align: left;
+        margin: 10px 0;
+        padding: 15px 18px;
+        border: 2.5px solid #DCE7FF;
+        border-radius: 14px;
+        background: #F5F8FF;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-family: 'Space Mono', monospace;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--racing-blue);
+        position: relative;
+    }
+
+    .option:hover {
+        background: #EAF2FF;
+        border-color: #A9C7FF;
+        transform: translateX(4px);
+    }
+
+    /* Correct — green */
+    .option.is-correct {
+        background: #E2F8E5 !important;
+        border-color: var(--racing-green);
+        color: #1B7A47;
+        box-shadow: 0 4px 0 #A7E5BE;
+        transform: translateX(4px);
+    }
+    .option.is-correct::after {
+        content: " ★ CORRECT! ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-green);
+        color: #FFF;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* Wrong — pink */
+    .option.is-wrong {
+        background: #FFE5E5 !important;
+        border-color: var(--racing-pink);
+        color: #D6336C;
+        box-shadow: 0 4px 0 #FFB8CC;
+        transform: translateX(4px);
+        animation: shake 0.5s ease;
+    }
+    .option.is-wrong::after {
+        content: " ✗ WRONG! ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-pink);
+        color: #FFF;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    /* Reveal the right answer when user picked wrong */
+    .option.reveal-correct {
+        background: #FFF8E0 !important;
+        border-color: var(--racing-yellow);
+        box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.5);
+    }
+    .option.reveal-correct::after {
+        content: " ← The right one ";
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--racing-yellow);
+        color: #6A4B00;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 11px;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(4px); }
+        20%      { transform: translateX(-4px); }
+        40%      { transform: translateX(6px); }
+        60%      { transform: translateX(-4px); }
+        80%      { transform: translateX(4px); }
+    }
+
+    /* ================================================================
+       NEXT BUTTON
+       ================================================================ */
+    .next-btn {
+        display: none;
+        margin-top: 16px;
+        width: 100%;
+        padding: 14px;
+        background: var(--racing-blue);
+        color: #FFF;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: 1.5px;
+        box-shadow: 0 5px 0 #0a0a15;
+        transition: all 0.15s ease;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #0a0a15; }
+    .next-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #0a0a15; }
+
+    /* ================================================================
+       IMAGES + STATUS
+       ================================================================ */
+    .cam-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border: 4px solid var(--racing-red);
+        border-radius: 14px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px -8px rgba(225, 6, 0, 0.35);
+        background: linear-gradient(135deg, #FFE9B0, #B5E8FF);
+    }
+
+    .status {
+        display: inline-block;
+        background: var(--racing-red);
+        color: #FFF;
+        text-transform: uppercase;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 5px 14px;
+        border-radius: 999px;
+        letter-spacing: 1.5px;
+        margin-bottom: 14px;
+    }
+
+    .mission p {
+        font-family: 'Space Mono', monospace;
+        font-size: 15px;
+        line-height: 1.7;
+        color: var(--racing-blue);
+        margin: 8px 0 14px;
+    }
+
+    /* ================================================================
+       FINAL SCREEN
+       ================================================================ */
+    #m_final {
+        text-align: center;
+        border-color: var(--racing-green);
+        background: linear-gradient(135deg, #E2F8E5, #FFFFFF);
+    }
+
+    #m_final h2 {
+        font-family: 'Black Ops One', cursive;
+        color: var(--racing-green);
+        font-size: 42px;
+        margin: 10px 0;
+        text-shadow: 3px 3px 0 var(--racing-yellow);
+    }
+
+    #m_final p {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 1px;
+    }
+
+    #m_final p:last-of-type {
+        color: var(--racing-red);
+        font-size: 18px;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 560px) {
+        .tablet { padding: 20px; border-width: 6px; }
+        h1 { font-size: 18px; }
+        .cam-img { height: 150px; }
+        .option { font-size: 13px; padding: 12px 14px; }
+        .option.is-correct::after,
+        .option.is-wrong::after,
+        .option.reveal-correct::after {
+            position: static;
+            display: block;
+            transform: none;
+            margin-top: 8px;
+            text-align: center;
+        }
+        #m_final h2 { font-size: 30px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="tablet">
+    <h1>Racing Master Protocol</h1>
+
+    <!-- ═══ MISSION 1 ═══ -->
+    <div class="mission active" id="m1" data-correct="a">
+        <span class="status">🕒 Clock Scan · 3:30</span>
+        <img class="cam-img" src="https://photobooth.cdn.sports.ru/preset/message/c/bc/f222dd6c445e081f380515c1551ec.jpeg?f=webp&q=90&s=2x&w=730" alt="Speed limit sign">
+        <p>The clock shows <b>3:30</b>. Complete the rule:</p>
+        <p style="color:var(--racing-red); font-weight:bold;">"At half past three when it's ________ race..."</p>
+        <button class="option" data-answer="a">A) dangerous — you can't drive fast</button>
+        <button class="option" data-answer="b">B) safe — you can drive fast</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 2 ═══ -->
+    <div class="mission" id="m2" data-correct="b">
+        <span class="status">🚦 Signal · 12:15</span>
+        <img class="cam-img" src="https://media.istockphoto.com/id/1346966549/ru/%D1%84%D0%BE%D1%82%D0%BE/%D0%BF%D0%B5%D1%88%D0%B5%D1%85%D0%BE%D0%B4%D0%BD%D1%8B%D0%B5-%D1%81%D0%B2%D0%B5%D1%82%D0%BE%D1%84%D0%BE%D1%80%D1%8B.jpg?s=612x612&w=0&k=20&c=ID0KgEJF44btFAkF6G-OAZYng5GiHAq8j-EocK__3J0=" alt="Pedestrian signal">
+        <p>The clock shows <b>12:15</b>. Complete the rule:</p>
+        <p style="color:var(--racing-red); font-weight:bold;">"At quarter past twelve you can't ________."</p>
+        <button class="option" data-answer="a">A) turn left on the road</button>
+        <button class="option" data-answer="b">B) cross the street — you can only stay</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 3 ═══ -->
+    <div class="mission" id="m3" data-correct="a">
+        <span class="status">🌙 Night Track · 4:40</span>
+        <img class="cam-img" src="https://static.vecteezy.com/system/resources/previews/002/079/786/non_2x/no-left-turn-traffic-sign-on-white-background-free-vector.jpg" alt="Night race track">
+        <p>The clock shows <b>4:40</b>. Complete the rule:</p>
+        <p style="color:var(--racing-red); font-weight:bold;">"At twenty to five ________ turn left."</p>
+        <button class="option" data-answer="a">A) don't</button>
+        <button class="option" data-answer="b">B) do</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 4 ═══ -->
+    <div class="mission" id="m4" data-correct="b">
+        <span class="status">🎆 Fireworks</span>
+        <img class="cam-img" src="https://i.pinimg.com/originals/77/8a/88/778a88552c5e8084eb662e98037c714b.jpg?nii=t" alt="Fireworks race">
+        <p>Complete the sentence:</p>
+        <p style="color:var(--racing-red); font-weight:bold;">"The driver ________ the fireworks in the evening now at ten to seven."</p>
+        <button class="option" data-answer="a">A) watch</button>
+        <button class="option" data-answer="b">B) is watching</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 5 ═══ -->
+    <div class="mission" id="m5" data-correct="a">
+        <span class="status">🚫 Speed Limit · DECODE 1</span>
+        <img class="cam-img" src="https://media.istockphoto.com/id/1191601948/ru/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F/%D0%BE%D0%B3%D1%80%D0%B0%D0%BD%D0%B8%D1%87%D0%B5%D0%BD%D0%B8%D0%B5-%D1%81%D0%BA%D0%BE%D1%80%D0%BE%D1%81%D1%82%D0%B8-80-%D0%B7%D0%BD%D0%B0%D0%BA.jpg?s=170667a&w=0&k=20&c=dqJnL2msgb-Gpxe9S1qViNSHAFrvgMGScoLb8Fs0cx4=" alt="Speed limit">
+        <p>UNSCRAMBLE: <b>[ ? ]</b></p>
+        <button class="option" data-answer="a">A) You can't drive more eighty — it's speed limit.</button>
+        <button class="option" data-answer="b">B) It's speed limit you can drive more eighty drive.</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 6 ═══ -->
+    <div class="mission" id="m6" data-correct="b">
+        <span class="status">↩️ Road Sign · DECODE 2</span>
+        <p>UNSCRAMBLE: <b>[?]</b></p>
+        <button class="option" data-answer="a">A) On that road only right you can turn.</button>
+        <button class="option" data-answer="b">B) You can only turn right on that road.</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 7 ═══ -->
+    <div class="mission" id="m7" data-correct="a">
+        <span class="status">📅 Weekend Log · DECODE 3</span>
+        <img class="cam-img" src="https://static.independent.co.uk/2026/10/09/12/2239337953..?width=1200&amp;height=800&amp;crop=1200:800" alt="Driver">
+        <p>UNSCRAMBLE: <b>[ ?]</b></p>
+        <button class="option" data-answer="a">A) What did he do on Saturday?</button>
+        <button class="option" data-answer="b">B) He on Saturday did what do?</button>
+        <button class="next-btn" onclick="nextMission()">NEXT MISSION →</button>
+    </div>
+
+    <!-- ═══ MISSION 8 ═══ -->
+    <div class="mission" id="m8" data-correct="b">
+        <span class="status">🏆 Final Audio File</span>
+        <img class="cam-img" src="https://static.independent.co.uk/2026/10/09/12/2239337953..?width=1200&amp;height=800&amp;crop=1200:800" alt="Winner">
+        <p>DECODE: <b>"Когда он стал победителем?"</b></p>
+        <button class="option" data-answer="a">A) Where did he turn on Tuesday?</button>
+        <button class="option" data-answer="b">B) When was he the winner?</button>
+        <button class="next-btn" onclick="nextMission()">FINISH RACE 🏁</button>
+    </div>
+
+    <!-- ═══ FINAL SCREEN ═══ -->
+    <div class="mission" id="m_final">
+        <h2>🏁 FINISH LINE 🏁</h2>
+        <p>ALL MISSIONS COMPLETE</p>
+        <p>CHAMPION STATUS UNLOCKED</p>
+        <p>YOU SURVIVED THE RACE.</p>
+        <button class="next-btn show" onclick="location.reload()" style="background:var(--racing-green); box-shadow:0 5px 0 #00A854;">REBOOT RACE 🔁</button>
+    </div>
+
+</div>
+
+<script>
+    const missions = document.querySelectorAll('.mission');
+    let currentIndex = 0;
+    let answered = false;
+
+    function nextMission() {
+        const current = missions[currentIndex];
+        current.classList.remove('active');
+        currentIndex++;
+
+        if (currentIndex < missions.length) {
+            missions[currentIndex].classList.add('active');
+            answered = false;
+        }
+    }
+
+    document.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            const mission = e.target.closest('.mission');
+            if (!mission || answered) return;
+            answered = true;
+
+            const chosenAnswer = option.dataset.answer;
+            const correctAnswer = mission.dataset.correct;
+            const isCorrect = chosenAnswer === correctAnswer;
+
+            // Disable further clicks on this mission
+            mission.querySelectorAll('.option').forEach(btn => {
+                btn.style.cursor = 'default';
+                btn.style.pointerEvents = 'none';
+            });
+
+            // Mark the chosen option
+            if (isCorrect) {
+                option.classList.add('is-correct');
+            } else {
+                option.classList.add('is-wrong');
+
+                // Also reveal the correct option
+                const correctBtn = mission.querySelector(`.option[data-answer="${correctAnswer}"]`);
+                if (correctBtn) correctBtn.classList.add('reveal-correct');
+            }
+
+            // Show the Next button
+            const nextBtn = mission.querySelector('.next-btn');
+            if (nextBtn) nextBtn.classList.add('show');
+        });
+    });
+</script>
+
+</body>
+</html>
