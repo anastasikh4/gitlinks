@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appearance Hero: 3 Stages</title>
+    <style>
+        :root {
+            --hero-blue: #2980b9;
+            --hero-purple: #8e44ad;
+            --hero-yellow: #f1c40f;
+            --comic-black: #2c3e50;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Arial Black', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(135deg, #2980b9, #8e44ad);
+            background-attachment: fixed;
+            color: var(--comic-black);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            user-select: none;
+        }
+
+        #hero-card {
+            background: var(--white);
+            border: 6px solid var(--comic-black);
+            border-radius: 20px;
+            box-shadow: 12px 12px 0 var(--comic-black);
+            max-width: 720px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--hero-yellow);
+            color: var(--comic-black);
+            font-size: 0.85em;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 3px solid var(--comic-black);
+            transform: rotate(6deg);
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .hero-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .hero-header h1 {
+            font-size: 2em;
+            color: var(--hero-blue);
+            margin: 0 0 6px 0;
+            text-shadow: 3px 3px 0 var(--hero-yellow), 5px 5px 0 var(--comic-black);
+            letter-spacing: 1px;
+            line-height: 1.1;
+        }
+
+        .hero-header .subtitle {
+            font-size: 0.9em;
+            color: var(--hero-purple);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stages-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stage-pill {
+            padding: 8px 16px;
+            border: 3px solid var(--comic-black);
+            border-radius: 30px;
+            background: white;
+            font-size: 0.8em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+
+        .stage-pill.active {
+            background: var(--hero-yellow);
+            color: var(--comic-black);
+            transform: scale(1.05);
+            box-shadow: 3px 3px 0 var(--comic-black);
+        }
+
+        .stage-pill.done {
+            background: var(--success);
+            color: white;
+        }
+
+        .hero-meter {
+            background: #ecf0f1;
+            height: 20px;
+            border-radius: 10px;
+            border: 3px solid var(--comic-black);
+            overflow: hidden;
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .hero-meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--hero-yellow), #f39c12);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .hero-meter-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.72em;
+            font-weight: 900;
+            color: var(--comic-black);
+            text-shadow: 1px 1px 0 white;
+            letter-spacing: 1px;
+        }
+
+        /* ============ MATCHING MEMORY CARDS ============ */
+        .match-info {
+            text-align: center;
+            font-size: 1em;
+            color: var(--hero-purple);
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .memory-card {
+            perspective: 1000px;
+            height: 120px;
+            cursor: pointer;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .memory-card.flipped .memory-card-inner,
+        .memory-card.matched .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            cursor: default;
+            animation: matchPop 0.5s ease;
+        }
+
+        @keyframes matchPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        .memory-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border: 4px solid var(--comic-black);
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            box-shadow: 4px 4px 0 var(--comic-black);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .memory-front {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            font-size: 2.5em;
+        }
+
+        .memory-back {
+            background: linear-gradient(135deg, #fff9c4, #ffe082);
+            transform: rotateY(180deg);
+            font-size: 0.85em;
+            line-height: 1.2;
+            font-weight: 900;
+            color: var(--comic-black);
+        }
+
+        .memory-back .mini-emoji {
+            font-size: 1.6em;
+            margin-bottom: 2px;
+        }
+
+        .memory-back.ru-side {
+            background: linear-gradient(135deg, #d6eaf8, #aed6f1);
+            font-family: 'Arial', sans-serif;
+            font-weight: 700;
+        }
+
+        .memory-card.matched .memory-back {
+            background: linear-gradient(135deg, #d5f5e3, #a9dfbf);
+            border-color: var(--success);
+        }
+
+        .memory-card.wrong-pick .memory-back {
+            background: linear-gradient(135deg, #fadbd8, #f5b7b1);
+            border-color: var(--error);
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotateY(180deg) translateX(0); }
+            25% { transform: rotateY(180deg) translateX(-6px); }
+            75% { transform: rotateY(180deg) translateX(6px); }
+        }
+
+        /* ============ ACTION BAR ============ */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn {
+            background: white;
+            border: 4px solid var(--comic-black);
+            border-radius: 14px;
+            padding: 14px 24px;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 0.95em;
+            font-weight: 900;
+            color: var(--comic-black);
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--comic-black);
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-btn:hover:not(:disabled) {
+            background: #ecf0f1;
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0 var(--comic-black);
+        }
+
+        .hero-btn:active:not(:disabled) {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 var(--comic-black);
+        }
+
+        .hero-btn.primary {
+            background: var(--hero-yellow);
+        }
+
+        .hero-btn.primary:hover:not(:disabled) {
+            background: #f39c12;
+        }
+
+        .hero-btn.correct-bg {
+            background: var(--success);
+            color: white;
+        }
+
+        .hero-btn.wrong-bg {
+            background: var(--error);
+            color: white;
+        }
+
+        .hero-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ============ QUIZ ============ */
+        .question-number {
+            display: inline-block;
+            background: var(--hero-purple);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            border: 3px solid var(--comic-black);
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .question-title {
+            font-size: 1.3em;
+            color: var(--comic-black);
+            margin-bottom: 18px;
+            line-height: 1.3;
+        }
+
+        .prompt-card {
+            background: linear-gradient(135deg, #fff9c4, #ffe082);
+            border: 4px solid var(--comic-black);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.15);
+        }
+
+        .prompt-card .prompt-emoji {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .prompt-card .prompt-word {
+            font-size: 1.8em;
+            color: var(--comic-black);
+            letter-spacing: 1px;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 4px solid var(--comic-black);
+            border-radius: 14px;
+            padding: 16px 12px;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 1em;
+            color: var(--comic-black);
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--comic-black);
+            transition: all 0.1s;
+            letter-spacing: 0.5px;
+        }
+
+        .choice-btn:hover:not(.disabled) {
+            background: #ecf0f1;
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0 var(--comic-black);
+        }
+
+        .choice-btn:active:not(.disabled) {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 var(--comic-black);
+        }
+
+        .choice-btn.selected {
+            background: #d6eaf8;
+            border-color: var(--hero-blue);
+            color: var(--hero-blue);
+        }
+
+        .choice-btn.correct-choice {
+            background: #d5f5e3;
+            border-color: var(--success);
+            color: #1e8449;
+        }
+
+        .choice-btn.wrong-choice {
+            background: #fadbd8;
+            border-color: var(--error);
+            color: #922b21;
+        }
+
+        .choice-btn.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* ============ MISSING LETTER ============ */
+        .missing-word {
+            text-align: center;
+            font-size: 3em;
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 6px;
+            color: var(--comic-black);
+            background: linear-gradient(135deg, #fff9c4, #ffe082);
+            border: 5px solid var(--comic-black);
+            border-radius: 16px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
+        }
+
+        .missing-word .blank-letter {
+            display: inline-block;
+            min-width: 60px;
+            border-bottom: 6px solid var(--error);
+            color: var(--error);
+            margin: 0 4px;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .letter-choices {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .letter-btn {
+            background: white;
+            border: 4px solid var(--comic-black);
+            border-radius: 14px;
+            padding: 18px 8px;
+            font-family: 'Arial Black', sans-serif;
+            font-size: 1.5em;
+            color: var(--comic-black);
+            cursor: pointer;
+            box-shadow: 4px 4px 0 var(--comic-black);
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+
+        .letter-btn:hover:not(.disabled) {
+            background: #ecf0f1;
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0 var(--comic-black);
+        }
+
+        .letter-btn:active:not(.disabled) {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 var(--comic-black);
+        }
+
+        .letter-btn.correct-choice {
+            background: #d5f5e3;
+            border-color: var(--success);
+            color: #1e8449;
+        }
+
+        .letter-btn.wrong-choice {
+            background: #fadbd8;
+            border-color: var(--error);
+            color: #922b21;
+        }
+
+        .letter-btn.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .feedback-text {
+            font-size: 1em;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            min-height: 26px;
+            margin-bottom: 10px;
+        }
+        .feedback-text.correct { color: var(--success); }
+        .feedback-text.wrong { color: var(--error); }
+
+        /* End screen */
+        .end-screen {
+            text-align: center;
+            padding: 20px 10px;
+        }
+        .end-screen .trophy { font-size: 5em; display: block; margin-bottom: 10px; }
+        .end-screen h2 {
+            font-size: 1.8em;
+            color: var(--hero-blue);
+            text-shadow: 3px 3px 0 var(--hero-yellow);
+            margin-bottom: 15px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border: 4px solid var(--comic-black);
+            border-radius: 14px;
+            padding: 12px 22px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
+        }
+        .stat-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 1.6em;
+            color: var(--hero-blue);
+            margin-top: 3px;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        .pop { animation: pop 0.3s; }
+
+        @media (max-width: 520px) {
+            .choices-grid { grid-template-columns: 1fr; }
+            .hero-header h1 { font-size: 1.4em; }
+            .missing-word { font-size: 2em; letter-spacing: 3px; }
+            .memory-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .memory-card { height: 100px; }
+            .memory-back { font-size: 0.7em; }
+            .memory-back .mini-emoji { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="hero-card">
+    <div class="badge" id="badge">💥 STAGE 1</div>
+
+    <div class="hero-header">
+        <h1>🦸 Appearance Hero</h1>
+        <div class="subtitle">3-Stage Vocabulary Mission</div>
+    </div>
+
+    <div class="stages-bar">
+        <div class="stage-pill active" id="pill1">1. Карточки</div>
+        <div class="stage-pill" id="pill2">2. Квиз</div>
+        <div class="stage-pill" id="pill3">3. Буквы</div>
+    </div>
+
+    <div class="hero-meter">
+        <div class="hero-meter-fill" id="heroMeterFill"></div>
+        <div class="hero-meter-label" id="heroMeterLabel">0%</div>
+    </div>
+
+    <div id="stageContainer"></div>
+</div>
+
+<script>
+// ==================== ДАННЫЕ ====================
+const vocab = [
+    { en: 'fair',           ru: 'светлые (волосы)',   emoji: '👱',  tag: 'Hair' },
+    { en: 'grey',           ru: 'седые',              emoji: '👩‍🦳', tag: 'Hair' },
+    { en: 'brown',          ru: 'коричневые',         emoji: '👩‍🦰', tag: 'Hair' },
+    { en: 'dark',           ru: 'тёмные',             emoji: '👩‍🦱', tag: 'Hair' },
+    { en: 'short',          ru: 'короткие',           emoji: '✂️',  tag: 'Hair' },
+    { en: 'straight',       ru: 'прямые',             emoji: '📏',  tag: 'Hair' },
+    { en: 'long',           ru: 'длинные',            emoji: '💇‍♀️', tag: 'Hair' },
+    { en: 'wavy',           ru: 'волнистые',          emoji: '🌊',  tag: 'Hair' },
+    { en: 'curly',          ru: 'кудрявые',           emoji: '🌀',  tag: 'Hair' },
+
+    { en: 'ear',            ru: 'ухо',                emoji: '👂',  tag: 'Face' },
+    { en: 'eye',            ru: 'глаз',               emoji: '👁️', tag: 'Face' },
+    { en: 'nose',           ru: 'нос',                emoji: '👃',  tag: 'Face' },
+    { en: 'moustache',      ru: 'усы',                emoji: '👨‍🦰', tag: 'Face' },
+    { en: 'cheek',          ru: 'щека',               emoji: '😊',  tag: 'Face' },
+    { en: 'teeth',          ru: 'зубы',               emoji: '🦷',  tag: 'Face' },
+    { en: 'mouth',          ru: 'рот',                emoji: '👄',  tag: 'Face' },
+    { en: 'beard',          ru: 'борода',             emoji: '🧔',  tag: 'Face' },
+    { en: 'neck',           ru: 'шея',                emoji: '💪',  tag: 'Face' },
+    { en: 'tongue',         ru: 'язык',               emoji: '👅',  tag: 'Face' },
+    { en: 'chin',           ru: 'подбородок',         emoji: '🤔',  tag: 'Face' },
+
+    { en: 'hand',           ru: 'рука (кисть)',       emoji: '🖐️', tag: 'Body' },
+    { en: 'arm',            ru: 'рука (от плеча)',    emoji: '💪',  tag: 'Body' },
+    { en: 'leg',            ru: 'нога',               emoji: '🦵',  tag: 'Body' },
+    { en: 'feet',           ru: 'ступни',             emoji: '🦶',  tag: 'Body' },
+
+    { en: 'short',          ru: 'низкий',             emoji: '📏',  tag: 'Height' },
+    { en: 'of medium height', ru: 'среднего роста',   emoji: '📐',  tag: 'Height' },
+    { en: 'tall',           ru: 'высокий',            emoji: '📈',  tag: 'Height' },
+
+    { en: 'thin',           ru: 'худой',              emoji: '🧘',  tag: 'Weight' },
+    { en: 'slim',           ru: 'стройный',           emoji: '🏃',  tag: 'Weight' },
+    { en: 'plump',          ru: 'полный',             emoji: '🍩',  tag: 'Weight' },
+    { en: 'well-built',     ru: 'крепкий',            emoji: '💪',  tag: 'Weight' },
+    { en: 'fat',            ru: 'толстый',            emoji: '🍔',  tag: 'Weight' },
+
+    { en: 'young',          ru: 'молодой',            emoji: '👶',  tag: 'Age' },
+    { en: 'middle-aged',    ru: 'средних лет',        emoji: '👨‍🦳', tag: 'Age' },
+    { en: 'old',            ru: 'пожилой',            emoji: '👴',  tag: 'Age' },
+];
+
+// ✨ 6 самых сложных слов для matching-игры
+const difficultVocab = [
+    { en: 'moustache',        ru: 'усы',              emoji: '👨‍🦰', tag: 'Face' },
+    { en: 'straight',         ru: 'прямые',           emoji: '📏',  tag: 'Hair' },
+    { en: 'of medium height', ru: 'среднего роста',   emoji: '📐',  tag: 'Height' },
+    { en: 'well-built',       ru: 'крепкий',          emoji: '💪',  tag: 'Weight' },
+    { en: 'middle-aged',      ru: 'средних лет',      emoji: '👨‍🦳', tag: 'Age' },
+    { en: 'plump',            ru: 'полный',           emoji: '🍩',  tag: 'Weight' },
+];
+
+// ==================== СОСТОЯНИЕ ====================
+let stage = 1;
+
+// Stage 1 (matching)
+let matchCards = [];
+let matchFlipped = [];
+let matchMatched = 0;
+let matchMoves = 0;
+let matchLocked = false;
+let matchCorrect = 0;
+let matchWrong = 0;
+let matchXP = 0;
+
+// Stage 2 (quiz)
+let quizQuestions = [];
+let quizIndex = 0;
+let quizCorrect = 0;
+let quizWrong = 0;
+let quizXP = 0;
+let quizAnswered = false;
+let quizUserChoice = null;
+
+// Stage 3 (letters)
+let letterQuestions = [];
+let letterIndex = 0;
+let letterCorrect = 0;
+let letterWrong = 0;
+let letterXP = 0;
+let letterAnswered = false;
+let letterUserChoice = null;
+
+const TOTAL_STEPS = difficultVocab.length * 2 + 16 + 12;
+let completedSteps = 0;
+
+// ==================== УТИЛИТЫ ====================
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function pickRandom(arr, n, exclude = []) {
+    const filtered = arr.filter(x => !exclude.includes(x));
+    return shuffle(filtered).slice(0, n);
+}
+
+function updateProgress() {
+    const pct = Math.min(100, Math.round((completedSteps / TOTAL_STEPS) * 100));
+    document.getElementById('heroMeterFill').style.width = pct + '%';
+    document.getElementById('heroMeterLabel').textContent = pct + '%';
+}
+
+// ==================== STAGE 1: MATCHING MEMORY GAME ====================
+function buildMatchDeck() {
+    const deck = [];
+    difficultVocab.forEach((item, idx) => {
+        deck.push({ pairId: idx, side: 'en', text: item.en, emoji: item.emoji, tag: item.tag });
+        deck.push({ pairId: idx, side: 'ru', text: item.ru, emoji: item.emoji, tag: item.tag });
+    });
+    matchCards = shuffle(deck);
+    matchFlipped = [];
+    matchMatched = 0;
+    matchMoves = 0;
+    matchLocked = false;
+}
+
+function renderMatching() {
+    document.getElementById('badge').textContent = '💥 STAGE 1';
+    document.getElementById('pill1').className = 'stage-pill active';
+    document.getElementById('pill2').className = 'stage-pill';
+    document.getElementById('pill3').className = 'stage-pill';
+
+    let cardsHtml = '';
+    matchCards.forEach((card, i) => {
+        const isMatched = card.matched ? 'matched' : '';
+        const emoji = card.side === 'en' ? '🔤' : '📖';
+        cardsHtml += `
+            <div class="memory-card ${isMatched}" data-index="${i}" onclick="flipMemoryCard(${i})">
+                <div class="memory-card-inner">
+                    <div class="memory-face memory-front">${emoji}</div>
+                    <div class="memory-face memory-back ${card.side === 'ru' ? 'ru-side' : ''}">
+                        <span class="mini-emoji">${card.emoji}</span>
+                        <div>${card.text}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    const html = `
+        <div class="match-info">
+            🎯 Найди пары: английское слово ↔ русский перевод
+        </div>
+        <div class="memory-grid" id="memoryGrid">
+            ${cardsHtml}
+        </div>
+        <div class="action-bar">
+            <div style="font-weight:900; font-size:0.95em;">
+                Пары: ${matchMatched} / ${difficultVocab.length}
+            </div>
+            <div style="font-weight:900; font-size:0.95em; color:#7f8c8d;">
+                Ходы: ${matchMoves}
+            </div>
+        </div>
+    `;
+    document.getElementById('stageContainer').innerHTML = html;
+    updateProgress();
+}
+
+function flipMemoryCard(index) {
+    if (matchLocked) return;
+    const cardEl = document.querySelector(`.memory-card[data-index="${index}"]`);
+    if (!cardEl || cardEl.classList.contains('matched')) return;
+    if (matchFlipped.includes(index)) return;
+    if (matchFlipped.length >= 2) return;
+
+    cardEl.classList.add('flipped');
+    matchFlipped.push(index);
+
+    if (matchFlipped.length === 2) {
+        matchMoves++;
+        checkMemoryMatch();
+    }
+}
+
+function checkMemoryMatch() {
+    const [i1, i2] = matchFlipped;
+    const c1 = matchCards[i1];
+    const c2 = matchCards[i2];
+
+    matchLocked = true;
+
+    if (c1.pairId === c2.pairId && c1.side !== c2.side) {
+        // MATCH!
+        setTimeout(() => {
+            const el1 = document.querySelector(`.memory-card[data-index="${i1}"]`);
+            const el2 = document.querySelector(`.memory-card[data-index="${i2}"]`);
+            el1.classList.add('matched');
+            el2.classList.add('matched');
+            c1.matched = true;
+            c2.matched = true;
+
+            matchMatched++;
+            matchCorrect++;
+            matchXP += 5;
+            completedSteps += 2;
+            updateProgress();
+
+            matchFlipped = [];
+            matchLocked = false;
+
+            // Обновляем счётчик
+            const infoRow = document.querySelector('.action-bar');
+            if (infoRow) {
+                infoRow.children[0].textContent = `Пары: ${matchMatched} / ${difficultVocab.length}`;
+                infoRow.children[1].textContent = `Ходы: ${matchMoves}`;
+            }
+
+            if (matchMatched === difficultVocab.length) {
+                setTimeout(goToStage2, 700);
+            }
+        }, 300);
+    } else {
+        // NO MATCH
+        matchWrong++;
+        const el1 = document.querySelector(`.memory-card[data-index="${i1}"]`);
+        const el2 = document.querySelector(`.memory-card[data-index="${i2}"]`);
+        el1.classList.add('wrong-pick');
+        el2.classList.add('wrong-pick');
+
+        setTimeout(() => {
+            el1.classList.remove('flipped', 'wrong-pick');
+            el2.classList.remove('flipped', 'wrong-pick');
+            matchFlipped = [];
+            matchLocked = false;
+        }, 850);
+    }
+}
+
+// ==================== STAGE 2: QUIZ ====================
+function buildQuiz() {
+    const pool = shuffle(vocab).slice(0, 16);
+    quizQuestions = pool.map(item => {
+        const showRu = Math.random() < 0.5;
+        if (showRu) {
+            const distractors = pickRandom(vocab.filter(v => v.en !== item.en), 3).map(v => v.en);
+            const options = shuffle([item.en, ...distractors]);
+            return {
+                emoji: item.emoji,
+                prompt: item.ru,
+                correct: item.en,
+                options,
+                direction: 'ru-en'
+            };
+        } else {
+            const distractors = pickRandom(vocab.filter(v => v.ru !== item.ru), 3).map(v => v.ru);
+            const options = shuffle([item.ru, ...distractors]);
+            return {
+                emoji: item.emoji,
+                prompt: item.en,
+                correct: item.ru,
+                options,
+                direction: 'en-ru'
+            };
+        }
+    });
+    quizIndex = 0;
+    quizCorrect = 0;
+    quizWrong = 0;
+    quizXP = 0;
+    quizAnswered = false;
+    quizUserChoice = null;
+}
+
+function goToStage2() {
+    stage = 2;
+    buildQuiz();
+    document.getElementById('pill1').className = 'stage-pill done';
+    renderQuiz();
+}
+
+function renderQuiz() {
+    document.getElementById('badge').textContent = '💥 STAGE 2';
+    document.getElementById('pill2').className = 'stage-pill active';
+
+    if (quizIndex >= quizQuestions.length) {
+        document.getElementById('pill2').className = 'stage-pill done';
+        goToStage3();
+        return;
+    }
+
+    const q = quizQuestions[quizIndex];
+    const title = q.direction === 'ru-en'
+        ? 'Выбери правильный перевод на английский'
+        : 'Выбери правильный перевод на русский';
+
+    let optionsHtml = '';
+    q.options.forEach(opt => {
+        const escaped = opt.replace(/'/g, "\\'");
+        optionsHtml += `<button class="choice-btn" onclick="quizSelect(this, '${escaped}')">${opt}</button>`;
+    });
+
+    const html = `
+        <span class="question-number">Вопрос ${quizIndex + 1} / ${quizQuestions.length}</span>
+        <div class="question-title">${title}</div>
+        <div class="prompt-card">
+            <span class="prompt-emoji">${q.emoji}</span>
+            <div class="prompt-word">${q.prompt}</div>
+        </div>
+        <div class="choices-grid" id="choicesGrid">
+            ${optionsHtml}
+        </div>
+        <div class="feedback-text" id="quizFeedback"></div>
+        <div class="action-bar">
+            <div></div>
+            <button class="hero-btn primary" id="quizCheckBtn" onclick="quizCheck()" disabled>Проверить</button>
+        </div>
+    `;
+    document.getElementById('stageContainer').innerHTML = html;
+
+    quizAnswered = false;
+    quizUserChoice = null;
+    updateProgress();
+}
+
+function quizSelect(btn, value) {
+    if (quizAnswered) return;
+    document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    quizUserChoice = value;
+    document.getElementById('quizCheckBtn').disabled = false;
+}
+
+function quizCheck() {
+    if (quizAnswered) {
+        quizIndex++;
+        renderQuiz();
+        return;
+    }
+
+    const q = quizQuestions[quizIndex];
+    const isCorrect = quizUserChoice === q.correct;
+    const feedback = document.getElementById('quizFeedback');
+    const btn = document.getElementById('quizCheckBtn');
+
+    quizAnswered = true;
+    completedSteps++;
+
+    if (isCorrect) {
+        quizCorrect++;
+        quizXP += 10;
+        feedback.textContent = '✅ Отлично! +10 XP';
+        feedback.className = 'feedback-text correct';
+
+        document.querySelectorAll('.choice-btn').forEach(b => {
+            if (b.textContent === q.correct) b.classList.add('correct-choice', 'pop');
+            b.classList.add('disabled');
+        });
+    } else {
+        quizWrong++;
+        feedback.textContent = '❌ Правильный ответ: ' + q.correct;
+        feedback.className = 'feedback-text wrong';
+
+        document.querySelectorAll('.choice-btn').forEach(b => {
+            if (b.textContent === q.correct) b.classList.add('correct-choice');
+            else if (b.classList.contains('selected')) b.classList.add('wrong-choice', 'shake');
+            b.classList.add('disabled');
+        });
+    }
+
+    btn.textContent = quizIndex === quizQuestions.length - 1 ? 'К буквам →' : 'Дальше →';
+    btn.disabled = false;
+    btn.classList.remove('primary');
+    btn.classList.add(isCorrect ? 'correct-bg' : 'wrong-bg');
+    updateProgress();
+}
+
+// ==================== STAGE 3: MISSING LETTER ====================
+function buildLetters() {
+    const pool = shuffle(vocab.filter(v => v.en.replace(/[\s-]/g, '').length >= 4)).slice(0, 12);
+    letterQuestions = pool.map(item => {
+        const cleanWord = item.en;
+        let positions = [];
+        for (let i = 1; i < cleanWord.length; i++) {
+            if (/[a-zA-Z]/.test(cleanWord[i])) positions.push(i);
+        }
+        const pos = positions[Math.floor(Math.random() * positions.length)];
+        const correctLetter = cleanWord[pos].toLowerCase();
+
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        const distractors = shuffle(alphabet.filter(l => l !== correctLetter)).slice(0, 3);
+        const options = shuffle([correctLetter, ...distractors]);
+
+        const displayWord = cleanWord.split('').map((ch, i) => {
+            if (i === pos) return '<span class="blank-letter">?</span>';
+            return ch;
+        }).join('');
+
+        return {
+            emoji: item.emoji,
+            ru: item.ru,
+            fullWord: cleanWord,
+            displayWord,
+            correct: correctLetter,
+            options,
+            position: pos
+        };
+    });
+    letterIndex = 0;
+    letterCorrect = 0;
+    letterWrong = 0;
+    letterXP = 0;
+    letterAnswered = false;
+}
+
+function goToStage3() {
+    stage = 3;
+    buildLetters();
+    renderLetter();
+}
+
+function renderLetter() {
+    document.getElementById('badge').textContent = '💥 STAGE 3';
+    document.getElementById('pill3').className = 'stage-pill active';
+
+    if (letterIndex >= letterQuestions.length) {
+        showEnd();
+        return;
+    }
+
+    const q = letterQuestions[letterIndex];
+
+    let optionsHtml = '';
+    q.options.forEach(opt => {
+        optionsHtml += `<button class="letter-btn" onclick="letterSelect(this, '${opt}')">${opt}</button>`;
+    });
+
+    const html = `
+        <span class="question-number">Задание ${letterIndex + 1} / ${letterQuestions.length}</span>
+        <div class="question-title">Какая буква пропущена?</div>
+        <div class="missing-word">${q.displayWord}</div>
+        <div style="text-align:center; font-size:1.05em; color:#7f8c8d; margin-bottom:15px; font-family: Arial, sans-serif;">
+            ${q.emoji} ${q.ru}
+        </div>
+        <div class="letter-choices" id="letterChoices">
+            ${optionsHtml}
+        </div>
+        <div class="feedback-text" id="letterFeedback"></div>
+        <div class="action-bar">
+            <div></div>
+            <button class="hero-btn primary" id="letterCheckBtn" onclick="letterCheck()" disabled>Проверить</button>
+        </div>
+    `;
+    document.getElementById('stageContainer').innerHTML = html;
+
+    letterAnswered = false;
+    letterUserChoice = null;
+    updateProgress();
+}
+
+function letterSelect(btn, value) {
+    if (letterAnswered) return;
+    document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    letterUserChoice = value;
+    document.getElementById('letterCheckBtn').disabled = false;
+}
+
+function letterCheck() {
+    if (letterAnswered) {
+        letterIndex++;
+        renderLetter();
+        return;
+    }
+
+    const q = letterQuestions[letterIndex];
+    const isCorrect = letterUserChoice === q.correct;
+    const feedback = document.getElementById('letterFeedback');
+    const btn = document.getElementById('letterCheckBtn');
+
+    letterAnswered = true;
+    completedSteps++;
+
+    if (isCorrect) {
+        letterCorrect++;
+        letterXP += 10;
+        feedback.textContent = '✅ Отлично! +10 XP';
+        feedback.className = 'feedback-text correct';
+
+        document.querySelectorAll('.letter-btn').forEach(b => {
+            if (b.textContent === q.correct) b.classList.add('correct-choice', 'pop');
+            b.classList.add('disabled');
+        });
+    } else {
+        letterWrong++;
+        feedback.textContent = '❌ Правильная буква: ' + q.correct.toUpperCase();
+        feedback.className = 'feedback-text wrong';
+
+        document.querySelectorAll('.letter-btn').forEach(b => {
+            if (b.textContent === q.correct) b.classList.add('correct-choice');
+            else if (b.classList.contains('selected')) b.classList.add('wrong-choice', 'shake');
+            b.classList.add('disabled');
+        });
+    }
+
+    btn.textContent = letterIndex === letterQuestions.length - 1 ? 'Финиш 🏁' : 'Дальше →';
+    btn.disabled = false;
+    btn.classList.remove('primary');
+    btn.classList.add(isCorrect ? 'correct-bg' : 'wrong-bg');
+    updateProgress();
+}
+
+// ==================== END ====================
+function showEnd() {
+    document.getElementById('pill3').className = 'stage-pill done';
+    document.getElementById('badge').textContent = '🏆 DONE';
+
+    const totalCorrect = matchCorrect + quizCorrect + letterCorrect;
+    const totalWrong = matchWrong + quizWrong + letterWrong;
+    const totalXP = matchXP + quizXP + letterXP;
+
+    const html = `
+        <div class="end-screen">
+            <span class="trophy">🏆</span>
+            <h2>Миссия выполнена!</h2>
+            <p style="font-family: Arial, sans-serif; color: #7f8c8d; font-size: 1.05em;">
+                Ты прошёл все 3 этапа и готов к диктанту!
+            </p>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Правильно</div>
+                    <div class="stat-value">${totalCorrect}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ошибок</div>
+                    <div class="stat-value" style="color:#e74c3c;">${totalWrong}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Опыт</div>
+                    <div class="stat-value" style="color:#f39c12;">+${totalXP}</div>
+                </div>
+            </div>
+            <button class="hero-btn primary" style="font-size:1.1em; padding:16px 40px;" onclick="location.reload()">
+                🔄 Играть снова
+            </button>
+        </div>
+    `;
+    document.getElementById('stageContainer').innerHTML = html;
+    document.getElementById('heroMeterFill').style.width = '100%';
+    document.getElementById('heroMeterLabel').textContent = '100%';
+}
+
+// ==================== СТАРТ ====================
+buildMatchDeck();
+renderMatching();
+updateProgress();
+</script>
+
+</body>
+</html>
