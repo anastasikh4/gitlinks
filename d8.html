@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Some/Any/A/An & Text Completion</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --success: #00b894;
+            --error: #ff4757;
+            --bg: #f7f9fc;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #333; margin-top: 30px; }
+
+        /* Grammar Box Styling */
+        .grammar-box {
+            background-color: #ffeaea;
+            border: 1px solid var(--primary);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .grammar-title { font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .example { padding: 5px 0; border-bottom: 1px solid #ffcccc; }
+        .example:last-child { border-bottom: none; }
+        .highlight { color: var(--error); font-weight: bold; }
+
+        /* Exercise 3 Styling (Dropdowns) */
+        .question-card {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fff;
+            transition: background-color 0.3s;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 1.1em;
+        }
+        .question-card.correct { background-color: #e8f8f0; }
+        .question-card.wrong { background-color: #fff0f0; }
+
+        select {
+            margin-left: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            width: 140px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        /* Text Reading Styling */
+        .reading-text {
+            line-height: 2.2;
+            font-size: 1.1em;
+            background: #fafafa;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+        
+        /* Inline dropdowns in the text */
+        .inline-select {
+            margin: 0 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: auto;
+            min-width: 80px;
+            text-align: center;
+            background: white;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .inline-select.correct { border-color: var(--success); background: #e8f8f0; color: #155724; font-weight: bold; }
+        .inline-select.wrong { border-color: var(--error); background: #fff0f0; color: #721c24; font-weight: bold; }
+        
+        .hint-box {
+            font-size: 0.95em;
+            color: #555;
+            background: #fff3cd;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f1c40f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>English Grammar Practice</h1>
+
+    <!-- Grammar Explanation -->
+    <div class="grammar-box">
+        <div class="grammar-title">Some / Any / A / An</div>
+        <div class="example">We use <span class="highlight">some</span> in positive sentences. (There are <b>some</b> desks.)</div>
+        <div class="example">We use <span class="highlight">any</span> in negative sentences and questions. (There aren't <b>any</b> books. / Are there <b>any</b> chairs?)</div>
+        <div class="example">We use <span class="highlight">a</span> before consonant sounds. (There's <b>a</b> table.)</div>
+        <div class="example">We use <span class="highlight">an</span> before vowel sounds. (Is there <b>an</b> armchair?)</div>
+    </div>
+
+    <!-- Exercise 3: Underline the correct item -->
+    <h2>3 Underline the correct item.</h2>
+    <div id="exercise3-questions">
+        <div class="question-card" data-ans="some">
+            1 There are 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="any">any</option>
+                <option value="some">some</option>
+            </select>
+            desks in the classroom.
+        </div>
+
+        <div class="question-card" data-ans="any">
+            2 There aren't 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="some">some</option>
+                <option value="any">any</option>
+            </select>
+            children in the garden.
+        </div>
+        
+        <div class="question-card" data-ans="any">
+            3 There aren't 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="some">some</option>
+                <option value="any">any</option>
+            </select>
+            books on the desk.
+        </div>
+
+        <div class="question-card" data-ans="any">
+            4 Are there 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="any">any</option>
+                <option value="some">some</option>
+            </select>
+            chairs in the living room?
+        </div>
+
+        <div class="question-card" data-ans="a">
+            5 There's 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="a">a</option>
+                <option value="some">some</option>
+            </select>
+            table in the living room.
+        </div>
+
+        <div class="question-card" data-ans="a">
+            6 Is there 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="some">some</option>
+                <option value="a">a</option>
+            </select>
+            cat under the table?
+        </div>
+        
+        <div class="question-card" data-ans="some">
+            7 There are 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="some">some</option>
+                <option value="any">any</option>
+            </select>
+            students in the classroom.
+        </div>
+        
+        <div class="question-card" data-ans="an">
+            8 Is there 
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="some">some</option>
+                <option value="an">an</option>
+            </select>
+            armchair in the living room?
+        </div>
+    </div>
+
+    <!-- Exercise: Read the text and complete it -->
+    <h2>Read the text and complete it.</h2>
+    <div class="hint-box">
+        💡 <b>Hint:</b> Choose the correct word from the dropdown menus to complete the text.
+    </div>
+    
+    <div class="reading-text">
+        living room and the kitchen are on the ground floor and there is another bathroom next 
+        <select class="inline-select" data-ans="to" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="to">to</option>
+            <option value="at">at</option>
+            <option value="in">in</option>
+        </select>
+        the kitchen. The kitchen is very big and it has got lots of cupboards. The living room is fantastic. It has got my grandmother's antique sofa 
+        <select class="inline-select" data-ans="and" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="and">and</option>
+            <option value="but">but</option>
+            <option value="or">or</option>
+        </select>
+        a lovely fireplace in it. There 
+        <select class="inline-select" data-ans="are" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="are">are</option>
+            <option value="is">is</option>
+            <option value="be">be</option>
+        </select>
+        three comfortable armchairs in front of the fireplace. My favourite room is my bedroom. It is on the first floor opposite my parents' bedroom. There is a computer on my desk and lots of posters on the walls. I've got a nice bed and a big wardrobe next to the window, 
+        <select class="inline-select" data-ans="but" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="but">but</option>
+            <option value="and">and</option>
+            <option value="so">so</option>
+        </select>
+        I haven't got a TV 
+        <select class="inline-select" data-ans="in" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="in">in</option>
+            <option value="on">on</option>
+            <option value="at">at</option>
+        </select>
+        my room yet. There is a big garden in front 
+        <select class="inline-select" data-ans="of" onchange="checkInline(this)">
+            <option value="">--</option>
+            <option value="of">of</option>
+            <option value="to">to</option>
+            <option value="in">in</option>
+        </select>
+        the house and there is a garage for our two cars. That's our new house! I hope you can come and visit us soon. I miss you. Love, Pat
+    </div>
+
+</div>
+
+<script>
+    // Function for the dropdowns in Exercise 3
+    function checkAnswer(selectElement) {
+        const card = selectElement.closest('.question-card');
+        const correctAnswer = card.dataset.ans;
+        
+        if (selectElement.value === correctAnswer) {
+            card.classList.remove('wrong');
+            card.classList.add('correct');
+        } else if (selectElement.value === "") {
+            card.classList.remove('correct', 'wrong');
+        } else {
+            card.classList.remove('correct');
+            card.classList.add('wrong');
+        }
+    }
+
+    // Function for the inline dropdowns in the reading text
+    function checkInline(selectElement) {
+        const correctAnswer = selectElement.dataset.ans;
+        
+        if (selectElement.value === correctAnswer) {
+            selectElement.classList.remove('wrong');
+            selectElement.classList.add('correct');
+        } else if (selectElement.value === "") {
+            selectElement.classList.remove('correct', 'wrong');
+        } else {
+            selectElement.classList.remove('correct');
+            selectElement.classList.add('wrong');
+        }
+    }
+</script>
+
+</body>
+</html>
