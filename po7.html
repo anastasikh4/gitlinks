@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Genres Safari: 2 Levels</title>
+    <style>
+        :root {
+            --jungle-green: #2e7d32;
+            --safari-sand: #f4e1d2;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+            --primary: #7c4dff;
+            --bg-color: #a5d6a7;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif; 
+            background: var(--bg-color); 
+            background-image: url('https://www.transparenttextures.com');
+            text-align: center; color: #1b5e20; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 900px; margin: 0 auto; padding: 30px; background: var(--safari-sand); 
+            border-radius: 30px; border: 8px solid var(--jungle-green); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); z-index: 2;
+        }
+        h1 { margin-top: 0; color: var(--jungle-green); font-size: 2.2em; }
+        
+        .level { display: none; }
+        .active { display: block; }
+        
+        #score-board { 
+            font-size: 1.1em; background: white; padding: 10px 25px; 
+            border-radius: 20px; border: 3px dashed var(--jungle-green); 
+            margin-bottom: 20px; display: inline-block; gap: 20px; font-weight: bold;
+        }
+
+        .game-board {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 450px;
+        }
+        
+        .column h3 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.2em;
+        }
+
+        .card { 
+            padding: 15px 20px; 
+            background: white; 
+            border-radius: 15px; 
+            border: 3px solid #ccc;
+            font-size: 1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            word-wrap: break-word;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+            text-align: left;
+        }
+        
+        /* Genre Card Styling */
+        .card.genre-card { 
+            background: #e3f2fd; 
+            border-color: #1976d2; 
+            color: #0d47a1; 
+            font-size: 1.1em; 
+            text-align: center;
+        }
+        
+        /* Definition Card Styling */
+        .card.definition-card { 
+            background: #fff9c4; 
+            border-color: #fbc02d; 
+            color: #f57f17; 
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .card:hover { transform: scale(1.02); }
+        .card.selected { border-color: #ff9800; box-shadow: 0 0 15px rgba(255,152,0,0.6); transform: scale(1.03); }
+        .card.matched { background: #c8e6c9; border-color: #4caf50; color: #2e7d32; cursor: default; pointer-events: none; opacity: 0.7; transform: none; }
+        .card.wrong-match { background: #ffcdd2; border-color: #f44336; animation: shake 0.4s; }
+
+        /* LEVEL 2: Text Completion */
+        .text-display {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #ccc;
+            font-size: 1.1em;
+            line-height: 2.2;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .gap {
+            display: inline-block;
+            min-width: 90px;
+            border-bottom: 3px solid #bdc3c7;
+            text-align: center;
+            font-weight: bold;
+            color: #bdc3c7;
+            padding: 0 5px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+        .gap.filled {
+            border-bottom-color: var(--correct-btn);
+            color: var(--correct-btn);
+        }
+
+        .pool-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            min-height: 80px;
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .word-chip {
+            background: white;
+            border: 2px solid var(--jungle-green);
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.05rem;
+            transition: 0.2s;
+            user-select: none;
+            color: var(--jungle-green);
+        }
+
+        .word-chip:hover {
+            background: var(--jungle-green);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .word-chip.shake {
+            animation: shake 0.4s;
+            border-color: var(--wrong-btn);
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .feedback { font-weight: bold; min-height: 30px; margin-top: 20px; font-size: 1.3em; }
+        
+        button { 
+            padding: 12px 30px; font-size: 1.1em; cursor: pointer; 
+            color: white; border: none; border-radius: 25px; transition: 0.2s;
+            font-family: inherit; font-weight: bold; margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-restart { background: var(--primary); }
+        .btn-restart:hover { background: #651fff; transform: scale(1.05); }
+        
+        .btn-next { background: var(--correct-btn); display: none; }
+        .btn-next:hover { background: #388e3c; transform: scale(1.05); }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>📚 Book Genres Safari 🐘</h1>
+    <div id="score-board">
+        <span>Score: <span id="score">0</span></span>
+    </div>
+
+    <!-- LEVEL 1: Matching Game -->
+    <div id="level1" class="level active">
+        <h3 id="level-title">Level 1: Match the genre to its definition</h3>
+        
+        <div class="game-board">
+            <div class="column" id="left-col">
+                <h3>📖 Genre</h3>
+            </div>
+            <div class="column" id="right-col">
+                <h3>✍️ Definition</h3>
+            </div>
+        </div>
+        
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 2: Text Completion -->
+    <div id="level2" class="level">
+        <h3>Level 2: Read the text and complete it</h3>
+        
+        <div class="text-display">
+            Hi! My name is Emma. I love books. I read every day after school. My favourite book is about a clever detective. It is a <span class="gap" id="g1">[1]</span> story. My brother Sam does not like mysteries. He likes stories about other worlds, robots and space. That is <span class="gap" id="g2">[2]</span>. My mum likes funny stories. She likes <span class="gap" id="g3">[3]</span>. My dad reads stories about real people - <span class="gap" id="g4">[4]</span> are his favourite. Today we are going to learn about different types of books and about the famous writer Agatha Christie.
+        </div>
+        
+        <div class="pool-area" id="pool2"></div>
+        
+        <div id="feedback2" class="feedback"></div>
+        <button class="btn-next" id="next2" onclick="showWin()">Finish! 🏆</button>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 2.5em; color: var(--jungle-green);">ZOO-PER! 🏆</h2>
+        <p style="font-size: 1.2em;">You completed all levels of the Safari!</p>
+        <button class="btn-restart" onclick="initGame()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let matchesFound = 0;
+    let selectedLeft = null;
+    let selectedRight = null;
+    let isChecking = false;
+    let currentGapIndex = 1;
+
+    // --- LEVEL 1 DATA ---
+    const gameData = [
+        { id: 1, left: "comedy", right: "A funny story that makes people laugh." },
+        { id: 2, left: "adventure", right: "An exciting story about a hero who goes on an unusual journey and does new and dangerous things." },
+        { id: 3, left: "science fiction", right: "A story about events in the future or in space, with strange creatures and robots." },
+        { id: 4, left: "drama", right: "A serious and emotional play or story, written for the theatre, TV or radio." },
+        { id: 5, left: "mystery", right: "A story about a crime or a strange event that is difficult to explain." },
+        { id: 6, left: "humorous story", right: "A funny story with a happy ending." },
+        { id: 7, left: "biography", right: "The story of a person's life, written by another person." }
+    ];
+
+    // --- LEVEL 2 DATA ---
+    const level2Answers = {
+        g1: "mystery",
+        g2: "science fiction",
+        g3: "comedies",
+        g4: "biographies"
+    };
+    const level2Pool = ["mystery", "science fiction", "comedies", "biographies", "adventure", "drama"];
+
+    // --- SALUTE EFFECT ---
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 20; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 800;
+            const y = Math.random() * 500;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 250 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 250 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // --- GAME LOGIC ---
+    function initGame() {
+        score = 0;
+        matchesFound = 0;
+        currentGapIndex = 1;
+        document.getElementById('score').innerText = score;
+        document.getElementById('win-screen').classList.remove('active');
+        document.getElementById('level2').classList.remove('active');
+        document.getElementById('level1').classList.add('active');
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('feedback2').innerText = "";
+        
+        // Reset Level 2 UI
+        document.getElementById('next2').style.display = 'none';
+        document.querySelectorAll('.gap').forEach(gap => {
+            gap.classList.remove('filled');
+            gap.innerText = '[' + gap.id.charAt(1) + ']';
+        });
+
+        renderCards();
+    }
+
+    function renderCards() {
+        const leftCol = document.getElementById('left-col');
+        const rightCol = document.getElementById('right-col');
+        
+        // Clear existing cards
+        leftCol.querySelectorAll('.card').forEach(c => c.remove());
+        rightCol.querySelectorAll('.card').forEach(c => c.remove());
+
+        // Create Left Cards (Genres)
+        gameData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `card genre-card`;
+            card.innerText = item.left;
+            card.dataset.id = item.id;
+            card.onclick = () => handleCardClick(card, 'left');
+            leftCol.appendChild(card);
+        });
+
+        // Shuffle & Create Right Cards (Definitions)
+        const shuffledRight = [...gameData].sort(() => Math.random() - 0.5);
+        shuffledRight.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `card definition-card`;
+            card.innerText = item.right;
+            card.dataset.id = item.id;
+            card.onclick = () => handleCardClick(card, 'right');
+            rightCol.appendChild(card);
+        });
+    }
+
+    function handleCardClick(card, side) {
+        if (isChecking || card.classList.contains('matched')) return;
+        
+        if (card.classList.contains('selected')) {
+            card.classList.remove('selected');
+            if (side === 'left') selectedLeft = null;
+            else selectedRight = null;
+            return;
+        }
+
+        if (side === 'left') {
+            if (selectedLeft) selectedLeft.classList.remove('selected');
+            selectedLeft = card;
+        } else {
+            if (selectedRight) selectedRight.classList.remove('selected');
+            selectedRight = card;
+        }
+        
+        card.classList.add('selected');
+
+        if (selectedLeft && selectedRight) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        isChecking = true;
+        const leftId = selectedLeft.dataset.id;
+        const rightId = selectedRight.dataset.id;
+        const feed = document.getElementById('feedback');
+
+        if (leftId === rightId) {
+            score++;
+            matchesFound++;
+            document.getElementById('score').innerText = score;
+            
+            feed.innerText = "Match found! ✅";
+            feed.style.color = "#2e7d32";
+            
+            selectedLeft.classList.remove('selected');
+            selectedRight.classList.remove('selected');
+            selectedLeft.classList.add('matched');
+            selectedRight.classList.add('matched');
+            
+            triggerSalute();
+            
+            selectedLeft = null;
+            selectedRight = null;
+            isChecking = false;
+
+            if (matchesFound === gameData.length) {
+                setTimeout(nextLevel, 1200);
+            }
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            
+            const lCard = selectedLeft;
+            const rCard = selectedRight;
+            
+            lCard.classList.add('wrong-match');
+            rCard.classList.add('wrong-match');
+            
+            setTimeout(() => {
+                lCard.classList.remove('wrong-match', 'selected');
+                rCard.classList.remove('wrong-match', 'selected');
+                selectedLeft = null;
+                selectedRight = null;
+                isChecking = false;
+                feed.innerText = "";
+            }, 800);
+        }
+    }
+
+    function nextLevel() {
+        document.getElementById('level1').classList.remove('active');
+        document.getElementById('level2').classList.add('active');
+        initLevel2();
+    }
+
+    function initLevel2() {
+        currentGapIndex = 1;
+        const poolContainer = document.getElementById('pool2');
+        poolContainer.innerHTML = '';
+        
+        // Shuffle pool
+        const shuffledPool = [...level2Pool].sort(() => Math.random() - 0.5);
+        
+        shuffledPool.forEach(word => {
+            const chip = document.createElement('div');
+            chip.className = 'word-chip';
+            chip.innerText = word;
+            chip.onclick = () => handleLevel2Click(word, chip);
+            poolContainer.appendChild(chip);
+        });
+    }
+
+    function handleLevel2Click(word, chip) {
+        const currentGapId = 'g' + currentGapIndex;
+        const correctAnswer = level2Answers[currentGapId];
+
+        if (word === correctAnswer) {
+            const gapElement = document.getElementById(currentGapId);
+            gapElement.innerText = word;
+            gapElement.classList.add('filled');
+            
+            chip.remove();
+            
+            score++;
+            document.getElementById('score').innerText = score;
+            currentGapIndex++;
+            triggerSalute();
+
+            if (currentGapIndex > 4) {
+                document.getElementById('feedback2').innerText = "Perfect! Level 2 Complete! 🎉";
+                document.getElementById('feedback2').style.color = "#2e7d32";
+                document.getElementById('next2').style.display = 'block';
+            }
+        } else {
+            chip.classList.add('shake');
+            document.getElementById('feedback2').innerText = "Oops! Try again.";
+            document.getElementById('feedback2').style.color = "#c62828";
+            
+            setTimeout(() => {
+                chip.classList.remove('shake');
+                document.getElementById('feedback2').innerText = "";
+            }, 500);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('level2').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Start the game
+    initGame();
+</script>
+</body>
+</html>

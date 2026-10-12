@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agatha Christie Reading Quiz: 2 Levels</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- READING PASSAGE --- */
+        .reading-passage {
+            background: #f0f7ff;
+            border-left: 5px solid var(--quiz-light-purple);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        .reading-passage h3 {
+            margin-top: 0;
+            color: var(--quiz-light-purple);
+            font-size: 1.1rem;
+        }
+        .reading-passage p {
+            margin-bottom: 0;
+        }
+        .reading-passage b {
+            color: #d35400;
+        }
+
+        /* --- QUIZ SECTION --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 70%;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Question Display */
+        .text-display {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #2c3e50;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Answer Options */
+        .options-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .option-btn {
+            padding: 15px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 3px solid #bdc3c7;
+            background: #fafafa;
+            color: #333;
+            text-align: left;
+            width: 100%;
+        }
+
+        .option-btn:hover {
+            background: #e6f7ff;
+            border-color: #3498db;
+            transform: scale(1.02);
+        }
+
+        .option-btn.correct {
+            background: #e8f8f0;
+            border-color: var(--quiz-green);
+            color: var(--quiz-green);
+        }
+
+        .option-btn.wrong {
+            background: #fff0f0;
+            border-color: var(--quiz-red);
+            color: var(--quiz-red);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+            transform: none;
+        }
+
+        /* Buttons & Feedback */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #bdc3c7;
+        }
+        .btn-reset:hover { background: #95a5a6; }
+
+        .btn-next {
+            background: var(--quiz-green);
+            display: none;
+        }
+        .btn-next:hover { background: #20bf6b; }
+
+        #feedback {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.05rem;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shake 0.4s; border-color: var(--quiz-red) !important; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    
+    <!-- READING PASSAGE SECTION -->
+    <div class="reading-passage">
+        <h3>📖 Read the text:</h3>
+        <p>
+            Agatha Christie was born in Devon, England, in 1890. She is the world's best-known mystery writer. She created two famous detectives: <b>Hercule Poirot</b>, a Belgian detective with neat appearance and an obsession with order, and <b>Miss Marple</b>, an ordinary old lady who loves knitting. Hercule Poirot uses psychology in his investigations. Miss Marple is nothing like a typical detective — at first glance she looks like a quiet grandmother. But she can solve the hardest mysteries and puts many criminals behind bars.
+        </p>
+    </div>
+
+    <!-- LEVEL 1: True/False -->
+    <div id="level1" class="level active">
+        <div class="header">
+            <div class="progress-container"><div id="progress-bar"></div></div>
+            <div class="category-tag" id="category">Level 1: True/False</div>
+        </div>
+
+        <div class="instruction">Read the sentence and choose True or False:</div>
+        
+        <div class="text-display" id="question-text">
+            Loading...
+        </div>
+        
+        <div class="options-area" id="options-area">
+            <button class="option-btn" onclick="checkAnswer(true)">True ✅</button>
+            <button class="option-btn" onclick="checkAnswer(false)">False ❌</button>
+        </div>
+
+        <div id="feedback"></div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-reset" onclick="resetQuestion()">Reset</button>
+            <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡️</button>
+        </div>
+    </div>
+
+    <!-- LEVEL 2: Multiple Choice -->
+    <div id="level2" class="level hidden">
+        <div class="header">
+            <div class="progress-container"><div id="progress-bar2"></div></div>
+            <div class="category-tag" id="category2">Level 2: Multiple Choice</div>
+        </div>
+
+        <div class="instruction">Choose the correct answer:</div>
+        
+        <div class="text-display" id="question-text2">
+            Loading...
+        </div>
+        
+        <div class="options-area" id="options-area2"></div>
+
+        <div id="feedback2"></div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-next" id="next-btn2" onclick="handleNext2()">Next Question ➡️</button>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen" class="final-screen hidden">
+        <h1 style="font-size: 3rem;">🏆</h1>
+        <h2>All Levels Complete!</h2>
+        <p style="font-size: 1.2rem;">You scored: <strong><span id="final-score">0</span> / <span id="final-total">0</span></strong></p>
+        <button class="btn btn-reset" style="display:inline-block; margin-top:20px;" onclick="location.reload()">TRY AGAIN 🔄</button>
+    </div>
+
+</div>
+
+<script>
+    // --- LEVEL 1 DATA: True/False ---
+    const level1Questions = [
+        {
+            text: "Agatha Christie was born in England.",
+            correct: true,
+            explanation: "True. The text says she was born in Devon, England, in 1890."
+        },
+        {
+            text: "She wrote science fiction stories.",
+            correct: false,
+            explanation: "False. The text says she is the world's best-known mystery writer."
+        },
+        {
+            text: "Hercule Poirot is a Belgian detective.",
+            correct: true,
+            explanation: "True. The text describes him as 'a Belgian detective'."
+        },
+        {
+            text: "Poirot does not care about order.",
+            correct: false,
+            explanation: "False. The text says he has 'an obsession with order'."
+        },
+        {
+            text: "Miss Marple loves knitting.",
+            correct: true,
+            explanation: "True. The text says she is 'an ordinary old lady who loves knitting'."
+        },
+        {
+            text: "Miss Marple looks like a typical detective.",
+            correct: false,
+            explanation: "False. The text says she is 'nothing like a typical detective — at first glance she looks like a quiet grandmother'."
+        }
+    ];
+
+    // --- LEVEL 2 DATA: Multiple Choice ---
+    const level2Questions = [
+        {
+            text: "Where was Agatha Christie born?",
+            options: ["London", "Devon", "Manchester"],
+            correct: 1,
+            explanation: "The text says she was born in Devon, England."
+        },
+        {
+            text: "What is Agatha Christie famous for?",
+            options: ["Science fiction", "Mystery writing", "Romance novels"],
+            correct: 1,
+            explanation: "The text says she is the world's best-known mystery writer."
+        },
+        {
+            text: "What is Hercule Poirot's nationality?",
+            options: ["French", "Belgian", "English"],
+            correct: 1,
+            explanation: "The text says he is a Belgian detective."
+        },
+        {
+            text: "What does Miss Marple love doing?",
+            options: ["Knitting", "Cooking", "Gardening"],
+            correct: 0,
+            explanation: "The text says she is an ordinary old lady who loves knitting."
+        },
+        {
+            text: "What does Hercule Poirot use in his investigations?",
+            options: ["Magic", "Psychology", "Technology"],
+            correct: 1,
+            explanation: "The text says Hercule Poirot uses psychology in his investigations."
+        },
+        {
+            text: "What happens to criminals in Agatha Christie's stories?",
+            options: ["They escape", "They are forgiven", "They are put behind bars"],
+            correct: 2,
+            explanation: "The text says Miss Marple puts many criminals behind bars."
+        }
+    ];
+
+    let currentQ1 = 0;
+    let score1 = 0;
+    let isAnswered1 = false;
+    let currentQ2 = 0;
+    let score2 = 0;
+    let isAnswered2 = false;
+
+    // --- LEVEL 1 LOGIC ---
+    function loadQuestion1() {
+        const q = level1Questions[currentQ1];
+        document.getElementById('progress-bar').style.width = (currentQ1 / level1Questions.length) * 100 + "%";
+        document.getElementById('category').innerText = "Level 1: Q " + (currentQ1 + 1) + " / " + level1Questions.length;
+        
+        document.getElementById('question-text').innerText = q.text;
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').style.display = 'none';
+        isAnswered1 = false;
+
+        const btns = document.querySelectorAll('#options-area .option-btn');
+        btns.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('correct', 'wrong');
+        });
+    }
+
+    function checkAnswer(userAnswer) {
+        if (isAnswered1) return;
+        isAnswered1 = true;
+
+        const q = level1Questions[currentQ1];
+        const feedback = document.getElementById('feedback');
+        const btns = document.querySelectorAll('#options-area .option-btn');
+        const trueBtn = btns[0];
+        const falseBtn = btns[1];
+
+        btns.forEach(btn => btn.disabled = true);
+
+        if (userAnswer === q.correct) {
+            score1++;
+            feedback.innerHTML = "<span style='color:var(--quiz-green)'>Correct! ✅</span>";
+            feedback.style.color = "var(--quiz-green)";
+            if (userAnswer) trueBtn.classList.add('correct');
+            else falseBtn.classList.add('correct');
+        } else {
+            feedback.innerHTML = "<span style='color:var(--quiz-red)'>Oops! " + q.explanation + "</span>";
+            feedback.style.color = "var(--quiz-red)";
+            if (q.correct) {
+                trueBtn.classList.add('correct');
+                falseBtn.classList.add('wrong');
+            } else {
+                falseBtn.classList.add('correct');
+                trueBtn.classList.add('wrong');
+            }
+        }
+
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function resetQuestion() {
+        if (isAnswered1) return;
+        loadQuestion1();
+    }
+
+    function handleNext() {
+        currentQ1++;
+        if (currentQ1 < level1Questions.length) {
+            loadQuestion1();
+        } else {
+            goToLevel2();
+        }
+    }
+
+    // --- LEVEL 2 LOGIC ---
+    function goToLevel2() {
+        document.getElementById('level1').classList.add('hidden');
+        document.getElementById('level2').classList.remove('hidden');
+        loadQuestion2();
+    }
+
+    function loadQuestion2() {
+        if (currentQ2 >= level2Questions.length) {
+            showFinalScreen();
+            return;
+        }
+        const q = level2Questions[currentQ2];
+        document.getElementById('progress-bar2').style.width = (currentQ2 / level2Questions.length) * 100 + "%";
+        document.getElementById('category2').innerText = "Level 2: Q " + (currentQ2 + 1) + " / " + level2Questions.length;
+        
+        document.getElementById('question-text2').innerText = q.text;
+        document.getElementById('feedback2').innerText = '';
+        document.getElementById('next-btn2').style.display = 'none';
+        isAnswered2 = false;
+
+        const optionsContainer = document.getElementById('options-area2');
+        optionsContainer.innerHTML = '';
+        
+        q.options.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option;
+            btn.onclick = () => checkAnswer2(index, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer2(selectedIndex, btn) {
+        if (isAnswered2) return;
+        isAnswered2 = true;
+
+        const q = level2Questions[currentQ2];
+        const feedback = document.getElementById('feedback2');
+        const allBtns = document.querySelectorAll('#options-area2 .option-btn');
+
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selectedIndex === q.correct) {
+            score2++;
+            btn.classList.add('correct');
+            feedback.innerHTML = "<span style='color:var(--quiz-green)'>Correct! ✅</span>";
+            feedback.style.color = "var(--quiz-green)";
+        } else {
+            btn.classList.add('wrong');
+            allBtns[q.correct].classList.add('correct');
+            feedback.innerHTML = "<span style='color:var(--quiz-red)'>Oops! " + q.explanation + "</span>";
+            feedback.style.color = "var(--quiz-red)";
+        }
+
+        document.getElementById('next-btn2').style.display = 'block';
+    }
+
+    function handleNext2() {
+        currentQ2++;
+        if (currentQ2 < level2Questions.length) {
+            loadQuestion2();
+        } else {
+            showFinalScreen();
+        }
+    }
+
+    // --- FINAL SCREEN ---
+    function showFinalScreen() {
+        document.getElementById('level2').classList.add('hidden');
+        document.getElementById('final-screen').classList.remove('hidden');
+        
+        const total = level1Questions.length + level2Questions.length;
+        const finalScore = score1 + score2;
+        document.getElementById('final-score').innerText = finalScore;
+        document.getElementById('final-total').innerText = total;
+    }
+
+    // --- START ---
+    loadQuestion1();
+</script>
+
+</body>
+</html>
