@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Months & Days — Interactive Worksheet</title>
+<style>
+  :root {
+    --primary: #ff6b35;
+    --secondary: #f7b801;
+    --accent: #0a2540;
+    --correct: #1e8e3e;
+    --wrong: #d93025;
+    --bg: #fff5e6;
+    --card: #ffffff;
+    --border: #ffd5a8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Raleway', 'Segoe UI', Tahoma, sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,107,53,0.15) 0 3px, transparent 4px),
+      radial-gradient(circle at 80% 30%, rgba(247,184,1,0.2) 0 4px, transparent 5px),
+      radial-gradient(circle at 40% 80%, rgba(10,37,64,0.08) 0 3px, transparent 4px),
+      var(--bg);
+    background-size: 200px 200px, 250px 250px, 180px 180px;
+    color: var(--accent);
+    padding: 25px 15px 60px;
+    font-size: 20px;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 1000px; margin: 0 auto; }
+
+  h1 {
+    text-align: center;
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--primary);
+    text-shadow: 3px 3px 0 var(--secondary), 6px 6px 0 rgba(10,37,64,0.15);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .sub {
+    text-align: center;
+    font-size: 18px;
+    color: #7a5b3a;
+    margin-bottom: 30px;
+    font-style: italic;
+  }
+
+  .block {
+    background: var(--card);
+    border: 4px solid var(--accent);
+    border-radius: 22px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    box-shadow: 10px 10px 0 var(--secondary);
+    position: relative;
+  }
+
+  .block h2 {
+    font-size: 30px;
+    color: var(--primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 3px dashed var(--border);
+    padding-bottom: 12px;
+  }
+  .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 26px;
+    box-shadow: 3px 3px 0 var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ============ CROSSWORD CLUE GRID ============ */
+  .clue-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .clue-col h3 {
+    font-size: 22px;
+    color: var(--accent);
+    background: var(--secondary);
+    padding: 8px 14px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 14px;
+    letter-spacing: 1px;
+  }
+  .clue {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    background: #fffaf2;
+    flex-wrap: wrap;
+  }
+  .clue-num {
+    font-weight: 900;
+    color: var(--primary);
+    font-size: 22px;
+    min-width: 30px;
+  }
+  .clue-text {
+    flex: 1;
+    min-width: 160px;
+    font-size: 17px;
+    color: #4a3520;
+  }
+  .clue select {
+    padding: 8px 12px;
+    font-size: 17px;
+    font-weight: 700;
+    border: 3px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--accent);
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s;
+    min-width: 150px;
+    font-family: inherit;
+  }
+  .clue select:focus { border-color: var(--primary); }
+  .clue select.correct {
+    border-color: var(--correct);
+    background: #e6f5ea;
+    color: var(--correct);
+  }
+  .clue select.wrong {
+    border-color: var(--wrong);
+    background: #fdecea;
+    color: var(--wrong);
+    animation: shake 0.4s;
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  /* ============ DAYS OF WEEK ============ */
+  .days-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #fffaf2;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .day-label {
+    color: var(--accent);
+    padding: 6px 12px;
+    background: var(--secondary);
+    border-radius: 8px;
+    font-weight: 900;
+  }
+  .day-select {
+    padding: 8px 14px;
+    font-size: 18px;
+    font-weight: 700;
+    border: 3px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--accent);
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    transition: 0.2s;
+    min-width: 150px;
+  }
+  .day-select:focus { border-color: var(--primary); }
+  .day-select.correct {
+    border-color: var(--correct);
+    background: #e6f5ea;
+    color: var(--correct);
+  }
+  .day-select.wrong {
+    border-color: var(--wrong);
+    background: #fdecea;
+    color: var(--wrong);
+    animation: shake 0.4s;
+  }
+
+  /* ============ BUTTONS & FEEDBACK ============ */
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .btn {
+    padding: 16px 42px;
+    font-size: 20px;
+    font-weight: 900;
+    border: 4px solid var(--accent);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.15s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: inherit;
+    box-shadow: 5px 5px 0 var(--accent);
+  }
+  .btn-check {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-check:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--accent); }
+  .btn-check:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--accent); }
+  .btn-reset {
+    background: var(--secondary);
+    color: var(--accent);
+  }
+  .btn-reset:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 var(--accent); }
+  .btn-reset:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--accent); }
+
+  .result-banner {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 900;
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 14px;
+    min-height: 30px;
+    display: none;
+  }
+  .result-banner.show { display: block; }
+  .result-banner.good {
+    background: #e6f5ea;
+    color: var(--correct);
+    border: 3px solid var(--correct);
+  }
+  .result-banner.mid {
+    background: #fff8e1;
+    color: #a67c00;
+    border: 3px solid #f0c040;
+  }
+  .result-banner.bad {
+    background: #fdecea;
+    color: var(--wrong);
+    border: 3px solid var(--wrong);
+  }
+
+  /* ============ ANSWER KEY ============ */
+  .answer-key {
+    display: none;
+    margin-top: 20px;
+    background: #f0f9ff;
+    border: 3px dashed #4a90e2;
+    border-radius: 14px;
+    padding: 18px 24px;
+  }
+  .answer-key.show { display: block; animation: fadeIn 0.5s; }
+  .answer-key h4 {
+    color: #4a90e2;
+    font-size: 20px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .answer-key p {
+    font-size: 18px;
+    margin: 4px 0;
+    color: #0a2540;
+  }
+  .answer-key .ak-item {
+    display: inline-block;
+    background: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 2px solid #bcd8f2;
+    margin: 3px 5px 3px 0;
+    font-weight: 700;
+    color: var(--correct);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 700px) {
+    body { font-size: 17px; }
+    h1 { font-size: 30px; }
+    .block { padding: 20px; box-shadow: 6px 6px 0 var(--secondary); }
+    .block h2 { font-size: 22px; }
+    .clue-grid { grid-template-columns: 1fr; }
+    .clue select { min-width: 130px; }
+    .btn { padding: 12px 24px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Months & Days</h1>
+  <div class="sub">Interactive Worksheet · Choose the correct answer</div>
+
+  <!-- ============ EXERCISE 1: CROSSWORD ============ -->
+  <div class="block">
+    <h2><span class="num">1</span> Do the crossword.</h2>
+
+    <div class="clue-grid">
+      <!-- ACROSS -->
+      <div class="clue-col">
+        <h3>➡️ Across</h3>
+
+        <div class="clue">
+          <span class="clue-num">6</span>
+          <span class="clue-text">The fourth month of the year.</span>
+          <select data-answer="April" data-id="6a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">7</span>
+          <span class="clue-text">The seventh month of the year.</span>
+          <select data-answer="July" data-id="7a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">9</span>
+          <span class="clue-text">The ninth month of the year.</span>
+          <select data-answer="September" data-id="9a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">10</span>
+          <span class="clue-text">The sixth month of the year.</span>
+          <select data-answer="June" data-id="10a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">11</span>
+          <span class="clue-text">The tenth month of the year.</span>
+          <select data-answer="October" data-id="11a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">12</span>
+          <span class="clue-text">The third month of the year.</span>
+          <select data-answer="March" data-id="12a">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- DOWN -->
+      <div class="clue-col">
+        <h3>⬇️ Down</h3>
+
+        <div class="clue">
+          <span class="clue-num">1</span>
+          <span class="clue-text">The second month of the year.</span>
+          <select data-answer="February" data-id="1d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">2</span>
+          <span class="clue-text">The first month of the year.</span>
+          <select data-answer="January" data-id="2d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">3</span>
+          <span class="clue-text">The eleventh month of the year.</span>
+          <select data-answer="November" data-id="3d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">4</span>
+          <span class="clue-text">The fifth month of the year.</span>
+          <select data-answer="May" data-id="4d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">5</span>
+          <span class="clue-text">The eighth month of the year.</span>
+          <select data-answer="August" data-id="5d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+
+        <div class="clue">
+          <span class="clue-num">8</span>
+          <span class="clue-text">The twelfth month of the year.</span>
+          <select data-answer="December" data-id="8d">
+            <option value="">— choose —</option>
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ EXERCISE 2: DAYS OF THE WEEK ============ -->
+  <div class="block">
+    <h2><span class="num">2</span> Fill in the missing days of the week.</h2>
+
+    <div class="days-row">
+      <span class="day-label">Monday,</span>
+      <select class="day-select" data-answer="Tuesday" data-id="d1">
+        <option value="">— choose —</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+      <span>,</span>
+      <select class="day-select" data-answer="Wednesday" data-id="d2">
+        <option value="">— choose —</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+      <span>,</span>
+    </div>
+
+    <div class="days-row" style="margin-top:14px;">
+      <span class="day-label">Thursday,</span>
+      <select class="day-select" data-answer="Friday" data-id="d3">
+        <option value="">— choose —</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+      <span>,</span>
+      <select class="day-select" data-answer="Saturday" data-id="d4">
+        <option value="">— choose —</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+      <span>,</span>
+      <select class="day-select" data-answer="Sunday" data-id="d5">
+        <option value="">— choose —</option>
+        <option value="Monday">Monday</option>
+        <option value="Tuesday">Tuesday</option>
+        <option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option>
+        <option value="Friday">Friday</option>
+        <option value="Saturday">Saturday</option>
+        <option value="Sunday">Sunday</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ============ BUTTONS ============ -->
+  <div class="actions">
+    <button class="btn btn-check" onclick="checkAll()">Check Answers</button>
+    <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+  </div>
+
+  <!-- ============ RESULT BANNER ============ -->
+  <div class="result-banner" id="banner"></div>
+
+  <!-- ============ ANSWER KEY ============ -->
+  <div class="answer-key" id="answerKey">
+    <h4>✅ ANSWER KEY</h4>
+
+    <p><b>Across:</b></p>
+    <p>
+      <span class="ak-item">6 — April</span>
+      <span class="ak-item">7 — July</span>
+      <span class="ak-item">9 — September</span>
+      <span class="ak-item">10 — June</span>
+      <span class="ak-item">11 — October</span>
+      <span class="ak-item">12 — March</span>
+    </p>
+
+    <p style="margin-top:12px;"><b>Down:</b></p>
+    <p>
+      <span class="ak-item">1 — February</span>
+      <span class="ak-item">2 — January</span>
+      <span class="ak-item">3 — November</span>
+      <span class="ak-item">4 — May</span>
+      <span class="ak-item">5 — August</span>
+      <span class="ak-item">8 — December</span>
+    </p>
+
+    <p style="margin-top:12px;"><b>Days of the week:</b></p>
+    <p>
+      <span class="ak-item">Monday</span>
+      <span class="ak-item">Tuesday</span>
+      <span class="ak-item">Wednesday</span>
+      <span class="ak-item">Thursday</span>
+      <span class="ak-item">Friday</span>
+      <span class="ak-item">Saturday</span>
+      <span class="ak-item">Sunday</span>
+    </p>
+  </div>
+
+</div>
+
+<script>
+  const allSelects = document.querySelectorAll('select[data-answer]');
+  const banner = document.getElementById('banner');
+  const answerKey = document.getElementById('answerKey');
+
+  function checkAll() {
+    let correct = 0;
+    let answered = 0;
+
+    allSelects.forEach(sel => {
+      sel.classList.remove('correct', 'wrong');
+      const userAns = sel.value;
+      const correctAns = sel.dataset.answer;
+
+      if (userAns !== '') answered++;
+
+      if (userAns === correctAns) {
+        sel.classList.add('correct');
+        correct++;
+      } else {
+        sel.classList.add('wrong');
+      }
+    });
+
+    const total = allSelects.length;
+    const pct = Math.round((correct / total) * 100);
+
+    banner.classList.add('show');
+    if (correct === total) {
+      banner.className = 'result-banner show good';
+      banner.textContent = `🏆 Perfect! ${correct} / ${total} — You know all the months and days!`;
+    } else if (pct >= 50) {
+      banner.className = 'result-banner show mid';
+      banner.textContent = `💪 Good job! ${correct} / ${total} — Check the red ones and try again.`;
+    } else {
+      banner.className = 'result-banner show bad';
+      banner.textContent = `📚 ${correct} / ${total} — Don't worry, look at the answer key below.`;
+    }
+
+    answerKey.classList.add('show');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function resetAll() {
+    allSelects.forEach(sel => {
+      sel.value = '';
+      sel.classList.remove('correct', 'wrong');
+    });
+    banner.classList.remove('show');
+    banner.className = 'result-banner';
+    answerKey.classList.remove('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Auto-clear red/green marking when the user changes an answer
+  allSelects.forEach(sel => {
+    sel.addEventListener('change', () => {
+      sel.classList.remove('correct', 'wrong');
+    });
+  });
+</script>
+
+</body>
+</html>
