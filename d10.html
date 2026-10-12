@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Quest: Unscramble the Letters</title>
+    <style>
+        :root { --main-bg: #1a1a2e; --card-bg: #ffffff; --gold: #f1c40f; --text: #2c3e50; --correct: #2ecc71; --wrong: #e74c3c; }
+        body { font-family: 'Arial Rounded MT Bold', 'Helvetica', sans-serif; background: var(--main-bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .game-ui { background: #16213e; color: white; padding: 15px 30px; border-radius: 50px; border: 3px solid var(--gold); margin-bottom: 20px; font-size: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .card { background: var(--card-bg); width: 100%; max-width: 600px; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 10px 0 #bdc3c7; }
+        .image-container { width: 100%; height: 100px; background: #f0f4f8; border-radius: 15px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; }
+        
+        .sentence { font-size: 22px; font-weight: bold; margin: 15px 0; min-height: 60px; line-height: 1.4; }
+        
+        .scrambled-box { 
+            background: #fff9c4; 
+            border: 2px dashed #f1c40f; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin: 15px 0; 
+            font-size: 28px; 
+            font-weight: bold; 
+            letter-spacing: 5px; 
+            color: #d35400;
+            text-transform: uppercase;
+        }
+        
+        .hint-text { font-size: 14px; color: #7f8c8d; margin-bottom: 15px; font-style: italic; }
+        
+        .input-area { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .input-box { padding: 15px; font-size: 20px; border: 2px solid #bdc3c7; border-radius: 12px; width: 60%; outline: none; text-align: center; text-transform: lowercase; }
+        .input-box:focus { border-color: var(--gold); }
+        
+        .btn { padding: 15px 25px; font-size: 18px; border: none; border-radius: 12px; cursor: pointer; color: white; transition: 0.2s; font-weight: bold; }
+        .btn-check { background: #3498db; box-shadow: 0 5px 0 #2980b9; }
+        .btn-check:active { transform: translateY(4px); box-shadow: none; }
+        .btn-next { background: #e67e22; box-shadow: 0 5px 0 #d35400; display: none; }
+        .btn-next:active { transform: translateY(4px); box-shadow: none; }
+        
+        .feedback { margin-top: 15px; font-size: 20px; font-weight: bold; min-height: 30px; }
+        .feedback.correct { color: var(--correct); }
+        .feedback.wrong { color: var(--wrong); }
+        
+        .hidden { display: none; }
+        .win-screen { font-size: 30px; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="game-ui">
+    💎 <span id="score">0</span> | Квест: <span id="current">1</span>/9
+</div>
+
+<div class="card" id="game-card">
+    <div class="image-container" id="img-box">🏠</div>
+    <div class="sentence" id="task-text">Загрузка...</div>
+    
+    <!-- Блок со перемешанными буквами -->
+    <div class="scrambled-box" id="scrambled-letters">...</div>
+    
+    <div class="hint-text" id="hint-text"></div>
+    
+    <div class="input-area">
+        <input type="text" id="user-answer" class="input-box" placeholder="Введите слово..." autocomplete="off">
+        <button class="btn btn-check" id="check-btn" onclick="checkAnswer()">Проверить</button>
+        <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">Далее ➡️</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+</div>
+
+<div id="finish" class="hidden">
+    <div class="card">
+        <h1 class="win-screen">🏆 ПОБЕДА!</h1>
+        <p>Ты разгадал все слова!</p>
+        <div style="font-size: 80px;">🧩🔠🎉</div>
+        <button class="btn btn-check" onclick="location.reload()" style="margin-top:20px;">ИГРАТЬ СНОВА</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let step = 0;
+
+    // Данные из фото (Упражнение 1 и 3) — последний вопрос удалён
+    const data = [
+        { 
+            s: "My brother f___ Max, our cat.", 
+            a: "feeds", 
+            emoji: "🐈", 
+            hint: "Present Simple, 3-е лицо ед.ч. (он кормит)" 
+        },
+        { 
+            s: "My dad e___ the dishwasher every morning.", 
+            a: "empties", 
+            emoji: "🍽️", 
+            hint: "Present Simple, 3-е лицо ед.ч. (он опустошает)" 
+        },
+        { 
+            s: "My mum c___ the kitchen table.", 
+            a: "cleans", 
+            emoji: "🧹", 
+            hint: "Present Simple, 3-е лицо ед.ч. (она убирает)" 
+        },
+        { 
+            s: "I always p___ my clothes.", 
+            a: "put away", 
+            emoji: "👕", 
+            hint: "Фразовый глагол (я убираю)" 
+        },
+        { 
+            s: "Hi Tina. What's ___?", 
+            a: "up", 
+            emoji: "📱", 
+            hint: "Фразовый глагол (как дела?)" 
+        },
+        { 
+            s: "Can you help me ___ my Maths homework?", 
+            a: "with", 
+            emoji: "📐", 
+            hint: "Предлог (помочь с чем-то)" 
+        },
+        { 
+            s: "Not ___ . She's not at home.", 
+            a: "right", 
+            emoji: "🙅", 
+            hint: "Прилагательное (не сейчас / не хорошо)" 
+        },
+        { 
+            s: "Yeah, ___ .", 
+            a: "really", 
+            emoji: "👍", 
+            hint: "Наречие (да, действительно)" 
+        },
+        { 
+            s: "Can you give me a ___ with the dishes?", 
+            a: "hand", 
+            emoji: "🤝", 
+            hint: "Существительное (помочь)" 
+        }
+    ];
+
+    // Функция для перемешивания букв в слове
+    function scrambleWord(str) {
+        const words = str.split(' ');
+        return words.map(word => {
+            if (word.length < 2) return word;
+            const letters = word.split('');
+            // Перемешивание Фишера-Йетса
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            let scrambled = letters.join('');
+            // Если случайно получилось исходное слово, меняем две буквы местами
+            if (scrambled === word && word.length > 1) {
+                scrambled = word.substring(1, 2) + word.substring(0, 1) + word.substring(2);
+            }
+            return scrambled;
+        }).join(' ');
+    }
+
+    function update() {
+        if (step < data.length) {
+            document.getElementById('current').innerText = step + 1;
+            document.getElementById('task-text').innerText = data[step].s;
+            document.getElementById('hint-text').innerText = "💡 " + data[step].hint;
+            document.getElementById('img-box').innerText = data[step].emoji;
+            
+            // Генерация и отображение перемешанных букв
+            const scrambled = scrambleWord(data[step].a);
+            document.getElementById('scrambled-letters').innerText = scrambled.toUpperCase();
+            
+            // Сброс интерфейса
+            const input = document.getElementById('user-answer');
+            input.value = '';
+            input.disabled = false;
+            input.style.borderColor = '#bdc3c7';
+            
+            document.getElementById('check-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('feedback').innerText = '';
+            
+            input.focus();
+        } else {
+            document.getElementById('game-card').classList.add('hidden');
+            document.getElementById('finish').classList.remove('hidden');
+        }
+    }
+
+    function checkAnswer() {
+        const input = document.getElementById('user-answer');
+        const userAnswer = input.value.trim().toLowerCase();
+        const correctAnswer = data[step].a.toLowerCase();
+        const feedback = document.getElementById('feedback');
+
+        // Проверка ответа
+        const isCorrect = userAnswer === correctAnswer;
+
+        if (isCorrect) {
+            score += 10;
+            document.getElementById('score').innerText = score;
+            feedback.innerText = "✅ Правильно!";
+            feedback.className = "feedback correct";
+            
+            // Блокировка ввода и показ кнопки "Далее"
+            input.disabled = true;
+            input.style.borderColor = '#2ecc71';
+            document.getElementById('check-btn').style.display = 'none';
+            document.getElementById('next-btn').style.display = 'inline-block';
+        } else {
+            feedback.innerText = "❌ Попробуй еще раз!";
+            feedback.className = "feedback wrong";
+            input.style.borderColor = '#e74c3c';
+            input.focus();
+        }
+    }
+
+    function nextQuestion() {
+        step++;
+        update();
+    }
+
+    // Обработка нажатия Enter
+    document.getElementById('user-answer').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            if (document.getElementById('next-btn').style.display === 'inline-block') {
+                nextQuestion();
+            } else {
+                checkAnswer();
+            }
+        }
+    });
+
+    update();
+</script>
+
+</body>
+</html>
