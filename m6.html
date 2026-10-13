@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐶 My Dog Rex — Easy Read & Answer</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+        font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+        background: linear-gradient(135deg, #e8f5ff 0%, #d4ecff 100%);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px 12px 50px;
+    }
+
+    .game-card {
+        background: white;
+        padding: 26px 22px;
+        border-radius: 30px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        width: 100%;
+        max-width: 700px;
+        border: 6px solid #74b9ff;
+        position: relative;
+    }
+
+    h1 {
+        text-align: center;
+        color: #0984e3;
+        font-size: 26px;
+        margin-bottom: 6px;
+        letter-spacing: 1px;
+    }
+    .subtitle {
+        text-align: center;
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 18px;
+        font-style: italic;
+    }
+    .mascot {
+        text-align: center;
+        font-size: 42px;
+        margin-bottom: 6px;
+        letter-spacing: 8px;
+    }
+
+    /* ============ STORY ============ */
+    .letter {
+        background: #eaf6ff;
+        border: 3px solid #b3dcff;
+        border-radius: 18px;
+        padding: 20px 22px;
+        font-family: 'Georgia', serif;
+        font-size: 18px;
+        line-height: 1.8;
+        color: #1a3a5c;
+        margin-bottom: 22px;
+        position: relative;
+        box-shadow: inset 0 2px 8px rgba(116, 185, 255, 0.18);
+    }
+    .letter::before {
+        content: '📖';
+        position: absolute;
+        top: -18px;
+        left: 20px;
+        font-size: 28px;
+        background: white;
+        padding: 0 6px;
+        border-radius: 50%;
+    }
+    .letter p { margin-bottom: 10px; }
+    .letter p:last-child { margin-bottom: 0; }
+    .letter b { color: #0984e3; }
+
+    /* ============ INSTRUCTIONS ============ */
+    .instructions {
+        text-align: center;
+        color: #0984e3;
+        font-weight: bold;
+        font-size: 17px;
+        margin-bottom: 16px;
+    }
+
+    /* ============ QUESTIONS ============ */
+    .question {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 15px;
+        background: #f8fafc;
+        border: 3px solid #e2e8f0;
+        border-radius: 16px;
+        margin-bottom: 10px;
+        transition: background 0.3s, border-color 0.3s;
+        flex-wrap: wrap;
+    }
+    .question.correct {
+        background: #e6f9ef;
+        border-color: #1dd1a1;
+    }
+    .question.wrong {
+        background: #ffeaea;
+        border-color: #ff6b6b;
+    }
+    .question-text {
+        flex: 1;
+        min-width: 200px;
+        font-size: 16px;
+        font-weight: bold;
+        color: #2d3748;
+        line-height: 1.4;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .q-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        background: #74b9ff;
+        color: white;
+        border-radius: 50%;
+        font-size: 13px;
+        font-weight: 900;
+        flex-shrink: 0;
+        box-shadow: 0 2px 0 #0984e3;
+    }
+    .q-buttons {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    .q-btn {
+        padding: 10px 20px;
+        border: 3px solid #cbd5e0;
+        background: white;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 900;
+        color: #4a5568;
+        cursor: pointer;
+        transition: 0.12s;
+        box-shadow: 0 3px 0 #cbd5e0;
+        letter-spacing: 0.5px;
+        min-width: 78px;
+    }
+    .q-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 #cbd5e0;
+    }
+    .q-btn:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 #cbd5e0;
+    }
+    .q-btn:disabled { cursor: default; }
+
+    /* ============ SELECTED = BLUE (before checking) ============ */
+    .q-btn.selected {
+        background: #74b9ff;
+        color: white;
+        border-color: #0984e3;
+        box-shadow: 0 3px 0 #0984e3;
+    }
+
+    /* ============ AFTER CHECKING ============ */
+    .q-btn.reveal-correct {
+        background: #d4f5e9;
+        color: #16a085;
+        border-color: #1dd1a1;
+        box-shadow: 0 3px 0 #1dd1a1;
+    }
+    .q-btn.reveal-wrong {
+        background: #ffe0e0;
+        color: #d63031;
+        border-color: #ff6b6b;
+        box-shadow: 0 3px 0 #ff6b6b;
+    }
+    /* The user's wrong choice — keep red */
+    .q-btn.wrong-choice {
+        background: #ff6b6b;
+        color: white;
+        border-color: #d63031;
+        box-shadow: 0 3px 0 #d63031;
+    }
+    /* The user's correct choice — keep green */
+    .q-btn.correct-choice {
+        background: #1dd1a1;
+        color: white;
+        border-color: #16a085;
+        box-shadow: 0 3px 0 #16a085;
+    }
+
+    /* ============ SCORE BAR ============ */
+    .score-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #eaf6ff;
+        border: 3px solid #74b9ff;
+        border-radius: 16px;
+        padding: 12px 18px;
+        margin-top: 18px;
+        margin-bottom: 14px;
+        font-weight: bold;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .score-label {
+        font-size: 13px;
+        color: #0984e3;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+    }
+    .score-value {
+        font-size: 22px;
+        color: #0984e3;
+    }
+    .score-stars {
+        font-size: 22px;
+        letter-spacing: 4px;
+    }
+
+    /* ============ CONTROLS ============ */
+    .controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    #checkBtn {
+        background: #1dd1a1;
+        flex: 2;
+        padding: 16px;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-family: inherit;
+        font-size: 18px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #16a085;
+        transition: 0.12s;
+        letter-spacing: 1px;
+    }
+    #checkBtn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 0 #16a085;
+    }
+    #checkBtn:active:not(:disabled) {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #16a085;
+    }
+    #checkBtn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    #resetBtn {
+        background: #ff6b6b;
+        flex: 1;
+        padding: 16px;
+        color: white;
+        border: none;
+        border-radius: 15px;
+        font-family: inherit;
+        font-size: 18px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #d63031;
+        transition: 0.12s;
+        letter-spacing: 1px;
+    }
+    #resetBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 0 #d63031;
+    }
+    #resetBtn:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #d63031;
+    }
+
+    #result-msg {
+        margin-top: 16px;
+        font-size: 19px;
+        font-weight: bold;
+        text-align: center;
+        min-height: 28px;
+        transition: 0.3s;
+    }
+
+    /* ============ MOBILE ============ */
+    @media (max-width: 560px) {
+        .game-card { padding: 18px 14px; border-radius: 24px; border-width: 5px; }
+        h1 { font-size: 20px; }
+        .letter { font-size: 16px; padding: 16px; line-height: 1.7; }
+        .question { padding: 11px; }
+        .question-text { font-size: 14.5px; min-width: 100%; }
+        .q-buttons { width: 100%; }
+        .q-btn { flex: 1; padding: 10px 4px; font-size: 13px; min-width: auto; }
+        .score-value { font-size: 19px; }
+        #checkBtn, #resetBtn { font-size: 15px; padding: 13px; }
+        #result-msg { font-size: 16px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="game-card">
+    <h1>🐶 My Dog Rex</h1>
+    <div class="mascot">🐶 🦴 🌳</div>
+    <div class="subtitle">Read the story and answer — easy level!</div>
+
+    <!-- ============ STORY ============ -->
+    <div class="letter">
+        <p>Hello! My name is <b>Sam</b>. I am <b>nine</b> years old.</p>
+        <p>I have got a <b>dog</b>. His name is <b>Rex</b>. Rex is <b>big</b> and <b>brown</b>.</p>
+        <p>Rex likes to <b>play</b>. We play in the <b>park</b>. I love Rex!</p>
+    </div>
+
+    <!-- ============ INSTRUCTIONS ============ -->
+    <div class="instructions">🎯 Нажми TRUE или FALSE для каждого предложения</div>
+
+    <!-- ============ QUESTIONS ============ -->
+    <div id="questions">
+        <div class="question" data-answer="true">
+            <div class="question-text"><span class="q-num">A</span> Sam is nine.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="false">
+            <div class="question-text"><span class="q-num">B</span> Rex is a cat.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="true">
+            <div class="question-text"><span class="q-num">C</span> Rex is brown.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="true">
+            <div class="question-text"><span class="q-num">D</span> Rex likes to play.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="false">
+            <div class="question-text"><span class="q-num">E</span> Sam and Rex play in the house.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="true">
+            <div class="question-text"><span class="q-num">F</span> Sam loves Rex.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="true" onclick="selectAnswer(this)">TRUE</button>
+                <button class="q-btn" data-value="false" onclick="selectAnswer(this)">FALSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SCORE BAR ============ -->
+    <div class="score-bar">
+        <div>
+            <div class="score-label">Твой счёт</div>
+            <div class="score-value"><span id="score-num">0</span> / 6</div>
+        </div>
+        <div class="score-stars" id="score-stars">☆☆☆</div>
+    </div>
+
+    <!-- ============ CONTROLS ============ -->
+    <div class="controls">
+        <button id="resetBtn" onclick="resetQuiz()">Заново 🔄</button>
+        <button id="checkBtn" onclick="checkAnswers()">Проверить ✅</button>
+    </div>
+
+    <div id="result-msg"></div>
+</div>
+
+<script>
+    let checked = false;
+
+    /* =====================================================
+       SELECT AN ANSWER — turns BLUE only (not green/red yet)
+       ===================================================== */
+    function selectAnswer(btn) {
+        if (checked) return;
+
+        const parent = btn.closest('.question');
+        const buttons = parent.querySelectorAll('.q-btn');
+
+        // Clear previous selection in this question
+        buttons.forEach(b => b.classList.remove('selected'));
+
+        // Mark this one as selected (blue)
+        btn.classList.add('selected');
+    }
+
+    /* =====================================================
+       CHECK ANSWERS — auto-check all at once
+       After pressing: correct = green, wrong = red,
+       and the correct answer is revealed
+       ===================================================== */
+    function checkAnswers() {
+        if (checked) return;
+
+        const questions = document.querySelectorAll('.question');
+        let allAnswered = true;
+        let score = 0;
+
+        // Make sure every question has an answer
+        questions.forEach(q => {
+            const selected = q.querySelector('.q-btn.selected');
+            if (!selected) allAnswered = false;
+        });
+
+        if (!allAnswered) {
+            const msg = document.getElementById('result-msg');
+            msg.innerText = "⚠️ Сначала ответь на все 6 вопросов!";
+            msg.style.color = "#f39c12";
+            return;
+        }
+
+        checked = true;
+        document.getElementById('checkBtn').disabled = true;
+
+        // Auto-check every question
+        questions.forEach(q => {
+            const correct = q.dataset.answer;
+            const selected = q.querySelector('.q-btn.selected');
+            const allBtns = q.querySelectorAll('.q-btn');
+            const chosen = selected.dataset.value;
+
+            // Turn off the blue "selected" style
+            selected.classList.remove('selected');
+
+            allBtns.forEach(b => b.disabled = true);
+
+            if (chosen === correct) {
+                // User's choice is correct → green
+                q.classList.add('correct');
+                selected.classList.add('correct-choice');
+                score++;
+            } else {
+                // User's choice is wrong → red, then reveal correct in green
+                q.classList.add('wrong');
+                selected.classList.add('wrong-choice');
+                const correctBtn = q.querySelector(`.q-btn[data-value="${correct}"]`);
+                correctBtn.classList.add('reveal-correct');
+            }
+        });
+
+        // Auto-update score & stars
+        document.getElementById('score-num').textContent = score;
+        updateStars(score, questions.length);
+
+        // Auto-show result message
+        const msg = document.getElementById('result-msg');
+        const pct = Math.round((score / questions.length) * 100);
+
+        if (pct === 100) {
+            msg.innerText = "🏆 Отлично! Ты справился!";
+            msg.style.color = "#1dd1a1";
+        } else if (pct >= 66) {
+            msg.innerText = `🌟 Молодец! ${score} / 6 правильно!`;
+            msg.style.color = "#1dd1a1";
+        } else if (pct >= 33) {
+            msg.innerText = `💪 Хорошая попытка! ${score} / 6 — прочитай текст ещё раз!`;
+            msg.style.color = "#f39c12";
+        } else {
+            msg.innerText = `📚 ${score} / 6 — Давай прочитаем текст вместе!`;
+            msg.style.color = "#ff6b6b";
+        }
+    }
+
+    /* =====================================================
+       RESET
+       ===================================================== */
+    function resetQuiz() {
+        checked = false;
+
+        document.querySelectorAll('.question').forEach(q => {
+            q.classList.remove('correct', 'wrong');
+            q.querySelectorAll('.q-btn').forEach(b => {
+                b.disabled = false;
+                b.classList.remove('selected', 'correct-choice', 'wrong-choice', 'reveal-correct');
+            });
+        });
+
+        document.getElementById('score-num').textContent = '0';
+        document.getElementById('score-stars').textContent = '☆☆☆';
+        document.getElementById('checkBtn').disabled = false;
+
+        const msg = document.getElementById('result-msg');
+        msg.innerText = '';
+        msg.style.color = '';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* =====================================================
+       STARS
+       ===================================================== */
+    function updateStars(score, total) {
+        const pct = score / total;
+        let stars = '☆☆☆';
+        if (pct === 1)        stars = '⭐⭐⭐';
+        else if (pct >= 0.66) stars = '⭐⭐☆';
+        else if (pct >= 0.33) stars = '⭐☆☆';
+        document.getElementById('score-stars').textContent = stars;
+    }
+</script>
+
+</body>
+</html>

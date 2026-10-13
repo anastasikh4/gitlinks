@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shops & Services — Where Would You Hear It?</title>
+    <style>
+        :root {
+            --primary: #ff6b6b;
+            --success: #00b894;
+            --error: #ff4757;
+            --bg: #f7f9fc;
+            --chip: #e8f0fe;
+            --chip-border: #c5d8f7;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            max-width: 780px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #333; margin-top: 25px; font-size: 1.15em; }
+
+        /* Shops box */
+        .shops-box {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 18px;
+            background-color: #f1f2f6;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        .shop-chip {
+            background-color: var(--chip);
+            border: 2px solid var(--chip-border);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95em;
+            color: #2c3e50;
+        }
+
+        /* Question cards */
+        .question-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: #fff;
+            border: 2px solid #eee;
+            transition: background-color 0.3s, border-color 0.3s;
+            flex-wrap: wrap;
+        }
+        .question-card.correct {
+            background-color: #e8f8f0;
+            border-color: var(--success);
+        }
+        .question-card.wrong {
+            background-color: #fff0f0;
+            border-color: var(--error);
+        }
+        .q-num {
+            font-weight: 800;
+            color: var(--primary);
+            min-width: 26px;
+            font-size: 1.05em;
+        }
+        .q-text {
+            flex: 1;
+            min-width: 240px;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+        select {
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 2px solid #ccc;
+            font-size: 0.95em;
+            font-family: inherit;
+            min-width: 170px;
+            background: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        select:focus { outline: none; border-color: var(--primary); }
+        .question-card.correct select { border-color: var(--success); background: #d4f5e4; }
+        .question-card.wrong select { border-color: var(--error); background: #ffdada; }
+
+        /* Score line */
+        .score-line {
+            margin-top: 22px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+        .score-line span { color: var(--primary); font-size: 1.25em; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Where Would You Hear It?</h1>
+
+    <h2>3a. In which of the shops below would you hear the following?</h2>
+
+    <!-- Shops chips -->
+    <div class="shops-box">
+        <div class="shop-chip">🧁 baker's</div>
+        <div class="shop-chip">📰 newsagent's</div>
+        <div class="shop-chip">💐 florist's</div>
+        <div class="shop-chip">💍 jeweller's</div>
+        <div class="shop-chip">👞 shoe shop</div>
+        <div class="shop-chip">💊 chemist's</div>
+        <div class="shop-chip">🥩 butcher's</div>
+        <div class="shop-chip">💇 hairdresser's</div>
+        <div class="shop-chip">📮 post office</div>
+        <div class="shop-chip">👕 clothes shop</div>
+        <div class="shop-chip">🐟 fishmonger's</div>
+        <div class="shop-chip">👓 optician's</div>
+    </div>
+
+    <!-- Questions -->
+    <div id="questions">
+        <!-- 1 -->
+        <div class="question-card" data-ans="clothes shop">
+            <span class="q-num">1</span>
+            <span class="q-text">"Do you have this in an extra large size?"</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 2 -->
+        <div class="question-card" data-ans="hairdresser's">
+            <span class="q-num">2</span>
+            <span class="q-text">"Just a wash and blow-dry, please."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 3 -->
+        <div class="question-card" data-ans="butcher's">
+            <span class="q-num">3</span>
+            <span class="q-text">"A kilo of steak, please."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 4 -->
+        <div class="question-card" data-ans="baker's">
+            <span class="q-num">4</span>
+            <span class="q-text">"These are fresh from the oven."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 5 -->
+        <div class="question-card" data-ans="chemist's">
+            <span class="q-num">5</span>
+            <span class="q-text">"I've come to pick up my prescription."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 6 -->
+        <div class="question-card" data-ans="shoe shop">
+            <span class="q-num">6</span>
+            <span class="q-text">"I take a size five, narrow."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 7 -->
+        <div class="question-card" data-ans="optician's">
+            <span class="q-num">7</span>
+            <span class="q-text">"Are you long or short-sighted?"</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 8 -->
+        <div class="question-card" data-ans="post office">
+            <span class="q-num">8</span>
+            <span class="q-text">"I need to send this first class."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 9 -->
+        <div class="question-card" data-ans="florist's">
+            <span class="q-num">9</span>
+            <span class="q-text">"A dozen of those pink ones, please."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 10 -->
+        <div class="question-card" data-ans="fishmonger's">
+            <span class="q-num">10</span>
+            <span class="q-text">"They were caught fresh this morning."</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 11 -->
+        <div class="question-card" data-ans="newsagent's">
+            <span class="q-num">11</span>
+            <span class="q-text">"Is this the July issue?"</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+
+        <!-- 12 -->
+        <div class="question-card" data-ans="jeweller's">
+            <span class="q-num">12</span>
+            <span class="q-text">"Do you prefer gold or silver?"</span>
+            <select onchange="checkAnswer(this)">
+                <option value="">-- Choose --</option>
+                <option value="baker's">baker's</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="florist's">florist's</option>
+                <option value="jeweller's">jeweller's</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="chemist's">chemist's</option>
+                <option value="butcher's">butcher's</option>
+                <option value="hairdresser's">hairdresser's</option>
+                <option value="post office">post office</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="fishmonger's">fishmonger's</option>
+                <option value="optician's">optician's</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Score -->
+    <div class="score-line">Score: <span id="score">0</span> / 12</div>
+</div>
+
+<script>
+    function checkAnswer(selectElement) {
+        const card = selectElement.closest('.question-card');
+        const correctAnswer = card.dataset.ans;
+
+        if (selectElement.value === correctAnswer) {
+            card.classList.remove('wrong');
+            card.classList.add('correct');
+        } else if (selectElement.value === "") {
+            card.classList.remove('correct', 'wrong');
+        } else {
+            card.classList.remove('correct');
+            card.classList.add('wrong');
+        }
+
+        updateScore();
+    }
+
+    function updateScore() {
+        const total = document.querySelectorAll('.question-card').length;
+        const correct = document.querySelectorAll('.question-card.correct').length;
+        document.getElementById('score').textContent = correct;
+    }
+</script>
+
+</body>
+</html>

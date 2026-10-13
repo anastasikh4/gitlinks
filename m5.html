@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sound Craft: 3 Level Quest (Auto)</title>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --mc-green: #5aa730;
+        --mc-dirt: #795548;
+        --mc-sky: #7293ff;
+        --mc-border: #212121;
+        --font-main: 'Comic Neue', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+        font-family: var(--font-main);
+        background-color: var(--mc-sky);
+        background-image: linear-gradient(to bottom, #7293ff, #ffffff);
+        margin: 0;
+        display: flex; flex-direction: column; align-items: center;
+        min-height: 100vh; color: white; overflow-x: hidden;
+        padding: 10px;
+    }
+    h1 {
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        margin: 15px 0 5px;
+        text-shadow: 4px 4px 0px #000;
+        letter-spacing: 2px;
+        text-align: center;
+    }
+    .level-badge {
+        display: inline-block;
+        background: #ffff00;
+        color: #212121;
+        font-weight: bold;
+        padding: 6px 18px;
+        border: 4px solid var(--mc-border);
+        font-size: clamp(1rem, 3vw, 1.3rem);
+        margin-bottom: 12px;
+        box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+    }
+    .container {
+        width: 95%;
+        max-width: 850px;
+        background: #7a7a7a;
+        border: 8px solid var(--mc-border);
+        padding: 25px 20px;
+        box-shadow: inset -10px -10px 0px #4a4a4a, 0 10px 0px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+    .stats-bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: clamp(1rem, 3vw, 1.5rem);
+        margin-bottom: 18px;
+        color: #ffff00;
+        text-shadow: 2px 2px 0px #000;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .stats-bar span { font-weight: bold; }
+
+    /* ============ PICTURE ============ */
+    .picture-stage {
+        background: #fff9ec;
+        border: 6px solid var(--mc-border);
+        box-shadow: inset -6px -6px 0px #d4c4a8;
+        padding: 18px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+    }
+    .emoji-pic {
+        font-size: clamp(4rem, 14vw, 7rem);
+        line-height: 1;
+        filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.2));
+        animation: floaty 2.5s ease-in-out infinite;
+    }
+    @keyframes floaty {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    /* ============ QUESTION ============ */
+    .question-box {
+        background: rgba(0,0,0,0.35);
+        border: 4px solid var(--mc-border);
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        text-align: left;
+        font-size: clamp(1.05rem, 3.2vw, 1.3rem);
+        line-height: 1.5;
+    }
+    .question-box .speaker {
+        color: #ffff00;
+        font-weight: bold;
+        margin-right: 6px;
+    }
+    .question-box .q-text { color: #ffffff; }
+    .gap-blank {
+        display: inline-block;
+        min-width: 70px;
+        border-bottom: 4px solid #ffff00;
+        color: #ffff00;
+        font-weight: bold;
+        text-align: center;
+        padding: 0 6px;
+    }
+
+    /* ============ ANSWERS ============ */
+    .answers {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 10px;
+    }
+    @media (min-width: 600px) {
+        .answers { grid-template-columns: 1fr 1fr; }
+    }
+
+    .mc-btn {
+        font-family: var(--font-main);
+        font-weight: bold;
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        padding: 14px 18px;
+        color: white;
+        background: #666;
+        border: 5px solid var(--mc-border);
+        border-top-color: #aaa;
+        border-left-color: #aaa;
+        cursor: pointer;
+        text-shadow: 2px 2px 0px #000;
+        transition: 0.1s;
+        text-align: left;
+        line-height: 1.3;
+        width: 100%;
+    }
+    .mc-btn:hover:not(:disabled) { filter: brightness(1.1); }
+    .mc-btn:active:not(:disabled) {
+        transform: translateY(3px);
+        border-top-color: #212121;
+        border-left-color: #212121;
+        border-bottom-color: #aaa;
+        border-right-color: #aaa;
+    }
+    .mc-btn:disabled { cursor: default; }
+
+    .btn-green { background-color: var(--mc-green); }
+    .btn-blue { background-color: #3d6dcc; }
+    .btn-dirt { background-color: var(--mc-dirt); }
+
+    .mc-btn.correct {
+        background-color: var(--mc-green) !important;
+        animation: pulse 0.4s;
+    }
+    .mc-btn.wrong {
+        background-color: #c62828 !important;
+        animation: shake 0.4s;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.04); }
+        100% { transform: scale(1); }
+    }
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        25% { transform: translateX(-8px); }
+        75% { transform: translateX(8px); }
+    }
+
+    /* ============ PROGRESS ============ */
+    .progress-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    .dot {
+        width: 18px; height: 18px;
+        border: 3px solid var(--mc-border);
+        background: #555;
+    }
+    .dot.done { background: var(--mc-green); }
+    .dot.current { background: #ffff00; animation: pulse 1s infinite; }
+
+    /* ============ MASCOT ============ */
+    .mascot {
+        width: 90px; height: 90px;
+        background: #333;
+        margin: 20px auto 5px;
+        border: 5px solid #000;
+        position: relative;
+        transition: background 0.3s, transform 0.2s;
+    }
+    .mascot.happy { background: var(--mc-green); transform: scale(1.1); }
+    .eye {
+        width: 18px; height: 18px;
+        background: #000;
+        position: absolute; top: 18px;
+    }
+    .eye.left { left: 18px; }
+    .eye.right { right: 18px; }
+    .mouth {
+        width: 36px; height: 30px;
+        background: #000;
+        position: absolute; bottom: 12px; left: 22px;
+    }
+
+    /* ============ THUMBS UP ============ */
+    #thumb {
+        position: fixed;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 10rem;
+        z-index: 1000;
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+        pointer-events: none;
+        opacity: 0;
+    }
+    #thumb.pop {
+        transform: translate(-50%, -50%) scale(1.4);
+        opacity: 1;
+    }
+
+    /* ============ SCREENS ============ */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ============ LEVEL COMPLETE ============ */
+    .big-text {
+        font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+        margin: 18px 0;
+        text-shadow: 2px 2px 0 #000;
+        line-height: 1.5;
+    }
+    .win-title {
+        color: #ffff00;
+        font-size: clamp(1.8rem, 7vw, 3rem);
+        text-shadow: 4px 4px 0 #000;
+        margin: 18px 0;
+    }
+
+    /* ============ FEEDBACK ============ */
+    #feedback {
+        margin-top: 18px;
+        font-size: clamp(1rem, 3vw, 1.2rem);
+        font-weight: bold;
+        min-height: 30px;
+        text-shadow: 2px 2px 0 #000;
+    }
+    #feedback.good { color: #7dff7d; }
+    #feedback.bad { color: #ff7d7d; }
+
+    /* ============ AUTO-COUNTDOWN ============ */
+    .auto-countdown {
+        margin-top: 20px;
+        font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+        color: #ffff00;
+        text-shadow: 2px 2px 0 #000;
+        animation: pulse 1s infinite;
+    }
+    .countdown-num {
+        display: inline-block;
+        min-width: 40px;
+        font-size: 1.4em;
+        background: #212121;
+        border: 4px solid #ffff00;
+        padding: 4px 12px;
+        margin: 0 8px;
+    }
+
+    /* ============ START SCREEN ============ */
+    .level-intro {
+        background: rgba(0,0,0,0.35);
+        border: 4px solid var(--mc-border);
+        padding: 20px 16px;
+        margin: 15px 0;
+    }
+    .level-intro .level-num {
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        color: #ffff00;
+        text-shadow: 3px 3px 0 #000;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .level-intro .level-name {
+        font-size: clamp(1.2rem, 4vw, 1.7rem);
+        font-weight: bold;
+        text-shadow: 2px 2px 0 #000;
+        margin-bottom: 10px;
+    }
+    .level-intro .level-desc {
+        font-size: clamp(1rem, 3vw, 1.15rem);
+        line-height: 1.5;
+    }
+
+    @media (max-width: 500px) {
+        .container { padding: 18px 12px; border-width: 6px; }
+        .picture-stage { min-height: 130px; padding: 14px; }
+        .mascot { width: 70px; height: 70px; }
+        .eye { width: 14px; height: 14px; top: 14px; }
+        .eye.left { left: 14px; }
+        .eye.right { right: 14px; }
+        .mouth { width: 28px; height: 22px; bottom: 10px; left: 18px; }
+    }
+</style>
+</head>
+<body>
+
+    <h1>SOUND CRAFT QUEST</h1>
+    <div class="level-badge" id="level-badge">LEVEL 1</div>
+    <div class="stats-bar">
+        <div>XP: <span id="xp">0</span></div>
+        <div>Q: <span id="q-count">0/0</span></div>
+    </div>
+    <div id="thumb">👍</div>
+
+    <div class="container">
+
+        <!-- ============ START SCREEN ============ -->
+        <div id="scr-start" class="screen active">
+            <p class="big-text">Welcome to the English Quest!</p>
+            <div class="level-intro">
+                <span class="level-num">🗺️ 3 LEVELS</span>
+                <div class="level-desc">
+                    <b>Level 1:</b> Look & Answer<br>
+                    <b>Level 2:</b> Fill the Gap<br>
+                    <b>Level 3:</b> Pick the Question
+                </div>
+            </div>
+            <button class="mc-btn btn-green" style="max-width:340px; margin:0 auto; display:block; text-align:center; font-size:1.3rem;" onclick="startGame()">
+                ▶ START QUEST
+            </button>
+        </div>
+
+        <!-- ============ QUIZ SCREEN ============ -->
+        <div id="scr-quiz" class="screen">
+            <div class="progress-row" id="progress"></div>
+
+            <div class="picture-stage" id="picture-stage"></div>
+
+            <div class="question-box">
+                <span class="speaker" id="q-speaker">A:</span>
+                <span class="q-text" id="q-text"></span>
+            </div>
+
+            <div class="answers" id="answers"></div>
+
+            <div id="feedback"></div>
+        </div>
+
+        <!-- ============ LEVEL COMPLETE (auto-transition) ============ -->
+        <div id="scr-level-complete" class="screen">
+            <div class="win-title" id="lc-title">LEVEL COMPLETE!</div>
+            <div style="font-size:3rem; margin:15px 0;" id="lc-emoji">🏆</div>
+            <p class="big-text" id="lc-score"></p>
+
+            <div class="auto-countdown" id="auto-countdown">
+                Next level in <span class="countdown-num" id="countdown-num">3</span>...
+            </div>
+        </div>
+
+        <!-- ============ WIN SCREEN ============ -->
+        <div id="scr-win" class="screen">
+            <div class="win-title">QUEST COMPLETE!</div>
+            <div style="font-size:3.5rem; margin:15px 0;">🏆👑🏆</div>
+            <p class="big-text">You earned <span id="final-xp" style="color:#ffff00;">0</span> XP!</p>
+            <p class="big-text" style="font-size:1.2rem;">You are an English Champion!</p>
+            <button class="mc-btn btn-dirt" style="max-width:340px; margin:20px auto 0; display:block; text-align:center; font-size:1.2rem;" onclick="location.reload()">
+                🔄 PLAY AGAIN
+            </button>
+        </div>
+
+        <!-- ============ MASCOT ============ -->
+        <div class="mascot" id="mascot">
+            <div class="eye left"></div>
+            <div class="eye right"></div>
+            <div class="mouth"></div>
+        </div>
+
+    </div>
+
+<script>
+/* =====================================================
+   QUIZ DATA
+   ===================================================== */
+const LEVELS = {
+    1: {
+        name: "Look & Answer",
+        questions: [
+            { emoji: "🪁", speaker: "A:", text: "They're yellow and blue. Are they flowers?",
+              options: ["No, they aren't. They're kites.", "Yes, they are.", "No, they aren't. They're hats."], correct: 0 },
+            { emoji: "✈️✈️", speaker: "A:", text: "They're red and blue. Are they aeroplanes?",
+              options: ["No, they aren't.", "Yes, they are.", "No, they aren't. They're balls."], correct: 1 },
+            { emoji: "🐶🐶", speaker: "A:", text: "They're black and white. Are they cats?",
+              options: ["No, they aren't. They're dogs.", "Yes, they are.", "No, they aren't. They're hats."], correct: 0 },
+            { emoji: "🎩🎩", speaker: "A:", text: "They're green and yellow. Are they hats?",
+              options: ["No, they aren't.", "Yes, they are.", "No, they aren't. They're kites."], correct: 1 },
+            { emoji: "🌺🌺", speaker: "A:", text: "They're red. Are they rubbers?",
+              options: ["No, they aren't. They're flowers.", "Yes, they are.", "No, they aren't. They're kites."], correct: 0 }
+        ]
+    },
+    2: {
+        name: "Fill the Gap",
+        questions: [
+            { emoji: "🪁", speaker: "", text: "They ___ kites.", options: ["is", "are", "isn't"], correct: 1 },
+            { emoji: "✈️✈️", speaker: "", text: "Are they aeroplanes? Yes, they ___.", options: ["is", "are", "aren't"], correct: 1 },
+            { emoji: "🐶🐶", speaker: "", text: "Are they cats? No, they ___.", options: ["aren't", "are", "isn't"], correct: 0 },
+            { emoji: "🎩🎩", speaker: "", text: "___ green and yellow.", options: ["They're", "It's", "He's"], correct: 0 },
+            { emoji: "🌺🌺", speaker: "", text: "Are they rubbers? No, ___.", options: ["they aren't", "they are", "it isn't"], correct: 0 },
+            { emoji: "🟠", speaker: "", text: "Is it an orange? Yes, it ___.", options: ["is", "are", "isn't"], correct: 0 }
+        ]
+    },
+    3: {
+        name: "Pick the Question",
+        questions: [
+            { emoji: "🪁", speaker: "B:", text: "No, they aren't. They're kites.",
+              options: ["Are they flowers?", "Are they kites?", "Is it a kite?"], correct: 0 },
+            { emoji: "🐶🐶", speaker: "B:", text: "No, they aren't. They're dogs.",
+              options: ["Are they dogs?", "Are they cats?", "Is it a dog?"], correct: 1 },
+            { emoji: "🎩🎩", speaker: "B:", text: "Yes, they are.",
+              options: ["Is it a hat?", "Are they hats?", "Are they cats?"], correct: 1 },
+            { emoji: "✈️✈️", speaker: "B:", text: "Yes, they are.",
+              options: ["Are they aeroplanes?", "Are they flowers?", "Is it a plane?"], correct: 0 },
+            { emoji: "🌺🌺", speaker: "B:", text: "No, they aren't. They're flowers.",
+              options: ["Are they flowers?", "Are they rubbers?", "Is it a flower?"], correct: 1 }
+        ]
+    }
+};
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let xp = 0;
+let currentLevel = 1;
+let currentQ = 0;
+let answered = false;
+let levelCorrect = 0;
+let countdownTimer = null;
+let levelTransitionTimer = null;
+
+/* =====================================================
+   HELPERS
+   ===================================================== */
+function addXP(n) {
+    xp += n;
+    document.getElementById('xp').textContent = xp;
+}
+
+function showThumb() {
+    const t = document.getElementById('thumb');
+    const m = document.getElementById('mascot');
+    t.classList.add('pop');
+    m.classList.add('happy');
+    setTimeout(() => {
+        t.classList.remove('pop');
+        m.classList.remove('happy');
+    }, 800);
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+/* =====================================================
+   GAME FLOW
+   ===================================================== */
+function startGame() {
+    xp = 0;
+    document.getElementById('xp').textContent = 0;
+    currentLevel = 1;
+    loadLevel();
+}
+
+function loadLevel() {
+    currentQ = 0;
+    levelCorrect = 0;
+    document.getElementById('level-badge').textContent = 'LEVEL ' + currentLevel;
+    showScreen('scr-quiz');
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const level = LEVELS[currentLevel];
+    const total = level.questions.length;
+
+    if (currentQ >= total) {
+        levelComplete();
+        return;
+    }
+    answered = false;
+
+    const q = level.questions[currentQ];
+
+    document.getElementById('q-count').textContent = (currentQ + 1) + '/' + total;
+
+    // Progress dots
+    const prog = document.getElementById('progress');
+    prog.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        if (i < currentQ) dot.classList.add('done');
+        if (i === currentQ) dot.classList.add('current');
+        prog.appendChild(dot);
+    }
+
+    // Picture
+    document.getElementById('picture-stage').innerHTML =
+        `<div class="emoji-pic">${q.emoji}</div>`;
+
+    // Question
+    const speakerEl = document.getElementById('q-speaker');
+    speakerEl.textContent = q.speaker ? q.speaker + ' ' : '';
+    const qText = document.getElementById('q-text');
+
+    if (currentLevel === 2) {
+        qText.innerHTML = ' ' + q.text.replace(/___/g, '<span class="gap-blank">?</span>');
+    } else {
+        qText.textContent = ' ' + q.text;
+    }
+
+    // Answers
+    const ansBox = document.getElementById('answers');
+    ansBox.innerHTML = '';
+    const letters = ['A', 'B', 'C'];
+
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'mc-btn btn-blue';
+        btn.innerHTML = `<span style="color:#ffff00;">${letters[i]}.</span> ${opt}`;
+        btn.onclick = () => checkAnswer(btn, i, q.correct);
+        ansBox.appendChild(btn);
+    });
+
+    const fb = document.getElementById('feedback');
+    fb.textContent = '';
+    fb.className = '';
+}
+
+function checkAnswer(btn, chosen, correct) {
+    if (answered) return;
+    answered = true;
+
+    const allBtns = document.querySelectorAll('#answers .mc-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    const fb = document.getElementById('feedback');
+
+    if (chosen === correct) {
+        btn.classList.add('correct');
+        addXP(20);
+        levelCorrect++;
+        showThumb();
+        fb.textContent = '✅ Correct! +20 XP';
+        fb.className = 'good';
+        setTimeout(() => {
+            currentQ++;
+            renderQuestion();
+        }, 1200);
+    } else {
+        btn.classList.add('wrong');
+        allBtns[correct].classList.add('correct');
+        fb.textContent = '❌ Oops! The green answer is correct.';
+        fb.className = 'bad';
+        setTimeout(() => {
+            currentQ++;
+            renderQuestion();
+        }, 1900);
+    }
+}
+
+/* =====================================================
+   LEVEL COMPLETE — AUTO-GO
+   ===================================================== */
+function levelComplete() {
+    const level = LEVELS[currentLevel];
+    const total = level.questions.length;
+
+    let emoji = '🏆';
+    let title = 'LEVEL COMPLETE!';
+    if (levelCorrect === total) {
+        emoji = '🌟';
+        title = 'PERFECT LEVEL!';
+    } else if (levelCorrect >= total * 0.6) {
+        emoji = '🎉';
+        title = 'LEVEL COMPLETE!';
+    } else {
+        emoji = '💪';
+        title = 'GOOD TRY!';
+    }
+
+    document.getElementById('lc-title').textContent = title;
+    document.getElementById('lc-emoji').textContent = emoji;
+    document.getElementById('lc-score').innerHTML =
+        `You got <span style="color:#ffff00;">${levelCorrect} / ${total}</span> correct!<br>Total XP: <span style="color:#ffff00;">${xp}</span>`;
+
+    showScreen('scr-level-complete');
+
+    // If NOT the last level → auto-countdown to next level
+    if (currentLevel < 3) {
+        startAutoCountdown();
+    } else {
+        // Last level complete → show final win after short delay
+        const cd = document.getElementById('auto-countdown');
+        cd.innerHTML = '🏁 Final results in <span class="countdown-num" id="countdown-num">3</span>...';
+        startCountdown(() => showWin());
+    }
+}
+
+function startAutoCountdown() {
+    const cd = document.getElementById('auto-countdown');
+    cd.innerHTML = 'Next level in <span class="countdown-num" id="countdown-num">3</span>...';
+    startCountdown(() => {
+        currentLevel++;
+        loadLevel();
+    });
+}
+
+function startCountdown(callback) {
+    clearInterval(countdownTimer);
+    let n = 3;
+    const el = document.getElementById('countdown-num');
+    if (el) el.textContent = n;
+
+    countdownTimer = setInterval(() => {
+        n--;
+        const cur = document.getElementById('countdown-num');
+        if (cur) cur.textContent = n;
+        if (n <= 0) {
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+            callback();
+        }
+    }, 1000);
+}
+
+/* =====================================================
+   FINAL WIN
+   ===================================================== */
+function showWin() {
+    document.getElementById('final-xp').textContent = xp;
+    document.getElementById('level-badge').textContent = '🏆 CHAMPION';
+    showScreen('scr-win');
+    for (let i = 0; i < 5; i++) {
+        setTimeout(showThumb, i * 200);
+    }
+}
+
+</script>
+</body>
+</html>

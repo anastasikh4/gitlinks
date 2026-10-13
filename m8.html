@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopping for Sunglasses — Interactive Worksheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #6c5ce7;
+    --primary-dark: #4834b8;
+    --primary-light: #eeecfd;
+    --green: #23b26d;
+    --green-dark: #1a8a54;
+    --green-light: #e6f9ef;
+    --red: #ff4b4b;
+    --red-dark: #d33;
+    --red-light: #ffeaea;
+    --yellow: #ffcd1f;
+    --yellow-light: #fff9d6;
+    --orange: #ff8c42;
+    --blue: #74b9ff;
+    --blue-dark: #4a8ee0;
+    --blue-light: #e8f4ff;
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #2d3436;
+    --text-light: #7a8aa3;
+    --border: #e8ecf3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(circle at 10% 5%, rgba(108,92,231,0.12) 0 50px, transparent 70px),
+      radial-gradient(circle at 90% 15%, rgba(255,205,31,0.18) 0 60px, transparent 80px),
+      radial-gradient(circle at 15% 90%, rgba(255,140,66,0.12) 0 45px, transparent 65px),
+      radial-gradient(circle at 88% 92%, rgba(35,178,109,0.12) 0 55px, transparent 75px),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 12px 60px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrapper { max-width: 780px; margin: 0 auto; }
+
+  /* ==================== HEADER ==================== */
+  .head-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 26px 28px 22px;
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.12);
+    border: 2px solid var(--border);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .head-card::before {
+    content: '🕶️';
+    position: absolute;
+    top: -25px;
+    right: -15px;
+    font-size: 130px;
+    opacity: 0.1;
+    transform: rotate(-12deg);
+    pointer-events: none;
+  }
+
+  .topic-tag {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.15;
+  }
+  .subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .fields {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    background: #fafbfd;
+    transition: 0.2s;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(108,92,231,0.12);
+  }
+  .field input::placeholder { color: #b0bccd; font-weight: 500; }
+
+  /* ==================== SECTION ==================== */
+  .section {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 26px 28px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+    border: 2px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .section-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    font-size: 24px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+  }
+  .badge-1 { background: linear-gradient(135deg, #6c5ce7, #4834b8); }
+  .badge-2 { background: linear-gradient(135deg, #23b26d, #1a8a54); }
+  .badge-3 { background: linear-gradient(135deg, #ff8c42, #d96a1f); }
+
+  .section h2 {
+    font-size: 21px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .section-hint {
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-left: 62px;
+    font-style: italic;
+  }
+
+  /* ==================== READING TEXT ==================== */
+  .reading-box {
+    background: linear-gradient(135deg, #fafbfd 0%, #f3f1fd 100%);
+    border-left: 5px solid var(--primary);
+    border-radius: 14px;
+    padding: 22px 24px;
+    font-size: 16.5px;
+    line-height: 1.75;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .dialog-line {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    align-items: flex-start;
+  }
+  .speaker {
+    font-weight: 900;
+    color: var(--primary);
+    min-width: 62px;
+    flex-shrink: 0;
+    font-size: 15px;
+  }
+  .dialog-text {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .dialog-text .blank {
+    display: inline-block;
+    min-width: 100px;
+    border-bottom: 2.5px solid var(--orange);
+    padding: 0 6px;
+    text-align: center;
+    font-weight: 800;
+    color: var(--orange);
+    transition: 0.25s;
+    background: #fff8f0;
+    border-radius: 4px 4px 0 0;
+    margin: 0 3px;
+    vertical-align: baseline;
+    cursor: pointer;
+  }
+  .dialog-text .blank.filled {
+    color: var(--primary-dark);
+    border-bottom-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .dialog-text .blank.correct {
+    color: var(--green-dark);
+    border-bottom-color: var(--green);
+    background: var(--green-light);
+  }
+  .dialog-text .blank.wrong {
+    color: var(--red-dark);
+    border-bottom-color: var(--red);
+    background: var(--red-light);
+  }
+
+  /* ==================== GAP-FILL WORD BANK ==================== */
+  .gap-word-bank {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 18px;
+    background: var(--yellow-light);
+    border: 2px dashed var(--yellow);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+  .bank-word {
+    padding: 10px 18px;
+    background: white;
+    border: 2px solid var(--yellow);
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 15px;
+    color: #7a5c00;
+    cursor: pointer;
+    transition: 0.15s;
+    box-shadow: 0 3px 0 var(--yellow);
+    user-select: none;
+  }
+  .bank-word:hover:not(.used) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 var(--yellow);
+    background: #fffbe6;
+  }
+  .bank-word:active:not(.used) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--yellow);
+  }
+  .bank-word.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+    box-shadow: 0 3px 0 var(--primary-dark);
+  }
+  .bank-word.used {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: scale(0.9);
+    box-shadow: none;
+  }
+
+  /* ==================== MATCHING ==================== */
+  .match-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .match-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .match-col-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .match-item {
+    padding: 14px 16px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: 0.15s;
+    box-shadow: 0 3px 0 var(--border);
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.35;
+  }
+  .match-item:hover:not(.matched) {
+    transform: translateY(-2px);
+    border-color: #d5dde8;
+    box-shadow: 0 5px 0 var(--border);
+  }
+  .match-item:active:not(.matched) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .match-item.selected {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+    box-shadow: 0 3px 0 var(--primary-dark);
+  }
+  .match-item.matched {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green-dark);
+    box-shadow: 0 3px 0 var(--green-dark);
+    cursor: default;
+    opacity: 0.75;
+  }
+  .match-item.wrong {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red-dark);
+    animation: shake 0.4s;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+  .match-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    background: #eef2f8;
+    color: var(--text-light);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 900;
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .match-item.selected .match-num { background: var(--primary); color: white; }
+  .match-item.matched .match-num { background: var(--green); color: white; }
+
+  /* ==================== BUTTONS ==================== */
+  .btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.12s;
+    color: white;
+    user-select: none;
+    min-width: 160px;
+    flex: 1;
+  }
+  .btn-check {
+    background: var(--green);
+    box-shadow: 0 5px 0 var(--green-dark);
+  }
+  .btn-check:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+  .btn-reset {
+    background: var(--text-light);
+    box-shadow: 0 5px 0 #5b6a82;
+  }
+  .btn-reset:active { transform: translateY(3px); box-shadow: 0 2px 0 #5b6a82; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+
+  /* ==================== RESULT ==================== */
+  .result-banner {
+    display: none;
+    margin-top: 18px;
+    padding: 18px 22px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 800;
+    animation: fadeIn 0.4s;
+  }
+  .result-banner.show { display: block; }
+  .result-banner.good {
+    background: linear-gradient(135deg, #e6f9ef, #c8f0db);
+    color: var(--green-dark);
+    border: 2px solid var(--green);
+  }
+  .result-banner.mid {
+    background: linear-gradient(135deg, #fff9d6, #fff0a8);
+    color: #7a5c00;
+    border: 2px solid var(--yellow);
+  }
+  .result-banner.bad {
+    background: linear-gradient(135deg, #ffeaea, #ffd4d4);
+    color: var(--red-dark);
+    border: 2px solid var(--red);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==================== SCORE BAR ==================== */
+  .score-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 24px;
+    border: 2px solid var(--border);
+    box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .score-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+  .score-value {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .score-value .of { font-size: 18px; color: var(--text-light); }
+  .score-stars { font-size: 26px; letter-spacing: 4px; }
+
+  /* ==================== MOBILE ==================== */
+  @media (max-width: 520px) {
+    body { padding: 14px 10px 40px; }
+    .head-card { padding: 20px 18px; }
+    h1 { font-size: 24px; }
+    .subtitle { font-size: 20px; }
+    .section { padding: 20px 18px 22px; }
+    .section-hint { padding-left: 0; }
+    .fields { grid-template-columns: 1fr; }
+    .reading-box { padding: 16px; font-size: 15px; }
+    .dialog-line { padding: 8px 10px; gap: 8px; }
+    .speaker { min-width: 50px; font-size: 14px; }
+    .dialog-text { font-size: 15px; }
+    .match-grid { grid-template-columns: 1fr; gap: 20px; }
+    .btn { font-size: 14px; padding: 13px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="head-card">
+    <span class="topic-tag">📝 Interactive Worksheet</span>
+    <h1>Shopping for Sunglasses</h1>
+    <div class="subtitle">Read, fill in, and match!</div>
+
+    <div class="fields">
+      <div class="field">
+        <label for="studentName">Name</label>
+        <input type="text" id="studentName" placeholder="Write your name...">
+      </div>
+      <div class="field">
+        <label for="studentDate">Date</label>
+        <input type="text" id="studentDate" placeholder="DD / MM">
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 1: READING + GAP-FILL ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge badge-1">1</div>
+      <h2>Read and Complete</h2>
+    </div>
+    <div class="section-hint">
+      Read the dialogue. Then tap a word from the box → tap a gap to fill it in.
+    </div>
+
+    <!-- Word bank — MIXED UP -->
+    <div class="gap-word-bank" id="gapBank">
+      <div class="bank-word" data-word="Saturday">Saturday</div>
+      <div class="bank-word" data-word="£20">£20</div>
+      <div class="bank-word" data-word="Street">Street</div>
+      <div class="bank-word" data-word="bargain">bargain</div>
+      <div class="bank-word" data-word="new">new</div>
+      <div class="bank-word" data-word="bus station">bus station</div>
+      <div class="bank-word" data-word="Stacey's">Stacey's</div>
+      <div class="bank-word" data-word="weekend">weekend</div>
+    </div>
+
+    <!-- Reading text with gaps -->
+    <div class="reading-box">
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">I love your sunglasses! Are they <span class="blank" data-answer="new" data-gap="1">_____</span>?</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Jenny:</div>
+        <div class="dialog-text">Yes, I bought them last <span class="blank" data-answer="weekend" data-gap="2">_____</span>. I'm glad you like them.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">They really suit you! Where did you get them?</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Jenny:</div>
+        <div class="dialog-text">At <span class="blank" data-answer="Stacey's" data-gap="3">_____</span>, in the town centre.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">Whereabouts is it exactly?</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Jenny:</div>
+        <div class="dialog-text">In Crimpson <span class="blank" data-answer="Street" data-gap="4">_____</span>, opposite the baker's.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">Were they very expensive?</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Jenny:</div>
+        <div class="dialog-text">No, not at all. They were only <span class="blank" data-answer="£20" data-gap="5">_____</span>.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">That's a <span class="blank" data-answer="bargain" data-gap="6">_____</span>. I think I'll go and have a look myself on <span class="blank" data-answer="Saturday" data-gap="7">_____</span>.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Jenny:</div>
+        <div class="dialog-text">Great! Let's meet at 10:30 at the <span class="blank" data-answer="bus station" data-gap="8">_____</span>.</div>
+      </div>
+      <div class="dialog-line">
+        <div class="speaker">Amy:</div>
+        <div class="dialog-text">OK! See you there.</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-check" id="checkGaps">✅ Check Gaps</button>
+      <button class="btn btn-reset" id="resetGaps">🔄 Reset Gaps</button>
+    </div>
+
+    <div class="result-banner" id="gapResult"></div>
+  </div>
+
+  <!-- ==================== SECTION 2: MATCHING ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge badge-3">2</div>
+      <h2>Match the Questions and Answers</h2>
+    </div>
+    <div class="section-hint">
+      Tap a question on the left, then tap its matching answer on the right.
+    </div>
+
+    <div class="match-grid">
+      <div class="match-col">
+        <div class="match-col-title">Questions</div>
+        <div class="match-item" data-id="q1" data-match="a1">
+          <span class="match-num">1</span> Are your sunglasses new?
+        </div>
+        <div class="match-item" data-id="q2" data-match="a2">
+          <span class="match-num">2</span> Where did you buy them?
+        </div>
+        <div class="match-item" data-id="q3" data-match="a3">
+          <span class="match-num">3</span> Were they very expensive?
+        </div>
+        <div class="match-item" data-id="q4" data-match="a4">
+          <span class="match-num">4</span> Where exactly is the shop?
+        </div>
+        <div class="match-item" data-id="q5" data-match="a5">
+          <span class="match-num">5</span> What time shall we meet?
+        </div>
+      </div>
+      <div class="match-col">
+        <div class="match-col-title">Answers</div>
+        <div class="match-item" data-id="a3" data-match="q3">
+          No, not at all. They were only £20.
+        </div>
+        <div class="match-item" data-id="a1" data-match="q1">
+          Yes, I bought them a couple of days ago.
+        </div>
+        <div class="match-item" data-id="a5" data-match="q5">
+          Let's meet at 10:30 at the bus station.
+        </div>
+        <div class="match-item" data-id="a2" data-match="q2">
+          At "Stacey's" in the town centre.
+        </div>
+        <div class="match-item" data-id="a4" data-match="q4">
+          In Crimpson Street, opposite the baker's.
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-check" id="checkMatch">✅ Check Match</button>
+      <button class="btn btn-reset" id="resetMatch">🔄 Reset Match</button>
+    </div>
+
+    <div class="result-banner" id="matchResult"></div>
+  </div>
+
+  <!-- ==================== SCORE ==================== -->
+  <div class="score-bar">
+    <div>
+      <div class="score-label">Your Total Score</div>
+      <div class="score-value"><span id="scoreNum">0</span><span class="of"> / 13</span></div>
+    </div>
+    <div class="score-stars" id="scoreStars">☆☆☆</div>
+  </div>
+
+</div>
+
+<script>
+/* =====================================================
+   STATE
+   ===================================================== */
+let selectedBankWord = null;
+let gapsChecked = false;
+let matchChecked = false;
+let gapScore = 0;
+let matchScore = 0;
+
+/* =====================================================
+   GAP-FILL
+   ===================================================== */
+const bankWords = document.querySelectorAll('.bank-word');
+const blanks = document.querySelectorAll('.blank');
+
+bankWords.forEach(word => {
+  word.addEventListener('click', () => {
+    if (gapsChecked) return;
+    if (word.classList.contains('used')) return;
+
+    if (selectedBankWord === word) {
+      word.classList.remove('selected');
+      selectedBankWord = null;
+    } else {
+      if (selectedBankWord) selectedBankWord.classList.remove('selected');
+      word.classList.add('selected');
+      selectedBankWord = word;
+    }
+  });
+});
+
+blanks.forEach(blank => {
+  blank.addEventListener('click', () => {
+    if (gapsChecked) return;
+
+    const currentFilled = blank.dataset.filled;
+    const currentWord = blank.dataset.currentWord;
+
+    if (currentFilled === 'true' && currentWord) {
+      bankWords.forEach(w => {
+        if (w.dataset.word === currentWord && w.classList.contains('used')) {
+          w.classList.remove('used');
+        }
+      });
+      blank.textContent = '_____';
+      blank.classList.remove('filled');
+      blank.dataset.filled = 'false';
+      delete blank.dataset.currentWord;
+      return;
+    }
+
+    if (selectedBankWord) {
+      const word = selectedBankWord.dataset.word;
+      blank.textContent = word;
+      blank.classList.add('filled');
+      blank.dataset.filled = 'true';
+      blank.dataset.currentWord = word;
+
+      selectedBankWord.classList.remove('selected');
+      selectedBankWord.classList.add('used');
+      selectedBankWord = null;
+    }
+  });
+});
+
+/* =====================================================
+   CHECK GAPS
+   ===================================================== */
+document.getElementById('checkGaps').addEventListener('click', () => {
+  if (gapsChecked) return;
+  gapsChecked = true;
+
+  let correct = 0;
+  let total = 0;
+
+  blanks.forEach(blank => {
+    total++;
+    const answer = blank.dataset.answer;
+    const currentWord = blank.dataset.currentWord;
+
+    if (currentWord === answer) {
+      blank.classList.remove('filled');
+      blank.classList.add('correct');
+      correct++;
+    } else {
+      blank.classList.remove('filled');
+      blank.classList.add('wrong');
+      if (currentWord) {
+        blank.textContent = currentWord + ' → ' + answer;
+      } else {
+        blank.textContent = answer;
+      }
+    }
+  });
+
+  gapScore = correct;
+  updateScore();
+
+  const banner = document.getElementById('gapResult');
+  banner.classList.remove('good', 'mid', 'bad');
+  const pct = Math.round((correct / total) * 100);
+
+  if (pct === 100) {
+    banner.textContent = `🏆 Perfect! ${correct} / ${total} — Well done!`;
+    banner.classList.add('show', 'good');
+  } else if (pct >= 60) {
+    banner.textContent = `🌟 Good job! ${correct} / ${total} — Almost there!`;
+    banner.classList.add('show', 'good');
+  } else {
+    banner.textContent = `💪 ${correct} / ${total} — Read the text again and check the answers above.`;
+    banner.classList.add('show', 'mid');
+  }
+
+  document.getElementById('checkGaps').disabled = true;
+  bankWords.forEach(w => w.style.pointerEvents = 'none');
+  blanks.forEach(b => b.style.pointerEvents = 'none');
+});
+
+/* =====================================================
+   RESET GAPS
+   ===================================================== */
+document.getElementById('resetGaps').addEventListener('click', () => {
+  gapsChecked = false;
+  gapScore = 0;
+  selectedBankWord = null;
+
+  bankWords.forEach(w => {
+    w.classList.remove('used', 'selected');
+    w.style.pointerEvents = '';
+  });
+
+  blanks.forEach(b => {
+    b.textContent = '_____';
+    b.classList.remove('filled', 'correct', 'wrong');
+    b.dataset.filled = 'false';
+    delete b.dataset.currentWord;
+    b.style.pointerEvents = '';
+  });
+
+  document.getElementById('gapResult').classList.remove('show');
+  document.getElementById('checkGaps').disabled = false;
+  updateScore();
+});
+
+/* =====================================================
+   MATCHING
+   ===================================================== */
+let selectedMatch = null;
+let matchedPairs = new Set();
+
+const matchItems = document.querySelectorAll('.match-item');
+
+matchItems.forEach(item => {
+  item.addEventListener('click', () => {
+    if (matchChecked) return;
+    if (item.classList.contains('matched')) return;
+
+    const id = item.dataset.id;
+
+    if (selectedMatch) {
+      if (selectedMatch === item) {
+        item.classList.remove('selected');
+        selectedMatch = null;
+        return;
+      }
+
+      const sideA = selectedMatch.dataset.id[0];
+      const sideB = id[0];
+
+      if (sideA === sideB) {
+        selectedMatch.classList.remove('selected');
+        item.classList.add('selected');
+        selectedMatch = item;
+        return;
+      }
+
+      const a = selectedMatch;
+      const b = item;
+
+      if (a.dataset.match === b.dataset.id && b.dataset.match === a.dataset.id) {
+        a.classList.remove('selected');
+        b.classList.remove('selected');
+        a.classList.add('matched');
+        b.classList.add('matched');
+        matchedPairs.add(a.dataset.id);
+        matchedPairs.add(b.dataset.id);
+        selectedMatch = null;
+        matchScore = matchedPairs.size / 2;
+        updateScore();
+      } else {
+        a.classList.add('wrong');
+        b.classList.add('wrong');
+        const savedA = a;
+        const savedB = b;
+        setTimeout(() => {
+          savedA.classList.remove('wrong', 'selected');
+          savedB.classList.remove('wrong', 'selected');
+        }, 600);
+        selectedMatch = null;
+      }
+    } else {
+      item.classList.add('selected');
+      selectedMatch = item;
+    }
+  });
+});
+
+/* =====================================================
+   CHECK MATCH
+   ===================================================== */
+document.getElementById('checkMatch').addEventListener('click', () => {
+  if (matchChecked) return;
+  matchChecked = true;
+
+  const totalPairs = 5;
+  const correct = matchedPairs.size / 2;
+
+  const banner = document.getElementById('matchResult');
+  banner.classList.remove('good', 'mid', 'bad');
+  const pct = Math.round((correct / totalPairs) * 100);
+
+  if (pct === 100) {
+    banner.textContent = `🏆 Amazing! All ${totalPairs} pairs matched perfectly!`;
+    banner.classList.add('show', 'good');
+  } else if (pct >= 60) {
+    banner.textContent = `🌟 Good job! ${correct} / ${totalPairs} pairs matched.`;
+    banner.classList.add('show', 'good');
+  } else {
+    banner.textContent = `💪 ${correct} / ${totalPairs} pairs matched. Read the dialogue again and try once more!`;
+    banner.classList.add('show', 'mid');
+  }
+
+  document.getElementById('checkMatch').disabled = true;
+});
+
+/* =====================================================
+   RESET MATCH
+   ===================================================== */
+document.getElementById('resetMatch').addEventListener('click', () => {
+  matchChecked = false;
+  selectedMatch = null;
+  matchedPairs.clear();
+  matchScore = 0;
+
+  matchItems.forEach(item => {
+    item.classList.remove('selected', 'matched', 'wrong');
+  });
+
+  document.getElementById('matchResult').classList.remove('show');
+  document.getElementById('checkMatch').disabled = false;
+  updateScore();
+});
+
+/* =====================================================
+   SCORE
+   ===================================================== */
+function updateScore() {
+  const total = gapScore + matchScore;
+  document.getElementById('scoreNum').textContent = total;
+
+  const maxScore = 13;
+  const pct = total / maxScore;
+  const starsEl = document.getElementById('scoreStars');
+  if (total === maxScore) starsEl.textContent = '⭐⭐⭐';
+  else if (pct >= 0.66)   starsEl.textContent = '⭐⭐☆';
+  else if (pct >= 0.33)   starsEl.textContent = '⭐☆☆';
+  else                    starsEl.textContent = '☆☆☆';
+}
+
+updateScore();
+
+</script>
+</body>
+</html>

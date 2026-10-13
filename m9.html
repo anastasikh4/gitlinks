@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Sunglasses — Comprehension Worksheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #6c5ce7;
+    --primary-dark: #4834b8;
+    --green: #23b26d;
+    --green-dark: #1a8a54;
+    --green-light: #e6f9ef;
+    --red: #ff4b4b;
+    --red-dark: #d33;
+    --red-light: #ffeaea;
+    --yellow: #ffcd1f;
+    --yellow-light: #fff9d6;
+    --blue: #74b9ff;
+    --blue-dark: #4a8ee0;
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #2d3436;
+    --text-light: #7a8aa3;
+    --border: #e8ecf3;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(108,92,231,0.12) 0 40px, transparent 60px),
+      radial-gradient(circle at 88% 20%, rgba(255,205,31,0.18) 0 50px, transparent 70px),
+      radial-gradient(circle at 20% 92%, rgba(116,185,255,0.15) 0 45px, transparent 65px),
+      radial-gradient(circle at 85% 90%, rgba(35,178,109,0.12) 0 40px, transparent 60px),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px 12px 60px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrapper {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ==================== HEADER CARD ==================== */
+  .head-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 26px 28px 22px;
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.12);
+    border: 2px solid var(--border);
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .head-card::before {
+    content: '😎';
+    position: absolute;
+    top: -20px;
+    right: -10px;
+    font-size: 110px;
+    opacity: 0.12;
+    transform: rotate(-15deg);
+    pointer-events: none;
+  }
+
+  .topic-tag {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.15;
+  }
+  .subtitle {
+    font-family: 'Caveat', cursive;
+    font-size: 24px;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  /* ---- Name & Date fields ---- */
+  .fields {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .field {
+    position: relative;
+  }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    background: #fafbfd;
+    transition: 0.2s;
+    outline: none;
+  }
+  .field input:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(108,92,231,0.12);
+  }
+  .field input::placeholder {
+    color: #b0bccd;
+    font-weight: 500;
+  }
+
+  /* ==================== AUDIO PLAYER ==================== */
+  .audio-card {
+    background: linear-gradient(135deg, #6c5ce7 0%, #8b7bf0 100%);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .audio-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.22);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+    animation: pulseAudio 2.2s ease-in-out infinite;
+  }
+  @keyframes pulseAudio {
+    0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
+    50% { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+  }
+  .audio-info { flex: 1; min-width: 180px; }
+  .audio-title {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+  }
+  .audio-sub {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+  .audio-card audio {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 30px;
+    outline: none;
+    height: 42px;
+  }
+
+  /* ==================== SECTION CARD ==================== */
+  .section {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 24px 26px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+    border: 2px solid var(--border);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 6px;
+  }
+  .section-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    flex-shrink: 0;
+  }
+  .badge-a { background: linear-gradient(135deg, #23b26d, #1a8a54); }
+  .badge-b { background: linear-gradient(135deg, #6c5ce7, #4834b8); }
+
+  .section h2 {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+    color: var(--text);
+  }
+  .section-hint {
+    font-size: 14px;
+    color: var(--text-light);
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-left: 58px;
+    font-style: italic;
+  }
+
+  /* ==================== TRUE / FALSE ==================== */
+  .tf-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #fafbfd;
+    border: 2px solid var(--border);
+    margin-bottom: 12px;
+    transition: 0.3s;
+    flex-wrap: wrap;
+  }
+  .tf-text {
+    flex: 1;
+    min-width: 200px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    font-size: 13px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .tf-buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .tf-btn {
+    min-width: 76px;
+    padding: 10px 20px;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--text);
+    cursor: pointer;
+    transition: 0.12s;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 0 var(--border);
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .tf-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 var(--border);
+    border-color: #d5dde8;
+  }
+  .tf-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .tf-btn.selected-true {
+    background: var(--green);
+    color: white;
+    border-color: var(--green-dark);
+    box-shadow: 0 3px 0 var(--green-dark);
+  }
+  .tf-btn.selected-false {
+    background: var(--red);
+    color: white;
+    border-color: var(--red-dark);
+    box-shadow: 0 3px 0 var(--red-dark);
+  }
+  .tf-btn.correct-answer {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green-dark);
+    box-shadow: 0 3px 0 var(--green-dark);
+  }
+  .tf-btn.wrong-answer {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red-dark);
+    box-shadow: 0 3px 0 var(--red-dark);
+  }
+  .tf-btn:disabled { cursor: default; }
+
+  .tf-item.good { background: var(--green-light); border-color: var(--green); }
+  .tf-item.bad { background: var(--red-light); border-color: var(--red); }
+
+  /* ==================== MULTIPLE CHOICE ==================== */
+  .mc-item {
+    padding: 16px 18px 18px;
+    border-radius: 16px;
+    background: #fafbfd;
+    border: 2px solid var(--border);
+    margin-bottom: 14px;
+    transition: 0.3s;
+  }
+  .mc-question {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.35;
+  }
+  .mc-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 36px;
+  }
+  .mc-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.15s;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 3px 0 var(--border);
+    -webkit-user-select: none;
+    user-select: none;
+    font-family: inherit;
+    text-align: left;
+  }
+  .mc-option:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: #d5dde8;
+    box-shadow: 0 5px 0 var(--border);
+  }
+  .mc-option:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .mc-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #eef2f8;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--text-light);
+    flex-shrink: 0;
+    transition: 0.15s;
+  }
+  .mc-option:hover:not(:disabled) .mc-letter {
+    background: var(--primary);
+    color: white;
+  }
+  .mc-option.selected {
+    background: #eeecfd;
+    border-color: var(--primary);
+    color: var(--primary-dark);
+    box-shadow: 0 3px 0 var(--primary-dark);
+  }
+  .mc-option.selected .mc-letter {
+    background: var(--primary);
+    color: white;
+  }
+  .mc-option.correct-answer {
+    background: var(--green-light);
+    border-color: var(--green);
+    color: var(--green-dark);
+    box-shadow: 0 3px 0 var(--green-dark);
+  }
+  .mc-option.correct-answer .mc-letter {
+    background: var(--green);
+    color: white;
+  }
+  .mc-option.wrong-answer {
+    background: var(--red-light);
+    border-color: var(--red);
+    color: var(--red-dark);
+    box-shadow: 0 3px 0 var(--red-dark);
+  }
+  .mc-option.wrong-answer .mc-letter {
+    background: var(--red);
+    color: white;
+  }
+  .mc-option:disabled { cursor: default; }
+  .mc-option.dimmed { opacity: 0.55; }
+
+  .mc-item.good { background: var(--green-light); border-color: var(--green); }
+  .mc-item.bad { background: var(--red-light); border-color: var(--red); }
+
+  /* ==================== SCORE & BUTTONS ==================== */
+  .score-bar {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 24px;
+    border: 2px solid var(--border);
+    box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .score-label {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+  .score-value {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .score-value .of {
+    font-size: 17px;
+    color: var(--text-light);
+  }
+  .score-stars {
+    font-size: 24px;
+    letter-spacing: 3px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 14px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.12s;
+    color: white;
+    -webkit-user-select: none;
+    user-select: none;
+    flex: 1;
+    min-width: 140px;
+  }
+  .btn-check {
+    background: var(--green);
+    box-shadow: 0 5px 0 var(--green-dark);
+  }
+  .btn-check:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+  .btn-reset {
+    background: var(--text-light);
+    box-shadow: 0 5px 0 #5b6a82;
+  }
+  .btn-reset:active { transform: translateY(3px); box-shadow: 0 2px 0 #5b6a82; }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ==================== RESULT BANNER ==================== */
+  .result-banner {
+    display: none;
+    margin-top: 18px;
+    padding: 18px 22px;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    animation: fadeIn 0.4s;
+  }
+  .result-banner.show { display: block; }
+  .result-banner.good {
+    background: linear-gradient(135deg, #e6f9ef, #c8f0db);
+    color: var(--green-dark);
+    border: 2px solid var(--green);
+  }
+  .result-banner.mid {
+    background: linear-gradient(135deg, #fff9d6, #fff0a8);
+    color: #7a5c00;
+    border: 2px solid var(--yellow);
+  }
+  .result-banner.bad {
+    background: linear-gradient(135deg, #ffeaea, #ffd4d4);
+    color: var(--red-dark);
+    border: 2px solid var(--red);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==================== MOBILE ==================== */
+  @media (max-width: 520px) {
+    body { padding: 14px 10px 40px; }
+    .head-card { padding: 20px 20px 18px; }
+    h1 { font-size: 24px; }
+    .subtitle { font-size: 20px; }
+    .section { padding: 18px 18px 20px; }
+    .section-hint { padding-left: 0; }
+    .fields { grid-template-columns: 1fr; }
+    .tf-item { padding: 12px 14px; }
+    .tf-text { font-size: 15px; }
+    .tf-btn { padding: 8px 14px; font-size: 14px; min-width: 66px; }
+    .mc-options { padding-left: 0; }
+    .audio-card { padding: 16px; }
+    .audio-icon { width: 48px; height: 48px; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="head-card">
+    <span class="topic-tag">📝 Comprehension Worksheet</span>
+    <h1>New Sunglasses</h1>
+    <div class="subtitle">Listen and check your understanding!</div>
+
+    <div class="fields">
+      <div class="field">
+        <label for="studentName">Name</label>
+        <input type="text" id="studentName" placeholder="Write your name...">
+      </div>
+      <div class="field">
+        <label for="studentDate">Date</label>
+        <input type="text" id="studentDate" placeholder="DD / MM">
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== AUDIO PLAYER ==================== -->
+  <div class="audio-card">
+    <div class="audio-icon">🎧</div>
+    <div class="audio-info">
+      <div class="audio-title">Audio: ou20</div>
+      <div class="audio-sub">Listen carefully, then answer the questions below</div>
+    </div>
+    <audio id="audioPlayer" controls preload="auto">
+      <source src="ou20.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  <!-- ==================== PART A: TRUE / FALSE ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge badge-a">A</div>
+      <h2>True or False?</h2>
+    </div>
+    <div class="section-hint">Listen to the audio and choose T (True) or F (False).</div>
+
+    <!-- Q1 -->
+    <div class="tf-item" data-id="tf1" data-correct="true">
+      <div class="tf-text">
+        <span class="num">1</span>
+        <span>Jenny and Amy met in the town centre last weekend.</span>
+      </div>
+      <div class="tf-buttons">
+        <button class="tf-btn" data-value="true">T</button>
+        <button class="tf-btn" data-value="false">F</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="tf-item" data-id="tf2" data-correct="false">
+      <div class="tf-text">
+        <span class="num">2</span>
+        <span>Jenny's sunglasses were very expensive.</span>
+      </div>
+      <div class="tf-buttons">
+        <button class="tf-btn" data-value="true">T</button>
+        <button class="tf-btn" data-value="false">F</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="tf-item" data-id="tf3" data-correct="true">
+      <div class="tf-text">
+        <span class="num">3</span>
+        <span>Amy and Jenny will go shopping together on Saturday.</span>
+      </div>
+      <div class="tf-buttons">
+        <button class="tf-btn" data-value="true">T</button>
+        <button class="tf-btn" data-value="false">F</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PART B: MULTIPLE CHOICE ==================== -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge badge-b">B</div>
+      <h2>Multiple Choice</h2>
+    </div>
+    <div class="section-hint">Listen to the audio and choose A, B, or C.</div>
+
+    <!-- MC1 -->
+    <div class="mc-item" data-id="mc1" data-correct="b">
+      <div class="mc-question">
+        <span class="num">1</span>
+        <span>Where did Jenny buy her sunglasses?</span>
+      </div>
+      <div class="mc-options">
+        <button class="mc-option" data-value="a"><span class="mc-letter">A</span><span>At the baker's</span></button>
+        <button class="mc-option" data-value="b"><span class="mc-letter">B</span><span>At "Stacey's" in the town centre</span></button>
+        <button class="mc-option" data-value="c"><span class="mc-letter">C</span><span>At the bus station</span></button>
+      </div>
+    </div>
+
+    <!-- MC2 -->
+    <div class="mc-item" data-id="mc2" data-correct="b">
+      <div class="mc-question">
+        <span class="num">2</span>
+        <span>How much were the sunglasses?</span>
+      </div>
+      <div class="mc-options">
+        <button class="mc-option" data-value="a"><span class="mc-letter">A</span><span>£12</span></button>
+        <button class="mc-option" data-value="b"><span class="mc-letter">B</span><span>£20</span></button>
+        <button class="mc-option" data-value="c"><span class="mc-letter">C</span><span>£30</span></button>
+      </div>
+    </div>
+
+    <!-- MC3 -->
+    <div class="mc-item" data-id="mc3" data-correct="b">
+      <div class="mc-question">
+        <span class="num">3</span>
+        <span>What time will Amy and Jenny meet on Saturday?</span>
+      </div>
+      <div class="mc-options">
+        <button class="mc-option" data-value="a"><span class="mc-letter">A</span><span>10:00</span></button>
+        <button class="mc-option" data-value="b"><span class="mc-letter">B</span><span>10:30</span></button>
+        <button class="mc-option" data-value="c"><span class="mc-letter">C</span><span>11:30</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCORE + ACTIONS ==================== -->
+  <div class="score-bar">
+    <div>
+      <div class="score-label">Your Score</div>
+      <div class="score-value"><span id="scoreNum">0</span><span class="of"> / 6</span></div>
+    </div>
+    <div class="score-stars" id="scoreStars">☆☆☆</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-check" id="checkBtn">✅ Check Answers</button>
+    <button class="btn btn-reset" id="resetBtn">🔄 Reset</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</div>
+
+<script>
+/* =====================================================
+   STATE
+   ===================================================== */
+let checked = false;
+
+/* =====================================================
+   TRUE / FALSE LOGIC
+   ===================================================== */
+document.querySelectorAll('.tf-item').forEach(item => {
+  const buttons = item.querySelectorAll('.tf-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (checked) return;
+      // deselect siblings
+      buttons.forEach(b => {
+        b.classList.remove('selected-true', 'selected-false');
+      });
+      if (btn.dataset.value === 'true') btn.classList.add('selected-true');
+      else btn.classList.add('selected-false');
+    });
+  });
+});
+
+/* =====================================================
+   MULTIPLE CHOICE LOGIC
+   ===================================================== */
+document.querySelectorAll('.mc-item').forEach(item => {
+  const options = item.querySelectorAll('.mc-option');
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      if (checked) return;
+      options.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+});
+
+/* =====================================================
+   CHECK ANSWERS
+   ===================================================== */
+document.getElementById('checkBtn').addEventListener('click', () => {
+  if (checked) return;
+
+  let score = 0;
+  const total = 6;
+
+  // -------- Part A: True / False --------
+  document.querySelectorAll('.tf-item').forEach(item => {
+    const correct = item.dataset.correct;
+    const selected = item.querySelector('.tf-btn.selected-true, .tf-btn.selected-false');
+    const allBtns = item.querySelectorAll('.tf-btn');
+
+    // disable all
+    allBtns.forEach(b => b.disabled = true);
+
+    if (!selected) {
+      // not answered — highlight correct
+      allBtns.forEach(b => {
+        if (b.dataset.value === correct) b.classList.add('correct-answer');
+      });
+      item.classList.add('bad');
+      return;
+    }
+
+    const chosen = selected.dataset.value;
+
+    if (chosen === correct) {
+      selected.classList.remove('selected-true', 'selected-false');
+      selected.classList.add('correct-answer');
+      item.classList.add('good');
+      score++;
+    } else {
+      selected.classList.remove('selected-true', 'selected-false');
+      selected.classList.add('wrong-answer');
+      allBtns.forEach(b => {
+        if (b.dataset.value === correct) b.classList.add('correct-answer');
+      });
+      item.classList.add('bad');
+    }
+  });
+
+  // -------- Part B: Multiple Choice --------
+  document.querySelectorAll('.mc-item').forEach(item => {
+    const correct = item.dataset.correct;
+    const selected = item.querySelector('.mc-option.selected');
+    const allOpts = item.querySelectorAll('.mc-option');
+
+    allOpts.forEach(o => o.disabled = true);
+
+    if (!selected) {
+      allOpts.forEach(o => {
+        if (o.dataset.value === correct) o.classList.add('correct-answer');
+      });
+      item.classList.add('bad');
+      return;
+    }
+
+    const chosen = selected.dataset.value;
+
+    if (chosen === correct) {
+      selected.classList.remove('selected');
+      selected.classList.add('correct-answer');
+      item.classList.add('good');
+      score++;
+    } else {
+      selected.classList.remove('selected');
+      selected.classList.add('wrong-answer');
+      allOpts.forEach(o => {
+        if (o.dataset.value === correct) o.classList.add('correct-answer');
+        else o.classList.add('dimmed');
+      });
+      item.classList.add('bad');
+    }
+  });
+
+  // -------- Update score --------
+  document.getElementById('scoreNum').textContent = score;
+  updateStars(score, total);
+
+  // -------- Result banner --------
+  const banner = document.getElementById('resultBanner');
+  const pct = Math.round((score / total) * 100);
+  banner.classList.remove('good', 'mid', 'bad');
+
+  if (pct === 100) {
+    banner.textContent = `🏆 Perfect! ${score} / ${total} — You are a superstar!`;
+    banner.classList.add('show', 'good');
+  } else if (pct >= 66) {
+    banner.textContent = `🌟 Great job! ${score} / ${total} — Almost perfect!`;
+    banner.classList.add('show', 'good');
+  } else if (pct >= 33) {
+    banner.textContent = `💪 Good effort! ${score} / ${total} — Listen again and try once more.`;
+    banner.classList.add('show', 'mid');
+  } else {
+    banner.textContent = `📚 ${score} / ${total} — Listen again carefully, you can do it!`;
+    banner.classList.add('show', 'bad');
+  }
+
+  checked = true;
+  document.getElementById('checkBtn').disabled = true;
+});
+
+/* =====================================================
+   RESET
+   ===================================================== */
+document.getElementById('resetBtn').addEventListener('click', () => {
+  checked = false;
+
+  // Reset True/False
+  document.querySelectorAll('.tf-item').forEach(item => {
+    item.classList.remove('good', 'bad');
+    item.querySelectorAll('.tf-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('selected-true', 'selected-false', 'correct-answer', 'wrong-answer');
+    });
+  });
+
+  // Reset Multiple Choice
+  document.querySelectorAll('.mc-item').forEach(item => {
+    item.classList.remove('good', 'bad');
+    item.querySelectorAll('.mc-option').forEach(o => {
+      o.disabled = false;
+      o.classList.remove('selected', 'correct-answer', 'wrong-answer', 'dimmed');
+    });
+  });
+
+  // Reset score & banner
+  document.getElementById('scoreNum').textContent = '0';
+  document.getElementById('scoreStars').textContent = '☆☆☆';
+  const banner = document.getElementById('resultBanner');
+  banner.className = 'result-banner';
+  banner.textContent = '';
+
+  document.getElementById('checkBtn').disabled = false;
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* =====================================================
+   STARS
+   ===================================================== */
+function updateStars(score, total) {
+  const starsEl = document.getElementById('scoreStars');
+  const pct = score / total;
+  let stars = '';
+  if (pct === 1)        stars = '⭐⭐⭐';
+  else if (pct >= 0.66) stars = '⭐⭐☆';
+  else if (pct >= 0.33) stars = '⭐☆☆';
+  else                  stars = '☆☆☆';
+  starsEl.textContent = stars;
+}
+
+</script>
+</body>
+</html>
