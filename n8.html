@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎻 A Street Musician's Life — Interactive Worksheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #6c5ce7;
+        --primary-dark: #4834b8;
+        --primary-light: #eeecfd;
+        --green: #23b26d;
+        --green-dark: #1a8a54;
+        --green-light: #e6f9ef;
+        --red: #ff4b4b;
+        --red-dark: #d33;
+        --red-light: #ffeaea;
+        --yellow: #ffcd1f;
+        --yellow-light: #fff9d6;
+        --orange: #ff8c42;
+        --blue: #74b9ff;
+        --blue-dark: #4a8ee0;
+        --blue-light: #e8f4ff;
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #2d3436;
+        --text-light: #7a8aa3;
+        --border: #e8ecf3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+        font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background:
+            radial-gradient(circle at 10% 5%, rgba(108,92,231,0.12) 0 50px, transparent 70px),
+            radial-gradient(circle at 90% 15%, rgba(255,205,31,0.18) 0 60px, transparent 80px),
+            radial-gradient(circle at 15% 90%, rgba(255,140,66,0.12) 0 45px, transparent 65px),
+            radial-gradient(circle at 88% 92%, rgba(35,178,109,0.12) 0 55px, transparent 75px),
+            var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 20px 12px 60px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .wrapper { max-width: 780px; margin: 0 auto; }
+
+    /* ==================== HEADER ==================== */
+    .head-card {
+        background: var(--card);
+        border-radius: 24px;
+        padding: 26px 28px 22px;
+        box-shadow: 0 8px 30px rgba(108, 92, 231, 0.12);
+        border: 2px solid var(--border);
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    .head-card::before {
+        content: '🎻';
+        position: absolute;
+        top: -20px;
+        right: -10px;
+        font-size: 130px;
+        opacity: 0.1;
+        transform: rotate(-15deg);
+        pointer-events: none;
+    }
+
+    .topic-tag {
+        display: inline-block;
+        background: var(--primary);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        font-size: 30px;
+        font-weight: 900;
+        letter-spacing: -0.5px;
+        color: var(--text);
+        margin-bottom: 4px;
+        line-height: 1.15;
+    }
+    .subtitle {
+        font-family: 'Caveat', cursive;
+        font-size: 24px;
+        color: var(--primary);
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .fields {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+    }
+    .field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        margin-bottom: 6px;
+    }
+    .field input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        background: #fafbfd;
+        transition: 0.2s;
+        outline: none;
+    }
+    .field input:focus {
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(108,92,231,0.12);
+    }
+    .field input::placeholder { color: #b0bccd; font-weight: 500; }
+
+    /* ==================== AUDIO PLAYER ==================== */
+    .audio-card {
+        background: linear-gradient(135deg, #6c5ce7 0%, #8b7bf0 100%);
+        border-radius: 20px;
+        padding: 22px 24px;
+        margin-bottom: 20px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+    .audio-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255,255,255,0.22);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+        animation: pulseAudio 2.2s ease-in-out infinite;
+    }
+    @keyframes pulseAudio {
+        0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.5); }
+        50% { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+    }
+    .audio-info { flex: 1; min-width: 180px; }
+    .audio-title {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        margin-bottom: 2px;
+    }
+    .audio-sub {
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.85;
+    }
+    .audio-card audio {
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 30px;
+        outline: none;
+        height: 42px;
+    }
+
+    /* ==================== SECTION ==================== */
+    .section {
+        background: var(--card);
+        border-radius: 22px;
+        padding: 24px 26px 26px;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+        border: 2px solid var(--border);
+    }
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 6px;
+    }
+    .section-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        font-size: 20px;
+        font-weight: 900;
+        color: white;
+        flex-shrink: 0;
+    }
+    .badge-a { background: linear-gradient(135deg, #23b26d, #1a8a54); }
+    .badge-b { background: linear-gradient(135deg, #6c5ce7, #4834b8); }
+    .badge-c { background: linear-gradient(135deg, #ff8c42, #d96a1f); }
+
+    .section h2 {
+        font-size: 20px;
+        font-weight: 900;
+        letter-spacing: -0.3px;
+        color: var(--text);
+    }
+    .section-hint {
+        font-size: 14px;
+        color: var(--text-light);
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-left: 60px;
+        font-style: italic;
+    }
+
+    /* ==================== TRUE / FALSE ==================== */
+    .tf-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #fafbfd;
+        border: 2px solid var(--border);
+        margin-bottom: 12px;
+        transition: 0.3s;
+        flex-wrap: wrap;
+    }
+    .tf-text {
+        flex: 1;
+        min-width: 200px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.35;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: white;
+        font-size: 13px;
+        font-weight: 900;
+        flex-shrink: 0;
+    }
+    .tf-buttons {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+    .tf-btn {
+        min-width: 76px;
+        padding: 10px 20px;
+        border: 2px solid var(--border);
+        background: white;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 900;
+        color: var(--text);
+        cursor: pointer;
+        transition: 0.12s;
+        letter-spacing: 0.5px;
+        box-shadow: 0 3px 0 var(--border);
+        user-select: none;
+    }
+    .tf-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 0 var(--border);
+        border-color: #d5dde8;
+    }
+    .tf-btn:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 var(--border);
+    }
+    .tf-btn.selected-t {
+        background: var(--blue);
+        color: white;
+        border-color: var(--blue-dark);
+        box-shadow: 0 3px 0 var(--blue-dark);
+    }
+    .tf-btn.selected-f {
+        background: var(--blue);
+        color: white;
+        border-color: var(--blue-dark);
+        box-shadow: 0 3px 0 var(--blue-dark);
+    }
+    .tf-btn.correct-answer {
+        background: var(--green) !important;
+        border-color: var(--green-dark) !important;
+        color: white !important;
+        box-shadow: 0 3px 0 var(--green-dark) !important;
+    }
+    .tf-btn.wrong-answer {
+        background: var(--red) !important;
+        border-color: var(--red-dark) !important;
+        color: white !important;
+        box-shadow: 0 3px 0 var(--red-dark) !important;
+        animation: shake 0.4s;
+    }
+    .tf-btn:disabled { cursor: default; }
+
+    .tf-item.good { background: var(--green-light); border-color: var(--green); }
+    .tf-item.bad { background: var(--red-light); border-color: var(--red); }
+
+    @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        25% { transform: translateX(-6px); }
+        75% { transform: translateX(6px); }
+    }
+
+    /* ==================== MULTIPLE CHOICE ==================== */
+    .mc-item {
+        padding: 16px 18px 18px;
+        border-radius: 16px;
+        background: #fafbfd;
+        border: 2px solid var(--border);
+        margin-bottom: 14px;
+        transition: 0.3s;
+    }
+    .mc-question {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        line-height: 1.35;
+    }
+    .mc-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-left: 36px;
+    }
+    .mc-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.15s;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+        box-shadow: 0 3px 0 var(--border);
+        user-select: none;
+        font-family: inherit;
+        text-align: left;
+    }
+    .mc-option:hover:not(:disabled) {
+        transform: translateY(-2px);
+        border-color: #d5dde8;
+        box-shadow: 0 5px 0 var(--border);
+    }
+    .mc-option:active:not(:disabled) {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 var(--border);
+    }
+    .mc-letter {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #eef2f8;
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--text-light);
+        flex-shrink: 0;
+        transition: 0.15s;
+    }
+    .mc-option.selected {
+        background: var(--blue-light);
+        border-color: var(--blue);
+        color: var(--blue-dark);
+        box-shadow: 0 3px 0 var(--blue-dark);
+    }
+    .mc-option.selected .mc-letter {
+        background: var(--blue);
+        color: white;
+    }
+    .mc-option.correct-answer {
+        background: var(--green-light);
+        border-color: var(--green);
+        color: var(--green-dark);
+        box-shadow: 0 3px 0 var(--green-dark);
+    }
+    .mc-option.correct-answer .mc-letter {
+        background: var(--green);
+        color: white;
+    }
+    .mc-option.wrong-answer {
+        background: var(--red-light);
+        border-color: var(--red);
+        color: var(--red-dark);
+        box-shadow: 0 3px 0 var(--red-dark);
+        animation: shake 0.4s;
+    }
+    .mc-option.wrong-answer .mc-letter {
+        background: var(--red);
+        color: white;
+    }
+    .mc-option.dimmed { opacity: 0.5; }
+    .mc-option:disabled { cursor: default; }
+
+    .mc-item.good { background: var(--green-light); border-color: var(--green); }
+    .mc-item.bad { background: var(--red-light); border-color: var(--red); }
+
+    /* ==================== MATCHING ==================== */
+    .match-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 8px;
+    }
+    .match-col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .match-col-title {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        text-align: center;
+        margin-bottom: 4px;
+    }
+    .match-item {
+        padding: 14px 16px;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 14px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        cursor: pointer;
+        transition: 0.15s;
+        box-shadow: 0 3px 0 var(--border);
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        line-height: 1.35;
+        min-height: 60px;
+        word-wrap: break-word;
+    }
+    .match-item:hover:not(.matched) {
+        transform: translateY(-2px);
+        border-color: #d5dde8;
+        box-shadow: 0 5px 0 var(--border);
+    }
+    .match-item:active:not(.matched) {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 var(--border);
+    }
+    .match-item.selected {
+        background: var(--blue-light);
+        border-color: var(--blue);
+        color: var(--blue-dark);
+        box-shadow: 0 3px 0 var(--blue-dark);
+        transform: scale(1.02);
+    }
+    .match-item.matched {
+        background: var(--green-light);
+        border-color: var(--green);
+        color: var(--green-dark);
+        box-shadow: 0 3px 0 var(--green-dark);
+        cursor: default;
+        opacity: 0.8;
+    }
+    .match-item.wrong {
+        background: var(--red-light);
+        border-color: var(--red);
+        color: var(--red-dark);
+        animation: shake 0.4s;
+    }
+    .match-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        background: #eef2f8;
+        color: var(--text-light);
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 900;
+        flex-shrink: 0;
+        transition: 0.15s;
+    }
+    .match-item.selected .match-num { background: var(--blue); color: white; }
+    .match-item.matched .match-num { background: var(--green); color: white; }
+
+    /* ==================== BUTTONS ==================== */
+    .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 0.12s;
+        color: white;
+        user-select: none;
+        flex: 1;
+        min-width: 150px;
+    }
+    .btn-check {
+        background: var(--green);
+        box-shadow: 0 5px 0 var(--green-dark);
+    }
+    .btn-check:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 0 var(--green-dark);
+    }
+    .btn-check:active:not(:disabled) {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 var(--green-dark);
+    }
+    .btn-reset {
+        background: var(--text-light);
+        box-shadow: 0 5px 0 #5b6a82;
+    }
+    .btn-reset:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 0 #5b6a82;
+    }
+    .btn-reset:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #5b6a82;
+    }
+    .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ==================== RESULT BANNER ==================== */
+    .result-banner {
+        display: none;
+        margin-top: 22px;
+        padding: 18px 22px;
+        border-radius: 16px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 800;
+        animation: fadeIn 0.4s;
+    }
+    .result-banner.show { display: block; }
+    .result-banner.good {
+        background: linear-gradient(135deg, #e6f9ef, #c8f0db);
+        color: var(--green-dark);
+        border: 2px solid var(--green);
+    }
+    .result-banner.mid {
+        background: linear-gradient(135deg, #fff9d6, #fff0a8);
+        color: #7a5c00;
+        border: 2px solid var(--yellow);
+    }
+    .result-banner.bad {
+        background: linear-gradient(135deg, #ffeaea, #ffd4d4);
+        color: var(--red-dark);
+        border: 2px solid var(--red);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==================== SCORE BAR ==================== */
+    .score-bar {
+        background: white;
+        border-radius: 20px;
+        padding: 20px 24px;
+        border: 2px solid var(--border);
+        box-shadow: 0 6px 24px rgba(45, 52, 54, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    .score-label {
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-light);
+        margin-bottom: 2px;
+    }
+    .score-value {
+        font-size: 28px;
+        font-weight: 900;
+        color: var(--primary);
+        letter-spacing: -0.5px;
+    }
+    .score-value .of { font-size: 18px; color: var(--text-light); }
+    .score-stars { font-size: 26px; letter-spacing: 4px; }
+
+    /* ==================== MOBILE ==================== */
+    @media (max-width: 560px) {
+        body { padding: 14px 10px 40px; }
+        .head-card { padding: 20px 18px; }
+        h1 { font-size: 22px; }
+        .subtitle { font-size: 20px; }
+        .section { padding: 20px 16px 22px; }
+        .section-hint { padding-left: 0; }
+        .fields { grid-template-columns: 1fr; }
+        .tf-item { padding: 12px; }
+        .tf-text { font-size: 15px; min-width: 100%; }
+        .tf-buttons { width: 100%; }
+        .tf-btn { flex: 1; padding: 10px; }
+        .mc-options { padding-left: 0; }
+        .mc-option { font-size: 14px; padding: 11px 13px; }
+        .match-grid { grid-template-columns: 1fr; gap: 20px; }
+        .match-item { font-size: 14px; padding: 12px; }
+        .btn { font-size: 14px; padding: 13px 20px; min-width: 120px; }
+        .score-value { font-size: 22px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+    <!-- ==================== HEADER ==================== -->
+    <div class="head-card">
+        <span class="topic-tag">🎧 Listening Worksheet</span>
+        <h1>A Street Musician's Life</h1>
+        <div class="subtitle">Listen, then answer — Daniel's story</div>
+
+        <div class="fields">
+            <div class="field">
+                <label for="studentName">Name</label>
+                <input type="text" id="studentName" placeholder="Write your name...">
+            </div>
+            <div class="field">
+                <label for="studentDate">Date</label>
+                <input type="text" id="studentDate" placeholder="DD / MM">
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== AUDIO PLAYER ==================== -->
+    <div class="audio-card">
+        <div class="audio-icon">🎧</div>
+        <div class="audio-info">
+            <div class="audio-title">Audio: mus20</div>
+            <div class="audio-sub">Listen carefully — you can play it as many times as you need</div>
+        </div>
+        <audio id="audioPlayer" controls preload="auto">
+            <source src="mus20.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <!-- ==================== PART A: TRUE / FALSE ==================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-badge badge-a">A</div>
+            <h2>True or False?</h2>
+        </div>
+        <div class="section-hint">Listen to the audio and choose T (True) or F (False).</div>
+
+        <div class="tf-item" data-correct="false">
+            <div class="tf-text">
+                <span class="num">1</span>
+                <span>Daniel comes from Dublin.</span>
+            </div>
+            <div class="tf-buttons">
+                <button class="tf-btn" data-value="true" onclick="selectTF(this)">TRUE</button>
+                <button class="tf-btn" data-value="false" onclick="selectTF(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="tf-item" data-correct="true">
+            <div class="tf-text">
+                <span class="num">2</span>
+                <span>Daniel has been playing the violin since he was a child.</span>
+            </div>
+            <div class="tf-buttons">
+                <button class="tf-btn" data-value="true" onclick="selectTF(this)">TRUE</button>
+                <button class="tf-btn" data-value="false" onclick="selectTF(this)">FALSE</button>
+            </div>
+        </div>
+
+        <div class="tf-item" data-correct="true">
+            <div class="tf-text">
+                <span class="num">3</span>
+                <span>Daniel is going to record his first album next year.</span>
+            </div>
+            <div class="tf-buttons">
+                <button class="tf-btn" data-value="true" onclick="selectTF(this)">TRUE</button>
+                <button class="tf-btn" data-value="false" onclick="selectTF(this)">FALSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PART B: MULTIPLE CHOICE ==================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-badge badge-b">B</div>
+            <h2>Multiple Choice</h2>
+        </div>
+        <div class="section-hint">Listen to the audio and choose A, B, or C.</div>
+
+        <!-- MC1 -->
+        <div class="mc-item" data-correct="b">
+            <div class="mc-question">
+                <span class="num">1</span>
+                <span>Where does Daniel usually play his violin?</span>
+            </div>
+            <div class="mc-options">
+                <button class="mc-option" data-value="a" onclick="selectMC(this)"><span class="mc-letter">A</span><span>In a music hall</span></button>
+                <button class="mc-option" data-value="b" onclick="selectMC(this)"><span class="mc-letter">B</span><span>In Temple Bar or Grafton Street</span></button>
+                <button class="mc-option" data-value="c" onclick="selectMC(this)"><span class="mc-letter">C</span><span>In a university</span></button>
+            </div>
+        </div>
+
+        <!-- MC2 -->
+        <div class="mc-item" data-correct="c">
+            <div class="mc-question">
+                <span class="num">2</span>
+                <span>How much can Daniel earn on a good day?</span>
+            </div>
+            <div class="mc-options">
+                <button class="mc-option" data-value="a" onclick="selectMC(this)"><span class="mc-letter">A</span><span>Around twenty euros</span></button>
+                <button class="mc-option" data-value="b" onclick="selectMC(this)"><span class="mc-letter">B</span><span>Around fifty euros</span></button>
+                <button class="mc-option" data-value="c" onclick="selectMC(this)"><span class="mc-letter">C</span><span>Around eighty euros</span></button>
+            </div>
+        </div>
+
+        <!-- MC3 -->
+        <div class="mc-item" data-correct="b">
+            <div class="mc-question">
+                <span class="num">3</span>
+                <span>What is Daniel's dream?</span>
+            </div>
+            <div class="mc-options">
+                <button class="mc-option" data-value="a" onclick="selectMC(this)"><span class="mc-letter">A</span><span>To become a violin teacher</span></button>
+                <button class="mc-option" data-value="b" onclick="selectMC(this)"><span class="mc-letter">B</span><span>To tour around Europe with his own band</span></button>
+                <button class="mc-option" data-value="c" onclick="selectMC(this)"><span class="mc-letter">C</span><span>To move back to his hometown</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PART C: MATCHING ==================== -->
+    <div class="section">
+        <div class="section-header">
+            <div class="section-badge badge-c">C</div>
+            <h2>Match the Questions and Answers</h2>
+        </div>
+        <div class="section-hint">Tap a question on the left, then tap the matching answer on the right.</div>
+
+        <div class="match-grid">
+            <div class="match-col">
+                <div class="match-col-title">Questions</div>
+                <div class="match-item" data-id="q1" data-match="a1">
+                    <span class="match-num">1</span>
+                    <span>Where does Daniel live now?</span>
+                </div>
+                <div class="match-item" data-id="q2" data-match="a2">
+                    <span class="match-num">2</span>
+                    <span>Who taught him to play the violin?</span>
+                </div>
+                <div class="match-item" data-id="q3" data-match="a3">
+                    <span class="match-num">3</span>
+                    <span>How long has he been playing the violin?</span>
+                </div>
+                <div class="match-item" data-id="q4" data-match="a4">
+                    <span class="match-num">4</span>
+                    <span>Why does he share the rent with other musicians?</span>
+                </div>
+                <div class="match-item" data-id="q5" data-match="a5">
+                    <span class="match-num">5</span>
+                    <span>What has he already written for his album?</span>
+                </div>
+            </div>
+            <div class="match-col">
+                <div class="match-col-title">Answers</div>
+                <div class="match-item" data-id="a3" data-match="q3">
+                    <span class="match-num">A</span>
+                    <span>Since he was seven years old.</span>
+                </div>
+                <div class="match-item" data-id="a1" data-match="q1">
+                    <span class="match-num">B</span>
+                    <span>He lives in a small flat in Dublin with two other musicians.</span>
+                </div>
+                <div class="match-item" data-id="a4" data-match="q4">
+                    <span class="match-num">C</span>
+                    <span>Because Dublin is expensive and sharing is the only way to afford it.</span>
+                </div>
+                <div class="match-item" data-id="a2" data-match="q2">
+                    <span class="match-num">D</span>
+                    <span>His grandmother.</span>
+                </div>
+                <div class="match-item" data-id="a5" data-match="q5">
+                    <span class="match-num">E</span>
+                    <span>Twelve songs.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SCORE BAR ==================== -->
+    <div class="score-bar">
+        <div>
+            <div class="score-label">Your Score</div>
+            <div class="score-value"><span id="scoreNum">0</span><span class="of"> / 11</span></div>
+        </div>
+        <div class="score-stars" id="scoreStars">☆☆☆</div>
+    </div>
+
+    <!-- ==================== ACTIONS ==================== -->
+    <div class="actions">
+        <button class="btn btn-check" id="checkBtn" onclick="checkAll()">✓ Check Answers</button>
+        <button class="btn btn-reset" onclick="resetAll()">🔄 Reset</button>
+    </div>
+
+    <div class="result-banner" id="resultBanner"></div>
+
+</div>
+
+<script>
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let checked = false;
+
+/* =====================================================================
+   TRUE / FALSE — SELECT
+   ===================================================================== */
+function selectTF(btn) {
+    if (checked) return;
+    const parent = btn.closest('.tf-item');
+    parent.querySelectorAll('.tf-btn').forEach(b => {
+        b.classList.remove('selected-t', 'selected-f');
+    });
+    if (btn.dataset.value === 'true') btn.classList.add('selected-t');
+    else btn.classList.add('selected-f');
+}
+
+/* =====================================================================
+   MULTIPLE CHOICE — SELECT
+   ===================================================================== */
+function selectMC(btn) {
+    if (checked) return;
+    const parent = btn.closest('.mc-item');
+    parent.querySelectorAll('.mc-option').forEach(b => {
+        b.classList.remove('selected');
+    });
+    btn.classList.add('selected');
+}
+
+/* =====================================================================
+   MATCHING — SELECT & MATCH
+   ===================================================================== */
+let selectedMatch = null;
+const matchedPairs = new Set();
+
+document.querySelectorAll('.match-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (checked) return;
+        if (item.classList.contains('matched')) return;
+
+        const id = item.dataset.id;
+        const side = id[0]; // 'q' or 'a'
+
+        if (selectedMatch) {
+            // Click same item — deselect
+            if (selectedMatch === item) {
+                item.classList.remove('selected');
+                selectedMatch = null;
+                return;
+            }
+
+            const prevSide = selectedMatch.dataset.id[0];
+
+            // Same side — switch selection
+            if (prevSide === side) {
+                selectedMatch.classList.remove('selected');
+                item.classList.add('selected');
+                selectedMatch = item;
+                return;
+            }
+
+            // Different side — try to match
+            const a = selectedMatch;
+            const b = item;
+
+            if (a.dataset.match === b.dataset.id && b.dataset.match === a.dataset.id) {
+                a.classList.remove('selected');
+                b.classList.remove('selected');
+                a.classList.add('matched');
+                b.classList.add('matched');
+                matchedPairs.add(a.dataset.id);
+                matchedPairs.add(b.dataset.id);
+                selectedMatch = null;
+            } else {
+                a.classList.add('wrong');
+                b.classList.add('wrong');
+                const savedA = a;
+                const savedB = b;
+                setTimeout(() => {
+                    savedA.classList.remove('wrong', 'selected');
+                    savedB.classList.remove('wrong', 'selected');
+                }, 500);
+                selectedMatch = null;
+            }
+        } else {
+            item.classList.add('selected');
+            selectedMatch = item;
+        }
+    });
+});
+
+/* =====================================================================
+   CHECK ALL
+   ===================================================================== */
+function checkAll() {
+    if (checked) return;
+    checked = true;
+
+    let score = 0;
+    const total = 11;
+
+    /* --- Part A: True / False --- */
+    document.querySelectorAll('.tf-item').forEach(item => {
+        const correct = item.dataset.correct;
+        const selected = item.querySelector('.tf-btn.selected-t, .tf-btn.selected-f');
+        const allBtns = item.querySelectorAll('.tf-btn');
+
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected) {
+            const chosen = selected.dataset.value;
+            if (chosen === correct) {
+                selected.classList.remove('selected-t', 'selected-f');
+                selected.classList.add('correct-answer');
+                item.classList.add('good');
+                score++;
+            } else {
+                selected.classList.remove('selected-t', 'selected-f');
+                selected.classList.add('wrong-answer');
+                item.classList.add('bad');
+                // Reveal correct
+                allBtns.forEach(b => {
+                    if (b.dataset.value === correct) b.classList.add('correct-answer');
+                });
+            }
+        } else {
+            // Not answered — reveal correct
+            allBtns.forEach(b => {
+                if (b.dataset.value === correct) b.classList.add('correct-answer');
+            });
+            item.classList.add('bad');
+        }
+    });
+
+    /* --- Part B: Multiple Choice --- */
+    document.querySelectorAll('.mc-item').forEach(item => {
+        const correct = item.dataset.correct;
+        const selected = item.querySelector('.mc-option.selected');
+        const allOpts = item.querySelectorAll('.mc-option');
+
+        allOpts.forEach(o => o.disabled = true);
+
+        if (selected) {
+            const chosen = selected.dataset.value;
+            if (chosen === correct) {
+                selected.classList.remove('selected');
+                selected.classList.add('correct-answer');
+                item.classList.add('good');
+                score++;
+            } else {
+                selected.classList.remove('selected');
+                selected.classList.add('wrong-answer');
+                item.classList.add('bad');
+                allOpts.forEach(o => {
+                    if (o.dataset.value === correct) o.classList.add('correct-answer');
+                    else o.classList.add('dimmed');
+                });
+            }
+        } else {
+            allOpts.forEach(o => {
+                if (o.dataset.value === correct) o.classList.add('correct-answer');
+            });
+            item.classList.add('bad');
+        }
+    });
+
+    /* --- Part C: Matching --- */
+    const matchScore = matchedPairs.size / 2;
+    score += matchScore;
+
+    /* --- Update score --- */
+    document.getElementById('scoreNum').textContent = score;
+    updateStars(score, total);
+
+    /* --- Result banner --- */
+    const banner = document.getElementById('resultBanner');
+    banner.classList.remove('good', 'mid', 'bad');
+    const pct = Math.round((score / total) * 100);
+
+    if (pct === 100) {
+        banner.textContent = `🏆 PERFECT! ${score} / ${total} — Outstanding!`;
+        banner.classList.add('show', 'good');
+    } else if (pct >= 70) {
+        banner.textContent = `🌟 Great job! ${score} / ${total} — Almost there!`;
+        banner.classList.add('show', 'good');
+    } else if (pct >= 40) {
+        banner.textContent = `💪 Good effort! ${score} / ${total} — Listen again and check your answers.`;
+        banner.classList.add('show', 'mid');
+    } else {
+        banner.textContent = `📚 ${score} / ${total} — Listen carefully again, you can do it!`;
+        banner.classList.add('show', 'bad');
+    }
+
+    /* --- Disable check button --- */
+    document.getElementById('checkBtn').disabled = true;
+
+    // Scroll to score
+    document.querySelector('.score-bar').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* =====================================================================
+   RESET ALL
+   ===================================================================== */
+function resetAll() {
+    checked = false;
+    selectedMatch = null;
+    matchedPairs.clear();
+
+    /* --- Reset True/False --- */
+    document.querySelectorAll('.tf-item').forEach(item => {
+        item.classList.remove('good', 'bad');
+        item.querySelectorAll('.tf-btn').forEach(b => {
+            b.disabled = false;
+            b.classList.remove('selected-t', 'selected-f', 'correct-answer', 'wrong-answer');
+        });
+    });
+
+    /* --- Reset MC --- */
+    document.querySelectorAll('.mc-item').forEach(item => {
+        item.classList.remove('good', 'bad');
+        item.querySelectorAll('.mc-option').forEach(o => {
+            o.disabled = false;
+            o.classList.remove('selected', 'correct-answer', 'wrong-answer', 'dimmed');
+        });
+    });
+
+    /* --- Reset matching --- */
+    document.querySelectorAll('.match-item').forEach(item => {
+        item.classList.remove('selected', 'matched', 'wrong');
+    });
+
+    /* --- Reset score & banner --- */
+    document.getElementById('scoreNum').textContent = '0';
+    document.getElementById('scoreStars').textContent = '☆☆☆';
+    const banner = document.getElementById('resultBanner');
+    banner.className = 'result-banner';
+    banner.textContent = '';
+
+    document.getElementById('checkBtn').disabled = false;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* =====================================================================
+   STARS
+   ===================================================================== */
+function updateStars(score, total) {
+    const pct = score / total;
+    const starsEl = document.getElementById('scoreStars');
+    if (pct === 1)          starsEl.textContent = '⭐⭐⭐';
+    else if (pct >= 0.66)   starsEl.textContent = '⭐⭐☆';
+    else if (pct >= 0.33)   starsEl.textContent = '⭐☆☆';
+    else                    starsEl.textContent = '☆☆☆';
+}
+</script>
+
+</body>
+</html>

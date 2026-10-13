@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carlos the Guitarist — Reading & Comprehension</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 850px;
+            margin: auto;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #0056b3;
+            border-bottom: 3px solid #0056b3;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* ============ READING TEXT ============ */
+        .reading-text {
+            background: #f8fafc;
+            border-left: 6px solid #0056b3;
+            border-radius: 10px;
+            padding: 22px 26px;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.75;
+            color: #1e293b;
+        }
+
+        .tense-section {
+            margin-bottom: 18px;
+        }
+        .tense-section:last-child { margin-bottom: 0; }
+
+        .tense-label {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 6px;
+        }
+        .label-present { background: #0284c7; }
+        .label-past    { background: #d97706; }
+        .label-future  { background: #16a34a; }
+
+        .reading-text b {
+            color: #0056b3;
+            background: #e0f2fe;
+            padding: 0 4px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        /* ============ QUIZ SECTION ============ */
+        h2 {
+            color: #0056b3;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+
+        .quiz-section form {
+            margin-top: 10px;
+        }
+
+        .question-block {
+            margin-bottom: 18px;
+            background: #fdfdfd;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .question-block.correct-q {
+            background: #f0fdf4;
+            border-color: #16a34a;
+        }
+        .question-block.wrong-q {
+            background: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        .question-block h3 {
+            color: #1e293b;
+            margin: 0 0 12px 0;
+            font-size: 16px;
+            line-height: 1.45;
+        }
+        .question-block h3 .qnum {
+            display: inline-block;
+            background: #0056b3;
+            color: white;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 13px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        li:hover {
+            background: #f1f5f9;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+            transform: scale(1.15);
+        }
+        li label {
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .feedback {
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct { color: #16a34a; }
+        .feedback.incorrect { color: #dc2626; }
+
+        /* ============ BUTTONS ============ */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            padding: 13px 28px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #003d82;
+            font-family: inherit;
+        }
+        button:hover {
+            background-color: #004494;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 #003d82;
+        }
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #003d82;
+        }
+        button.secondary {
+            background-color: #64748b;
+            box-shadow: 0 3px 0 #475569;
+        }
+        button.secondary:hover {
+            background-color: #475569;
+        }
+
+        /* ============ SCORE ============ */
+        .score-board {
+            margin-top: 25px;
+            padding: 18px;
+            background: #e0f2fe;
+            border: 2px solid #0284c7;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0c4a6e;
+            display: none;
+        }
+        .score-board.show { display: block; }
+        .score-board .score-value {
+            color: #0056b3;
+            font-size: 26px;
+            font-weight: 900;
+        }
+        .score-board.perfect {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #f59e0b;
+            color: #78350f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Carlos the Guitarist</h1>
+        <p class="subtitle">Read the text below carefully. Then answer the comprehension questions.</p>
+
+        <!-- ==========================================
+             READING TEXT
+             ========================================== -->
+        <div class="reading-text">
+
+            <div class="tense-section">
+                <span class="tense-label label-present">Present</span>
+                <p>
+                    Hi! I'm <b>Carlos Ramírez</b>, and I'm a young <b>guitarist</b> on the streets of Madrid! 
+                    I <b>come</b> from Mexico, but now I <b>live</b> in Spain because I <b>am studying</b> 
+                    flamenco music at the Royal Conservatory. I <b>share</b> a small flat with two other 
+                    musicians near the city centre, and I <b>play</b> my guitar in Plaza Mayor almost every 
+                    evening. I <b>don't have</b> a regular job, so I <b>earn</b> a little money from the 
+                    tourists who stop to listen. I <b>miss</b> my family in Mexico very much, but I 
+                    <b>have</b> many good friends here. The conservatory <b>has</b> students from more 
+                    than twenty countries.
+                </p>
+            </div>
+
+            <div class="tense-section">
+                <span class="tense-label label-past">Past</span>
+                <p>
+                    I <b>was born</b> in Guadalajara – a big, colourful city in Mexico. I <b>moved</b> to 
+                    Madrid three years ago when I <b>was</b> nineteen. I <b>wanted</b> to leave my small 
+                    town, but I <b>didn't want</b> to leave my parents. Luckily, I <b>won</b> a music 
+                    scholarship, so I <b>couldn't say</b> "no" to that! In my first year, I 
+                    <b>felt</b> very homesick, but soon I <b>got</b> used to Spanish life.
+                </p>
+            </div>
+
+            <div class="tense-section">
+                <span class="tense-label label-future">Future</span>
+                <p>
+                    Next summer, I <b>am going to play</b> in a real flamenco band, not just on the streets. 
+                    I <b>am going to tour</b> around Spain with three other musicians, and after that 
+                    I <b>am going to return</b> to Mexico for a big family concert. My dream <b>is</b> 
+                    to become a professional flamenco guitarist one day.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ==========================================
+             COMPREHENSION QUIZ
+             ========================================== -->
+        <h2>Comprehension Quiz</h2>
+        <div class="quiz-section">
+            <form id="quizForm">
+
+                <div class="question-block" data-q="1">
+                    <h3><span class="qnum">1</span>Where is Carlos from originally?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q1" value="a"> (a) Madrid, Spain</label></li>
+                        <li><label><input type="radio" name="q1" value="b"> (b) Mexico</label></li>
+                        <li><label><input type="radio" name="q1" value="c"> (c) Italy</label></li>
+                    </ul>
+                    <div class="feedback" id="f1"></div>
+                </div>
+
+                <div class="question-block" data-q="2">
+                    <h3><span class="qnum">2</span>Why is Carlos living in Madrid?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q2" value="a"> (a) Because he works in a hotel</label></li>
+                        <li><label><input type="radio" name="q2" value="b"> (b) Because he is studying flamenco music at the Royal Conservatory</label></li>
+                        <li><label><input type="radio" name="q2" value="c"> (c) Because his family lives there</label></li>
+                    </ul>
+                    <div class="feedback" id="f2"></div>
+                </div>
+
+                <div class="question-block" data-q="3">
+                    <h3><span class="qnum">3</span>How does Carlos earn money?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q3" value="a"> (a) He has a full-time job in an office</label></li>
+                        <li><label><input type="radio" name="q3" value="b"> (b) He plays guitar for tourists on the street</label></li>
+                        <li><label><input type="radio" name="q3" value="c"> (c) He teaches music lessons</label></li>
+                    </ul>
+                    <div class="feedback" id="f3"></div>
+                </div>
+
+                <div class="question-block" data-q="4">
+                    <h3><span class="qnum">4</span>Where does Carlos play his guitar?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q4" value="a"> (a) In Plaza Mayor</label></li>
+                        <li><label><input type="radio" name="q4" value="b"> (b) At the Royal Conservatory</label></li>
+                        <li><label><input type="radio" name="q4" value="c"> (c) In a restaurant</label></li>
+                    </ul>
+                    <div class="feedback" id="f4"></div>
+                </div>
+
+                <div class="question-block" data-q="5">
+                    <h3><span class="qnum">5</span>How old was Carlos when he moved to Madrid?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q5" value="a"> (a) Sixteen</label></li>
+                        <li><label><input type="radio" name="q5" value="b"> (b) Nineteen</label></li>
+                        <li><label><input type="radio" name="q5" value="c"> (c) Twenty-five</label></li>
+                    </ul>
+                    <div class="feedback" id="f5"></div>
+                </div>
+
+                <div class="question-block" data-q="6">
+                    <h3><span class="qnum">6</span>Why couldn't Carlos say "no" to leaving Mexico?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q6" value="a"> (a) Because he won a music scholarship</label></li>
+                        <li><label><input type="radio" name="q6" value="b"> (b) Because his parents asked him to go</label></li>
+                        <li><label><input type="radio" name="q6" value="c"> (c) Because his friends were already in Madrid</label></li>
+                    </ul>
+                    <div class="feedback" id="f6"></div>
+                </div>
+
+                <div class="question-block" data-q="7">
+                    <h3><span class="qnum">7</span>What is Carlos going to do next summer?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q7" value="a"> (a) Move back to Mexico</label></li>
+                        <li><label><input type="radio" name="q7" value="b"> (b) Play in a real flamenco band and tour around Spain</label></li>
+                        <li><label><input type="radio" name="q7" value="c"> (c) Stop playing music</label></li>
+                    </ul>
+                    <div class="feedback" id="f7"></div>
+                </div>
+
+                <div class="question-block" data-q="8">
+                    <h3><span class="qnum">8</span>What is Carlos's dream?</h3>
+                    <ul>
+                        <li><label><input type="radio" name="q8" value="a"> (a) To open a restaurant in Madrid</label></li>
+                        <li><label><input type="radio" name="q8" value="b"> (b) To become a professional flamenco guitarist</label></li>
+                        <li><label><input type="radio" name="q8" value="c"> (c) To become a teacher</label></li>
+                    </ul>
+                    <div class="feedback" id="f8"></div>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- ==========================================
+             BUTTONS & SCORE
+             ========================================== -->
+        <div class="btn-group">
+            <button onclick="checkAnswers()">✓ Check Answers</button>
+            <button class="secondary" onclick="showAnswers()">👁 Show Answers</button>
+            <button class="secondary" onclick="resetAll()">🔄 Reset</button>
+        </div>
+
+        <div class="score-board" id="scoreBoard">
+            Your score: <span class="score-value" id="scoreValue">0</span> / <span id="totalValue">8</span>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT = {
+            q1: 'b',   // Mexico
+            q2: 'b',   // studying flamenco music at the Royal Conservatory
+            q3: 'b',   // plays guitar for tourists on the street
+            q4: 'a',   // Plaza Mayor
+            q5: 'b',   // Nineteen
+            q6: 'a',   // won a music scholarship
+            q7: 'b',   // play in a real flamenco band and tour
+            q8: 'b'    // professional flamenco guitarist
+        };
+
+        const TOTAL = Object.keys(CORRECT).length;
+
+        function checkAnswers() {
+            let score = 0;
+
+            Object.keys(CORRECT).forEach((q, index) => {
+                const block = document.querySelector(`.question-block[data-q="${index + 1}"]`);
+                const feedback = document.getElementById(`f${index + 1}`);
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+
+                block.classList.remove('correct-q', 'wrong-q');
+                feedback.classList.remove('show', 'correct', 'incorrect');
+                feedback.textContent = '';
+
+                if (selected && selected.value === CORRECT[q]) {
+                    block.classList.add('correct-q');
+                    feedback.textContent = '✓ Correct!';
+                    feedback.classList.add('show', 'correct');
+                    score++;
+                } else {
+                    block.classList.add('wrong-q');
+                    feedback.textContent = '✗ Incorrect. Correct answer: (' + CORRECT[q] + ')';
+                    feedback.classList.add('show', 'incorrect');
+                }
+            });
+
+            const bar = document.getElementById('scoreBoard');
+            const scoreValue = document.getElementById('scoreValue');
+            bar.classList.add('show');
+            scoreValue.textContent = score;
+
+            if (score === TOTAL) {
+                bar.classList.add('perfect');
+                bar.innerHTML = '🏆 Perfect! You got all ' + TOTAL + ' answers correct!';
+            } else {
+                bar.classList.remove('perfect');
+                bar.innerHTML = 'Your score: <span class="score-value">' + score + '</span> / ' + TOTAL;
+            }
+
+            bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function showAnswers() {
+            Object.keys(CORRECT).forEach((q, index) => {
+                const radio = document.querySelector(`input[name="${q}"][value="${CORRECT[q]}"]`);
+                if (radio) radio.checked = true;
+
+                const block = document.querySelector(`.question-block[data-q="${index + 1}"]`);
+                const feedback = document.getElementById(`f${index + 1}`);
+                block.classList.remove('correct-q', 'wrong-q');
+                feedback.classList.remove('show', 'correct', 'incorrect');
+                feedback.textContent = '👁 Answer revealed.';
+                feedback.classList.add('show');
+                feedback.style.color = '#64748b';
+            });
+
+            document.getElementById('scoreBoard').classList.remove('show');
+        }
+
+        function resetAll() {
+            document.getElementById('quizForm').reset();
+
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('correct-q', 'wrong-q');
+            });
+
+            for (let i = 1; i <= TOTAL; i++) {
+                const fb = document.getElementById(`f${i}`);
+                if (fb) {
+                    fb.classList.remove('show', 'correct', 'incorrect');
+                    fb.textContent = '';
+                    fb.style.color = '';
+                }
+            }
+
+            const bar = document.getElementById('scoreBoard');
+            bar.classList.remove('show', 'perfect');
+            document.getElementById('scoreValue').textContent = '0';
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+
+</body>
+</html>

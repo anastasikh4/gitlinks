@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tense Revision — Present, Past and Future</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+            background: #f4f6f8;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #1e3a5f;
+            font-size: 26px;
+            margin-bottom: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        h2 {
+            color: #475569;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .rule-explanation {
+            background-color: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .rule-explanation h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #075985;
+            font-size: 16px;
+        }
+
+        .rule-explanation p {
+            margin: 6px 0;
+            font-size: 14.5px;
+            color: #0c4a6e;
+        }
+
+        /* ============ CARD FOR EACH PERSON ============ */
+        .person-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .person-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 14px;
+        }
+
+        .avatar {
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+        .avatar-johanna { background: #fce7f3; }
+        .avatar-garlen  { background: #dbeafe; }
+
+        .person-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+        .person-from {
+            font-size: 14px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* ============ WORD BOX ============ */
+        .word-box {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .word-box span {
+            background: #ffffff;
+            border: 1.5px solid #94a3b8;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ============ TEXT WITH GAPS ============ */
+        .text-body {
+            font-size: 16px;
+            line-height: 2.1;
+            color: #1e293b;
+        }
+
+        select {
+            padding: 5px 8px;
+            border: 2px solid #94a3b8;
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: inherit;
+            font-weight: 600;
+            color: #1e3a5f;
+            background: #ffffff;
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 130px;
+        }
+        select:focus {
+            outline: none;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        select.correct {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+        }
+        select.incorrect {
+            border-color: #dc2626;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .gap-num {
+            display: inline-block;
+            background: #0284c7;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 2px;
+            vertical-align: middle;
+        }
+
+        /* ============ FEEDBACK ============ */
+        .feedback {
+            display: none;
+            margin-left: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+        .feedback.correct { color: #16a34a; }
+        .feedback.incorrect { color: #dc2626; }
+
+        /* ============ BUTTONS ============ */
+        .button-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 26px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: 0.2s;
+            box-shadow: 0 3px 0 #0369a1;
+        }
+        button:hover {
+            background-color: #0369a1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 0 #075985;
+        }
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #075985;
+        }
+        button.secondary {
+            background-color: #64748b;
+            box-shadow: 0 3px 0 #475569;
+        }
+        button.secondary:hover {
+            background-color: #475569;
+            box-shadow: 0 4px 0 #334155;
+        }
+
+        /* ============ SCORE ============ */
+        .score-bar {
+            text-align: center;
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e3a5f;
+            padding: 14px;
+            background: #ffffff;
+            border-radius: 12px;
+            margin-top: 25px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            display: none;
+        }
+        .score-bar.show { display: block; }
+        .score-bar .num {
+            color: #0284c7;
+            font-size: 22px;
+        }
+        .score-bar.perfect {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #f59e0b;
+            color: #78350f;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .person-card { padding: 18px 16px; }
+            .text-body { font-size: 15px; line-height: 2.3; }
+            select { min-width: 110px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Grammar</h1>
+    <h2>Tense revision — present, past and future</h2>
+
+    <div class="rule-explanation">
+        <h4>📘 Rule reminder</h4>
+        <p><b>Present Simple</b> → habits, routines, facts: <i>She has two brothers.</i></p>
+        <p><b>Present Continuous</b> → actions happening now / temporary: <i>I'm studying anthropology.</i></p>
+        <p><b>Past Simple</b> → finished actions in the past: <i>She was born in Germany.</i></p>
+        <p><b>Future</b> → plans and hopes: <i>I'm hoping to become a lawyer.</i></p>
+    </div>
+
+    <!-- =========================================================
+         PERSON 1 — JOHANNA BECKER
+         ========================================================= -->
+    <div class="person-card">
+        <div class="person-header">
+            <div class="avatar avatar-johanna">👩</div>
+            <div>
+                <div class="person-name">Johanna Becker</div>
+                <div class="person-from">from the US</div>
+            </div>
+        </div>
+
+        <div class="word-box">
+            <span>has</span>
+            <span>speaks</span>
+            <span>'m studying</span>
+            <span>'m hoping</span>
+            <span>don't want</span>
+            <span>was</span>
+            <span>moved</span>
+            <span>studied</span>
+            <span>was born</span>
+        </div>
+
+        <div class="text-body">
+            Johanna Becker is a student. She <span class="gap-num">1</span>
+            <select data-answer="was born">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            in Germany, but she <span class="gap-num">2</span>
+            <select data-answer="moved">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            to Boston in the US with her parents when she <span class="gap-num">3</span>
+            <select data-answer="was">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            just six years old. She <span class="gap-num">4</span>
+            <select data-answer="has">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            two older brothers. She <span class="gap-num">5</span>
+            <select data-answer="speaks">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            three languages — German, English, and Spanish.
+        </div>
+
+        <div class="text-body" style="margin-top: 12px;">
+            'I <span class="gap-num">6</span>
+            <select data-answer="studied">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            law at Stanford University from 2014 to 2017, but I <span class="gap-num">7</span>
+            <select data-answer="don't want">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            to become a lawyer. Now I <span class="gap-num">8</span>
+            <select data-answer="'m studying">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            anthropology at Oxford University. After that, I <span class="gap-num">9</span>
+            <select data-answer="'m hoping">
+                <option value="">--Select--</option>
+                <option value="has">has</option>
+                <option value="speaks">speaks</option>
+                <option value="'m studying">'m studying</option>
+                <option value="'m hoping">'m hoping</option>
+                <option value="don't want">don't want</option>
+                <option value="was">was</option>
+                <option value="moved">moved</option>
+                <option value="studied">studied</option>
+                <option value="was born">was born</option>
+            </select>
+            <span class="feedback"></span>
+            to get a job in Mexico. I really want to work at the Museum of Anthropology in Mexico City.'
+        </div>
+    </div>
+
+    <!-- =========================================================
+         PERSON 2 — GARLEN BERNARD
+         ========================================================= -->
+    <div class="person-card">
+        <div class="person-header">
+            <div class="avatar avatar-garlen">👨</div>
+            <div>
+                <div class="person-name">Garlen Bernard</div>
+                <div class="person-from">from France</div>
+            </div>
+        </div>
+
+        <div class="word-box">
+            <span>comes</span>
+            <span>like</span>
+            <span>found</span>
+            <span>takes</span>
+            <span>play</span>
+            <span>don't like</span>
+            <span>missed</span>
+            <span>'m living</span>
+            <span>'s teaching</span>
+            <span>made</span>
+            <span>teaches</span>
+            <span>'m going to look</span>
+        </div>
+
+        <div class="text-body">
+            Garlen is a teacher. He <span class="gap-num">1</span>
+            <select data-answer="comes">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            from France. He normally <span class="gap-num">2</span>
+            <select data-answer="teaches">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            mathematics at the Sorbonne, but at the moment he <span class="gap-num">3</span>
+            <select data-answer="'s teaching">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            mathematics at McGill University in Montreal for a year.
+        </div>
+
+        <div class="text-body" style="margin-top: 12px;">
+            'I <span class="gap-num">4</span>
+            <select data-answer="like">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            living in Canada very much, the people are warm and friendly. At first, I <span class="gap-num">5</span>
+            <select data-answer="missed">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            home a lot, but I soon <span class="gap-num">6</span>
+            <select data-answer="made">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            friends and <span class="gap-num">7</span>
+            <select data-answer="found">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            an apartment. I <span class="gap-num">8</span>
+            <select data-answer="'m living">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            in an apartment with three other teachers — it's fun. I <span class="gap-num">9</span>
+            <select data-answer="don't like">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            living on my own. It only <span class="gap-num">10</span>
+            <select data-answer="takes">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            me five minutes to walk downtown, where I can shop or go to cafés and clubs. I often <span class="gap-num">11</span>
+            <select data-answer="play">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            sports here — football and tennis. I <span class="gap-num">12</span>
+            <select data-answer="'m going to look">
+                <option value="">--Select--</option>
+                <option value="comes">comes</option>
+                <option value="like">like</option>
+                <option value="found">found</option>
+                <option value="takes">takes</option>
+                <option value="play">play</option>
+                <option value="don't like">don't like</option>
+                <option value="missed">missed</option>
+                <option value="'m living">'m living</option>
+                <option value="'s teaching">'s teaching</option>
+                <option value="made">made</option>
+                <option value="teaches">teaches</option>
+                <option value="'m going to look">'m going to look</option>
+            </select>
+            <span class="feedback"></span>
+            for a permanent job in Canada when I finish my year at McGill University. Maybe here in Montreal? Who knows? I really like Vancouver, too.'
+        </div>
+    </div>
+
+    <!-- =========================================================
+         BUTTONS
+         ========================================================= -->
+    <div class="button-row">
+        <button onclick="checkAnswers()">✓ Check Answers</button>
+        <button class="secondary" onclick="showAnswers()">👁 Show Answers</button>
+        <button class="secondary" onclick="resetAll()">🔄 Reset</button>
+    </div>
+
+    <!-- =========================================================
+         SCORE BAR
+         ========================================================= -->
+    <div class="score-bar" id="scoreBar">
+        Your score: <span class="num" id="scoreNum">0</span> / <span class="num" id="scoreTotal">21</span>
+    </div>
+
+    <!-- =========================================================
+         SCRIPT
+         ========================================================= -->
+    <script>
+        const TOTAL = 21;
+
+        function checkAnswers() {
+            const selects = document.querySelectorAll('select[data-answer]');
+            let score = 0;
+
+            selects.forEach(select => {
+                const userAnswer = select.value.trim().toLowerCase();
+                const correctAnswer = select.getAttribute('data-answer').toLowerCase();
+                const feedbackSpan = select.nextElementSibling;
+
+                // Remove old state
+                select.classList.remove('correct', 'incorrect');
+
+                if (userAnswer === correctAnswer && userAnswer !== '') {
+                    select.classList.add('correct');
+                    if (feedbackSpan) {
+                        feedbackSpan.textContent = '✓';
+                        feedbackSpan.className = 'feedback correct';
+                    }
+                    score++;
+                } else {
+                    select.classList.add('incorrect');
+                    if (feedbackSpan) {
+                        feedbackSpan.textContent = '✗';
+                        feedbackSpan.className = 'feedback incorrect';
+                    }
+                }
+
+                if (feedbackSpan) feedbackSpan.style.display = 'inline';
+            });
+
+            // Show score bar
+            const bar = document.getElementById('scoreBar');
+            bar.classList.add('show');
+            document.getElementById('scoreNum').textContent = score;
+
+            if (score === TOTAL) {
+                bar.classList.add('perfect');
+                bar.innerHTML = '🏆 Perfect! You got all ' + TOTAL + ' answers correct!';
+            } else {
+                bar.classList.remove('perfect');
+                bar.innerHTML = 'Your score: <span class="num">' + score + '</span> / <span class="num">' + TOTAL + '</span>';
+            }
+
+            // Scroll to score
+            bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function showAnswers() {
+            const selects = document.querySelectorAll('select[data-answer]');
+            selects.forEach(select => {
+                select.value = select.getAttribute('data-answer');
+                select.classList.remove('correct', 'incorrect');
+                select.classList.add('correct');
+                const feedbackSpan = select.nextElementSibling;
+                if (feedbackSpan) feedbackSpan.style.display = 'none';
+            });
+
+            const bar = document.getElementById('scoreBar');
+            bar.classList.add('show');
+            bar.classList.remove('perfect');
+            bar.innerHTML = '👁 All answers revealed. Press <b>Reset</b> to try again.';
+        }
+
+        function resetAll() {
+            const selects = document.querySelectorAll('select[data-answer]');
+            selects.forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'incorrect');
+                const feedbackSpan = select.nextElementSibling;
+                if (feedbackSpan) {
+                    feedbackSpan.style.display = 'none';
+                    feedbackSpan.textContent = '';
+                }
+            });
+
+            const bar = document.getElementById('scoreBar');
+            bar.classList.remove('show', 'perfect');
+            document.getElementById('scoreNum').textContent = '0';
+        }
+    </script>
+
+</body>
+</html>
