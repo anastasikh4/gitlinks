@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adjectives & Sentences Quiz · A1 Level</title>
+<style>
+    :root { 
+        --primary: #0984e3; 
+        --success: #00b894; 
+        --error: #d63031; 
+        --bg: #fdfdfd; 
+        --look-bg: #fff9c4;
+        --look-border: #f1c40f;
+    }
+    * { box-sizing: border-box; font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; }
+    body { 
+        background: var(--bg); 
+        display: flex; 
+        justify-content: center; 
+        padding: 20px; 
+        margin: 0; 
+        min-height: 100vh; 
+    }
+    .quiz-container {
+        background: white; 
+        width: 100%; 
+        max-width: 800px; 
+        padding: 30px;
+        border-radius: 30px; 
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        text-align: center; 
+        border: 4px solid #eee; 
+        min-height: 600px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* LOOK! Grammar Box */
+    .look-box {
+        background: var(--look-bg);
+        border: 3px solid var(--look-border);
+        border-radius: 15px;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        text-align: left;
+        font-size: 0.95rem;
+        color: #333;
+    }
+    .look-box h3 {
+        margin: 0 0 10px 0;
+        color: #d35400;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .look-box ul {
+        margin: 0;
+        padding-left: 20px;
+        list-style-type: disc;
+    }
+    .look-box li {
+        margin-bottom: 8px;
+        line-height: 1.5;
+    }
+    .look-box .example {
+        color: #7f8c8d;
+        font-style: italic;
+        font-size: 0.9rem;
+        margin-left: 5px;
+    }
+
+    .progress-header { 
+        font-weight: bold; 
+        color: #aaa; 
+        text-transform: uppercase; 
+        margin-bottom: 10px; 
+        font-size: 0.9rem; 
+        letter-spacing: 1px; 
+    }
+    .q-title { 
+        font-size: 1.4rem; 
+        color: #2d3436; 
+        margin: 8px 0 12px; 
+        line-height: 1.5;
+    }
+    .visual-box { 
+        font-size: 4.5rem; 
+        margin: 20px 0; 
+        display: flex; 
+        justify-content: center; 
+        gap: 20px; 
+        align-items: center; 
+        min-height: 100px; 
+    }
+
+    /* Options for Choice */
+    .btn-pool { 
+        display: flex; 
+        justify-content: center; 
+        gap: 20px; 
+        flex-wrap: wrap; 
+        margin-top: 20px; 
+    }
+    .action-btn {
+        background: #fff; 
+        padding: 15px 35px; 
+        border: 3px solid #ddd;
+        border-radius: 15px; 
+        cursor: pointer; 
+        font-weight: bold;
+        font-size: 1.3rem; 
+        box-shadow: 0 4px 0 #ccc;
+        transition: 0.15s; 
+        font-family: inherit; 
+        color: #2d3436;
+        min-width: 140px;
+    }
+    .action-btn:hover:not(:disabled) { 
+        background: #eef7ff; 
+        border-color: var(--primary); 
+        transform: translateY(-2px);
+    }
+    .action-btn:active:not(:disabled) { 
+        transform: translateY(3px); 
+        box-shadow: none; 
+    }
+    .action-btn:disabled {
+        opacity: 0.6;
+        cursor: default;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Fill in the blanks */
+    .fill-input {
+        padding: 15px 20px;
+        font-size: 1.4rem;
+        border: 3px solid #ddd;
+        border-radius: 15px;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+        font-family: inherit;
+        outline: none;
+        transition: 0.2s;
+    }
+    .fill-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(9, 132, 227, 0.15);
+    }
+
+    /* Sentence Builder */
+    .sentence-builder {
+        min-height: 70px;
+        border-bottom: 3px dashed #ddd;
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 10px;
+    }
+    .word-tag {
+        background: var(--primary);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 1.2rem;
+        animation: pop 0.3s;
+    }
+    @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+
+    .feedback { 
+        margin-top: 25px; 
+        font-size: 1.6rem; 
+        font-weight: bold; 
+        min-height: 50px; 
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+        0%   { transform: translateX(0); }
+        25%  { transform: translateX(-8px); }
+        50%  { transform: translateX(8px); }
+        75%  { transform: translateX(-8px); }
+        100% { transform: translateX(0); }
+    }
+    .shake { animation: shake 0.4s; border-color: var(--error) !important; }
+
+    @media (max-width: 520px) {
+        .quiz-container { padding: 20px; }
+        .q-title { font-size: 1.15rem; }
+        .visual-box { font-size: 3.2rem; }
+        .action-btn { font-size: 1rem; padding: 12px 16px; min-width: 100px; }
+        .fill-input { font-size: 1.1rem; padding: 12px; }
+        .look-box { font-size: 0.85rem; }
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+    
+    <!-- ============ LOOK! BOX ============ -->
+    <div class="look-box">
+        <h3>🔍 LOOK!</h3>
+        <ul>
+            <li>put the adjectives <b>before</b> the noun <span class="example">(a new hat)</span></li>
+            <li>adjectives are always <b>singular</b> <span class="example">(one new hat, two new hats)</span></li>
+            <li>put <b>very</b> before the adjective <span class="example">(The hat is very cool.)</span></li>
+        </ul>
+    </div>
+
+    <!-- ============ QUIZ UI ============ -->
+    <div id="progress" class="progress-header">Loading...</div>
+    <h2 id="q-title" class="q-title">Title</h2>
+    <div id="visual-content" class="visual-box"></div>
+
+    <!-- UI containers dynamically populated based on exercise type -->
+    <div id="game-ui">
+        <div id="builder" class="sentence-builder" style="display: none;"></div>
+        <div id="options-area" class="btn-pool"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+</div>
+
+<script>
+    let currentStep = 0;
+
+    /* Each question:
+       - type: 'choice', 'fill', or 'order'
+       - title: the instruction or sentence prompt
+       - visual: emoji representation
+       - options/correct (for choice)
+       - correct (for fill)
+       - words/correct (for order)
+    */
+    const rawData = [
+        /* ══ EXERCISE 3 · Circle the correct answer ══ */
+        { 
+            type: 'choice',
+            title: "Rocco is good at football. He's very <u>______</u>.", 
+            visual: "⚽ 🏃‍♂️",
+            options: ["sporty", "pretty"], 
+            correct: "sporty" 
+        },
+        { 
+            type: 'choice',
+            title: "Big Al has got a lot of friends. He's very <u>______</u>.", 
+            visual: "🤝 👥",
+            options: ["small", "friendly"], 
+            correct: "friendly" 
+        },
+        { 
+            type: 'choice',
+            title: "Carla is very <u>______</u>. When there's a problem, ask Carla!", 
+            visual: "🆘 👩‍🏫",
+            options: ["sporty", "helpful"], 
+            correct: "helpful" 
+        },
+        { 
+            type: 'choice',
+            title: "Big Al's sofa is <u>______</u>. But it's his favourite thing!", 
+            visual: "🛋️ 🕰️",
+            options: ["old", "new"], 
+            correct: "old" 
+        },
+        { 
+            type: 'choice',
+            title: "Carla is <u>______</u>. She's very good at Maths!", 
+            visual: "🧮 🧠",
+            options: ["clever", "funny"], 
+            correct: "clever" 
+        },
+
+        /* ══ EXERCISE 1 · Complete the adjectives ══ */
+        { 
+            type: 'fill',
+            title: "Complete the adjective: c_l_ver", 
+            visual: "🧠",
+            correct: "clever" 
+        },
+        { 
+            type: 'fill',
+            title: "Complete the adjective: pr_tt_", 
+            visual: "🌸",
+            correct: "pretty" 
+        },
+        { 
+            type: 'fill',
+            title: "Complete the adjective: sm_ll", 
+            visual: "🐜",
+            correct: "small" 
+        },
+        { 
+            type: 'fill',
+            title: "Complete the adjective: sp_rty", 
+            visual: "⚽",
+            correct: "sporty" 
+        },
+        { 
+            type: 'fill',
+            title: "Complete the adjective: fr__ndly", 
+            visual: "🤝",
+            correct: "friendly" 
+        },
+        { 
+            type: 'fill',
+            title: "Complete the adjective: f_nny", 
+            visual: "😂",
+            correct: "funny" 
+        },
+
+        /* ══ EXERCISE 2 · Put the words in the correct order ══ */
+        { 
+            type: 'order',
+            title: "Put the words in the correct order.",
+            words: ["got", "I've", "a", "bike", "new"], 
+            correct: "I've got a new bike",
+            visual: "🚲"
+        },
+        { 
+            type: 'order',
+            title: "Put the words in the correct order.",
+            words: ["helpful", "You're", "friend", "a"], 
+            correct: "You're a helpful friend",
+            visual: "👫"
+        },
+        { 
+            type: 'order',
+            title: "Put the words in the correct order.",
+            words: ["hat", "a", "It's", "big"], 
+            correct: "It's a big hat",
+            visual: "🎩"
+        },
+        { 
+            type: 'order',
+            title: "Put the words in the correct order.",
+            words: ["old", "book", "is", "very", "The"], 
+            correct: "The book is very old",
+            visual: "📖"
+        },
+        { 
+            type: 'order',
+            title: "Put the words in the correct order.",
+            words: ["sister", "girl", "My", "is", "a", "pretty", "very"], 
+            correct: "My sister is a very pretty girl",
+            visual: "👧"
+        }
+    ];
+
+    /* ── Fisher–Yates shuffle ── */
+    function shuffle(arr) {
+        const a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if (!q) return;
+
+        // Update header & visual
+        document.getElementById('progress').innerText =
+            `Question ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('q-title').innerHTML = q.title;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        document.getElementById('feedback').innerText = "";
+
+        // UI Elements
+        const optionsArea = document.getElementById('options-area');
+        const builder = document.getElementById('builder');
+        const gameUI = document.getElementById('game-ui');
+
+        // Reset UI
+        optionsArea.innerHTML = "";
+        builder.innerHTML = "";
+        builder.style.display = 'none';
+        optionsArea.style.display = 'flex';
+
+        /* ── RENDER CHOICE ── */
+        if (q.type === 'choice') {
+            const shuffledOptions = shuffle(q.options);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "action-btn";
+                btn.innerText = opt;
+                btn.dataset.value = opt;
+                btn.onclick = () => checkChoice(btn, q);
+                optionsArea.appendChild(btn);
+            });
+        }
+
+        /* ── RENDER FILL ── */
+        else if (q.type === 'fill') {
+            optionsArea.innerHTML = `
+                <input type="text" id="fill-input" class="fill-input" placeholder="Type here..." autocomplete="off">
+                <button class="action-btn" onclick="checkFill()">Check</button>
+            `;
+            // Focus the input automatically
+            setTimeout(() => {
+                const input = document.getElementById('fill-input');
+                if (input) input.focus();
+                // Allow pressing "Enter" to check
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') checkFill();
+                });
+            }, 100);
+        }
+
+        /* ── RENDER ORDER ── */
+        else if (q.type === 'order') {
+            builder.style.display = 'flex';
+            optionsArea.style.display = 'flex';
+            
+            // Shuffle the words
+            const shuffledWords = shuffle(q.words);
+            
+            shuffledWords.forEach(word => {
+                const btn = document.createElement('button');
+                btn.className = "action-btn";
+                btn.innerText = word;
+                btn.onclick = () => {
+                    // Hide the button from pool
+                    btn.style.display = 'none';
+                    
+                    // Add to builder
+                    const tag = document.createElement('span');
+                    tag.className = 'word-tag';
+                    tag.innerText = word;
+                    builder.appendChild(tag);
+                    
+                    // Check if all words are used
+                    if (builder.children.length === q.words.length) {
+                        const userAnswer = Array.from(builder.children).map(el => el.innerText).join(" ");
+                        if (userAnswer.toLowerCase() === q.correct.toLowerCase()) {
+                            success();
+                        } else {
+                            fail();
+                        }
+                    }
+                };
+                optionsArea.appendChild(btn);
+            });
+        }
+    }
+
+    /* ── CHECKERS ── */
+    function checkChoice(btn, q) {
+        const feedback = document.getElementById('feedback');
+        const allBtns = document.querySelectorAll('.action-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (btn.dataset.value === q.correct) {
+            btn.style.borderColor = 'var(--success)';
+            btn.style.background = '#e8f8f0';
+            btn.style.color = 'var(--success)';
+            success();
+        } else {
+            btn.classList.add('shake');
+            btn.style.borderColor = 'var(--error)';
+            btn.style.background = '#fff0f0';
+            btn.style.color = 'var(--error)';
+            feedback.innerHTML = "<span style='color:var(--error)'>❌ Try again!</span>";
+            
+            setTimeout(() => {
+                allBtns.forEach(b => {
+                    if (b.dataset.value === q.correct) {
+                        b.style.borderColor = 'var(--success)';
+                        b.style.background = '#e8f8f0';
+                        b.style.color = 'var(--success)';
+                    }
+                });
+            }, 500);
+
+            setTimeout(() => {
+                allBtns.forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('shake');
+                    if (b.dataset.value !== q.correct) {
+                        b.style.borderColor = '#ddd';
+                        b.style.background = '#fff';
+                        b.style.color = '#2d3436';
+                    }
+                });
+                feedback.innerText = "";
+            }, 2000);
+        }
+    }
+
+    function checkFill() {
+        const input = document.getElementById('fill-input');
+        const feedback = document.getElementById('feedback');
+        const userAnswer = input.value.trim().toLowerCase();
+        const q = rawData[currentStep];
+
+        if (userAnswer === q.correct) {
+            input.style.borderColor = 'var(--success)';
+            input.style.color = 'var(--success)';
+            success();
+        } else {
+            input.classList.add('shake');
+            input.style.borderColor = 'var(--error)';
+            input.style.color = 'var(--error)';
+            feedback.innerHTML = "<span style='color:var(--error)'>❌ Try again!</span>";
+            
+            setTimeout(() => {
+                input.classList.remove('shake');
+                input.style.borderColor = '#ddd';
+                input.style.color = '#2d3436';
+                input.value = ""; // Clear input for retry
+                input.focus();
+                feedback.innerText = "";
+            }, 1500);
+        }
+    }
+
+    function success() {
+        document.getElementById('feedback').innerHTML =
+            "<span style='color:var(--success)'>🌟 WELL DONE! 🌟</span>";
+        
+        // Disable all interactive elements
+        document.querySelectorAll('.action-btn, .fill-input').forEach(el => el.disabled = true);
+
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < rawData.length) {
+                loadGame();
+            } else {
+                finish();
+            }
+        }, 1200);
+    }
+
+    function fail() {
+        document.getElementById('feedback').innerHTML =
+            "<span style='color:var(--error)'>❌ Try again!</span>";
+        
+        // Disable all buttons
+        document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+
+        setTimeout(() => {
+            // Reload the same question (resets and reshuffles)
+            loadGame();
+        }, 1500);
+    }
+
+    function finish() {
+        document.getElementById('progress').innerText = "Quiz Complete!";
+        document.getElementById('q-title').innerText = "Adjectives Master Achieved!";
+        document.getElementById('visual-content').innerHTML = "🏆";
+        document.getElementById('game-ui').innerHTML = 
+            "<h3 style='color: var(--success);'>Excellent! You know your adjectives and sentence structure!</h3>";
+        document.getElementById('feedback').innerText = "";
+    }
+
+    loadGame();
+</script>
+</body>
+</html>
