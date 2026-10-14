@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary & Grammar: Shops and Verbs — Interactive Quiz</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-pink: #ff6b9d;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+            --pink-soft: #ffe4ec;
+            --yellow-soft: #fff9c4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 700px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============ HEADER ============ */
+        h1 {
+            color: var(--quiz-light-purple);
+            font-size: 1.6rem;
+            margin: 0 0 6px 0;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* ============ VOCABULARY BOX ============ */
+        .writing-box {
+            background: var(--pink-soft);
+            border-left: 6px solid var(--quiz-pink);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 22px;
+        }
+        .writing-box h3 {
+            margin: 0 0 12px 0;
+            color: var(--quiz-pink);
+            font-size: 1.15rem;
+        }
+        .writing-box p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 8px 0;
+            color: #2c3e50;
+        }
+        .writing-box .kw {
+            font-weight: 900;
+            padding: 1px 8px;
+            border-radius: 4px;
+            color: #fff;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .kw-shop { background: #f39c12; }
+        .kw-verb { background: #2980b9; }
+
+        /* ============ QUIZ SECTION ============ */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+        .progress-container {
+            flex: 1;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Sentence display */
+        .sentence-display {
+            background: #fafafa;
+            padding: 24px 22px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            margin-bottom: 18px;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            color: #2c3e50;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .blank-slot {
+            display: inline-block;
+            min-width: 100px;
+            border-bottom: 3px solid var(--quiz-light-purple);
+            color: var(--quiz-light-purple);
+            font-weight: 900;
+            padding: 0 10px;
+            margin: 0 6px;
+            transition: 0.3s;
+        }
+        .blank-slot.filled {
+            color: var(--quiz-green);
+            border-bottom-color: var(--quiz-green);
+        }
+
+        /* Answer Options (2 buttons) */
+        .options-area {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 3px solid #bdc3c7;
+            background: #fafafa;
+            color: #333;
+            flex: 1;
+            max-width: 220px;
+            min-width: 130px;
+            letter-spacing: 0.5px;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #e6f7ff;
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .option-btn.correct {
+            background: #e8f8f0;
+            border-color: var(--quiz-green);
+            color: var(--quiz-green);
+        }
+
+        .option-btn.wrong {
+            background: #fff0f0;
+            border-color: var(--quiz-red);
+            color: var(--quiz-red);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.7;
+            cursor: default;
+            transform: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+            font-family: inherit;
+        }
+
+        .btn-reset { background: #bdc3c7; }
+        .btn-reset:hover { background: #95a5a6; }
+
+        .btn-next {
+            background: var(--quiz-green);
+            display: none;
+        }
+        .btn-next:hover { background: #20bf6b; }
+
+        #feedback {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        /* ============ WRITING TIME ============ */
+        .writing-time {
+            background: #e8f4ff;
+            border-left: 6px solid #3498db;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-top: 25px;
+        }
+        .writing-time h3 {
+            margin: 0 0 10px 0;
+            color: #2980b9;
+            font-size: 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .writing-time h3::before { content: '✏️'; }
+        .writing-time p {
+            font-size: 1rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+        .writing-time textarea {
+            width: 100%;
+            min-height: 110px;
+            padding: 12px 14px;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #2c3e50;
+            background: #ffffff;
+            resize: vertical;
+            outline: none;
+        }
+        .writing-time textarea:focus {
+            border-style: solid;
+            box-shadow: 0 0 0 4px rgba(52,152,219,0.15);
+        }
+        .help-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .help-chips span {
+            background: #ffffff;
+            border: 2px solid #3498db;
+            color: #2980b9;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* ============ FINAL SCREEN ============ */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .final-screen h1 { font-size: 3rem; margin: 0; }
+        .final-screen h2 { color: var(--quiz-light-purple); margin: 10px 0; }
+        .final-screen p { font-size: 1.2rem; color: #2c3e50; }
+
+        .hidden { display: none; }
+
+        /* Shake animation */
+        @keyframes shake {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-5px); }
+            50%  { transform: translateX(5px); }
+            75%  { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shake 0.4s; border-color: var(--quiz-red) !important; }
+
+        /* Mobile */
+        @media (max-width: 500px) {
+            .quiz-container { padding: 18px; }
+            .sentence-display { font-size: 1rem; padding: 18px; }
+            .option-btn { font-size: 0.95rem; padding: 12px 14px; }
+            h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+
+    <!-- ============ VOCABULARY BOX ============ -->
+    <div class="writing-box">
+        <h3>📚 Vocabulary Reference</h3>
+        <p><span class="kw kw-shop">Chemist's</span> 💊 prescription, medicine</p>
+        <p><span class="kw kw-shop">Florist's</span> 🌸 flowers, roses</p>
+        <p><span class="kw kw-shop">Butcher's</span> 🥩 meat, minced beef</p>
+        <p><span class="kw kw-shop">Optician's</span> 👓 eye test, glasses</p>
+        <p><span class="kw kw-shop">Supermarket</span> 🛒 tinned foods, aisle</p>
+        <p><span class="kw kw-shop">Baker's</span> 🥖 bread, loaves</p>
+        <hr style="margin: 10px 0; border-top: 1px dashed #ccc;">
+        <p><span class="kw kw-verb">Verbs:</span> invent, develop, generate, turn into, dissolve, on sale, print out, demonstrate</p>
+    </div>
+
+    <!-- ============ HEADER ============ -->
+    <h1>🛒 Shops & Verbs Practice</h1>
+    <div class="subtitle">Match the phrases and complete the sentences</div>
+
+    <!-- ============ QUIZ SECTION ============ -->
+    <div class="header-row">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">1 / 14</div>
+    </div>
+
+    <div class="instruction" id="instruction">Choose the correct word to complete the sentence:</div>
+
+    <div class="sentence-display" id="sentence-display">
+        Loading...
+    </div>
+
+    <div class="options-area" id="options-area">
+        <button class="option-btn" id="opt1" onclick="checkAnswer(this)">—</button>
+        <button class="option-btn" id="opt2" onclick="checkAnswer(this)">—</button>
+    </div>
+
+    <div id="feedback"></div>
+
+    <div class="action-buttons">
+        <button class="btn btn-reset" onclick="resetQuestion()">Reset</button>
+        <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Question ➡️</button>
+    </div>
+
+</div>
+
+<script>
+/* =====================================================
+   QUIZ DATA — 14 questions adapted from the image
+   ===================================================== */
+const questions = [
+    // --- EXERCISE 1: Shops and Phrases (6 questions) ---
+    {
+        before: "Could you direct me to the tinned foods aisle, please? — This is a",
+        after: ".",
+        options: ["supermarket", "florist's"],
+        correct: "supermarket",
+        explanation: "Tinned foods are found in the supermarket."
+    },
+    {
+        before: "I have an appointment for an eye test. — This is an",
+        after: ".",
+        options: ["optician's", "butcher's"],
+        correct: "optician's",
+        explanation: "You go to the optician's for eye tests."
+    },
+    {
+        before: "I'll take one kilo of minced beef, please. — This is a",
+        after: ".",
+        options: ["butcher's", "baker's"],
+        correct: "butcher's",
+        explanation: "You buy meat at the butcher's."
+    },
+    {
+        before: "Do you have any wholegrain loaves? — This is a",
+        after: ".",
+        options: ["baker's", "chemist's"],
+        correct: "baker's",
+        explanation: "You buy bread at the baker's."
+    },
+    {
+        before: "A dozen roses, please. — This is a",
+        after: ".",
+        options: ["florist's", "supermarket"],
+        correct: "florist's",
+        explanation: "You buy flowers at the florist's."
+    },
+    {
+        before: "I'd like to collect my prescription, please. — This is a",
+        after: ".",
+        options: ["chemist's", "optician's"],
+        correct: "chemist's",
+        explanation: "You collect prescriptions at the chemist's."
+    },
+
+    // --- EXERCISE 2: Fill in the blanks (8 questions) ---
+    {
+        before: "The new technology has taken scientists years to",
+        after: ".",
+        options: ["develop", "invent"],
+        correct: "develop",
+        explanation: "'Develop' means to grow or improve something over time."
+    },
+    {
+        before: "Stir the coffee until the sugar",
+        after: ".",
+        options: ["dissolves", "generates"],
+        correct: "dissolves",
+        explanation: "Sugar dissolves in hot coffee."
+    },
+    {
+        before: "Jane often",
+        after: " copies of articles she finds on the Internet.",
+        options: ["prints out", "turns into"],
+        correct: "prints out",
+        explanation: "'Prints out' means to produce a paper copy."
+    },
+    {
+        before: "Many power stations burn coal to",
+        after: " electricity.",
+        options: ["generate", "dissolve"],
+        correct: "generate",
+        explanation: "'Generate' means to produce or create."
+    },
+    {
+        before: "The professor will",
+        after: " his new invention at the science fair.",
+        options: ["demonstrate", "print out"],
+        correct: "demonstrate",
+        explanation: "'Demonstrate' means to show how something works."
+    },
+    {
+        before: "The new printer will soon go",
+        after: " for about £100.",
+        options: ["on sale", "turn into"],
+        correct: "on sale",
+        explanation: "'On sale' means available to buy."
+    },
+    {
+        before: "Alexander Graham Bell",
+        after: " the telephone in 1876.",
+        options: ["invented", "developed"],
+        correct: "invented",
+        explanation: "He created the telephone, so he 'invented' it."
+    },
+    {
+        before: "In the future, a window made of 'smart glass' will",
+        after: " a TV screen.",
+        options: ["turn into", "dissolve"],
+        correct: "turn into",
+        explanation: "'Turn into' means to become something else."
+    }
+];
+
+/* =====================================================
+   STATE
+   ===================================================== */
+let currentQ = 0;
+let score = 0;
+let isAnswered = false;
+
+/* =====================================================
+   LOAD QUESTION
+   ===================================================== */
+function loadQuestion() {
+    const q = questions[currentQ];
+
+    // Progress bar
+    document.getElementById('progress-bar').style.width =
+        (currentQ / questions.length) * 100 + "%";
+    document.getElementById('category').innerText =
+        (currentQ + 1) + " / " + questions.length;
+
+    // Build sentence with a blank slot
+    const sentenceEl = document.getElementById('sentence-display');
+    sentenceEl.innerHTML =
+        `${q.before} <span class="blank-slot" id="blank-slot">?</span> ${q.after}`;
+
+    // Feedback
+    document.getElementById('feedback').innerText = '';
+    document.getElementById('next-btn').style.display = 'none';
+    isAnswered = false;
+
+    // Shuffle options
+    const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+    
+    // Populate option buttons
+    const opt1 = document.getElementById('opt1');
+    const opt2 = document.getElementById('opt2');
+    opt1.innerText = shuffledOptions[0];
+    opt2.innerText = shuffledOptions[1];
+    opt1.dataset.value = shuffledOptions[0];
+    opt2.dataset.value = shuffledOptions[1];
+
+    // Enable buttons
+    [opt1, opt2].forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('correct', 'wrong', 'shake');
+    });
+}
+
+/* =====================================================
+   CHECK ANSWER
+   ===================================================== */
+function checkAnswer(btn) {
+    if (isAnswered) return;
+    isAnswered = true;
+
+    const q = questions[currentQ];
+    const userChoice = btn.dataset.value;
+    const feedback = document.getElementById('feedback');
+    const opt1 = document.getElementById('opt1');
+    const opt2 = document.getElementById('opt2');
+    const blank = document.getElementById('blank-slot');
+
+    // Lock buttons
+    [opt1, opt2].forEach(b => b.disabled = true);
+
+    if (userChoice === q.correct) {
+        // Correct
+        score++;
+        btn.classList.add('correct');
+        blank.innerText = q.correct;
+        blank.classList.add('filled');
+        feedback.innerHTML =
+            `<span style="color:var(--quiz-green)">✅ Correct! ${q.explanation}</span>`;
+    } else {
+        // Wrong
+        btn.classList.add('wrong', 'shake');
+        // Highlight the correct answer
+        const correctBtn = opt1.dataset.value === q.correct ? opt1 : opt2;
+        correctBtn.classList.add('correct');
+        // Reveal correct word in the blank
+        blank.innerText = q.correct;
+        blank.style.color = 'var(--quiz-red)';
+        blank.style.borderBottomColor = 'var(--quiz-red)';
+        feedback.innerHTML =
+            `<span style="color:var(--quiz-red)">❌ Oops! ${q.explanation}</span>`;
+    }
+
+    document.getElementById('next-btn').style.display = 'inline-block';
+}
+
+/* =====================================================
+   RESET
+   ===================================================== */
+function resetQuestion() {
+    if (isAnswered) return;
+    loadQuestion();
+}
+
+/* =====================================================
+   NEXT QUESTION
+   ===================================================== */
+function handleNext() {
+    currentQ++;
+    if (currentQ < questions.length) {
+        loadQuestion();
+    } else {
+        showResults();
+    }
+}
+
+/* =====================================================
+   RESULTS
+   ===================================================== */
+function showResults() {
+    document.getElementById('progress-bar').style.width = "100%";
+
+    let emoji = '🏆';
+    let title = 'Quiz Complete!';
+    let message = 'Well done!';
+    const pct = Math.round((score / questions.length) * 100);
+
+    if (pct === 100)     { emoji = '🥇'; title = 'Perfect!';   message = 'You are a Vocabulary Master!'; }
+    else if (pct >= 80)  { emoji = '🌟'; title = 'Excellent!'; message = 'Almost perfect!'; }
+    else if (pct >= 60)  { emoji = '💪'; title = 'Good work!'; message = 'Keep practising!'; }
+    else if (pct >= 40)  { emoji = '📚'; title = 'Nice try!';  message = 'Review the vocabulary box again.'; }
+    else                 { emoji = '🦉'; title = 'Keep going!'; message = 'Read the vocabulary box again.'; }
+
+    document.getElementById('quiz-box').innerHTML = `
+        <div class="final-screen">
+            <h1>${emoji}</h1>
+            <h2>${title}</h2>
+            <p>${message}</p>
+            <p style="font-size:1.3rem; margin-top:18px;">
+                You scored <strong>${score} / ${questions.length}</strong>
+            </p>
+            <button class="btn btn-reset" style="display:inline-block; margin-top:20px; padding:14px 32px; font-size:1.05rem;"
+                    onclick="location.reload()">TRY AGAIN 🔄</button>
+
+            <!-- WRITING TIME -->
+            <div class="writing-time" style="text-align:left; margin-top:35px;">
+                <h3>Writing Time</h3>
+                <p>Write a short dialogue between a customer and a shop assistant. Use at least <b>two different shops</b> from the list below.</p>
+                <textarea placeholder="Start writing here... &#10;&#10;Example:&#10;Customer: I'd like to buy some bread, please.&#10;Baker: Here you go. That's £1.50."></textarea>
+                <div class="help-chips">
+                    <span>chemist's</span>
+                    <span>florist's</span>
+                    <span>butcher's</span>
+                    <span>optician's</span>
+                    <span>supermarket</span>
+                    <span>baker's</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+loadQuestion();
+</script>
+
+</body>
+</html>
