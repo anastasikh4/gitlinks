@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Grammar Challenge</title>
+    <style>
+        :root {
+            --primary-purple: #7c4dff;
+            --light-purple: #ede7f6;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+            --bg-color: #e8eaf6;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif; 
+            background: var(--bg-color); 
+            text-align: center; color: #311b92; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 650px; margin: 0 auto; padding: 30px; background: white; 
+            border-radius: 30px; border: 6px solid var(--primary-purple); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 2;
+        }
+        .level { display: none; }
+        .active { display: block; }
+        
+        .text-display { 
+            font-size: 1.4em; 
+            line-height: 1.6; 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: var(--light-purple); 
+            border-radius: 15px; 
+            border: 2px dashed var(--primary-purple);
+            text-align: center;
+            font-weight: bold;
+        }
+        .blank { 
+            display: inline-block; 
+            min-width: 60px; 
+            border-bottom: 3px solid var(--primary-purple); 
+            text-align: center; 
+            font-weight: bold; 
+            color: var(--primary-purple);
+            padding: 0 5px;
+        }
+        
+        .options-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 20px; }
+        button { 
+            padding: 15px 30px; font-size: 1.1em; cursor: pointer; 
+            color: white; border: none; border-radius: 15px; transition: 0.2s;
+            font-family: inherit; font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-option { background: var(--primary-purple); }
+        .btn-option:hover { transform: scale(1.05); opacity: 0.9; }
+        
+        .feedback { font-weight: bold; height: 30px; margin-top: 15px; font-size: 1.2em; }
+        #score-board { font-size: 1.1em; background: var(--light-purple); padding: 10px 20px; border-radius: 20px; border: 2px solid var(--primary-purple); margin-bottom: 20px; display: inline-block; }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🌟 Starlight Grammar 🌟</h1>
+    <div id="score-board">Level: <span id="current-level">1</span> | Score: <span id="score">0</span></div>
+
+    <!-- LEVEL 1: Underline the correct item (a/an, some/any) -->
+    <div id="level1" class="level active">
+        <h3>Level 1: Underline the correct item</h3>
+        <div id="l1-text" class="text-display"></div>
+        <div id="l1-options" class="options-row"></div>
+        <div id="l1-feedback" class="feedback"></div>
+    </div>
+
+    <!-- LEVEL 2: Choose the correct preposition -->
+    <div id="level2" class="level">
+        <h3>Level 2: Choose the correct preposition</h3>
+        <div id="l2-text" class="text-display"></div>
+        <div id="l2-options" class="options-row"></div>
+        <div id="l2-feedback" class="feedback"></div>
+    </div>
+
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 2.5em; color: var(--primary-purple);">🌟 STAR STUDENT! 🌟</h2>
+        <p style="font-size: 1.2em;">You finished all the exercises!</p>
+        <button onclick="location.reload()" style="background: var(--primary-purple); margin-top: 20px;">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLvl = 1;
+
+    // --- LEVEL 1 DATA: a/an, some/any ---
+    const l1Data = [
+        { text: "There is ___ fireplace in the living room.", correct: "a", options: ["a", "an"] },
+        { text: "There are ___ cushions on the sofa.", correct: "some", options: ["any", "some"] },
+        { text: "There aren't ___ paintings on the wall.", correct: "any", options: ["some", "any"] },
+        { text: "There's ___ armchair opposite the coffee table.", correct: "an", options: ["an", "a"] },
+        { text: "There aren't ___ chairs in the dining room.", correct: "any", options: ["any", "a"] }
+    ];
+    let l1Index = 0;
+
+    // --- LEVEL 2 DATA: Prepositions of place ---
+    const l2Data = [
+        { text: "Where's the cat? She's ___ the table.", correct: "under", options: ["between", "under"] },
+        { text: "Mike sits ___ the computer all day.", correct: "in front of", options: ["in front of", "in"] },
+        { text: "I put the flowers ___ a vase.", correct: "in", options: ["opposite", "in"] },
+        { text: "John sits ___ Pete in class. They are good friends.", correct: "next to", options: ["on", "next to"] },
+        { text: "Where's the newspaper? It's ___ the table.", correct: "on", options: ["on", "behind"] },
+        { text: "Our house is ___ the park and the cinema.", correct: "between", options: ["under", "between"] }
+    ];
+    let l2Index = 0;
+
+    // SALUTE EFFECT FUNCTION
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 15; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 600;
+            const y = Math.random() * 400;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // --- LEVEL 1 LOGIC ---
+    function initLevel1() {
+        if (l1Index >= l1Data.length) {
+            nextLevel();
+            return;
+        }
+
+        const currentTask = l1Data[l1Index];
+        const textContainer = document.getElementById('l1-text');
+        const optionsContainer = document.getElementById('l1-options');
+        
+        // Display sentence with blank
+        textContainer.innerHTML = currentTask.text.replace("___", "<span class='blank'>___</span>");
+        
+        // Render options
+        optionsContainer.innerHTML = "";
+        currentTask.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL1(opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('l1-feedback').innerText = "";
+        updateScore();
+    }
+
+    function checkL1(choice) {
+        const feed = document.getElementById('l1-feedback');
+        const currentTask = l1Data[l1Index];
+        
+        if (choice === currentTask.correct) {
+            const blankSpan = document.querySelector('#l1-text .blank');
+            if (blankSpan) {
+                blankSpan.innerText = choice;
+                blankSpan.style.color = "#2e7d32";
+            }
+            
+            score += 10; 
+            feed.innerText = "Correct! ✅"; 
+            feed.style.color = "#2e7d32";
+            triggerSalute();
+            l1Index++;
+            updateScore();
+            
+            setTimeout(initLevel1, 1000);
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+        }
+    }
+
+    // --- LEVEL 2 LOGIC ---
+    function initLevel2() {
+        if (l2Index >= l2Data.length) {
+            showWin();
+            return;
+        }
+
+        const currentTask = l2Data[l2Index];
+        const textContainer = document.getElementById('l2-text');
+        const optionsContainer = document.getElementById('l2-options');
+        
+        // Display sentence with blank
+        textContainer.innerHTML = currentTask.text.replace("___", "<span class='blank'>___</span>");
+        
+        // Render options
+        optionsContainer.innerHTML = "";
+        currentTask.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL2(opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('l2-feedback').innerText = "";
+        updateScore();
+    }
+
+    function checkL2(choice) {
+        const feed = document.getElementById('l2-feedback');
+        const currentTask = l2Data[l2Index];
+        
+        if (choice === currentTask.correct) {
+            const blankSpan = document.querySelector('#l2-text .blank');
+            if (blankSpan) {
+                blankSpan.innerText = choice;
+                blankSpan.style.color = "#2e7d32";
+            }
+            
+            score += 10; 
+            feed.innerText = "Correct! ✅"; 
+            feed.style.color = "#2e7d32";
+            triggerSalute();
+            l2Index++;
+            updateScore();
+            
+            setTimeout(initLevel2, 1000);
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+        }
+    }
+
+    function updateScore() { 
+        document.getElementById('score').innerText = score; 
+    }
+
+    function nextLevel() {
+        document.getElementById(`level${currentLvl}`).classList.remove('active');
+        currentLvl++; 
+        document.getElementById('current-level').innerText = currentLvl;
+        
+        if (currentLvl === 2) initLevel2();
+        
+        document.getElementById(`level${currentLvl}`).classList.add('active');
+    }
+
+    function showWin() {
+        document.getElementById('level2').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Start the game
+    initLevel1();
+</script>
+</body>
+</html>
