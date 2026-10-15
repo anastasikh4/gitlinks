@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suffix Agent: Word Superhero Academy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@700;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Baloo 2', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(180deg, #4fc3f7 0%, #81d4fa 40%, #b3e5fc 100%);
+            background-attachment: fixed;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative clouds */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            width: 180px; height: 60px;
+            top: 40px; left: -30px;
+            box-shadow: 80px 20px 0 -10px rgba(255,255,255,0.7),
+                        160px -10px 0 -15px rgba(255,255,255,0.6);
+        }
+        body::after {
+            width: 220px; height: 70px;
+            bottom: 60px; right: -50px;
+            box-shadow: -100px 30px 0 -15px rgba(255,255,255,0.7),
+                        -200px 5px 0 -20px rgba(255,255,255,0.5);
+        }
+
+        /* ===== MENU BUTTON ===== */
+        .menu-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff5252;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            z-index: 100;
+            font-weight: 800;
+            font-family: 'Fredoka One', cursive;
+            font-size: 16px;
+            border: 3px solid #fff;
+            box-shadow: 0 5px 0 #c62828;
+            transition: 0.15s;
+            letter-spacing: 0.5px;
+        }
+        .menu-btn:hover { transform: translateY(-2px); }
+        .menu-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #c62828; }
+
+        .menu-content {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: white;
+            border: 3px solid #1976d2;
+            border-radius: 15px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+            z-index: 100;
+            overflow: hidden;
+            min-width: 220px;
+        }
+        .menu-content button {
+            display: block;
+            width: 100%;
+            padding: 14px 18px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            text-align: left;
+            font-size: 15px;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 700;
+            color: #0d47a1;
+            transition: 0.15s;
+        }
+        .menu-content button:hover { background: #e3f2fd; padding-left: 24px; }
+
+        /* ===== MAIN CARD ===== */
+        .detective-card {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 30px 25px 25px;
+            border-radius: 30px;
+            border: 5px solid #0d47a1;
+            box-shadow: 0 12px 0 #0d47a1,
+                        0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Star badge at top of card */
+        .detective-card::before {
+            content: '⭐';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 46px;
+            filter: drop-shadow(0 3px 0 #b8860b);
+            animation: starSpin 3s ease-in-out infinite;
+        }
+
+        @keyframes starSpin {
+            0%, 100% { transform: translateX(-50%) rotate(-10deg) scale(1); }
+            50% { transform: translateX(-50%) rotate(10deg) scale(1.1); }
+        }
+
+        /* ===== HEADERS ===== */
+        .level-tag {
+            display: inline-block;
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+            color: #5d4037;
+            font-family: 'Fredoka One', cursive;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 3px solid #5d4037;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+
+        h1 {
+            color: #0d47a1;
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px;
+            margin: 0 0 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 4px dashed #bbdefb;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== WORD DISPLAY ===== */
+        .word-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 52px;
+            font-weight: 800;
+            color: #d32f2f;
+            margin: 15px 0;
+            letter-spacing: 3px;
+            text-transform: lowercase;
+            text-shadow: 3px 3px 0 #ffe082,
+                         6px 6px 0 rgba(0,0,0,0.08);
+            animation: wordBounce 0.6s ease-out;
+        }
+
+        @keyframes wordBounce {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .translation-hint {
+            display: inline-block;
+            font-size: 16px;
+            color: #fff;
+            background: #7e57c2;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 5px 0 20px;
+            border: 3px solid #4527a0;
+            box-shadow: 0 4px 0 #4527a0;
+            font-style: normal;
+        }
+
+        /* ===== WORD SLOTS ===== */
+        .word-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 25px 0;
+            min-height: 65px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #42a5f5, #1976d2);
+            color: white;
+            border: 3px solid #0d47a1;
+            padding: 14px 30px;
+            font-size: 24px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0d47a1;
+            margin: 5px;
+            transition: 0.12s;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(180deg, #64b5f6, #2196f3);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0d47a1;
+        }
+
+        /* Level 3 smaller buttons */
+        .action-btn.small {
+            font-size: 16px;
+            padding: 14px 20px;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            max-width: 200px;
+        }
+
+        .letter-small-btn {
+            background: linear-gradient(180deg, #ff7043, #e64a19);
+            color: white;
+            padding: 14px 16px;
+            font-size: 22px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 12px;
+            border: 3px solid #bf360c;
+            min-width: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #bf360c;
+            transition: 0.12s;
+            text-transform: lowercase;
+        }
+
+        .letter-small-btn:hover {
+            background: linear-gradient(180deg, #ff8a65, #ff5722);
+            transform: translateY(-2px);
+        }
+
+        .letter-small-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #bf360c;
+        }
+
+        .letter-small-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== FEEDBACK ===== */
+        #feedback {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 22px;
+            min-height: 30px;
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-correct {
+            color: #2e7d32;
+            animation: popFeedback 0.4s ease-out;
+        }
+
+        .feedback-wrong {
+            color: #c62828;
+            animation: shakeFeedback 0.4s ease-out;
+        }
+
+        @keyframes popFeedback {
+            0% { transform: scale(0.5); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeFeedback {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ===== RESET BUTTON ===== */
+        .clear-btn {
+            background: #90a4ae;
+            color: white;
+            border: 3px solid #455a64;
+            padding: 10px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 4px 0 #455a64;
+            transition: 0.12s;
+        }
+
+        .clear-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #455a64;
+        }
+
+        /* ===== VICTORY ===== */
+        .victory-title {
+            color: #2e7d32;
+            font-family: 'Fredoka One', cursive;
+            font-size: 30px;
+            margin: 15px 0;
+            animation: victoryPulse 1s ease-in-out infinite;
+            text-shadow: 3px 3px 0 #c8e6c9;
+        }
+
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .victory-text {
+            color: #555;
+            font-size: 17px;
+            margin: 10px 0 20px;
+            font-weight: 700;
+        }
+
+        .victory-emoji {
+            font-size: 70px;
+            display: block;
+            margin: 10px 0;
+            animation: trophyBounce 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes trophyBounce {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-12px) rotate(5deg); }
+        }
+
+        .replay-btn {
+            background: linear-gradient(180deg, #66bb6a, #43a047);
+            color: white;
+            border: 3px solid #1b5e20;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1b5e20;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            transition: 0.12s;
+        }
+
+        .replay-btn:hover { transform: translateY(-2px); }
+
+        .replay-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1b5e20;
+        }
+
+        /* Confetti stars around victory */
+        .victory-card {
+            position: relative;
+        }
+
+        .victory-card::before,
+        .victory-card::after {
+            content: '🎉';
+            position: absolute;
+            font-size: 40px;
+            animation: floatStar 2s ease-in-out infinite;
+        }
+        .victory-card::before { top: 20px; left: 20px; }
+        .victory-card::after { top: 20px; right: 20px; animation-delay: 0.5s; }
+
+        @keyframes floatStar {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-10px) rotate(10deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 500px) {
+            .detective-card { padding: 25px 15px 20px; border-radius: 25px; }
+            .word-display { font-size: 40px; }
+            h1 { font-size: 18px; }
+            .action-btn { font-size: 20px; padding: 12px 22px; }
+            .action-btn.small { font-size: 14px; padding: 12px 16px; }
+            .letter-small-btn { font-size: 18px; min-width: 44px; padding: 12px; }
+            .menu-btn { padding: 10px 14px; font-size: 14px; top: 12px; right: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="menu-btn" onclick="toggleMenu()">☰ LEVELS</div>
+<div class="menu-content" id="menu">
+    <button onclick="changeLevel(1)">🎯 1. Suffix Matcher</button>
+    <button onclick="changeLevel(2)">🔨 2. Build the Suffix</button>
+    <button onclick="changeLevel(3)">🌍 3. Translation Quiz</button>
+</div>
+
+<div class="detective-card" id="detective-card">
+    <div class="level-tag" id="level-label">LEVEL 1</div>
+    <h1 id="task-desc">Suffix Matcher!</h1>
+    <div class="word-display" id="main-word">teach</div>
+    <div class="translation-hint" id="translation-hint">Значение: Учитель</div>
+    <div class="word-container" id="word-slots"></div>
+    <div id="interaction-area" class="btn-grid"></div>
+    <div id="feedback"></div>
+    <button class="clear-btn" id="clear-btn" onclick="initTask()">Reset ↩️</button>
+</div>
+
+<script>
+    const vocabulary = [
+        { base: "teach", suffix: "-er", completed: "teacher", rule: "er", translation: "Учитель" },
+        { base: "milk", suffix: "-man", completed: "milkman", rule: "man", translation: "Продавец молока" },
+        { base: "post", suffix: "-man", completed: "postman", rule: "man", translation: "Почтальон" },
+        { base: "drive", suffix: "-er", completed: "driver", rule: "er", translation: "Водитель" },
+        { base: "police", suffix: "-man", completed: "policeman", rule: "man", translation: "Полицейский" },
+        { base: "sing", suffix: "-er", completed: "singer", rule: "er", translation: "Певец" }
+    ];
+
+    let currentLevel = 1;
+    let currentIdx = 0;
+    let typedSuffix = [];
+
+    function toggleMenu() {
+        const m = document.getElementById('menu');
+        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function changeLevel(lv) {
+        currentLevel = lv;
+        currentIdx = 0;
+        initTask();
+        document.getElementById('menu').style.display = 'none';
+    }
+
+    function speak(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-GB';
+        msg.rate = 0.85;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function initTask() {
+        // --- STAGE JUMP LOGIC ---
+        if (currentIdx >= vocabulary.length) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                currentIdx = 0;
+                const fb = document.getElementById('feedback');
+                fb.innerText = `🚀 ADVANCING TO LEVEL ${currentLevel}...`;
+                fb.style.color = "#1976D2";
+                fb.className = '';
+                setTimeout(initTask, 1500);
+                return;
+            } else {
+                showVictory();
+                return;
+            }
+        }
+
+        const data = vocabulary[currentIdx];
+        const slots = document.getElementById('word-slots');
+        const area = document.getElementById('interaction-area');
+        const label = document.getElementById('level-label');
+        const desc = document.getElementById('task-desc');
+        const mainWord = document.getElementById('main-word');
+        const transHint = document.getElementById('translation-hint');
+
+        slots.innerHTML = "";
+        area.innerHTML = "";
+        const fb = document.getElementById('feedback');
+        fb.innerText = "";
+        fb.className = '';
+
+        mainWord.innerText = data.base;
+        mainWord.style.animation = 'none';
+        setTimeout(() => mainWord.style.animation = '', 10);
+
+        transHint.innerText = `Значение: ${data.translation}`;
+
+        document.getElementById('clear-btn').style.display = currentLevel === 2 ? "inline-block" : "none";
+
+        /* ===== LEVEL 1 ===== */
+        if (currentLevel === 1) {
+            label.innerText = "🎯 LEVEL 1: SUFFIX PAIRING";
+            desc.innerText = "Choose the correct suffix:";
+
+            let choices = ["-er", "-man"].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if ((opt === "-er" && data.rule === "er") || (opt === "-man" && data.rule === "man")) {
+                        success();
+                    } else {
+                        error("Try the other option! 🔍");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 2 ===== */
+        else if (currentLevel === 2) {
+            label.innerText = "🔨 LEVEL 2: SUFFIX BUILDING";
+            desc.innerText = "Build the suffix letter by letter:";
+            typedSuffix = [];
+
+            let displayString = data.base + " _ _" + (data.rule === 'man' ? " _" : "");
+            mainWord.innerText = displayString;
+
+            let pool = data.rule === 'er' ? ['e', 'r', 'm', 'a'] : ['m', 'a', 'n', 'e', 'r'];
+            pool = pool.sort(() => Math.random() - 0.5);
+
+            pool.forEach(char => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-small-btn';
+                btn.innerText = char;
+                btn.onclick = () => {
+                    typedSuffix.push(char);
+                    mainWord.innerText = data.base + " " + typedSuffix.join('');
+                    btn.disabled = true;
+
+                    let targetSuffix = data.rule === 'er' ? 'er' : 'man';
+                    if (typedSuffix.length === targetSuffix.length) {
+                        if (typedSuffix.join('') === targetSuffix) success();
+                        else {
+                            error("Spelling mismatch! 🔧");
+                            setTimeout(initTask, 1100);
+                        }
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 3 ===== */
+        else if (currentLevel === 3) {
+            label.innerText = "🌍 LEVEL 3: TRANSLATION MATCH";
+            desc.innerText = "Pick the correct translation:";
+            mainWord.innerText = data.completed;
+
+            let options = [data.translation];
+            while (options.length < 3) {
+                let randTrans = vocabulary[Math.floor(Math.random() * vocabulary.length)].translation;
+                if (!options.includes(randTrans)) options.push(randTrans);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn small';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.translation) success();
+                    else error("Wrong translation! 🤔");
+                };
+                area.appendChild(btn);
+            });
+        }
+    }
+
+    function success() {
+        const fb = document.getElementById('feedback');
+        fb.innerText = "✅ GREAT JOB!";
+        fb.className = 'feedback-correct';
+        speak(vocabulary[currentIdx].completed);
+        currentIdx++;
+        setTimeout(initTask, 1200);
+    }
+
+    function error(msg = "Incorrect! Try again!") {
+        const fb = document.getElementById('feedback');
+        fb.innerText = `❌ ${msg}`;
+        fb.className = 'feedback-wrong';
+    }
+
+    function showVictory() {
+        const card = document.getElementById('detective-card');
+        card.classList.add('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" style="background: linear-gradient(180deg, #66bb6a, #2e7d32); color: white; border-color: #1b5e20;">MISSION COMPLETE</div>
+            <span class="victory-emoji">🏆</span>
+            <h1 class="victory-title">YOU WIN, AGENT!</h1>
+            <p class="victory-text">You mastered all 6 suffixes like a true word superhero! 🦸‍♂️</p>
+            <button class="replay-btn" onclick="replayQuest()">▶️ PLAY AGAIN</button>
+        `;
+    }
+
+    function replayQuest() {
+        currentLevel = 1;
+        currentIdx = 0;
+        typedSuffix = [];
+        const card = document.getElementById('detective-card');
+        card.classList.remove('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" id="level-label">LEVEL 1</div>
+            <h1 id="task-desc">Suffix Matcher!</h1>
+            <div class="word-display" id="main-word">teach</div>
+            <div class="translation-hint" id="translation-hint">Значение: Учитель</div>
+            <div class="word-container" id="word-slots"></div>
+            <div id="interaction-area" class="btn-grid"></div>
+            <div id="feedback"></div>
+            <button class="clear-btn" id="clear-btn" onclick="initTask()">Reset ↩️</button>
+        `;
+        initTask();
+    }
+
+    initTask();
+</script>
+
+</body>
+</html>

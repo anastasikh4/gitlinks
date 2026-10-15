@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Starlight English Quiz: Numbers & Dialogues 🌟</title>
+    <style>
+        :root {
+            --spring-mint: #e8f5e9;
+            --cherry-pink: #a1ccfe;
+            --leaf-green: #8bc34a;
+            --sun-yellow: #fff59d;
+            --sky-blue: #e3f2fd;
+            --bark: #2c3e50;
+        }
+        body {
+            background: linear-gradient(135deg, var(--sky-blue), var(--spring-mint));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--bark);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .garden-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 35px;
+            border: 10px solid var(--cherry-pink);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--cherry-pink);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .progress-container {
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--leaf-green);
+            width: 0%;
+            border-radius: 10px;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stats { display: flex; justify-content: space-between; font-weight: bold; color: #1a5276; }
+        
+        .quiz-area { padding: 25px; text-align: center; }
+        .emoji-vibe { font-size: 4.5em; margin-bottom: 10px; display: block; font-weight: bold; color: #2980b9; }
+        
+        .btn-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        button {
+            padding: 18px;
+            border: 3px solid var(--cherry-pink);
+            border-radius: 50px;
+            background: var(--sun-yellow);
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--bark);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: var(--leaf-green);
+            color: white;
+            transform: scale(1.03);
+            border-color: var(--leaf-green);
+        }
+        #victory { display: none; padding: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="garden-card">
+    <div class="header">
+        <div class="stats">
+            <span id="rank-text">🌱 Learner</span>
+            <span id="q-count">1 / 10</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="quiz-content" class="quiz-area">
+        <span id="current-emoji" class="emoji-vibe">18</span>
+        <h2 id="question-text">Loading quiz...</h2>
+        <div id="options-container" class="btn-grid"></div>
+    </div>
+
+    <div id="victory">
+        <span class="emoji-vibe" style="font-size: 3.5em;">🏆🥇🇬🇧</span>
+        <h1>NOW I CAN!</h1>
+        <p>You completed all challenges successfully. You can count to 20 and talk about family!</p>
+        <button onclick="location.reload()" style="width:100%">Try Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    // DATA: 10 Groups (6 numbers + 4 dialogue questions), 3 variants each for variety
+    const masterData = [
+        { // 1: Number 18
+            variants: [
+                {q: "Choose the correct word for the number 18:", opt: ["eighteen", "eight"], ans: 0, em: "18"},
+                {q: "How do you spell 18?", opt: ["eight", "eighteen"], ans: 1, em: "18"},
+                {q: "Find the text version of 18:", opt: ["eighteen", "eighty"], ans: 0, em: "18"}
+            ]
+        },
+        { // 2: Number 15
+            variants: [
+                {q: "Choose the correct word for the number 15:", opt: ["five", "fifteen"], ans: 1, em: "15"},
+                {q: "Is this five or fifteen?", opt: ["five", "fifteen"], ans: 1, em: "15"},
+                {q: "How do you write 15 in English?", opt: ["fifteen", "fifty"], ans: 0, em: "15"}
+            ]
+        },
+        { // 3: Number 11
+            variants: [
+                {q: "Choose the correct word for the number 11:", opt: ["eleven", "nineteen"], ans: 0, em: "11"},
+                {q: "Look at number 11. Is it eleven?", opt: ["yes, eleven", "no, twelve"], ans: 0, em: "11"},
+                {q: "Spell the number 11:", opt: ["nineteen", "eleven"], ans: 1, em: "11"}
+            ]
+        },
+        { // 4: Number 20
+            variants: [
+                {q: "Choose the correct word for the number 20:", opt: ["twelve", "twenty"], ans: 1, em: "20"},
+                {q: "Is this twelve or twenty?", opt: ["twelve", "twenty"], ans: 1, em: "20"},
+                {q: "Find the name of number 20:", opt: ["twenty", "two"], ans: 0, em: "20"}
+            ]
+        },
+        { // 5: Number 13
+            variants: [
+                {q: "Choose the correct word for the number 13:", opt: ["sixteen", "thirteen"], ans: 1, em: "13"},
+                {q: "How do you write 13?", opt: ["thirteen", "thirty"], ans: 0, em: "13"},
+                {q: "Select the option for 13:", opt: ["sixteen", "thirteen"], ans: 1, em: "13"}
+            ]
+        },
+        { // 6: Number 17
+            variants: [
+                {q: "Choose the correct word for the number 17:", opt: ["seven", "seventeen"], ans: 1, em: "17"},
+                {q: "Is this seven or seventeen?", opt: ["seven", "seventeen"], ans: 1, em: "17"},
+                {q: "Find the text form for 17:", opt: ["seventeen", "seventy"], ans: 0, em: "17"}
+            ]
+        },
+        { // 7: Dialogue 1
+            variants: [
+                {q: "Complete: A: ______ that? B: That's my dad.", opt: ["Who's", "Is she"], ans: 0, em: "👨‍👦"},
+                {q: "Fill in: A: ______ that? B: That's my dad.", opt: ["name", "Who's"], ans: 1, em: "💬"},
+                {q: "What fits best? A: ______ that? B: That's my dad.", opt: ["Who's", "happy"], ans: 0, em: "❓"}
+            ]
+        },
+        { // 8: Dialogue 2
+            variants: [
+                {q: "Complete: A: Are they ______? B: Yes, they are.", opt: ["happy", "name"], ans: 0, em: "😊"},
+                {q: "Fill in the blank: A: Are they ______? B: Yes, they are.", opt: ["is she", "happy"], ans: 1, em: "🧑‍🤝‍🧑"},
+                {q: "What is missing? A: Are they ______? B: Yes, they are.", opt: ["happy", "Who's"], ans: 0, em: "💬"}
+            ]
+        },
+        { // 9: Dialogue 3
+            variants: [
+                {q: "Complete the age question: A: How old ______? B: She's seventeen.", opt: ["name", "is she"], ans: 1, em: "🎂"},
+                {q: "Fill in: A: How old ______? B: She's seventeen.", opt: ["is she", "happy"], ans: 0, em: "💬"},
+                {q: "What fits here? A: How old ______? B: She's seventeen.", opt: ["Who's", "is she"], ans: 1, em: "👧"}
+            ]
+        },
+        { // 10: General review
+            variants: [
+                {q: "Complete the greeting: A: What's your ______? B: I'm John.", opt: ["name", "happy"], ans: 0, em: "👋"},
+                {q: "Fill in: A: What's your ______? B: I'm John.", opt: ["is she", "name"], ans: 1, em: "💬"},
+                {q: "What is missing here? A: What's your ______? B: I'm John.", opt: ["name", "Who's"], ans: 0, em: "🧑"}
+            ]
+        }
+    ];
+
+    let currentStep = 0;
+    let selectedQuestions = [];
+
+    function initQuiz() {
+        // Подбираем случайный вариант для каждого из 10 вопросов
+        selectedQuestions = masterData.map(group => {
+            const randomIdx = Math.floor(Math.random() * group.variants.length);
+            return group.variants[randomIdx];
+        });
+        currentStep = 0;
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if (currentStep >= selectedQuestions.length) {
+            showVictory();
+            return;
+        }
+
+        const activeQ = selectedQuestions[currentStep];
+        
+        // Обновление прогресс-бара и счетчиков
+        const progressPercent = (currentStep / selectedQuestions.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        document.getElementById('q-count').innerText = `${currentStep + 1} / ${selectedQuestions.length}`;
+        
+        // Назначение званий по ходу прохождения
+        let rank = "🌱 Seedling";
+        if (currentStep >= 3) rank = "🌿 Smart Learner";
+        if (currentStep >= 7) rank = "🌟 English Star";
+        document.getElementById('rank-text').innerText = rank;
+
+        // Отрендерить вопрос и эмодзи/число
+        document.getElementById('current-emoji').innerText = activeQ.em;
+        document.getElementById('question-text').innerText = activeQ.q;
+
+        // Генерация кнопок вариантов ответа
+        const optionsBox = document.getElementById('options-container');
+        optionsBox.innerHTML = '';
+        activeQ.opt.forEach((option, idx) => {
+            const btn = document.createElement('button');
+            btn.innerText = option;
+            btn.onclick = () => checkAnswer(idx, activeQ.ans);
+            optionsBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(chosen, correct) {
+        if (chosen === correct) {
+            currentStep++;
+            showQuestion();
+        } else {
+            alert("Oops! Try again! 🤔");
+        }
+    }
+
+    function showVictory() {
+        document.getElementById('progress-bar').style.width = '100%';
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('victory').style.display = 'block';
+    }
+
+    // Старт квиза при загрузке страницы
+    initQuiz();
+</script>
+
+</body>
+</html>

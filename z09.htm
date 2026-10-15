@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight Trace: Actions & Professions</title>
+    <style>
+        :root { --bg: #fdfefe; --accent: #ff9f43; --btn-green: #1dd1a1; }
+        body { font-family: 'Comic Sans MS', sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; margin: 0; }
+        
+        .card { background: white; width: 100%; max-width: 650px; padding: 25px; border-radius: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; border: 4px solid #f1f2f6; }
+        
+        .progress { color: #ff9f43; font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .emoji-hint { font-size: 4rem; margin: 5px 0; }
+
+        #canvas-box { position: relative; background: #fff; border: 3px dashed #ced6e0; border-radius: 30px; margin: 15px auto; width: 550px; height: 220px; touch-action: none; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 2; cursor: crosshair; }
+        
+        /* УВЕЛИЧЕННЫЙ ШРИФТ ДЛЯ ОБВОДКИ */
+        .trace-text { position: absolute; width: 100%; top: 50%; transform: translateY(-50%); font-size: 90px; color: #f1f2f6; user-select: none; z-index: 1; letter-spacing: 2px; font-weight: normal; }
+        
+        #notebook { display: none; padding: 30px; background: #fff9db; border: 4px solid #f1c40f; border-radius: 30px; margin: 15px 0; }
+        
+        /* УВЕЛИЧЕННЫЙ ШРИФТ ДЛЯ ЗАПИСИ В ТЕТРАДЬ */
+        .word-show { font-size: 5rem; font-weight: bold; color: #2d3436; margin-bottom: 10px; }
+        
+        .instr-text { font-size: 1.4rem; color: #7f8c8d; font-weight: bold; margin-bottom: 10px; }
+
+        .btn-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        button { padding: 12px 35px; font-size: 1.2rem; font-weight: bold; border-radius: 25px; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-next { background: var(--btn-green); color: white; box-shadow: 0 5px 0 #10ac84; }
+        .btn-next:active { transform: translateY(3px); box-shadow: none; }
+        .btn-clear { background: #ff6b6b; color: white; box-shadow: 0 5px 0 #ee5253; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="progress" id="info">Слово 1 из 8</div>
+    <div class="emoji-hint" id="emoji">🚶</div>
+    <div class="instr-text" id="instr">Обведи слово! ✍️</div>
+
+    <!-- Размеры бокса немного увеличены под крупный шрифт -->
+    <div id="canvas-box">
+        <div class="trace-text" id="trace-text">walk</div>
+        <canvas id="drawCanvas" width="550" height="220"></canvas>
+    </div>
+
+    <div id="notebook">
+        <div class="word-show" id="big-word">walk</div>
+        <h2 style="color: #f39c12; margin:0;">📓 Запиши в тетрадь!</h2>
+    </div>
+
+    <div class="btn-row">
+        <button class="btn-clear" id="clear-btn" onclick="clearDraw()">Стереть</button>
+        <button class="btn-next" id="main-btn" onclick="goNext()">ГОТОВО ✨</button>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { word: "walk", emoji: "🚶" },
+        { word: "drive", emoji: "🚗" },
+        { word: "ride", emoji: "🚴" },
+        { word: "run", emoji: "🏃" },
+        { word: "policeman", emoji: "👮" },
+        { word: "postman", emoji: "✉️" },
+        { word: "fireman", emoji: "🧑‍🚒" },
+        { word: "milkman", emoji: "🥛" }
+    ];
+
+    let idx = 0;
+    let isNotebook = false;
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    ctx.lineWidth = 6; // Немного утолщена линия рисования для соответствия крупному шрифту
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ff9f43';
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches && e.touches.clientX);
+        const clientY = e.clientY || (e.touches && e.touches.clientY);
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    function start(e) { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); }
+    function move(e) { if (!drawing) return; e.preventDefault(); const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+    function stop() { drawing = false; }
+
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', stop);
+    canvas.addEventListener('touchstart', start);
+    canvas.addEventListener('touchmove', move);
+    canvas.addEventListener('touchend', stop);
+
+    function clearDraw() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    function goNext() {
+        if (!isNotebook) {
+            document.getElementById('canvas-box').style.display = 'none';
+            document.getElementById('notebook').style.display = 'block';
+            document.getElementById('clear-btn').style.display = 'none';
+            document.getElementById('instr').innerText = "Теперь перепиши в тетрадь:";
+            document.getElementById('big-word').innerText = data[idx].word;
+            isNotebook = true;
+        } else {
+            idx++;
+            if (idx < data.length) {
+                isNotebook = false;
+                document.getElementById('canvas-box').style.display = 'block';
+                document.getElementById('notebook').style.display = 'none';
+                document.getElementById('clear-btn').style.display = 'inline-block';
+                document.getElementById('instr').innerText = "Обведи слово! ✍️";
+                document.getElementById('trace-text').innerText = data[idx].word;
+                document.getElementById('emoji').innerText = data[idx].emoji;
+                document.getElementById('info').innerText = `Слово ${idx + 1} из ${data.length}`;
+                clearDraw();
+            } else {
+                document.querySelector('.card').innerHTML = "<h1>🎖️ ГОТОВО!</h1><p>Ты великолепно знаешь все слова!</p><button class='btn-next' onclick='location.reload()'>ЗАНОВО</button>";
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

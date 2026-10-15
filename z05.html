@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentence Builder - Super Hero Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@700;800&display=swap');
+
+        :root {
+            --blue: #1976d2;
+            --blue-dark: #0d47a1;
+            --red: #e53935;
+            --red-dark: #b71c1c;
+            --orange: #fb8c00;
+            --orange-dark: #e65100;
+            --green: #43a047;
+            --green-dark: #1b5e20;
+            --yellow: #fdd835;
+            --yellow-dark: #f9a825;
+            --purple: #7e57c2;
+            --purple-dark: #4527a0;
+            --text: #000000;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Baloo 2', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(180deg, #29b6f6 0%, #4fc3f7 35%, #81d4fa 70%, #b3e5fc 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            color: #000;
+        }
+
+        /* Floating clouds decoration */
+        body::before,
+        body::after {
+            content: '☁️';
+            position: fixed;
+            font-size: 80px;
+            opacity: 0.55;
+            pointer-events: none;
+            z-index: 0;
+            animation: cloudDrift 20s linear infinite;
+        }
+        body::before { top: 30px; left: -100px; animation-delay: 0s; }
+        body::after  { top: 120px; right: -120px; animation-delay: 6s; font-size: 60px; }
+
+        @keyframes cloudDrift {
+            0%   { transform: translateX(0) translateY(0); }
+            50%  { transform: translateX(60vw) translateY(-15px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        /* ============ MAIN CARD ============ */
+        .quiz-container {
+            background: #fff;
+            width: 100%;
+            max-width: 660px;
+            padding: 55px 30px 30px;
+            border-radius: 30px;
+            border: 5px solid var(--blue-dark);
+            box-shadow: 0 12px 0 var(--blue-dark),
+                        0 25px 45px rgba(0,0,0,0.25);
+            text-align: center;
+            min-height: 620px;
+            position: relative;
+            z-index: 1;
+            animation: cardPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Hero badge at top of card */
+        .quiz-container::before {
+            content: '⚡';
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--yellow);
+            border: 5px solid var(--blue-dark);
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 0 var(--yellow-dark);
+            animation: boltPulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes boltPulse {
+            0%, 100% { transform: translateX(-50%) scale(1) rotate(-5deg); }
+            50%      { transform: translateX(-50%) scale(1.12) rotate(5deg); }
+        }
+
+        /* ============ HEADER ============ */
+        .instruction {
+            background: var(--yellow);
+            color: #000;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 10px 22px;
+            border-radius: 20px;
+            border: 3px solid var(--yellow-dark);
+            display: inline-block;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-bar {
+            color: #fff;
+            background: var(--purple);
+            font-weight: 800;
+            font-family: 'Fredoka One', cursive;
+            padding: 6px 18px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            display: inline-block;
+            margin-bottom: 18px;
+            border: 3px solid var(--purple-dark);
+            box-shadow: 0 4px 0 var(--purple-dark);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            color: #000;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.55rem;
+            margin-bottom: 12px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============ BIG EMOJI HERO ============ */
+        .main-emoji {
+            font-size: 90px;
+            line-height: 1;
+            display: block;
+            margin: 12px 0 18px;
+            animation: emojiBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 6px 0 rgba(0,0,0,0.15));
+        }
+
+        @keyframes emojiBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50%      { transform: translateY(-12px) scale(1.06); }
+        }
+
+        /* ============ SENTENCE BUILDER ============ */
+        .sentence-builder {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 22px 0;
+            min-height: 72px;
+            border: 4px dashed #90caf9;
+            padding: 14px;
+            background: #e3f2fd;
+            border-radius: 18px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .word-in-sentence {
+            background: linear-gradient(180deg, #66bb6a, #43a047);
+            color: #000;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-family: 'Baloo 2', sans-serif;
+            font-size: 1.15rem;
+            border: 3px solid #1b5e20;
+            box-shadow: 0 5px 0 #1b5e20;
+            animation: chipIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes chipIn {
+            0%   { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+            70%  { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        /* ============ WORD POOL ============ */
+        .word-pool {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            min-height: 60px;
+        }
+
+        .word-btn {
+            background: linear-gradient(180deg, #ffe082, #ffc107);
+            color: #000;
+            padding: 14px 22px;
+            border: 3px solid var(--orange-dark);
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 0 var(--orange-dark);
+            transition: 0.12s;
+            text-transform: lowercase;
+            user-select: none;
+        }
+
+        .word-btn:hover {
+            background: linear-gradient(180deg, #ffecb3, #ffd54f);
+            transform: translateY(-3px);
+            box-shadow: 0 9px 0 var(--orange-dark);
+        }
+
+        .word-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--orange-dark);
+        }
+
+        .word-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+        }
+
+        /* ============ FEEDBACK ============ */
+        .feedback {
+            margin-top: 22px;
+            font-family: 'Fredoka One', cursive;
+            min-height: 40px;
+            font-size: 1.35rem;
+            letter-spacing: 0.5px;
+        }
+
+        .correct-text {
+            color: var(--green-dark);
+            animation: successPop 0.5s ease-out;
+        }
+
+        .wrong-text {
+            color: var(--red-dark);
+            animation: wrongShake 0.5s ease-out;
+        }
+
+        @keyframes successPop {
+            0%   { transform: scale(0.5); opacity: 0; }
+            60%  { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-12px); }
+            40%      { transform: translateX(12px); }
+            60%      { transform: translateX(-8px); }
+            80%      { transform: translateX(8px); }
+        }
+
+        /* ============ RESET BUTTON ============ */
+        .reset-btn {
+            margin-top: 18px;
+            padding: 14px 30px;
+            background: linear-gradient(180deg, #ef5350, #e53935);
+            color: #000;
+            border: 3px solid var(--red-dark);
+            border-radius: 16px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.05rem;
+            display: none;
+            box-shadow: 0 6px 0 var(--red-dark);
+            letter-spacing: 0.5px;
+            transition: 0.12s;
+        }
+
+        .reset-btn:hover { transform: translateY(-2px); }
+
+        .reset-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--red-dark);
+        }
+
+        /* ============ FINAL SCREEN ============ */
+        .final-screen .main-emoji {
+            font-size: 110px;
+            animation: trophySpin 1.5s ease-in-out infinite;
+        }
+
+        @keyframes trophySpin {
+            0%, 100% { transform: rotate(-10deg) scale(1); }
+            50%      { transform: rotate(10deg) scale(1.15); }
+        }
+
+        /* ============ MOBILE ============ */
+        @media (max-width: 500px) {
+            .quiz-container { padding: 50px 18px 25px; border-radius: 24px; }
+            h2 { font-size: 1.2rem; }
+            .main-emoji { font-size: 70px; }
+            .word-btn { font-size: 1rem; padding: 12px 16px; }
+            .word-in-sentence { font-size: 1rem; padding: 8px 14px; }
+            .instruction { font-size: 0.85rem; padding: 8px 16px; }
+            .progress-bar { font-size: 0.8rem; }
+            .feedback { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="instruction">⚡ BUILD THE SENTENCE, HERO! ⚡</div>
+    <div id="progress" class="progress-bar">Level 1 of 6</div>
+    
+    <div class="step active">
+        <h2 id="title">Choose the components...</h2>
+        <span id="display-emoji" class="main-emoji">📚</span>
+        
+        <div class="sentence-builder" id="builder"></div>
+        <div class="word-pool" id="pool"></div>
+        
+        <div class="feedback" id="feedback"></div>
+        <button id="resetBtn" class="reset-btn" onclick="resetCurrent()">🔄 TRY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    let currentIdx = 0;
+    let currentSentence = [];
+    let expectedLength = 0;
+
+    const quizData = [
+        {
+            title: "Mission 1: My Teacher",
+            emoji: "👩‍🏫",
+            words: ["Look!", "This is", "my", "teacher."],
+            correct: "Look! This is my teacher.",
+            expectedCount: 4,
+            progress: "Level 1 of 6"
+        },
+        {
+            title: "Mission 2: Your Mum",
+            emoji: "👩‍👦",
+            words: ["Your mum", "is", "very", "pretty!"],
+            correct: "Your mum is very pretty!",
+            expectedCount: 4,
+            progress: "Level 2 of 6"
+        },
+        {
+            title: "Mission 3: My Sister",
+            emoji: "🎤",
+            words: ["My", "sister", "is", "a", "singer."],
+            correct: "My sister is a singer.",
+            expectedCount: 5,
+            progress: "Level 3 of 6"
+        },
+        {
+            title: "Mission 4: Policemen",
+            emoji: "👮‍♂️",
+            words: ["Policemen", "are", "sad."],
+            correct: "Policemen are sad.",
+            expectedCount: 3,
+            progress: "Level 4 of 6"
+        },
+        {
+            title: "Mission 5: A Teacher?",
+            emoji: "❓",
+            words: ["Are", "you", "a", "teacher?"],
+            correct: "Are you a teacher?",
+            expectedCount: 4,
+            progress: "Level 5 of 6"
+        },
+        {
+            title: "Mission 6: Not a Vase",
+            emoji: "🏺",
+            words: ["It is not", "a", "vase."],
+            correct: "It is not a vase.",
+            expectedCount: 3,
+            progress: "Level 6 of 6"
+        }
+    ];
+
+    function loadQuestion() {
+        const data = quizData[currentIdx];
+        
+        document.getElementById('title').innerText = data.title;
+        document.getElementById('display-emoji').innerText = data.emoji;
+        document.getElementById('progress').innerText = data.progress;
+        document.getElementById('feedback').innerHTML = "";
+        document.getElementById('resetBtn').style.display = 'none';
+
+        const pool = document.getElementById('pool');
+        const builder = document.getElementById('builder');
+        pool.innerHTML = "";
+        builder.innerHTML = "";
+        
+        currentSentence = [];
+        expectedLength = data.expectedCount;
+
+        // Shuffle words for the pool
+        const shuffled = [...data.words].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(word => {
+            const btn = document.createElement('button');
+            btn.className = 'word-btn';
+            btn.innerText = word;
+            btn.onclick = () => {
+                currentSentence.push(word);
+                btn.disabled = true;
+                renderBuilder();
+                
+                if (currentSentence.length === expectedLength) {
+                    checkResult();
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function renderBuilder() {
+        const builder = document.getElementById('builder');
+        builder.innerHTML = "";
+        currentSentence.forEach(word => {
+            const span = document.createElement('span');
+            span.className = 'word-in-sentence';
+            span.innerText = word;
+            builder.appendChild(span);
+        });
+    }
+
+    function checkResult() {
+        const result = currentSentence.join(" ");
+        const feedback = document.getElementById('feedback');
+        
+        if (result === quizData[currentIdx].correct) {
+            feedback.innerHTML = "<span class='correct-text'>🏆 AMAZING! You did it!</span>";
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showFinalSummary();
+                }
+            }, 1300);
+        } else {
+            feedback.innerHTML = "<span class='wrong-text'>💥 OOPS! Try again, hero!</span>";
+            document.getElementById('resetBtn').style.display = 'inline-block';
+        }
+    }
+
+    function resetCurrent() {
+        loadQuestion();
+    }
+
+    function showFinalSummary() {
+        const container = document.querySelector('.quiz-container');
+        container.innerHTML = `
+            <div class="final-screen" style="padding: 30px 10px;">
+                <span class="main-emoji">🏆</span>
+                <h2 style="color: #000; font-size: 2rem; margin: 15px 0;">YOU WIN!</h2>
+                <p style="font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; color: #000; margin-bottom: 20px;">
+                    You completed all 6 missions, hero! 🎉
+                </p>
+                <button class="reset-btn" style="display: inline-block; margin-top: 10px;" onclick="location.reload()">
+                    ▶️ PLAY AGAIN
+                </button>
+            </div>
+        `;
+    }
+
+    // Initial setup invocation
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
