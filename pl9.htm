@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driving Academy: English Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #1a202c;
+            --accent-green: #38a169;
+            --accent-red: #e53e3e;
+            --accent-yellow: #d69e2e;
+            --accent-blue: #3182ce;
+            --bg-light: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border-color: #cbd5e0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-light);
+            background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            font-family: 'Exo 2', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .tablet {
+            width: 100%;
+            max-width: 680px;
+            border: 8px solid var(--primary-dark);
+            border-radius: 16px;
+            background: var(--card-bg);
+            padding: 28px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .tablet::before {
+            content: 'DRIVER MONITOR v2.7';
+            position: absolute;
+            top: -14px;
+            left: 20px;
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 2px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            border-radius: 4px;
+        }
+
+        h1 {
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ===== STATS BAR ===== */
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            background: #e2e8f0;
+            height: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #cbd5e0;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-green);
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            font-weight: 800;
+            font-size: 1.1rem;
+            white-space: nowrap;
+        }
+
+        .stat-hp { color: var(--accent-red); }
+        .stat-xp { color: var(--accent-yellow); }
+
+        /* ===== QUIZ CARD ===== */
+        .quest-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 26px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            0%   { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 22px;
+            line-height: 1.5;
+            color: var(--text-main);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 18px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            color: var(--text-main);
+            border: 2px solid var(--border-color);
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #ebf8ff;
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .correct {
+            background: #f0fff4 !important;
+            border-color: var(--accent-green) !important;
+            color: #22543d !important;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2) !important;
+        }
+
+        .wrong {
+            background: #fff5f5 !important;
+            border-color: var(--accent-red) !important;
+            color: #742a2a !important;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important;
+        }
+
+        #feedback {
+            height: 24px;
+            margin-top: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 500px) {
+            .tablet { padding: 18px; }
+            h1 { font-size: 1.3rem; }
+            .question-text { font-size: 1rem; }
+            .option-btn { font-size: 0.95rem; padding: 14px; }
+            .header-stats { flex-wrap: wrap; justify-content: center; }
+            .progress-container { order: 3; width: 100%; flex-basis: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="tablet">
+    <h1>DRIVER'S ACADEMY</h1>
+
+    <div class="header-stats">
+        <span class="stat-item stat-hp">HP: <span id="lives">3</span></span>
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <span class="stat-item stat-xp">XP: <span id="score">0</span></span>
+    </div>
+
+    <div class="quest-card" id="quiz-box">
+        <div class="question-text" id="question">Initialising Driving Protocols...</div>
+        <div class="options-grid" id="options"></div>
+        <div id="feedback"></div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { 
+            q: "_______ two drivers.", 
+            a: ["There are", "It is", "They is", "He are"], 
+            correct: 0 
+        },
+        { 
+            q: "When did they see green traffic lights (7)?", 
+            a: ["It was on Friday", "It was on Thursday", "It was on Sunday", "It was on Tuesday"], 
+            correct: 2 
+        },
+        { 
+            q: "When was the bus on a bus stop (4)?", 
+            a: ["It was on Thursday", "It was on Sunday", "It was on Tuesday", "It was on Friday"], 
+            correct: 0 
+        },
+        { 
+            q: "When did they turn right on the road (2)?", 
+            a: ["It was on Tuesday", "It was on Friday", "It was on Sunday", "It was on Thursday"], 
+            correct: 0 
+        },
+        { 
+            q: "When did they open a pavement for people (7)?", 
+            a: ["It was on Sunday", "It was on Tuesday", "It was on Thursday", "It was on Friday"], 
+            correct: 0 
+        },
+        { 
+            q: "What does the sign with the number '50' mean?", 
+            a: ["Speed limit", "Zebra crossing", "Turning left", "Straight road"], 
+            correct: 0 
+        },
+        { 
+            q: "What is the black and white road marking called?", 
+            a: ["Zebra crossing", "Sea view", "Red lane", "Speed limit"], 
+            correct: 0 
+        },
+        { 
+            q: "What does the yellow line on the road mean?", 
+            a: ["Bike lane", "Turning left", "Red lane", "Sea view"], 
+            correct: 0 
+        },
+        { 
+            q: "What do you call the view of the ocean from the road?", 
+            a: ["Sea view", "Red lane", "Straight road", "Zebra crossing"], 
+            correct: 0 
+        },
+        { 
+            q: "What is the red light called?", 
+            a: ["Traffic lights", "Zebra crossing", "Speed limit", "Turning left"], 
+            correct: 0 
+        },
+        { 
+            q: "Which transport is on the bus stop?", 
+            a: ["A double-decker bus", "A racing car", "A bicycle", "A motorbike"], 
+            correct: 0 
+        },
+        { 
+            q: "What do the traffic lights show?", 
+            a: ["Green, yellow, red", "Only red", "Only green", "Blue, white, black"], 
+            correct: 0 
+        }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let lives = 3;
+    let busy = false;
+
+    function startMission() {
+        if (current >= questions.length) {
+            document.getElementById('quiz-box').innerHTML = `
+                <h2 style="color:var(--accent-green); text-align:center; font-size:2rem;">🏁 FINISH LINE</h2>
+                <p style="text-align:center; font-size:1.2rem; margin-top:10px;">Driving test complete!</p>
+                <p style="text-align:center; font-size:1.5rem; color:var(--accent-yellow); font-weight:800; margin-top:10px;">FINAL SCORE: ${score}</p>
+                <button onclick="location.reload()" class="option-btn" style="text-align:center; width:100%; margin-top:20px; background:var(--accent-blue); color:white; border-color:var(--accent-blue);">RESTART TERMINAL</button>
+            `;
+            return;
+        }
+
+        busy = false;
+        const data = questions[current];
+        document.getElementById('question').innerText = `>> QUESTION ${current + 1}: ${data.q}`;
+        const container = document.getElementById('options');
+        container.innerHTML = '';
+        document.getElementById('feedback').innerText = '';
+
+        // Shuffle options
+        const shuffledOptions = [...data.a].sort(() => Math.random() - 0.5);
+        const correctAnswer = data.a[data.correct];
+
+        shuffledOptions.forEach((opt) => {
+            const b = document.createElement('button');
+            b.className = 'option-btn';
+            b.innerText = `> ${opt}`;
+            b.onclick = () => {
+                if (busy) return;
+                busy = true;
+                
+                // Disable all buttons
+                document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+                if (opt === correctAnswer) {
+                    b.classList.add('correct');
+                    score += 100;
+                    document.getElementById('score').innerText = score;
+                    document.getElementById('feedback').innerText = "✅ CORRECT!";
+                    document.getElementById('feedback').style.color = "var(--accent-green)";
+                    setTimeout(() => { current++; startMission(); }, 800);
+                } else {
+                    b.classList.add('wrong');
+                    // Highlight correct answer
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        if (btn.innerText.includes(correctAnswer)) {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    lives--;
+                    document.getElementById('lives').innerText = lives;
+                    document.getElementById('feedback').innerText = "❌ WRONG!";
+                    document.getElementById('feedback').style.color = "var(--accent-red)";
+                    if (lives <= 0) { 
+                        setTimeout(() => {
+                            alert("SYSTEM OVERRIDE: You ran out of lives. Restarting...");
+                            location.reload();
+                        }, 1000);
+                    } else { 
+                        setTimeout(() => { current++; startMission(); }, 1800); 
+                    }
+                }
+            };
+            container.appendChild(b);
+        });
+
+        document.getElementById('progress-bar').style.width = (current / questions.length * 100) + "%";
+    }
+
+    startMission();
+</script>
+</body>
+</html>

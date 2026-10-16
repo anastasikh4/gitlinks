@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver's Academy: English Protocol</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&display=swap');
+
+    :root {
+        --primary-dark: #1a202c;
+        --accent-green: #38a169;
+        --accent-red: #e53e3e;
+        --accent-yellow: #d69e2e;
+        --accent-blue: #3182ce;
+        --bg-light: #f0f4f8;
+        --card-bg: #ffffff;
+        --text-main: #2d3748;
+        --text-muted: #718096;
+        --border-color: #cbd5e0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        background-color: var(--bg-light);
+        background-image: radial-gradient(circle at 50% 0%, #ffffff 0%, #e2e8f0 100%);
+        color: var(--text-main);
+        font-family: 'Exo 2', sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    .tablet {
+        width: 100%;
+        max-width: 680px;
+        border: 8px solid var(--primary-dark);
+        border-radius: 16px;
+        background: var(--card-bg);
+        padding: 28px;
+        box-shadow:
+            0 15px 35px rgba(0,0,0,0.1),
+            0 5px 15px rgba(0,0,0,0.05);
+        position: relative;
+    }
+
+    .tablet::before {
+        content: 'DRIVER MONITOR v2.7';
+        position: absolute;
+        top: -14px;
+        left: 20px;
+        background: var(--primary-dark);
+        color: #fff;
+        padding: 2px 14px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        border-radius: 4px;
+    }
+
+    h1 {
+        font-family: 'Exo 2', sans-serif;
+        font-weight: 800;
+        color: var(--primary-dark);
+        text-align: center;
+        margin-bottom: 24px;
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* ===== АВТО-ПЕРЕКЛЮЧЕНИЕ МИССИЙ ===== */
+    .mission {
+        display: none;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        background: #f8fafc;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        0%   { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    #m1 { display: block; }
+
+    input[name="q1"]:checked ~ #m1 { display: none; }
+    input[name="q1"]:checked ~ #m2 { display: block; }
+
+    input[name="q2"]:checked ~ #m2 { display: none; }
+    input[name="q2"]:checked ~ #m3 { display: block; }
+
+    input[name="q3"]:checked ~ #m3 { display: none; }
+    input[name="q3"]:checked ~ #m4 { display: block; }
+
+    input[name="q4"]:checked ~ #m4 { display: none; }
+    input[name="q4"]:checked ~ #m5 { display: block; }
+
+    input[name="q5"]:checked ~ #m5 { display: none; }
+    input[name="q5"]:checked ~ #m6 { display: block; }
+
+    input[name="q6"]:checked ~ #m6 { display: none; }
+    input[name="q6"]:checked ~ #m7 { display: block; }
+
+    input[name="q7"]:checked ~ #m7 { display: none; }
+    input[name="q7"]:checked ~ #m8 { display: block; }
+
+    input[name="q8"]:checked ~ #m8 { display: none; }
+    input[name="q8"]:checked ~ #m_final { display: block; }
+
+    /* ===== ВАРИАНТЫ ОТВЕТОВ ===== */
+    .option {
+        display: block;
+        margin: 12px 0;
+        padding: 16px 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 10px;
+        background: #ffffff;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1.05rem;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .option:hover {
+        background: #ebf8ff;
+        border-color: var(--accent-blue);
+        transform: translateY(-2px);
+    }
+
+    input[type="radio"] { display: none; }
+
+    .correct:checked + .option {
+        background: #f0fff4 !important;
+        border-color: var(--accent-green);
+        color: #22543d;
+        box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+    }
+
+    .wrong:checked + .option {
+        background: #fff5f5 !important;
+        border-color: var(--accent-red);
+        color: #742a2a;
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+    }
+
+    .cam-img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .status {
+        display: inline-block;
+        color: #c05621;
+        background: #feebc8;
+        border: 1px solid #fbd38d;
+        padding: 4px 12px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+
+    .mission p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 16px;
+        color: var(--text-main);
+        font-weight: 500;
+    }
+
+    .mission h2 {
+        font-family: 'Exo 2', sans-serif;
+        font-weight: 800;
+        color: var(--primary-dark);
+        font-size: 2.8rem;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 500px) {
+        h1 { font-size: 1.4rem; }
+        .tablet { padding: 20px; }
+        .mission { padding: 18px; }
+        .option { font-size: 0.95rem; padding: 14px; }
+        .cam-img { height: 160px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="tablet">
+    <h1>DRIVER'S ACADEMY</h1>
+
+    <!-- ========== MISSION 1: Picture + Present Continuous ========== -->
+    <input type="radio" name="q1" id="q1a" class="correct">
+    <input type="radio" name="q1" id="q1b" class="wrong">
+    <div class="mission" id="m1">
+        <span class="status">CAM 01 · BIKE LANE</span>
+        <img class="cam-img" src="https://i.pinimg.com/736x/bb/b6/b0/bbb6b0c21047c9b9e662528aff32c3e9.jpg?nii=t" alt="Cyclist on the road">
+        <p>RECON: "Look! This man ________ on the bike lane right now."</p>
+        <label for="q1a" class="option">A) is riding a bike</label>
+        <label for="q1b" class="option">B) rides a car</label>
+    </div>
+
+    <!-- ========== MISSION 2: Present Continuous ========== -->
+    <input type="radio" name="q2" id="q2a" class="wrong">
+    <input type="radio" name="q2" id="q2b" class="correct">
+    <div class="mission" id="m2">
+        <span class="status">CAM 02 · PIT STOP</span>
+        <img class="cam-img" src="https://i.pinimg.com/736x/9d/c1/e5/9dc1e5e55253cebce1169fc6772b9d7a.jpg?nii=t" alt="Racing driver">
+        <p>IDENTIFY: "The driver ________ (wear) special sunglasses at the moment."</p>
+        <label for="q2a" class="option">A) wear</label>
+        <label for="q2b" class="option">B) is wearing</label>
+    </div>
+
+    <!-- ========== MISSION 3: Present Continuous Negative ========== -->
+    <input type="radio" name="q3" id="q3a" class="correct">
+    <input type="radio" name="q3" id="q3b" class="wrong">
+    <div class="mission" id="m3">
+        <span class="status">CAM 03 · TRACK</span>
+        <p>MOTION: "The race car ________ (not / stop) at the finish line today."</p>
+        <label for="q3a" class="option">A) isn't stopping</label>
+        <label for="q3b" class="option">B) aren't stopping</label>
+    </div>
+
+    <!-- ========== MISSION 4: Traffic Signs ========== -->
+    <input type="radio" name="q4" id="q4a" class="wrong">
+    <input type="radio" name="q4" id="q4b" class="correct">
+    <div class="mission" id="m4">
+        <span class="status">CAM 04 · ROAD SIGNS</span>
+        <img class="cam-img" src="https://avatars.mds.yandex.net/i?id=c9f615ccd584a1e139943b7928ef1db172882931-12649328-images-thumbs&n=13" alt="Speed limit sign">
+        <p>DECODE: "This red circle with the number 50 means there is a ________."</p>
+        <label for="q4a" class="option">A) zebra crossing</label>
+        <label for="q4b" class="option">B) speed limit</label>
+    </div>
+
+    <!-- ========== MISSION 5: Unscramble ========== -->
+    <input type="radio" name="q5" id="q5a" class="correct">
+    <input type="radio" name="q5" id="q5b" class="wrong">
+    <div class="mission" id="m5">
+        <span class="status">DECODE SIGNAL 1</span>
+        <p>UNSCRAMBLE: [ on / bike lane / the / you / ride / can / bikes ]</p>
+        <label for="q5a" class="option">A) You can ride bikes on the bike lane.</label>
+        <label for="q5b" class="option">B) Bikes can ride you on the lane.</label>
+    </div>
+
+    <!-- ========== MISSION 6: Unscramble ========== -->
+    <input type="radio" name="q6" id="q6a" class="wrong">
+    <input type="radio" name="q6" id="q6b" class="correct">
+    <div class="mission" id="m6">
+        <span class="status">DECODE SIGNAL 2</span>
+        <p>UNSCRAMBLE: [ is / she / the car / in / and / driving / it / fast / very ]</p>
+        <label for="q6a" class="option">A) Very fast it is and driving in the car she.</label>
+        <label for="q6b" class="option">B) She is in the car and driving it very fast.</label>
+    </div>
+
+    <!-- ========== MISSION 7: Unscramble ========== -->
+    <input type="radio" name="q7" id="q7a" class="correct">
+    <input type="radio" name="q7" id="q7b" class="wrong">
+    <div class="mission" id="m7">
+        <span class="status">DECODE SIGNAL 3</span>
+        <p>UNSCRAMBLE: [ glasses / he / wear / doesn't / usual / sunglasses / it's ]</p>
+        <label for="q7a" class="option">A) He doesn't wear usual glasses, it's sunglasses.</label>
+        <label for="q7b" class="option">B) It's sunglasses, glasses he doesn't wear usual.</label>
+    </div>
+
+    <!-- ========== MISSION 8: Translation ========== -->
+    <input type="radio" name="q8" id="q8a" class="wrong">
+    <input type="radio" name="q8" id="q8b" class="correct">
+    <div class="mission" id="m8">
+        <span class="status">FINAL AUDIO FILE</span>
+        <img class="cam-img" src="https://avatars.mds.yandex.net/i?id=af9bed965690604d3e1d32549115dd7f_l-8566657-images-thumbs&n=13" alt="Traffic light">
+        <p>DECODE: ?</p>
+        <label for="q8a" class="option">A) The traffic light is green, you can go now.</label>
+        <label for="q8b" class="option">B) The traffic light is red, you can't go now.</label>
+    </div>
+
+    <!-- ========== FINAL SCREEN ========== -->
+    <div class="mission" id="m_final" style="text-align: center; border-color: var(--accent-green); background: #f0fff4;">
+        <h2 style="color: #22543d; font-size: 3rem;">🏁 FINISH LINE</h2>
+        <p style="font-size: 1.2rem; margin-top: 14px; color: #276749; font-weight: 700;">DRIVING TEST COMPLETE.</p>
+        <p style="color: var(--accent-green); font-size: 1.15rem; font-weight: 800;">YOU ARE A SAFE DRIVER NOW.</p>
+        <p style="color: #2f855a; font-size: 1rem; margin-top: 10px; font-weight: 600;">License approved ✅</p>
+    </div>
+
+</div>
+
+</body>
+</html>
