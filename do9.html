@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Master: Family & Jobs</title>
+    <style>
+        :root { --primary: #6c5ce7; --success: #00b894; --error: #d63031; --bg: #f7f9fc; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; align-items: center; }
+        
+        .quiz-container { 
+            background: white; 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            text-align: center; 
+            border-top: 6px solid var(--primary); 
+            min-height: 500px; 
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .progress-header { font-weight: bold; color: #b2bec3; text-transform: uppercase; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;}
+        #q-title { color: #2d3436; margin-bottom: 20px; font-size: 1.4rem; line-height: 1.5; }
+        .visual-box { font-size: 3.5rem; margin: 10px 0 20px; min-height: 80px; }
+        
+        /* Sentence Builder UI */
+        .sentence-builder { 
+            border: 2px dashed #dfe6e9; 
+            background: #fafbfc;
+            border-radius: 12px;
+            min-height: 100px; 
+            margin: 20px 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            padding: 15px; 
+        }
+        .word-tag { 
+            background: var(--primary); 
+            color: white; 
+            padding: 10px 18px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            animation: pop 0.3s;
+            box-shadow: 0 3px 0 #4b3bb3;
+        }
+        
+        /* Buttons */
+        .btn-pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 20px; }
+        .action-btn { 
+            background: #fff; 
+            padding: 12px 20px; 
+            border: 2px solid #dfe6e9; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            color: #2d3436;
+            box-shadow: 0 3px 0 #dfe6e9; 
+            transition: 0.1s;
+        }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        .action-btn:hover { background: #f1f2f6; }
+        
+        .feedback { margin-top: 20px; font-size: 1.5rem; font-weight: bold; min-height: 40px; }
+        
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Loading...</div>
+    <h2 id="q-title">Translate the sentence</h2>
+    <div id="visual-content" class="visual-box"></div>
+
+    <div id="game-ui">
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let currentSentence = [];
+
+    const rawData = [
+        { 
+            type: 'unscramble', 
+            title: "A) Мой брат — отличный полицейский.", 
+            visual: "👮‍♂️👨‍👦", 
+            words: ["My", "brother", "is", "a", "great", "policeman."], 
+            correct: "My brother is a great policeman." 
+        },
+        { 
+            type: 'unscramble', 
+            title: "B) Сколько лет нашему молочнику?", 
+            visual: "🥛👴", 
+            words: ["How", "old", "is", "our", "milkman?"], 
+            correct: "How old is our milkman?" 
+        },
+        { 
+            type: 'unscramble', 
+            title: "C) Я пожарный в нашем городе.", 
+            visual: "🚒🔥", 
+            words: ["I", "am", "a", "fireman", "in", "our", "city."], 
+            correct: "I am a fireman in our city." 
+        },
+        { 
+            type: 'unscramble', 
+            title: "D) Ученики внимательны на уроках?", 
+            visual: "📚👀", 
+            words: ["Are", "the", "students", "attentive", "in", "the", "lessons?"], 
+            correct: "Are the students attentive in the lessons?" 
+        },
+        { 
+            type: 'unscramble', 
+            title: "E) Кто эта симпатичная девочка?", 
+            visual: "👧✨", 
+            words: ["Who", "is", "this", "pretty", "girl?"], 
+            correct: "Who is this pretty girl?" 
+        },
+        { 
+            type: 'unscramble', 
+            title: "F) *Её сестра — хорошая певица?", 
+            visual: "🎤👩", 
+            words: ["Is", "her", "sister", "a", "good", "singer?"], 
+            correct: "Is her sister a good singer?" 
+        },
+        { 
+            type: 'unscramble', 
+            title: "G) *Мы счастливая семья.", 
+            visual: "👨‍👩‍👧‍👦❤️", 
+            words: ["We", "are", "a", "happy", "family."], 
+            correct: "We are a happy family." 
+        }
+    ];
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if(!q) return;
+
+        document.getElementById('progress').innerText = `Sentence ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('q-title').innerText = q.title;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        document.getElementById('feedback').innerText = "";
+        
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = ""; 
+        pool.innerHTML = "";
+        currentSentence = [];
+
+        // Shuffle the words
+        let items = [...q.words];
+        items.sort(() => Math.random() - 0.5);
+
+        items.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            
+            btn.onclick = () => {
+                // Hide the clicked button
+                btn.style.visibility = "hidden";
+                
+                // Add word to the sentence array and visual builder
+                currentSentence.push(item);
+                builder.innerHTML += `<span class="word-tag">${item}</span>`;
+                
+                // Check if the sentence is complete
+                let currentStr = currentSentence.join(" ");
+                
+                if (currentStr === q.correct) {
+                    nextStep();
+                } else if (currentStr.length >= q.correct.length) {
+                    // If they used all words but it's wrong
+                    document.getElementById('feedback').innerHTML = "<span style='color:var(--error)'>❌ Order is wrong, try again!</span>";
+                    setTimeout(loadGame, 1500); // Reload the same question
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function nextStep() {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--success)'>🌟 Correct! 🌟</span>";
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < rawData.length) {
+                loadGame();
+            } else {
+                // Finish screen
+                document.getElementById('q-title').innerText = "Translation Master!";
+                document.getElementById('visual-content').innerHTML = "🏆🎉";
+                document.getElementById('game-ui').innerHTML = "<h3 style='color:#6c5ce7; font-size:1.5rem;'>Excellent! You translated everything perfectly!</h3>";
+                document.getElementById('feedback').innerText = "";
+                document.getElementById('progress').innerText = "Completed!";
+            }
+        }, 1200);
+    }
+
+    loadGame();
+</script>
+</body>
+</html>
