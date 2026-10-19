@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Grammar Power ⚡</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --electric-blue: #1e90ff;
+            --deep-blue: #0b3d91;
+            --neon-green: #2ecc71;
+            --lime: #a8e6cf;
+            --orange: #ff8c00;
+            --light-bg: #f0f8ff;
+            --card-bg: #ffffff;
+            --text-dark: #1a1a2e;
+            --accent-yellow: #f1c40f;
+            --correct-bg: #d5f5e3;
+            --wrong-bg: #fadbd8;
+            --shadow-blue: #b3d9ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-weight: 400 !important;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #e0f0ff 0%, #f5f9ff 100%);
+            color: var(--text-dark);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            padding: 35px 30px;
+            border-radius: 20px;
+            border: 3px solid var(--electric-blue);
+            box-shadow: 0 12px 0 var(--shadow-blue), 0 8px 25px rgba(30, 144, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(46, 204, 113, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container::after {
+            content: "";
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(30, 144, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Bungee', cursive;
+            color: var(--electric-blue);
+            text-align: center;
+            font-size: 2.4rem;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 rgba(30, 144, 255, 0.15);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--deep-blue);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: 'Bungee', cursive;
+            color: var(--deep-blue);
+            margin-top: 40px;
+            border-bottom: 3px solid var(--electric-blue);
+            padding-bottom: 8px;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            font-family: 'Bungee', cursive;
+            color: var(--orange);
+            margin-top: 25px;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .grammar-reference {
+            background: rgba(30, 144, 255, 0.06);
+            padding: 20px 25px;
+            border-radius: 15px;
+            line-height: 1.9;
+            font-size: 1.1rem;
+            border: 2px dashed var(--electric-blue);
+            margin-bottom: 25px;
+        }
+
+        .grammar-reference ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .grammar-reference li {
+            margin-bottom: 10px;
+        }
+
+        .highlight-green {
+            color: #1e8449;
+            font-weight: 600 !important;
+        }
+
+        .highlight-red {
+            color: #c0392b;
+            font-weight: 600 !important;
+        }
+
+        .instruction {
+            font-size: 1.05rem;
+            color: var(--deep-blue);
+            margin-bottom: 20px;
+            text-align: center;
+            background: rgba(241, 196, 15, 0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: inline-block;
+            border: 1px solid rgba(241, 196, 15, 0.4);
+        }
+
+        .exercise-block {
+            margin-bottom: 20px;
+            padding: 22px;
+            background: #f9fbff;
+            border-radius: 15px;
+            border: 2px solid #d0e3ff;
+            font-size: 1.15rem;
+            line-height: 1.9;
+            transition: 0.2s;
+        }
+
+        .exercise-block:hover {
+            border-color: var(--electric-blue);
+            background: #f0f7ff;
+        }
+
+        .q-text {
+            margin-bottom: 8px;
+            color: var(--electric-blue);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600 !important;
+        }
+
+        select.gap-sel {
+            font-family: 'Quicksand', sans-serif;
+            padding: 8px 12px;
+            border: 2px solid var(--electric-blue);
+            color: var(--text-dark);
+            background: #ffffff;
+            font-size: 1.05rem;
+            border-radius: 8px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600 !important;
+        }
+
+        select.gap-sel:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .options-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 12px;
+        }
+
+        .opt-btn {
+            background: #ffffff;
+            border: 2px solid var(--electric-blue);
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            color: var(--electric-blue);
+            font-size: 1rem;
+            font-weight: 600 !important;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .opt-btn:hover {
+            background: rgba(30, 144, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(30, 144, 255, 0.2);
+        }
+
+        .opt-btn.active {
+            background: var(--electric-blue);
+            color: #ffffff;
+            border-color: var(--electric-blue);
+        }
+
+        .status-correct {
+            background-color: var(--correct-bg) !important;
+            border-color: #1e8449 !important;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.2);
+        }
+
+        .status-wrong {
+            background-color: var(--wrong-bg) !important;
+            border-color: #c0392b !important;
+            box-shadow: 0 0 15px rgba(192, 57, 43, 0.15);
+        }
+
+        .check-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--electric-blue), #1c7ed6);
+            color: #ffffff;
+            border: 2px solid var(--electric-blue);
+            border-radius: 12px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: 0.2s;
+            font-family: 'Bungee', cursive;
+            letter-spacing: 2px;
+            box-shadow: 0 6px 0 var(--shadow-blue);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--shadow-blue), 0 0 20px rgba(30, 144, 255, 0.2);
+        }
+
+        .check-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--shadow-blue);
+        }
+
+        .final-score {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            color: #1e8449;
+            display: none;
+            font-weight: 600 !important;
+            background: var(--correct-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #1e8449;
+        }
+
+        .divider {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--electric-blue), transparent);
+            margin: 40px 0;
+            opacity: 0.4;
+        }
+
+        .hidden-answers-link {
+            text-align: center;
+            color: var(--electric-blue);
+            font-size: 1rem;
+            margin-top: 20px;
+        }
+
+        .hidden-answers-link a {
+            color: var(--deep-blue);
+            text-decoration: none;
+            font-weight: 600 !important;
+            background: rgba(241, 196, 15, 0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            transition: 0.2s;
+            border: 1px solid rgba(241, 196, 15, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .hidden-answers-link a:hover {
+            background: rgba(241, 196, 15, 0.3);
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 12px rgba(241, 196, 15, 0.2);
+        }
+
+        #hidden-answers {
+            display: none;
+            background: rgba(30, 144, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 2px dashed var(--electric-blue);
+        }
+
+        #hidden-answers h3 {
+            margin-top: 0;
+            color: var(--deep-blue);
+        }
+
+        #hidden-answers p {
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            border: 1px solid #d0e3ff;
+            color: var(--text-dark);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+                border-radius: 15px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            .options-group {
+                flex-direction: column;
+            }
+            .opt-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>⚡ GRAMMAR POWER ⚡</h1>
+    <p class="subtitle">🚀 Level up your English 🚀</p>
+
+    <!-- ============================================================ -->
+    <!-- PART 1: GRAMMAR — USED TO                                     -->
+    <!-- ============================================================ -->
+    <h2>Part 1: Used to</h2>
+
+    <div class="grammar-reference">
+        <div style="font-size: 1.15rem; margin-bottom: 12px; color: var(--electric-blue); font-weight: 600 !important;">📖 Grammar Reference:</div>
+        <ul>
+            <li>• He <span class="highlight-green">used to</span> drink hot milk when he was 6.</li>
+            <li>• I <span class="highlight-green">didn't use to</span> eat porridge.</li>
+            <li>• Did you <span class="highlight-green">use to</span> color in pictures?</li>
+        </ul>
+    </div>
+
+    <h3>✏️ Complete the Sentences</h3>
+    <p class="instruction">Choose the correct structure to complete the ideas.</p>
+
+    <div id="usedto-area">
+        <div class="exercise-block">
+            <div class="q-text">Sentence 1</div>
+            + When I was a child, I
+            <select class="gap-sel" data-ans="used to drink">
+                <option value="">---</option>
+                <option value="used to drink">used to drink</option>
+                <option value="didn't use to drink">didn't use to drink</option>
+            </select>
+            pomegranate juice.
+        </div>
+
+        <div class="exercise-block">
+            <div class="q-text">Sentence 2</div>
+           - I
+            <select class="gap-sel" data-ans="didn't use to eat">
+                <option value="">---</option>
+                <option value="used to eat">used to eat</option>
+                <option value="didn't use to eat">didn't use to eat</option>
+            </select>
+            porridge for breakfast.
+        </div>
+
+        <div class="exercise-block">
+            <div class="q-text">Sentence 3</div>
+            + My family
+            <select class="gap-sel" data-ans="used to go">
+                <option value="">---</option>
+                <option value="used to go">used to go</option>
+                <option value="didn't use to go">didn't use to go</option>
+            </select>
+            to the Crimea in summer.
+        </div>
+
+        <div class="exercise-block">
+            <div class="q-text">Sentence 4</div>
+           - I
+            <select class="gap-sel" data-ans="didn't use to like">
+                <option value="">---</option>
+                <option value="used to like">used to like</option>
+                <option value="didn't use to like">didn't use to like</option>
+            </select>
+            to do homework, but now I do.
+        </div>
+    </div>
+
+    <button class="check-button" onclick="evaluateUsedTo()">⚡ CHECK ANSWERS ⚡</button>
+    <div id="usedto-score" class="final-score"></div>
+
+    <hr class="divider">
+
+    <!-- ============================================================ -->
+    <!-- PART 2: GRAMMAR — ERROR IDENTIFICATION                        -->
+    <!-- ============================================================ -->
+    <h2>Part 2: Find the Error</h2>
+    <p class="instruction">Four sentences are correct, one has a mistake. Can you spot it? 🔍</p>
+
+    <div id="errors-area">
+        <div class="exercise-block" data-ans="Correct">
+            <div>1. When I was at school, I uses to play football every Friday after classes.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="selectOption(this, 'inCorrect')">✅ Correct</button>
+                <button class="opt-btn" onclick="selectOption(this, 'Correct')">❌ Incorrect</button>
+            </div>
+        </div>
+
+        <div class="exercise-block" data-ans="Correct">
+            <div>2. My sister didn't use to like coffee, but now she drinks it every morning.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="selectOption(this, 'Correct')">✅ Correct</button>
+                <button class="opt-btn" onclick="selectOption(this, 'Incorrect')">❌ Incorrect</button>
+            </div>
+        </div>
+
+        <div class="exercise-block" data-ans="Incorrect">
+            <div>3. He used to went to the cinema every weekend when he lived in Paris.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="selectOption(this, 'Correct')">✅ Correct</button>
+                <button class="opt-btn" onclick="selectOption(this, 'Incorrect')">❌ Incorrect</button>
+            </div>
+        </div>
+
+        <div class="exercise-block" data-ans="Correct">
+            <div>4. Did you use to live in a big house before you moved to London?</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="selectOption(this, 'Correct')">✅ Correct</button>
+                <button class="opt-btn" onclick="selectOption(this, 'Incorrect')">❌ Incorrect</button>
+            </div>
+        </div>
+
+        <div class="exercise-block" data-ans="Correct">
+            <div>5. We used to spend our winter holidays in the mountains when we were younger.</div>
+            <div class="options-group">
+                <button class="opt-btn" onclick="selectOption(this, 'Correct')">✅ Correct</button>
+                <button class="opt-btn" onclick="selectOption(this, 'Incorrect')">❌ Incorrect</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="check-button" onclick="evaluateErrors()">⚡ CHECK ANSWERS ⚡</button>
+    <div id="errors-score" class="final-score"></div>
+
+    <hr class="divider">
+
+    <!-- ============================================================ -->
+    <!-- HIDDEN ANSWERS                                                -->
+    <!-- ============================================================ -->
+    <div class="hidden-answers-link">
+        <a href="#" onclick="document.getElementById('hidden-answers').style.display='block'; return false;">
+            🔓 Reveal Answers
+        </a>
+    </div>
+
+    <div id="hidden-answers">
+        <h3>🏆 Answers 🏆</h3>
+        <h3>Part 1: Used to</h3>
+        <p>1. used to drink &nbsp;|&nbsp; 2. didn't use to eat &nbsp;|&nbsp; 3. used to go &nbsp;|&nbsp; 4. didn't use to like</p>
+
+        <h3>Part 2: Find the Error</h3>
+        <p>1. Correct &nbsp;|&nbsp; 2. Correct &nbsp;|&nbsp; 3. Incorrect &nbsp;|&nbsp; 4. Correct &nbsp;|&nbsp; 5. Correct</p>
+    </div>
+
+</div>
+
+<!-- ================================================================= -->
+<!-- JAVASCRIPT                                                        -->
+<!-- ================================================================= -->
+<script>
+    /* ---------- Grammar — Used to ---------- */
+    function evaluateUsedTo() {
+        const blocks = document.querySelectorAll('#usedto-area .exercise-block');
+        let correctCount = 0;
+
+        blocks.forEach(block => {
+            const select = block.querySelector('.gap-sel');
+            const selectedValue = select.value;
+            const correctAnswer = select.getAttribute('data-ans');
+
+            if (selectedValue === correctAnswer) {
+                block.classList.remove('status-wrong');
+                block.classList.add('status-correct');
+                correctCount++;
+            } else {
+                block.classList.remove('status-correct');
+                block.classList.add('status-wrong');
+            }
+        });
+
+        const scoreDiv = document.getElementById('usedto-score');
+        scoreDiv.textContent = `⚡ Your Score: ${correctCount} / ${blocks.length} ⚡`;
+        scoreDiv.style.display = 'block';
+    }
+
+    /* ---------- Grammar — Error Identification ---------- */
+    function selectOption(button, value) {
+        const group = button.closest('.options-group');
+        const buttons = group.querySelectorAll('.opt-btn');
+
+        buttons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        group.setAttribute('data-selected', value);
+    }
+
+    function evaluateErrors() {
+        const blocks = document.querySelectorAll('#errors-area .exercise-block');
+        let correctCount = 0;
+
+        blocks.forEach(block => {
+            const group = block.querySelector('.options-group');
+            const selectedValue = group.getAttribute('data-selected');
+            const correctAnswer = block.getAttribute('data-ans');
+
+            if (selectedValue === correctAnswer) {
+                block.classList.remove('status-wrong');
+                block.classList.add('status-correct');
+                correctCount++;
+            } else {
+                block.classList.remove('status-correct');
+                block.classList.add('status-wrong');
+            }
+        });
+
+        const scoreDiv = document.getElementById('errors-score');
+        scoreDiv.textContent = `⚡ Your Score: ${correctCount} / ${blocks.length} ⚡`;
+        scoreDiv.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>

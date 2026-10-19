@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grammar Mastery: Past Simple</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --dark-blue: #003366;
+            --dark-green: #006400;
+            --black: #000000;
+            --dark-brown: #3d2b1f;
+            --cream-bg: #fdfaf1;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--cream-bg);
+            color: var(--black);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .quiz-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid var(--dark-brown);
+            box-shadow: 10px 10px 0px var(--dark-brown);
+        }
+
+        h1 { color: var(--dark-blue); text-align: center; margin-bottom: 10px; }
+        #level-indicator { 
+            text-align: center; 
+            font-weight: bold; 
+            color: var(--dark-green); 
+            text-transform: uppercase; 
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #ddd;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            background: var(--dark-green);
+            height: 100%;
+            width: 0%;
+            transition: 0.4s;
+        }
+
+        /* Word Bank Section */
+        .word-bank-header { color: var(--dark-brown); font-weight: bold; margin-bottom: 10px; font-size: 0.9rem; }
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            background: #eef2f3;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed var(--dark-blue);
+            margin-bottom: 30px;
+        }
+        .word-tag { color: var(--dark-blue); font-weight: bold; text-transform: uppercase; font-size: 0.8rem; border: 1px solid var(--dark-blue); padding: 4px 8px; border-radius: 5px; }
+
+        /* Question Styles */
+        .question-text { font-size: 1.25rem; font-weight: bold; color: var(--black); margin-bottom: 20px; min-height: 70px; line-height: 1.4; }
+        
+        .options-grid { display: grid; gap: 12px; }
+        .option-btn {
+            background: #fdfdfd;
+            border: 2px solid var(--dark-blue);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 700;
+            color: var(--dark-blue);
+            text-align: left;
+            transition: 0.2s;
+        }
+        .option-btn:hover { background: #f0f4f8; transform: translateY(-2px); }
+        
+        .correct { background: #c1e1c1 !important; border-color: var(--dark-green) !important; color: var(--dark-green) !important; }
+        .wrong { background: #f8d7da !important; border-color: #842029 !important; color: #842029 !important; }
+
+        #next-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: var(--dark-blue);
+            color: var(--cream-bg);
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            font-size: 1.1rem;
+            font-family: 'Raleway';
+        }
+
+        .hidden-dot { color: var(--cream-bg); font-size: 8px; cursor: pointer; display: block; text-align: center; margin-top: 50px; text-decoration: none; }
+
+        @media print {
+            .quiz-card { box-shadow: none; border: 1px solid #000; }
+            #next-btn, .progress-container { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <h1>English Grammar Quiz</h1>
+    <div id="level-indicator">Level 1: Circle the Correct Answer</div>
+
+    <div class="progress-container"><div id="progress-fill"></div></div>
+
+    <div class="word-bank-header">VERB BANK (Past Simple Forms):</div>
+    <div class="word-bank">
+        <span class="word-tag">wrote</span>
+        <span class="word-tag">created</span>
+        <span class="word-tag">was</span>
+        <span class="word-tag">studied</span>
+        <span class="word-tag">died</span>
+        <span class="word-tag">lived</span>
+        <span class="word-tag">helped</span>
+        <span class="word-tag">caught</span>
+    </div>
+
+    <div id="quiz-body">
+        <p id="q-text" class="question-text"></p>
+        <div id="options" class="options-grid"></div>
+        <button id="next-btn" onclick="handleNext()">CONTINUE</button>
+    </div>
+
+    <details>
+        <summary class="hidden-dot">.</summary>
+        <div style="color: var(--dark-green); font-size: 0.8rem; border: 1px solid #ccc; padding: 10px; margin-top: 10px;">
+            <strong>ANSWERS:</strong><br>
+            Q1-5: wrote, created, was, studied, died<br>
+            Q6-10 (Matching): lived, helped, caught, was, wrote
+        </div>
+    </details>
+</div>
+
+<script>
+    const questions = [
+        /* LEVEL 1: CIRCLE THE CORRECT ANSWER (Exercise 3) */
+        { q: "Arthur Conan Doyle (write / wrote) many books.", a: ["write", "wrote"], c: 1 },
+        { q: "He (create / created) Sherlock Holmes in 1887.", a: ["create", "created"], c: 1 },
+        { q: "He (was / were) a doctor.", a: ["was", "were"], c: 0 },
+        { q: "He (study / studied) medicine at university.", a: ["study", "studied"], c: 1 },
+        { q: "He (die / died) in 1930.", a: ["die", "died"], c: 1 },
+
+        /* LEVEL 2: MATCH THE VERBS (Exercise 1) */
+        { q: "MATCH PAST SIMPLE FORM:<br>What is the Past Simple form of <b>'live'</b>?", a: ["lived", "wrote", "caught"], c: 0 },
+        { q: "MATCH PAST SIMPLE FORM:<br>What is the Past Simple form of <b>'help'</b>?", a: ["caught", "helped", "was"], c: 1 },
+        { q: "MATCH PAST SIMPLE FORM:<br>What is the Past Simple form of <b>'catch'</b>?", a: ["lived", "was", "caught"], c: 2 },
+        { q: "MATCH PAST SIMPLE FORM:<br>What is the Past Simple form of <b>'be'</b>?", a: ["was", "wrote", "helped"], c: 0 },
+        { q: "MATCH PAST SIMPLE FORM:<br>What is the Past Simple form of <b>'write'</b>?", a: ["lived", "wrote", "caught"], c: 1 }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        
+        // Update Level Indicator
+        const indicator = document.getElementById('level-indicator');
+        if (currentIdx < 5) {
+            indicator.innerText = "Level 1: Circle the Correct Answer";
+            indicator.style.color = "var(--dark-green)";
+        } else {
+            indicator.innerText = "Level 2: Verb Matching Challenge";
+            indicator.style.color = "var(--dark-blue)";
+        }
+
+        // Update Progress Bar
+        document.getElementById('progress-fill').style.width = (currentIdx / questions.length * 100) + "%";
+        
+        // Update Question and Options
+        document.getElementById('q-text').innerHTML = q.q;
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        q.a.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = option;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsDiv.appendChild(btn);
+        });
+
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(selectedIdx, btn) {
+        const q = questions[currentIdx];
+        const buttons = document.querySelectorAll('.option-btn');
+        
+        buttons.forEach(b => b.disabled = true);
+        
+        if (selectedIdx === q.c) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            buttons[q.c].classList.add('correct');
+        }
+        
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentIdx++;
+        if (currentIdx < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('progress-fill').style.width = "100%";
+        document.getElementById('level-indicator').innerText = "Quiz Completed";
+        document.getElementById('quiz-body').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <h2 style="color: var(--dark-blue); font-size: 2rem;">🎉 Well Done!</h2>
+                <p style="font-size: 1.2rem; font-weight: bold;">Your Score: ${score} / ${questions.length}</p>
+                <button class="option-btn" style="text-align: center; margin-top: 20px; width: 100%;" onclick="location.reload()">RESTART QUIZ</button>
+            </div>
+        `;
+    }
+
+    // Initialize Quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>

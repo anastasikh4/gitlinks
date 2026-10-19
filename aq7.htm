@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Exhibition · Vocabulary Quiz</title>
+    <style>
+        :root {
+            --quiz-bg: #fff1f2;
+            --quiz-accent: #f43f5e;
+            --quiz-green: #10b981;
+            --quiz-red: #ef4444;
+            --white: #ffffff;
+            --text-dark: #374151;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-bg);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: var(--text-dark);
+            width: 95%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .progress-container {
+            width: 70%;
+            background: #ffe4e6;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-accent);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-accent);
+            color: white;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .context-box {
+            background: #fff8f8;
+            border-left: 4px solid var(--quiz-accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 12px 12px 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .question-box h2 {
+            font-size: 1.25rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            line-height: 1.45;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #fff5f5;
+            border: 2px solid #ffe4e6;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .option-btn:hover {
+            background: #ffe4e6;
+            border-color: #fca5a5;
+        }
+
+        .correct {
+            background: var(--quiz-green) !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+
+        .wrong {
+            background: var(--quiz-red) !important;
+            color: white !important;
+            border-color: #dc2626 !important;
+        }
+
+        #feedback {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.1rem;
+        }
+
+        .footer-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 12px;
+            background: var(--quiz-accent);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #be123c;
+            transition: transform 0.1s;
+        }
+
+        .footer-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #be123c;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <div class="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Exhibition</div>
+    </div>
+
+    <div id="content">
+        <div class="context-box">
+            Match the description to the correct vocabulary word from the exhibition discovery.
+        </div>
+        <div class="question-box">
+            <h2 id="question">Loading...</h2>
+        </div>
+        <div class="options-grid" id="options"></div>
+    </div>
+
+    <div id="feedback"></div>
+    <button id="next-btn" class="footer-btn" onclick="handleNext()">NEXT WORD</button>
+</div>
+
+<script>
+    const questions = [
+        {
+            cat: "Ruins",
+            q: "Which word matches: <b>'The broken parts of a very old building.'</b>?",
+            options: ["Idol", "Ruins", "Cave", "Rock"],
+            correct: 1
+        },
+        {
+            cat: "Rock",
+            q: "Which word matches: <b>'A very hard, solid material found in the ground.'</b>?",
+            options: ["Coin", "Bush", "Rock", "Ruins"],
+            correct: 2
+        },
+        {
+            cat: "Bush",
+            q: "Which word matches: <b>'A plant that is smaller than a tree and has many branches.'</b>?",
+            options: ["Bush", "Idol", "Cave", "Rock"],
+            correct: 0
+        },
+        {
+            cat: "Idol",
+            q: "Which word matches: <b>'A small statue that people pray to or worship.'</b>?",
+            options: ["Coin", "Ruins", "Bush", "Idol"],
+            correct: 3
+        },
+        {
+            cat: "Cave",
+            q: "Which word matches: <b>'A large, dark hole in the side of a hill or mountain.'</b>?",
+            options: ["Cave", "Rock", "Ruins", "Bush"],
+            correct: 0
+        },
+        {
+            cat: "Coin",
+            q: "Which word matches: <b>'A round, flat piece of metal used as money.'</b>?",
+            options: ["Idol", "Cave", "Coin", "Rock"],
+            correct: 2
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('category').innerText = q.cat;
+        document.getElementById('question').innerHTML = q.q;
+        document.getElementById('progress-bar').style.width = (currentQ / questions.length) * 100 + "%";
+        
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsEl.appendChild(btn);
+        });
+
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(idx, btn) {
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if(idx === questions[currentQ].correct) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--quiz-green)'>Correct! Match Found 🔍</span>";
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[questions[currentQ].correct].classList.add('correct');
+            document.getElementById('feedback').innerHTML = "<span style='color:var(--quiz-red)'>Incorrect match!</span>";
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleNext() {
+        currentQ++;
+        if(currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('progress-bar').style.width = "100%";
+        document.getElementById('quiz-box').innerHTML = `
+            <div class="final-screen">
+                <h1 style="font-size: 3.5rem; margin-bottom: 10px;">🤠</h1>
+                <h2>Exhibition Completed!</h2>
+                <p style="font-size: 1.2rem;">You correctly matched <strong>${score} / ${questions.length}</strong> items!</p>
+                <button class="option-btn" style="text-align:center; width:100%; margin-top:20px;" onclick="location.reload()">Restart Exhibition</button>
+            </div>
+        `;
+    }
+
+    // Initial Load
+    loadQuestion();
+</script>
+
+</body>
+</html>
