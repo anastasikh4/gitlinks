@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Style: Supermarket English</title>
+    <style>
+        :root { --duo-green: #58cc02; --duo-blue: #1cb0f6; --duo-red: #ea2b2b; --duo-dark: #3c3c3c; }
+        body { font-family: 'Din Round', 'Segoe UI', sans-serif; background: #fff; display: flex; justify-content: center; padding: 20px; }
+        .app-container { max-width: 550px; width: 100%; border: 2px solid #e5e5e5; border-radius: 16px; padding: 25px; }
+        
+        /* Progress Bar */
+        .progress-container { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .progress-bg { flex-grow: 1; height: 16px; background: #e5e5e5; border-radius: 10px; overflow: hidden; }
+        #fill { height: 100%; width: 0%; background: var(--duo-green); transition: 0.4s; }
+        
+        .instruction { font-size: 1.4rem; font-weight: bold; color: var(--duo-dark); margin-bottom: 20px; }
+        .q-box { min-height: 120px; background: #f7f7f7; border-radius: 15px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; border: 1px solid #e5e5e5; font-size: 1.2rem; line-height: 1.5; }
+        
+        .options { display: grid; gap: 12px; }
+        .opt-btn { padding: 15px; border: 2px solid #e5e5e5; border-bottom: 4px solid #e5e5e5; border-radius: 12px; 
+                   background: white; cursor: pointer; font-size: 1.1rem; font-weight: bold; color: #4b4b4b; transition: 0.1s; text-align: left; }
+        .opt-btn:hover:not(:disabled) { background: #f7f7f7; }
+        
+        .correct { background: #d7ffb8 !important; border-color: #58cc02 !important; color: #1e4601 !important; }
+        .wrong { background: #ffdfe0 !important; border-color: #ee2a2a !important; color: #6a0000 !important; }
+        
+        #feedback { font-weight: bold; text-align: center; margin-top: 15px; min-height: 24px; }
+        #next-btn { margin-top: 20px; width: 100%; padding: 15px; background: var(--duo-blue); color: white; border: none; border-radius: 12px; font-weight: bold; display: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="progress-container">
+        <span style="font-size: 1.5rem;">🦉</span>
+        <div class="progress-bg"><div id="fill"></div></div>
+    </div>
+
+    <div id="quiz-ui">
+        <div class="instruction">Choose the correct answer:</div>
+        <div class="q-box" id="question-text">Loading...</div>
+        <div class="options" id="options-grid"></div>
+        <div id="feedback"></div>
+        <button id="next-btn" onclick="nextQuestion()">CONTINUE</button>
+    </div>
+
+    <div id="final" style="display:none; text-align:center;">
+        <h1 style="color:var(--duo-green)">SHOPPING DONE! 🏆</h1>
+        <p>You completed the Supermarket Quiz.</p>
+        <button class="opt-btn" onclick="location.reload()" style="width:100%; text-align:center">PRACTICE AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // Combined questions from Exercise 2 and Exercise 3 from the photo
+    const questions = [
+        // --- Exercise 2: Circle the correct answer ---
+        { 
+            q: "1. My dad ____ the shopping home in a big shopping bag.", 
+            a: ["checks", "carries", "brings"], 
+            c: 1 
+        },
+        { 
+            q: "2. Would you like to pay in ____ or card?", 
+            a: ["coins", "cash", "money"], 
+            c: 1 
+        },
+        { 
+            q: "3. When I pay for the shopping, I make sure I get the correct ____.", 
+            a: ["price", "change", "money"], 
+            c: 1 
+        },
+        { 
+            q: "4. Check how much everything costs after you shop on the ____.", 
+            a: ["receipt", "paper", "price"], 
+            c: 0 
+        },
+        { 
+            q: "5. Let's stand in this ____. It's short.", 
+            a: ["line", "queue", "change"], 
+            c: 1 
+        },
+        { 
+            q: "6. I always get a shopping ____ because it's easier when you buy a lot of things.", 
+            a: ["bag", "trolley", "box"], 
+            c: 1 
+        },
+
+        // --- Exercise 3: Complete the dialogue ---
+        { 
+            q: "Paul: Have you got the shopping ____, Katy?", 
+            a: ["list", "bag", "card"], 
+            c: 0 
+        },
+        { 
+            q: "Katy: Can I put these biscuits in the shopping ____, please?", 
+            a: ["basket", "trolley", "bag"], 
+            c: 1 
+        },
+        { 
+            q: "Katy: They're a ____ offer.", 
+            a: ["special", "good", "big"], 
+            c: 0 
+        },
+        { 
+            q: "Paul: Let's check the ____. They're 70p for six.", 
+            a: ["price", "money", "cost"], 
+            c: 0 
+        },
+        { 
+            q: "Mum: Let's pay ____ the shopping there.", 
+            a: ["with", "for", "by"], 
+            c: 1 
+        },
+        { 
+            q: "Mum: The ____ is short.", 
+            a: ["queue", "line", "wait"], 
+            c: 0 
+        }
+    ];
+
+    let currentQ = 0;
+
+    function loadQuestion() {
+        const data = questions[currentQ];
+        document.getElementById('question-text').innerHTML = data.q;
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        
+        data.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            grid.appendChild(btn);
+        });
+        
+        document.getElementById('fill').style.width = (currentQ / questions.length) * 100 + "%";
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('feedback').innerText = '';
+    }
+
+    function checkAnswer(idx, btn) {
+        const correct = questions[currentQ].c;
+        const allBtns = document.querySelectorAll('.opt-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (idx === correct) {
+            btn.classList.add('correct');
+            document.getElementById('feedback').innerText = "✨ Perfect! +15 XP";
+            document.getElementById('feedback').style.color = "var(--duo-green)";
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correct].classList.add('correct');
+            document.getElementById('feedback').innerText = "🦉 Let's review this one!";
+            document.getElementById('feedback').style.color = "var(--duo-red)";
+        }
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('quiz-ui').style.display = 'none';
+            document.getElementById('fill').style.width = "100%";
+            document.getElementById('final').style.display = 'block';
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>

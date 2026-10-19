@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordwall Style: Supermarket Match</title>
+    <style>
+        :root {
+            --ww-blue: #0071ba;
+            --ww-light-blue: #e8f4fd;
+            --ww-dark: #2d3e50;
+            --ww-correct: #46a049;
+            --ww-wrong: #e91e63;
+            --ww-yellow: #ffcc00;
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background-color: var(--ww-light-blue); 
+            color: var(--ww-dark); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0;
+        }
+        .game-container { 
+            max-width: 800px; 
+            width: 100%; 
+            background: white; 
+            border: 3px solid var(--ww-blue); 
+            border-radius: 15px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        h1 { 
+            color: var(--ww-blue); 
+            text-align: center; 
+            text-transform: uppercase; 
+            margin-top: 0; 
+            font-size: 1.8rem;
+        }
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* Picture Grid */
+        .picture-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .picture-card {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .picture-card:hover {
+            border-color: var(--ww-blue);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .picture-card.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .pic-letter {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--ww-blue);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .pic-emoji {
+            font-size: 3rem;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Sentences List */
+        .sentences-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .sentence-item {
+            display: flex;
+            align-items: center;
+            background: #f0f7ff;
+            border: 2px solid #cce5ff;
+            border-radius: 10px;
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sentence-item:hover {
+            border-color: var(--ww-blue);
+            background: #e1f0fa;
+        }
+        .sentence-item.selected {
+            border-color: var(--ww-yellow);
+            background: #fffde7;
+            box-shadow: 0 0 0 3px var(--ww-yellow);
+        }
+        .sentence-num {
+            font-weight: bold;
+            color: var(--ww-blue);
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        .drop-zone { 
+            display: inline-block; 
+            width: 40px; 
+            height: 30px;
+            background: white;
+            border: 2px solid var(--ww-blue); 
+            border-radius: 6px;
+            text-align: center; 
+            color: var(--ww-blue); 
+            font-weight: bold; 
+            line-height: 26px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+        .sentence-text {
+            font-size: 1.05rem;
+            flex-grow: 1;
+        }
+
+        /* Controls */
+        .controls { 
+            margin-top: 30px; 
+            text-align: center; 
+        }
+        .btn-check { 
+            background: var(--ww-blue); 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 50px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #005a96; 
+            transition: 0.1s;
+        }
+        .btn-check:active { 
+            transform: translateY(4px); 
+            box-shadow: none; 
+        }
+
+        .feedback { 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            text-align: center; 
+            min-height: 30px;
+        }
+        
+        .correct-anim { color: var(--ww-correct) !important; border-color: var(--ww-correct) !important; }
+        .wrong-anim { color: var(--ww-wrong) !important; border-color: var(--ww-wrong) !important; }
+
+        @media (max-width: 600px) {
+            .picture-grid { grid-template-columns: repeat(2, 1fr); }
+            .sentence-text { font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🛒 Supermarket Match</h1>
+    <p class="instruction">Click a sentence, then click the correct picture.</p>
+
+    <!-- Picture Grid (A-F) -->
+    <div class="picture-grid">
+        <div class="picture-card" onclick="selectPicture(this, 'A')">
+            <div class="pic-letter">A</div>
+            <div class="pic-emoji">👩‍💼</div>
+        </div>
+        <div class="picture-card" onclick="selectPicture(this, 'B')">
+            <div class="pic-letter">B</div>
+            <div class="pic-emoji">🛒</div>
+        </div>
+        <div class="picture-card" onclick="selectPicture(this, 'C')">
+            <div class="pic-letter">C</div>
+            <div class="pic-emoji">0</div>
+        </div>
+        <div class="picture-card" onclick="selectPicture(this, 'D')">
+            <div class="pic-letter">D</div>
+            <div class="pic-emoji">🍪</div>
+        </div>
+        <div class="picture-card" onclick="selectPicture(this, 'E')">
+            <div class="pic-letter">E</div>
+            <div class="pic-emoji">📝</div>
+        </div>
+        <div class="picture-card" onclick="selectPicture(this, 'F')">
+            <div class="pic-letter">F</div>
+            <div class="pic-emoji">👵</div>
+        </div>
+    </div>
+
+    <!-- Sentences List (1-6) -->
+    <div class="sentences-list" id="sentencesList">
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">1</span>
+            <span class="drop-zone" data-ans="E"></span>
+            <span class="sentence-text">This shopping list is very long. Mum wants lots of things.</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">2</span>
+            <span class="drop-zone" data-ans="A"></span>
+            <span class="sentence-text">Hi, I'm Tina. I'm a cashier. I work six hours every day.</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">3</span>
+            <span class="drop-zone" data-ans="F"></span>
+            <span class="sentence-text">I can't find my card. Where is it?</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">4</span>
+            <span class="drop-zone" data-ans="B"></span>
+            <span class="sentence-text">There's a lot of food in my shopping trolley for my picnic.</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">5</span>
+            <span class="drop-zone" data-ans="D"></span>
+            <span class="sentence-text">There's a special offer for biscuits. Good!</span>
+        </div>
+        <div class="sentence-item" onclick="selectSentence(this)">
+            <span class="sentence-num">6</span>
+            <span class="drop-zone" data-ans="C"></span>
+            <span class="sentence-text">I arrived a minute ago. There's nothing in my shopping basket.</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-check" onclick="checkAnswers()">CHECK ANSWERS</button>
+        <div id="result" class="feedback"></div>
+    </div>
+</div>
+
+<script>
+    let selectedSentence = null;
+    let selectedPictureLetter = null;
+
+    // Highlight the clicked sentence
+    function selectSentence(el) {
+        // Remove highlight from previous sentence
+        if (selectedSentence) {
+            selectedSentence.classList.remove('selected');
+        }
+        
+        selectedSentence = el;
+        el.classList.add('selected');
+        
+        // If a picture was already selected, fill it in immediately
+        if (selectedPictureLetter) {
+            const dropZone = el.querySelector('.drop-zone');
+            dropZone.innerText = selectedPictureLetter;
+            // Reset selections after matching
+            el.classList.remove('selected');
+            selectedSentence = null;
+            selectedPictureLetter = null;
+        }
+    }
+
+    // Handle picture click
+    function selectPicture(el, letter) {
+        // If a sentence is selected, link them
+        if (selectedSentence) {
+            const dropZone = selectedSentence.querySelector('.drop-zone');
+            dropZone.innerText = letter;
+            
+            // Clear selections
+            selectedSentence.classList.remove('selected');
+            selectedSentence = null;
+            selectedPictureLetter = null;
+        } else {
+            // If no sentence is selected, just highlight the picture (optional visual feedback)
+            document.querySelectorAll('.picture-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedPictureLetter = letter;
+            
+            // Remove picture highlight after a brief moment if not used
+            setTimeout(() => {
+                el.classList.remove('selected');
+                if (selectedPictureLetter === letter) selectedPictureLetter = null;
+            }, 1500);
+        }
+    }
+
+    // Check all answers
+    function checkAnswers() {
+        let correctCount = 0;
+        const zones = document.querySelectorAll('.drop-zone');
+        const resultDiv = document.getElementById('result');
+        
+        // Reset previous colors
+        zones.forEach(zone => {
+            zone.classList.remove('correct-anim', 'wrong-anim');
+            const parent = zone.closest('.sentence-item');
+            parent.style.borderColor = '#cce5ff'; // reset border
+        });
+
+        zones.forEach(zone => {
+            const userAns = zone.innerText.trim().toUpperCase();
+            const correctAns = zone.getAttribute('data-ans').toUpperCase();
+            const parentItem = zone.closest('.sentence-item');
+
+            if (userAns === correctAns) {
+                zone.classList.add('correct-anim');
+                parentItem.style.borderColor = 'var(--ww-correct)';
+                correctCount++;
+            } else {
+                zone.classList.add('wrong-anim');
+                parentItem.style.borderColor = 'var(--ww-wrong)';
+            }
+        });
+
+        if (correctCount === zones.length) {
+            resultDiv.innerText = "🎉 Perfect! You are a supermarket pro!";
+            resultDiv.style.color = "var(--ww-correct)";
+        } else {
+            resultDiv.innerText = `Score: ${correctCount} / ${zones.length}. Try again!`;
+            resultDiv.style.color = "var(--ww-wrong)";
+        }
+    }
+</script>
+
+</body>
+</html>
