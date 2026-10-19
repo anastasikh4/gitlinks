@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotlight A1: Grammar Review</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8f5e9; padding: 20px; }
+    .quiz-container { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    h1 { color: #2e7d32; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #81c784; padding-bottom: 10px; }
+    .subtitle { text-align: center; color: #555; margin-bottom: 30px; font-size: 1.1rem; }
+    
+    .section-title { color: #1b5e20; margin-top: 30px; margin-bottom: 15px; font-size: 1.2rem; font-weight: bold; background: #e8f5e9; padding: 10px; border-radius: 8px; border-left: 5px solid #4caf50; }
+    
+    .question { margin-bottom: 12px; font-weight: 600; font-size: 1.05rem; color: #1b5e20; }
+    .options { list-style: none; padding: 0; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .options li { padding: 10px 15px; background: #f1f8e9; border: 2px solid #dcedc8; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; }
+    .options li:hover { background: #dcedc8; border-color: #aed581; }
+    
+    .correct { background: #4caf50 !important; color: white; border-color: #388e3c !important; }
+    .wrong { background: #ef5350 !important; color: white; border-color: #c62828 !important; }
+    .answered { pointer-events: none; }
+    
+    #result-box { display: none; text-align: center; padding: 20px; background: #388e3c; color: white; border-radius: 10px; font-size: 1.5rem; margin-top: 30px; }
+    button { width: 100%; padding: 15px; background: #2e7d32; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+    button:hover { background: #1b5e20; }
+</style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>🌱 Spotlight A1: Grammar Review</h1>
+    <div class="subtitle">Complete the gaps by choosing the correct option.</div>
+    
+    <div id="quiz">
+        <!-- Exercise 6 -->
+        <div class="section-title">Part 1: Time Words</div>
+
+        <!-- Q1 -->
+        <div class="question">1. ______ have you lived in London?</div>
+        <ul class="options" data-correct="0">
+            <li onclick="check(this, 0)">How long</li>
+            <li onclick="check(this, 1)">How much</li>
+            <li onclick="check(this, 2)">When</li>
+        </ul>
+
+        <!-- Q2 -->
+        <div class="question">2. I have ______ seen a ghost. I am scared!</div>
+        <ul class="options" data-correct="1">
+            <li onclick="check(this, 0)">yet</li>
+            <li onclick="check(this, 1)">never</li>
+            <li onclick="check(this, 2)">since</li>
+        </ul>
+
+        <!-- Q3 -->
+        <div class="question">3. When did you ______ go to the zoo?</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">ago</li>
+            <li onclick="check(this, 1)">since</li>
+            <li onclick="check(this, 2)">last</li>
+        </ul>
+
+        <!-- Q4 -->
+        <div class="question">4. I have known him ______ 2020.</div>
+        <ul class="options" data-correct="0">
+            <li onclick="check(this, 0)">since</li>
+            <li onclick="check(this, 1)">for</li>
+            <li onclick="check(this, 2)">ago</li>
+        </ul>
+
+        <!-- Q5 -->
+        <div class="question">5. Don't run! The bus has ______ arrived.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">yet</li>
+            <li onclick="check(this, 1)">ever</li>
+            <li onclick="check(this, 2)">just</li>
+        </ul>
+
+        <!-- Q6 -->
+        <div class="question">6. Have you finished your homework ______?</div>
+        <ul class="options" data-correct="0">
+            <li onclick="check(this, 0)">yet</li>
+            <li onclick="check(this, 1)">already</li>
+            <li onclick="check(this, 2)">just</li>
+        </ul>
+
+        <!-- Q7 -->
+        <div class="question">7. We visited our grandma three days ______.</div>
+        <ul class="options" data-correct="0">
+            <li onclick="check(this, 0)">ago</li>
+            <li onclick="check(this, 1)">since</li>
+            <li onclick="check(this, 2)">last</li>
+        </ul>
+
+        <!-- Q8 -->
+        <div class="question">8. Have you ______ eaten Chinese food?</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">never</li>
+            <li onclick="check(this, 1)">yet</li>
+            <li onclick="check(this, 2)">ever</li>
+        </ul>
+
+
+        <!-- Exercise 7 -->
+        <div class="section-title">Part 2: Articles (a / an / the / -)</div>
+
+        <!-- Q9 -->
+        <div class="question">9. My brother can play ______ guitar very well.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q10 -->
+        <div class="question">10. ______ Smiths are at the park today.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">A</li>
+            <li onclick="check(this, 1)">An</li>
+            <li onclick="check(this, 2)">The</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q11 -->
+        <div class="question">11. We go to ______ school every day.</div>
+        <ul class="options" data-correct="3">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q12 -->
+        <div class="question">12. I went to ______ Italy and saw ______ Colosseum.</div>
+        <ul class="options" data-correct="3">
+            <li onclick="check(this, 0)">- / a</li>
+            <li onclick="check(this, 1)">the / the</li>
+            <li onclick="check(this, 2)">a / an</li>
+            <li onclick="check(this, 3)">- / the</li>
+        </ul>
+
+        <!-- Q13 -->
+        <div class="question">13. I have ______ cold. I need a tissue.</div>
+        <ul class="options" data-correct="0">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q14 -->
+        <div class="question">14. When ______ car stopped, the man was walking.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q15 -->
+        <div class="question">15. I am going to ______ doctor now.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+
+        <!-- Q16 -->
+        <div class="question">16. I go to school by ______ bus, but today I took ______ train.</div>
+        <ul class="options" data-correct="3">
+            <li onclick="check(this, 0)">- / -</li>
+            <li onclick="check(this, 1)">the / a</li>
+            <li onclick="check(this, 2)">a / a</li>
+            <li onclick="check(this, 3)">- / a</li>
+        </ul>
+
+        <!-- Q17 -->
+        <div class="question">17. She lives in ______ UK.</div>
+        <ul class="options" data-correct="2">
+            <li onclick="check(this, 0)">a</li>
+            <li onclick="check(this, 1)">an</li>
+            <li onclick="check(this, 2)">the</li>
+            <li onclick="check(this, 3)">- (no article)</li>
+        </ul>
+    </div>
+
+    <div id="result-box">Excellent! Your score: <span id="score">0</span>/17</div>
+    <button onclick="location.reload()">Reset Test</button>
+</div>
+
+<script>
+    let score = 0;
+    let totalAnswered = 0;
+    const totalQuestions = 17;
+
+    function check(el, index) {
+        const parent = el.parentElement;
+        // Prevent clicking again if already answered
+        if (parent.classList.contains('answered')) return;
+
+        const correct = parseInt(parent.getAttribute('data-correct'));
+        
+        if (index === correct) {
+            el.classList.add('correct');
+            score++;
+        } else {
+            el.classList.add('wrong');
+            // Highlight the correct answer
+            parent.children[correct].classList.add('correct');
+        }
+        
+        parent.classList.add('answered');
+        totalAnswered++;
+
+        // Show score when all answered
+        if (totalAnswered === totalQuestions) {
+            const res = document.getElementById('result-box');
+            res.style.display = 'block';
+            document.getElementById('score').innerText = score;
+        }
+    }
+</script>
+
+</body>
+</html>

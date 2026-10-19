@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Present Perfect Grammar Garden 🌸</title>
+    <style>
+        :root {
+            --spring-mint: #e8f5e9;
+            --cherry-pink: #ffc1cc;
+            --leaf-green: #4caf50;
+            --sun-yellow: #fff59d;
+            --sky-blue: #b3e5fc;
+            --bark: #5d4037;
+            --error-red: #f44336;
+            --success-green: #4caf50;
+        }
+        body {
+            background: linear-gradient(135deg, var(--sky-blue), var(--spring-mint));
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--bark);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .garden-card {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 35px;
+            border: 10px solid var(--cherry-pink);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: var(--cherry-pink);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .progress-container {
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        #progress-bar {
+            height: 100%;
+            background: var(--leaf-green);
+            width: 0%;
+            border-radius: 10px;
+            transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stats { display: flex; justify-content: space-between; font-weight: bold; }
+        
+        .quiz-area { padding: 25px; text-align: center; flex-grow: 1; }
+        .emoji-vibe { font-size: 3.5em; margin-bottom: 10px; display: block; }
+        .question-text { font-size: 1.3em; font-weight: bold; margin-bottom: 25px; line-height: 1.4; }
+        
+        .btn-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        
+        button {
+            padding: 18px;
+            border: 3px solid var(--cherry-pink);
+            border-radius: 50px;
+            background: var(--sun-yellow);
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--bark);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        /* Only apply hover effect if the button is not disabled */
+        button:not(:disabled):hover {
+            background: var(--leaf-green);
+            color: white;
+            transform: scale(1.05);
+            border-color: var(--leaf-green);
+        }
+
+        /* State styles for feedback */
+        button.correct-answer {
+            background-color: var(--success-green) !important;
+            color: white !important;
+            border-color: #388e3c !important;
+        }
+        button.wrong-answer {
+            background-color: var(--error-red) !important;
+            color: white !important;
+            border-color: #d32f2f !important;
+        }
+        button:disabled {
+            opacity: 0.8;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #continue-btn {
+            display: none;
+            background: var(--sky-blue);
+            border-color: #81d4fa;
+            margin-top: 20px;
+        }
+
+        #victory { display: none; padding: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="garden-card">
+    <div class="header">
+        <div class="stats">
+            <span id="rank-text">🌱 Seedling</span>
+            <span id="q-count">1 / 10</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="quiz-content" class="quiz-area">
+        <span id="current-emoji" class="emoji-vibe">🌸</span>
+        <div id="question-text" class="question-text">Grammar is loading...</div>
+        <div id="options-container" class="btn-grid"></div>
+        <button id="continue-btn" onclick="nextQuestion()">CONTINUE 🌿</button>
+    </div>
+
+    <div id="victory">
+        <span class="emoji-vibe">🦋🐝👑</span>
+        <h1>GARDEN MASTERED!</h1>
+        <p>You completed all 10 Present Perfect missions.</p>
+        <button onclick="location.reload()" style="width:100%">Plant a New Garden 🌷</button>
+    </div>
+</div>
+
+<script>
+    // 10 questions based on the A2 grammar exercise
+    const questionsData = [
+        { q: "_____ have you been working as a cook?", opt: ["How long", "How much", "When"], ans: 0, em: "👨‍🍳" },
+        { q: "John has _____ been abroad.", opt: ["yet", "never", "since"], ans: 1, em: "✈️" },
+        { q: "When did you _____ go shopping?", opt: ["ago", "since", "last"], ans: 2, em: "🛍️" },
+        { q: "This place has changed _____ our last visit.", opt: ["since", "for", "ago"], ans: 0, em: "🏘️" },
+        { q: "John's not in. He's _____ left.", opt: ["yet", "ever", "just"], ans: 2, em: "🚪" },
+        { q: "Has Kelly visited you _____?", opt: ["yet", "already", "just"], ans: 0, em: "👩‍🦰" },
+        { q: "They won first prize two years _____.", opt: ["ago", "since", "last"], ans: 0, em: "🏆" },
+        { q: "Has Sue _____ travelled abroad?", opt: ["never", "yet", "ever"], ans: 2, em: "🌍" },
+        { q: "How many of the books have you read _____?", opt: ["so far", "just", "never"], ans: 0, em: "📚" },
+        { q: "We haven't left the library _____.", opt: ["just", "yet", "ever"], ans: 1, em: "📖" }
+    ];
+
+    let currentQ = 0;
+    let quizList = [];
+    const ranks = ["🌱 Seedling", "🌿 Sprout", "🌷 Blossom", "🦋 Butterfly", "🌳 Gardener", "👑 Master"];
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    function initQuiz() {
+        quizList = [...questionsData];
+        shuffle(quizList);
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const data = quizList[currentQ];
+        document.getElementById('current-emoji').innerText = data.em;
+        document.getElementById('question-text').innerText = data.q;
+        document.getElementById('q-count').innerText = (currentQ + 1) + " / " + quizList.length;
+        
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        
+        // Hide continue button
+        document.getElementById('continue-btn').style.display = 'none';
+
+        // Shuffle options
+        let shuffledOptions = data.opt.map((text, i) => ({ text, isCorrect: i === data.ans }));
+        shuffle(shuffledOptions);
+        
+        shuffledOptions.forEach((option) => {
+            const btn = document.createElement('button');
+            btn.innerText = option.text;
+            // Store whether this button is the correct one
+            btn.dataset.correct = option.isCorrect;
+            btn.onclick = () => checkAnswer(btn, option.isCorrect);
+            container.appendChild(btn);
+        });
+
+        // Update Progress Bar and Rank
+        document.getElementById('progress-bar').style.width = (currentQ / quizList.length * 100) + "%";
+        let rankIndex = Math.floor(currentQ / 2);
+        document.getElementById('rank-text').innerText = ranks[rankIndex] || "👑 Master";
+    }
+
+    function checkAnswer(clickedBtn, isCorrect) {
+        const allBtns = document.querySelectorAll('#options-container button');
+        
+        // Disable all buttons so user can't click again
+        allBtns.forEach(btn => btn.disabled = true);
+
+        if (isCorrect) {
+            clickedBtn.classList.add('correct-answer');
+        } else {
+            clickedBtn.classList.add('wrong-answer');
+            // Highlight the correct one
+            allBtns.forEach(btn => {
+                if (btn.dataset.correct === "true") {
+                    btn.classList.add('correct-answer');
+                }
+            });
+        }
+
+        // Show the continue button
+        document.getElementById('continue-btn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < quizList.length) {
+            renderQuestion();
+        } else {
+            // Victory
+            document.getElementById('quiz-content').style.display = 'none';
+            document.getElementById('progress-bar').style.width = "100%";
+            document.getElementById('rank-text').innerText = "👑 Master";
+            document.getElementById('victory').style.display = 'block';
+        }
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>
