@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Cadet: Language & Discovery Orbit</title>
+    <style>
+        :root {
+            --space-nebula: #6c5ce7;
+            --space-laser: #00cec9;
+            --space-star: #ffeaa7;
+            --space-deep: #1e1b29;
+            --space-void: #0f0d14;
+            --system-ok: #00b894;
+            --system-alert: #ff7675;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--space-void);
+            color: #f1f2f6;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ship-console {
+            max-width: 700px;
+            width: 100%;
+            background: var(--space-deep);
+            border: 3px solid var(--space-laser);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(0, 206, 201, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--space-star);
+            letter-spacing: 2px;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            color: var(--space-laser);
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .hud-counters {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.05);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sector-box {
+            background: #ffffff;
+            color: #2d3436;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .sector-tag {
+            font-weight: bold;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .transmission-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #2d3436;
+            line-height: 1.6;
+        }
+
+        .choices-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: #ffffff;
+            border: 2px solid #b2bec3;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #2d3436;
+            text-align: left;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--space-nebula);
+            background: #f1f2f6;
+            transform: translateX(4px);
+        }
+
+        .choice-btn.correct-node { 
+            background: var(--system-ok) !important; 
+            color: white !important; 
+            border-color: #00876c !important; 
+        }
+        
+        .choice-btn.error-node { 
+            background: var(--system-alert) !important; 
+            color: white !important; 
+            border-color: #d63031 !important; 
+        }
+
+        .hidden { display: none; }
+
+        #final-score {
+            font-size: 4.5rem;
+            color: var(--space-star);
+            font-weight: 800;
+            margin: 15px 0;
+        }
+
+        .restart-btn {
+            background: var(--space-laser);
+            color: var(--space-void);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            transition: opacity 0.2s;
+        }
+        .restart-btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="ship-console">
+    <h1>Space Cadet Orbit</h1>
+    <div class="subtitle">Communications & Crew Scanning Logs</div>
+    
+    <div class="hud-counters">
+        <span>DATA METERS: <span id="score-val">0</span></span>
+        <span>SECTOR: <span id="orbit-display">1/11</span></span>
+    </div>
+
+    <div id="interface-ui">
+        <div class="sector-box">
+            <div id="sector-title" class="sector-tag">Analyzing Crew Base: Leo's Fleet</div>
+            <div id="transmission-display" class="transmission-text">Loading secure line...</div>
+            <div class="choices-layout" id="choices-box"></div>
+        </div>
+    </div>
+
+    <div id="mission-report" class="hidden">
+        <h2 style="font-size: 2.2rem; color: var(--system-ok);">ORBIT SECURED!</h2>
+        <div id="final-score">0</div>
+        <p style="color: #b2bec3;">LOG DATA HAS BEEN CORRECTLY SYNCHRONIZED.</p>
+        <button onclick="location.reload()" class="restart-btn">Restart Orbit</button>
+    </div>
+</div>
+
+<script>
+    // NEW SENTENCES: First exercise is choosing the right word to complete the sentence
+    const logsDatabase = [
+        // SECTOR 1: CREW IDENTIFICATION (Choose the right ending/word)
+        { text: "This is Leo's 1) ______.", options: ["car", "family", "school"], right: 1 },
+        { text: "His 2) ______'s name is Mark.", options: ["father", "sister", "dog"], right: 0 },
+        { text: "And his 3) ______'s name is Lily.", options: ["brother", "sister", "grandpa"], right: 1 },
+        // CHANGED: Now the correct answer is "parents" (index 1)
+        { text: "Emma and Tom are his 4) ______...", options: ["teachers", "parents", "cousins"], right: 1 },
+        { text: "...and 5) ______.", options: ["friends", "books", "toys"], right: 0 },
+        { text: "And Jack is his 6) ______. He is very tall.", options: ["baby", "grandpa", "pet"], right: 1 },
+        
+        // SECTOR 2: RESPONSES FREQUENCY
+        { text: "Pilot A: Who's that boy?<br>Pilot B: ______", options: ["2) That is my cousin.", "1) This is my friend."], right: 0 },
+        { text: "Pilot A: How old is he?<br>Pilot B: ______", options: ["2) Yes, he is.", "1) He is ten years old."], right: 1 },
+        { text: "Pilot A: Hello! I'm Leo.<br>Pilot B: ______", options: ["2) Thank you, Leo!", "1) Nice to meet you, Leo!"], right: 1 },
+        { text: "Pilot A: Welcome to our city!<br>Pilot B: ______", options: ["2) Yes, it is.", "1) Thank you very much!"], right: 1 },
+        { text: "Pilot A: What's that?<br>Pilot B: ______", options: ["2) It is a big park.", "1) A big park."], right: 0 }
+    ];
+
+    let currentLog = 0;
+    let totalMeters = 0;
+
+    function renderLogScreen() {
+        const activeLog = logsDatabase[currentLog];
+        document.getElementById('orbit-display').innerText = `${currentLog + 1}/${logsDatabase.length}`;
+        document.getElementById('transmission-display').innerHTML = activeLog.text;
+        
+        const sectorHeader = document.getElementById('sector-title');
+        if (currentLog < 6) {
+            sectorHeader.innerText = "Analyzing Crew Base: Leo's Fleet";
+            sectorHeader.style.color = "var(--space-nebula)";
+        } else {
+            sectorHeader.innerText = "Verifying Radio Frequencies: Dialogue Logs";
+            sectorHeader.style.color = "var(--space-laser)";
+        }
+
+        const choicesBlock = document.getElementById('choices-box');
+        choicesBlock.innerHTML = '';
+
+        activeLog.options.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.className = 'choice-btn';
+            button.innerText = choice;
+            button.onclick = () => evaluationSequence(index, button);
+            choicesBlock.appendChild(button);
+        });
+    }
+
+    function evaluationSequence(userChoice, buttonNode) {
+        const correctNodeIndex = logsDatabase[currentLog].right;
+        const allNodes = document.querySelectorAll('.choice-btn');
+        
+        allNodes.forEach(node => node.style.pointerEvents = 'none');
+
+        if (userChoice === correctNodeIndex) {
+            buttonNode.classList.add('correct-node');
+            totalMeters += 10;
+            document.getElementById('score-val').innerText = totalMeters;
+        } else {
+            buttonNode.classList.add('error-node');
+            allNodes[correctNodeIndex].classList.add('correct-node');
+        }
+
+        setTimeout(() => {
+            currentLog++;
+            if (currentLog < logsDatabase.length) {
+                renderLogScreen();
+            } else {
+                displayFinalReport();
+            }
+        }, 1400);
+    }
+
+    function displayFinalReport() {
+        document.getElementById('interface-ui').classList.add('hidden');
+        document.getElementById('mission-report').classList.remove('hidden');
+        document.getElementById('final-score').innerText = `${totalMeters} PTS`;
+    }
+
+    renderLogScreen();
+</script>
+
+</body>
+</html>

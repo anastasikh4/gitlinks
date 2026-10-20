@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight Test 1A Practice Zone 🐻‍❄️🎉</title>
+    <style>
+        :root {
+            --primary: #ffeb3b;
+            --secondary: #ff5722;
+            --bg: #e1f5fe;
+            --card: #fff176;
+            --success: #2ecc71;
+            --error: #e74c3c;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding: 15px;
+            text-align: center;
+            font-size: 14px;
+            color: #222;
+        }
+        h1 {
+            font-size: 28px;
+            color: #d81b60;
+            margin: 8px 0;
+            text-shadow: 2px 2px 0 white;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: 680px;
+            margin: 0 auto;
+            min-height: 520px;
+        }
+        .level-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            margin: 12px 0 20px;
+        }
+        .big-emoji {
+            font-size: 70px;
+            margin: 15px 0;
+            display: block;
+        }
+        
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        /* Adjusted Level 1 to 5 columns for 10 cards (2 rows of 5) */
+        #card-grid { 
+            grid-template-columns: repeat(5, 1fr); 
+        }
+        #l3-grid { 
+            grid-template-columns: repeat(3, 1fr); 
+        }
+        
+        @media (max-width: 500px) {
+            #card-grid { grid-template-columns: repeat(2, 1fr); }
+            #l3-grid { grid-template-columns: repeat(1, 1fr); }
+            .card { height: 60px; font-size: 14px; }
+        }
+
+        .card {
+            height: 70px;
+            background: var(--card);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            border: 4px solid #fff59d;
+            transition: all 0.2s;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .card:hover { transform: scale(1.04); }
+        .card.flipped { background: white; border-color: #ffeb3b; font-size: 18px; }
+        .card.matched { background: #c8e6c9; border-color: #81c784; color: #2e7d32; pointer-events: none; opacity: 0.6; }
+        
+        /* Sentence / Word Builder Style */
+        .sentence-builder {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            min-height: 55px;
+            border-bottom: 3px dashed #ddd;
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 10px;
+        }
+        .word-in-sentence {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 0 #d84315;
+        }
+        .word-pool {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .word-btn {
+            background: #fff;
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #ccc;
+        }
+        .word-btn:hover { background: #f0f0f0; transform: translateY(-2px); }
+        .word-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+        .feedback { margin-top: 15px; font-weight: bold; min-height: 30px; font-size: 1.3rem; }
+        .correct-text { color: var(--success); }
+        .wrong-text { color: var(--error); }
+        
+        #next-level-btn {
+            font-size: 22px;
+            font-weight: bold;
+            padding: 15px 45px;
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            border: none;
+            border-radius: 35px;
+            margin: 20px auto 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            display: none;
+        }
+        #next-level-btn:hover { transform: scale(1.05); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Starlight Training Camp! 🌟</h1>
+    <div id="level-indicator" class="level-info">Stage 1 — Match Number Pairs! 🔢</div>
+
+    <!-- STAGE 1: MEMORY MATCH -->
+    <div id="level1">
+        <div class="grid" id="card-grid"></div>
+        <div class="feedback" id="l1-feedback"></div>
+    </div>
+
+    <!-- STAGE 2: VOCABULARY WORD-BUILDER -->
+    <div id="level2" class="hidden">
+        <span id="l2-emoji" class="big-emoji">🎤</span>
+        <div class="sentence-builder" id="builder"></div>
+        <div class="word-pool" id="pool"></div>
+        <div class="feedback" id="l2-feedback"></div>
+    </div>
+
+    <!-- STAGE 3: LISTEN & IDENTIFY -->
+    <div id="level3" class="hidden">
+        <button onclick="playAudioPrompt()" style="font-size:40px; padding:15px; border-radius:50%; background:#fff176; border:none; cursor:pointer; margin:15px; box-shadow: 0 4px 0 #fbc02d;">🔊</button>
+        <p style="font-weight:bold; color:#555;">Click the speaker to listen, then select the right block!</p>
+        <div class="grid" id="l3-grid"></div>
+        <div class="feedback" id="l3-feedback"></div>
+    </div>
+
+    <button id="next-level-btn" onclick="advanceStage()">YAY! NEXT LEVEL! 🚀</button>
+</div>
+
+<script>
+    // Level 1: Exactly 5 pairs (10 cards)
+    const numPairs = [
+        { text: "11", match: "eleven" }, { text: "eleven", match: "eleven" },
+        { text: "13", match: "thirteen" }, { text: "thirteen", match: "thirteen" },
+        { text: "15", match: "fifteen" }, { text: "fifteen", match: "fifteen" },
+        { text: "17", match: "seventeen" }, { text: "seventeen", match: "seventeen" },
+        { text: "20", match: "twenty" }, { text: "twenty", match: "twenty" }
+    ];
+
+    const spellingItems = [
+        { hint: "Word Formation: 🌸", pool: ["f", "l", "o", "w", "e", "r"], correct: ["f", "l", "o", "w", "e", "r"], emoji: "🌹" },
+        { hint: "Word Formation: 🚲", pool: ["p", "o", "l", "i", "c", "e", "m", "a", "n"], correct: ["p", "o", "l", "i", "c", "e", "m", "a", "n"], emoji: "👮‍♂️" },
+        { hint: "Word Formation: 👨‍👩‍👧‍👦", pool: ["f", "a", "m", "i", "l", "y"], correct: ["f", "a", "m", "i", "l", "y"], emoji: "👨‍👩‍👧‍👦" }
+    ];
+
+    // Level 3: Expanded Listening Challenge (10 items)
+    const auditoryItems = [
+        { text: "eleven", options: ["11", "12", "10"] },
+        { text: "twelve", options: ["20", "12", "13"] },
+        { text: "thirteen", options: ["13", "30", "14"] },
+        { text: "fourteen", options: ["15", "14", "40"] },
+        { text: "fifteen", options: ["15", "50", "16"] },
+        { text: "sixteen", options: ["60", "17", "16"] },
+        { text: "seventeen", options: ["17", "70", "18"] },
+        { text: "eighteen", options: ["18", "80", "19"] },
+        { text: "nineteen", options: ["20", "19", "90"] },
+        { text: "twenty", options: ["21", "12", "20"] }
+    ];
+
+    let currentStage = 1;
+    let selectedCards = [];
+    let l2Idx = 0;
+    let currentL2Sentence = [];
+    let l3Idx = 0;
+
+    // --- STAGE 1 LOGIC ---
+    function startStage1() {
+        document.getElementById('level-indicator').innerText = "Stage 1 — Match Number Pairs! 🔢";
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        
+        let shuffledCards = [...numPairs].sort(() => Math.random() - 0.5);
+        shuffledCards.forEach(cardData => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.match = cardData.match;
+            card.dataset.value = cardData.text;
+            card.onclick = () => {
+                if (selectedCards.length < 2 && !card.classList.contains('flipped') && !card.classList.contains('matched')) {
+                    card.classList.add('flipped');
+                    card.innerText = card.dataset.value;
+                    selectedCards.push(card);
+                    if (selectedCards.length === 2) setTimeout(verifyL1Match, 600);
+                }
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    function verifyL1Match() {
+        const [c1, c2] = selectedCards;
+        if (c1.dataset.match === c2.dataset.match) {
+            c1.className = 'card matched';
+            c2.className = 'card matched';
+            document.getElementById('l1-feedback').innerHTML = "<span class='correct-text'>Match Found! 🎉</span>";
+        } else {
+            c1.classList.remove('flipped');
+            c2.classList.remove('flipped');
+            c1.innerText = '';
+            c2.innerText = '';
+            document.getElementById('l1-feedback').innerHTML = "<span class='wrong-text'>Try again! ❌</span>";
+        }
+        selectedCards = [];
+        
+        // Check if all 10 cards (5 pairs) are matched
+        if (document.querySelectorAll('.card.matched').length === numPairs.length) {
+            document.getElementById('next-level-btn').style.display = 'block';
+            document.getElementById('l1-feedback').innerHTML = "<span class='correct-text'>Stage 1 Complete! 🏆</span>";
+        }
+    }
+
+    // --- STAGE 2 LOGIC ---
+    function startStage2() {
+        document.getElementById('level-indicator').innerText = "Stage 2 — Spell the Words! 📝";
+        document.getElementById('level1').classList.add('hidden');
+        document.getElementById('level2').classList.remove('hidden');
+        document.getElementById('next-level-btn').style.display = 'none';
+        loadSpellingQuestion();
+    }
+
+    function loadSpellingQuestion() {
+        const item = spellingItems[l2Idx];
+        document.getElementById('l2-emoji').innerText = item.emoji;
+        document.getElementById('l2-feedback').innerHTML = "";
+        
+        const pool = document.getElementById('pool');
+        const builder = document.getElementById('builder');
+        pool.innerHTML = "";
+        builder.innerHTML = "";
+        currentL2Sentence = [];
+
+        let shuffledLetters = [...item.pool].sort(() => Math.random() - 0.5);
+        shuffledLetters.forEach(letter => {
+            const btn = document.createElement('button');
+            btn.className = 'word-btn';
+            btn.innerText = letter;
+            btn.onclick = () => {
+                currentL2Sentence.push(letter);
+                btn.disabled = true;
+                
+                // Render structural representation inline
+                const span = document.createElement('span');
+                span.className = 'word-in-sentence';
+                span.innerText = letter;
+                builder.appendChild(span);
+                
+                if (currentL2Sentence.length === item.correct.length) {
+                    verifyL2Spelling();
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function verifyL2Spelling() {
+        const result = currentL2Sentence.join("");
+        const target = spellingItems[l2Idx].correct.join("");
+        const feedback = document.getElementById('l2-feedback');
+        
+        if (result === target) {
+            feedback.innerHTML = "<span class='correct-text'>Super! Excellent spelling! ✨</span>";
+            setTimeout(() => {
+                l2Idx++;
+                if (l2Idx < spellingItems.length) {
+                    loadSpellingQuestion();
+                } else {
+                    document.getElementById('next-level-btn').style.display = 'block';
+                    feedback.innerHTML = "<span class='correct-text'>Stage 2 Complete! 🏆</span>";
+                }
+            }, 1000);
+        } else {
+            feedback.innerHTML = "<span class='wrong-text'>Oops! Let's reload this word. ❌</span>";
+            setTimeout(loadSpellingQuestion, 1200);
+        }
+    }
+
+    // --- STAGE 3 LOGIC ---
+    function startStage3() {
+        document.getElementById('level-indicator').innerText = "Stage 3 — Auditory Listening Lab! 🔊";
+        document.getElementById('level2').classList.add('hidden');
+        document.getElementById('level3').classList.remove('hidden');
+        document.getElementById('next-level-btn').style.display = 'none';
+        loadAuditoryQuestion();
+    }
+
+    function playAudioPrompt() {
+        const targetText = auditoryItems[l3Idx].text;
+        const utterance = new SpeechSynthesisUtterance(targetText);
+        utterance.lang = 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function loadAuditoryQuestion() {
+        const currentData = auditoryItems[l3Idx];
+        document.getElementById('l3-feedback').innerHTML = "";
+        const grid = document.getElementById('l3-grid');
+        grid.innerHTML = "";
+        
+        // Instantly fire TTS hint upon card activation
+        setTimeout(playAudioPrompt, 300);
+        
+        currentData.options.forEach(opt => {
+            const block = document.createElement('button');
+            block.className = 'card';
+            block.innerText = opt;
+            block.onclick = () => {
+                const feedback = document.getElementById('l3-feedback');
+                if (opt === numToDigitsMap(currentData.text)) {
+                    block.style.background = "#c8e6c9";
+                    feedback.innerHTML = "<span class='correct-text'>Brilliant! Correct Number! 🏆</span>";
+                    setTimeout(() => {
+                        l3Idx++;
+                        if (l3Idx < auditoryItems.length) {
+                            loadAuditoryQuestion();
+                        } else {
+                            showGlobalGameOver();
+                        }
+                    }, 1200);
+                } else {
+                    block.style.background = "#ffcdd2";
+                    feedback.innerHTML = "<span class='wrong-text'>Listen closely and select again! ❌</span>";
+                }
+            };
+            grid.appendChild(block);
+        });
+    }
+
+    function numToDigitsMap(str) {
+        const map = {
+            "eleven": "11", "twelve": "12", "thirteen": "13", "fourteen": "14",
+            "fifteen": "15", "sixteen": "16", "seventeen": "17", "eighteen": "18",
+            "nineteen": "19", "twenty": "20"
+        };
+        return map[str] || "";
+    }
+
+    function advanceStage() {
+        if (currentStage === 1) {
+            currentStage = 2;
+            startStage2();
+        } else if (currentStage === 2) {
+            currentStage = 3;
+            startStage3();
+        }
+    }
+
+    function showGlobalGameOver() {
+        document.getElementById('level-indicator').innerText = "Mission Accomplished!";
+        document.getElementById('level3').innerHTML = "<span class='big-emoji'>👑</span><h3>Congratulations! You've masterfully finished all Starlight assessment modules.</h3>";
+    }
+
+    // Auto-boot setup
+    window.onload = startStage1;
+</script>
+
+</body>
+</html>
