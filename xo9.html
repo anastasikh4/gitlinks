@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duolingo Style: Shopping Step-by-Step</title>
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-blue: #1cb0f6;
+            --duo-red: #ea2b2b;
+            --duo-dark: #3c3c3c;
+            --bg-color: #f7f9fc;
+        }
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Din Round', 'Segoe UI', sans-serif; 
+            background-color: var(--bg-color); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            padding: 20px; 
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .app-container { 
+            max-width: 600px; 
+            width: 100%; 
+            background: white;
+            border: 2px solid #e5e5e5; 
+            border-radius: 16px; 
+            padding: 30px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        
+        /* Progress Bar */
+        .progress-container { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .progress-bg { flex-grow: 1; height: 16px; background: #e5e5e5; border-radius: 10px; overflow: hidden; }
+        #fill { height: 100%; width: 0%; background: var(--duo-green); transition: 0.4s; border-radius: 10px; }
+
+        /* Start / End Screens */
+        .screen { display: none; text-align: center; }
+        .screen.active { display: block; animation: fadeIn 0.5s ease; }
+        
+        .emoji-title { font-size: 60px; margin-bottom: 20px; }
+        h1 { color: var(--duo-dark); font-size: 1.8rem; margin-bottom: 15px; }
+        p { color: #777; font-size: 1.1rem; line-height: 1.5; margin-bottom: 25px; }
+        
+        .btn-main { 
+            background: var(--duo-green); color: white; border: none; padding: 15px 40px; 
+            border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 0 #46a302; font-family: inherit; width: 100%;
+            transition: 0.1s;
+        }
+        .btn-main:active { transform: translateY(5px); box-shadow: none; }
+
+        /* Quiz Screen */
+        .question-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--duo-dark);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-bottom: 4px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--duo-dark);
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: left;
+            font-family: inherit;
+            position: relative;
+        }
+        
+        .option-btn:hover:not(:disabled) { background: #f7f7f7; }
+        
+        /* Correct / Wrong States */
+        .option-btn.correct {
+            background: #d7ffb8;
+            border-color: var(--duo-green);
+            color: #1e4601;
+            pointer-events: none;
+        }
+        .option-btn.correct::after {
+            content: " ✅";
+            position: absolute;
+            right: 20px;
+            font-size: 1.3rem;
+        }
+
+        .option-btn.wrong {
+            background: #ffdfe0;
+            border-color: var(--duo-red);
+            color: #6a0000;
+            animation: shake 0.4s;
+            pointer-events: none; /* Disable the wrong button */
+        }
+        .option-btn.wrong::after {
+            content: " ❌";
+            position: absolute;
+            right: 20px;
+            font-size: 1.3rem;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="progress-container">
+        <span style="font-size: 1.5rem;">🦉</span>
+        <div class="progress-bg"><div id="fill"></div></div>
+    </div>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen active">
+        <div class="emoji-title">🛒🛍️</div>
+        <h1>Let's Go Shopping!</h1>
+        <p>Do you know the correct order of a shopping trip? Let's find out step by step.</p>
+        <button class="btn-main" onclick="startGame()">START</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="screen">
+        <div class="question-header" id="question-text">Question goes here</div>
+        <div class="options-container" id="options-container"></div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="screen">
+        <div class="emoji-title">🏆</div>
+        <h1>Perfect!</h1>
+        <p id="score-text">You completed the shopping trip.</p>
+        <button class="btn-main" onclick="location.reload()">PLAY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // Step-by-step questions based on the photo
+    const quizData = [
+        {
+            question: "What do you do FIRST?",
+            correct: "Take a basket.",
+            options: ["Pay for the shopping in cash.", "Take a basket.", "Go home and put the shopping away."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Check the price.",
+            options: ["Carry the shopping to the car.", "Check the price.", "Get your change and your receipt."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Put your shopping in the basket.",
+            options: ["Stand in a queue.", "Take a basket.", "Put your shopping in the basket."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Stand in a queue.",
+            options: ["Pay for the shopping in cash.", "Put your shopping in the basket.", "Stand in a queue."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Pay for the shopping in cash.",
+            options: ["Pay for the shopping in cash.", "Get your change and your receipt.", "Take a basket."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Get your change and your receipt.",
+            options: ["Carry the shopping to the car.", "Get your change and your receipt.", "Pay for the shopping in cash."]
+        },
+        {
+            question: "What do you do NEXT?",
+            correct: "Carry the shopping to the car.",
+            options: ["Go home and put the shopping away.", "Carry the shopping to the car.", "Stand in a queue."]
+        },
+        {
+            question: "What is the FINAL step?",
+            correct: "Go home and put the shopping away.",
+            options: ["Carry the shopping to the car.", "Go home and put the shopping away.", "Take a basket."]
+        }
+    ];
+
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    // DOM Elements
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const endScreen = document.getElementById('end-screen');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const progressFill = document.getElementById('fill');
+
+    // Shuffle helper
+    function shuffle(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startGame() {
+        startScreen.classList.remove('active');
+        quizScreen.classList.add('active');
+        currentIndex = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isAnimating = false;
+        
+        // Update progress bar
+        progressFill.style.width = (currentIndex / quizData.length) * 100 + "%";
+        
+        const currentQ = quizData[currentIndex];
+        questionText.innerText = currentQ.question;
+        
+        // Clear old options
+        optionsContainer.innerHTML = '';
+        
+        // Shuffle options to make it dynamic
+        const shuffledOptions = shuffle([...currentQ.options]);
+        
+        shuffledOptions.forEach(optionText => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = optionText;
+            btn.onclick = () => checkAnswer(btn, optionText, currentQ.correct);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedBtn, selectedText, correctText) {
+        if (isAnimating) return;
+
+        if (selectedText === correctText) {
+            // Correct
+            isAnimating = true;
+            selectedBtn.classList.add('correct');
+            
+            // Disable all buttons
+            const allBtns = optionsContainer.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            // Wait 1 second, then load next question
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showEndScreen();
+                }
+            }, 1000);
+
+        } else {
+            // Incorrect
+            selectedBtn.classList.add('wrong');
+            // The button automatically gets disabled via CSS pointer-events: none in .wrong class
+        }
+    }
+
+    function showEndScreen() {
+        quizScreen.classList.remove('active');
+        endScreen.classList.add('active');
+        progressFill.style.width = "100%";
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supermarket & Shopping Vocabulary Interactive Quiz</title>
+    <style>
+        :root {
+            --primary: #4f46e5; /* Vibrant Royal Indigo */
+            --success: #22c55e; /* Vibrant Success Green */
+            --error: #ef4444; /* Vibrant Danger Red */
+            --text-dark: #0f172a;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #fef3c7 100%); /* Bright interactive background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Strict viewport confinement */
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            width: 92%;
+            max-width: 580px;
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+            border: 3px solid #cbd5e1;
+            box-sizing: border-box;
+            transition: transform 0.2s;
+        }
+
+        h1 { 
+            color: var(--primary); 
+            text-align: center; 
+            margin-top: 0;
+            margin-bottom: 20px; 
+            font-size: 26px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-container { 
+            height: 10px; 
+            background: #e2e8f0; 
+            border-radius: 6px; 
+            margin-bottom: 25px; 
+            overflow: hidden;
+        }
+
+        #progress-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: var(--primary); 
+            border-radius: 6px; 
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
+        .question-text { 
+            font-size: 22px; 
+            font-weight: 700; 
+            margin-bottom: 25px; 
+            color: var(--text-dark); 
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .options-grid { 
+            display: grid; 
+            gap: 14px; 
+        }
+
+        .opt-btn {
+            padding: 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: #ffffff;
+            cursor: pointer;
+            text-align: left;
+            font-size: 18px;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .opt-btn:hover { 
+            border-color: var(--primary); 
+            background: #f0fdf4; 
+            transform: translateY(-1px);
+        }
+
+        /* Instant Wordwall Feedback Classes */
+        .correct { 
+            background: #d4edda !important; 
+            border-color: var(--success) !important; 
+            color: #155724 !important; 
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        .wrong { 
+            background: #f8d7da !important; 
+            border-color: var(--error) !important; 
+            color: #721c24 !important; 
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .results { 
+            text-align: center; 
+        }
+
+        .results p {
+            font-size: 20px;
+            font-weight: bold;
+            color: #475569;
+            margin: 20px 0;
+        }
+
+        .restart-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .restart-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+
+        /* Animations for interactive gaming dynamic */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <!-- GAME STATE USER INTERFACE -->
+    <div id="quiz-ui">
+        <h1>Supermarket Game 🛒</h1>
+        <div class="progress-container"><div id="progress-fill"></div></div>
+        <div id="question-area">
+            <div id="q-text" class="question-text"></div>
+            <div id="options" class="options-grid"></div>
+        </div>
+    </div>
+
+    <!-- FINAL GAME SCORE END SCREEN -->
+    <div id="result-ui" class="results hidden">
+        <h1 id="emoji" style="font-size: 60px; margin-bottom: 10px;">🎉</h1>
+        <h2>Shopping Complete!</h2>
+        <p id="score-text"></p>
+        <button onclick="location.reload()" class="restart-btn">Play Again ➔</button>
+    </div>
+</div>
+
+<script>
+    // A2 Level Supermarket & Shopping Context Arrays
+    const questions = [
+        { q: "We have a lot of items to buy today. Please grab a large _________ at the entrance.", a: ["basket", "trolley", "receipt"], c: 1 },
+        { q: "Look! These biscuits are buy one, get one free. They are on a _________.", a: ["special offer", "shopping list", "cash"], c: 0 },
+        { q: "I am ready to buy these things. Let's go to the checkout counter and _________.", a: ["pay", "trolley", "card"], c: 0 },
+        { q: "I don't have paper money with me. Can I pay by _________?", ba: "card", a: ["cash", "card", "receipt"], c: 1 },
+        { q: "Before we leave the house, let's write down everything we need on a shopping _________.", a: ["bag", "receipt", "list"], c: 2 },
+        { q: "The cashier gives you a piece of paper after you pay. This is your _________.", a: ["card", "receipt", "special offer"], c: 1 },
+        { q: "I only need to buy three small items, so I will take a small hand _________.", a: ["basket", "trolley", "cash"], c: 0 },
+        { q: "If you pay with coins and notes, you are paying with _________.", a: ["card", "trolley", "cash"], c: 1 },
+        { q: "We need something to pack our vegetables. Do you have a plastic _________?", a: ["bag", "receipt", "list"], c: 0 },
+        { q: "Excuse me, I can't find the price. Where can I check the _________ of this offer?", a: ["trolley", "price", "basket"], c: 1 }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    const totalQuestions = questions.length;
+
+    function loadQuestion() {
+        if (currentQ >= totalQuestions) {
+            showResults();
+            return;
+        }
+        
+        const data = questions[currentQ];
+        document.getElementById('q-text').innerHTML = data.q; 
+        
+        const optionsDiv = document.getElementById('options');
+        optionsDiv.innerHTML = '';
+        
+        data.a.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(i, btn);
+            optionsDiv.appendChild(btn);
+        });
+        
+        updateProgress();
+    }
+
+    function checkAnswer(idx, btn) {
+        const correct = questions[currentQ].c;
+        const allBtns = document.querySelectorAll('.opt-btn');
+        
+        // Instant locking mechanism to prevent multiple clicks
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        if(idx === correct) {
+            btn.classList.add('correct');
+            score++;
+        } else {
+            btn.classList.add('wrong');
+            allBtns[correct].classList.add('correct'); // Highlight correct answer
+        }
+        
+        // Wordwall dynamic automatic progression tracking delay (1.5 seconds)
+        setTimeout(() => {
+            currentQ++;
+            loadQuestion();
+        }, 1500);
+    }
+    
+    function updateProgress() {
+        const progress = (currentQ / totalQuestions) * 100;
+        document.getElementById('progress-fill').style.width = progress + '%';
+    }
+
+    function showResults() {
+        document.getElementById('quiz-ui').classList.add('hidden');
+        document.getElementById('result-ui').classList.remove('hidden');
+        document.getElementById('score-text').innerText = `Your total score is ${score} out of ${totalQuestions}!`;
+        document.getElementById('emoji').innerText = score === totalQuestions ? "🏆" : score > 6 ? "⭐" : "📚";
+    }
+
+    // Initialize Game Setup
+    loadQuestion();
+</script>
+
+</body>
+</html>
