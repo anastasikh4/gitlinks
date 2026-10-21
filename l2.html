@@ -276,6 +276,19 @@
     </div>
   </div>
 
+  <!-- MTC Girls -->
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
+       data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">
+    <div>
+      <h3 class="text-sm font-medium text-white">Girls</h3>
+      <p class="mt-1 text-xs text-zinc-500">MTS Link</p>
+    </div>
+    <div class="flex gap-2">
+      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Open</button>
+      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Copy link</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -411,7 +424,7 @@
 
             <!-- Объединённый блок: Итого к получению -->
             <div class="col-span-2 sm:col-span-3 lg:col-span-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 p-3 border border-emerald-500/30 mt-1">
-              <p class="text-[10px] uppercase tracking-wider text-zinc-300 font-semibold">Итого к получению (Выплата + Дни −4%):</p>
+              <p class="text-[10px] uppercase tracking-wider text-zinc-300 font-semibold">Итого к получению (После расходов + Дни −4%):</p>
               <p id="sumTotalCombined" class="mt-1 text-xl font-black text-emerald-400">0 ₽</p>
             </div>
           </div>
@@ -495,28 +508,65 @@
 
         <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
           <h2 class="mb-3 text-sm font-semibold text-white">Расходы</h2>
-          <div class="grid gap-3 md:grid-cols-2">
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Продукты">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Продукты</p>
-              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Дикси</button><button type="button" class="tag-btn">ВкусВилл</button><button type="button" class="tag-btn">Перекрёсток</button><button type="button" class="tag-btn">Пятёрочка</button></div>
+          <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Телефон">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Телефон</p>
               <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
             </div>
             <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Животные">
               <p class="mb-2 text-xs font-semibold text-zinc-300">Животные</p>
-              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Четыре лапы</button><button type="button" class="tag-btn">Ветклиника</button><button type="button" class="tag-btn">Корм</button></div>
               <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
             </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Связь">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Связь</p>
-              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">МТС</button><button type="button" class="tag-btn">Мегафон</button><button type="button" class="tag-btn">Интернет</button><button type="button" class="tag-btn">Zoom Pro</button></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Еда">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Еда</p>
               <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
             </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Финансы">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Финансы</p>
-              <div class="mb-2 flex flex-wrap gap-1.5"><button type="button" class="tag-btn">Комиссия</button><button type="button" class="tag-btn">Перевод</button><button type="button" class="tag-btn">Подушка</button></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Маркетплейс">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Маркетплейс</p>
               <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
             </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2" data-cat="Дополнительное">
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Кредит">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Кредит</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Благотворительность">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Благотворительность</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Транспорт">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Транспорт</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Квартира">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Квартира</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Подарки">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Подарки</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Такси">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Такси</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Аптека">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Аптека</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Отдых">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Отдых</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Сплит">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Сплит</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Одежда">
+              <p class="mb-2 text-xs font-semibold text-zinc-300">Одежда</p>
+              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
+            </div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2 lg:col-span-2 xl:col-span-2" data-cat="Дополнительное">
               <p class="mb-2 text-xs font-semibold text-zinc-300">Дополнительное поле</p>
               <div class="grid gap-2 sm:grid-cols-[1fr_140px_auto]">
                 <input id="extraExpName" class="fin-input" placeholder="Название расхода">
@@ -524,6 +574,7 @@
                 <button type="button" class="exp-add rounded-xl bg-white/10 px-4 text-sm">+</button>
               </div>
             </div>
+
           </div>
           <ul id="expenseList" class="mt-3 space-y-1.5 text-sm"></ul>
         </section>
@@ -838,7 +889,7 @@
       // ================================================================
       let expenseTotal = 0, expenses = [], selectedNames = {};
       let calcExpression = '', calcMemory = 0, lastNet = 0, lastGross = 0;
-      let finTab = localStorage.getItem('activePage') || 'tracker';
+      let finTab = 'tracker';
       let banksData = [];
 
       const BANKS = [
@@ -849,8 +900,12 @@
       ];
 
       // ====== ДОПОЛНИТЕЛЬНЫЕ ЗАНЯТИЯ (пакеты, разовые) ======
-      // Формат: { name: 'Имя', price: 5000 }
-      const EXTRA = [];
+      const EXTRA = [
+        { name: 'Лиза', price: 8000 },
+        { name: 'Ксюша', price: 6000 },
+        { name: 'Соня', price: 9000 },
+        { name: 'Егор', price: 9000 }
+      ];
 
       const SCHEDULE = [
         // ПОНЕДЕЛЬНИК
@@ -862,7 +917,6 @@
         // ВТОРНИК
         [
           { name: 'Sophia', price: 1100 },
-          { name: 'Катя', price: 1100 },
           { name: 'Лиза', price: 0 },      // пакет
           { name: 'Гоша', price: 700 }
         ],
@@ -870,7 +924,6 @@
         [
           { name: 'Sonya', price: 0 },    // пакет
           { name: 'Egor', price: 0 },     // пакет
-          { name: 'Олег', price: 1000 },
           { name: 'Andrey', price: 800 }
         ],
         // ЧЕТВЕРГ
@@ -912,12 +965,16 @@
           </div>
         </div>`;
       }
-      function renderDays(){
+            function renderDays(){
+        // Суммы по умолчанию для каждого дня (0-Пн, 1-Вт, 2-Ср, 3-Чт, 4-Пт, 5-Сб, 6-Вс)
+        const DAILY_NORMA = [4100, 2800, 3800, 2900, 4900, 1100, 1000];
+
         $('daysGrid').innerHTML = DAYS_RU.map((day,i)=>`
           <article class="day-card rounded-2xl border border-white/10 bg-white/[.035] p-4" data-day="${i}" id="day-${i}">
             <div class="mb-3 flex items-baseline justify-between"><h3 class="text-sm font-semibold text-white">${day}</h3><span class="cal-date text-[11px] text-zinc-500" data-idx="${i}"></span></div>
             <div class="tasks">${SCHEDULE[i].length?SCHEDULE[i].map((t,j)=>taskRow(t,'d'+i+'-'+j)).join(''):'<p class="text-xs text-zinc-500">Свободный день — добавьте занятие ниже.</p>'}</div>
-            ${payBlock()}
+            <div class="day-earned mt-3 text-right text-xs font-bold text-emerald-300">Итого за день: 0 ₽</div>
+            ${payBlock(DAILY_NORMA[i])}
           </article>`).join('');
         $('extraList').innerHTML = EXTRA.map((t,i)=>taskRow(t,'x'+i)).join('');
       }
@@ -997,30 +1054,24 @@
         $('sumExp').textContent=money(expenseTotal);
         $('sumAfter').textContent=money(after);
         $('sumPay').textContent=money(pay);
-        // Итоговая сумма: чистыми + оплата по дням после налога
-        const totalCombined = net + pay * (1 - TAX);
+
+        // Обновление "Итого за день"
+        document.querySelectorAll('.day-card').forEach(card => {
+            let daySum = 0;
+            card.querySelectorAll('.task-item input:checked').forEach(ch => daySum += num(ch.dataset.price));
+            const totalEl = card.querySelector('.day-earned');
+            if (totalEl) totalEl.textContent = `Итого за день: ${money(daySum)}`;
+        });
+
+        // Итоговая сумма: (Чистыми - Расходы) + (Оплата по дням - 4%)
+        const totalCombined = after + (pay * (1 - TAX));
         const totalEl = $('sumTotalCombined');
         if (totalEl) totalEl.textContent = money(totalCombined);
-        saveFinance();
       }
 
       // ---------- Расходы ----------
       function renderExpenses(){
         $('expenseList').innerHTML = expenses.map((e,i)=>`<li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/[.03] px-3 py-2"><span class="text-zinc-300">${e.name}</span><span class="flex items-center gap-3"><b>${money(e.sum)}</b><button type="button" data-del="${i}" class="text-[11px] text-rose-300">✕</button></span></li>`).join('');
-      }
-
-      function saveFinance(){
-        const checks={};
-        document.querySelectorAll('.task-item input').forEach(ch=>checks[ch.dataset.id]=ch.checked);
-        localStorage.setItem('finance2026', JSON.stringify({checks, expenses, extraHTML:$('extraList').innerHTML, notes:$('userNotes').value, finTab}));
-      }
-      function loadFinance(){
-        try{
-          const s=JSON.parse(localStorage.getItem('finance2026')||'{}');
-          if(s.extraHTML) $('extraList').innerHTML=s.extraHTML;
-          if(s.checks) document.querySelectorAll('.task-item input').forEach(ch=>{ if(s.checks[ch.dataset.id]) ch.checked=true; });
-          if(s.expenses){ expenses=s.expenses; expenseTotal=expenses.reduce((a,b)=>a+b.sum,0); renderExpenses(); }
-        }catch(e){}
       }
 
       // ---------- События для трекера ----------
@@ -1060,15 +1111,13 @@
 
       document.querySelectorAll('.exp-cat').forEach(cat=>{
         cat.addEventListener('click', e=>{
-          const tag=e.target.closest('.tag-btn');
-          if(tag){ cat.querySelectorAll('.tag-btn').forEach(t=>t.classList.remove('on')); tag.classList.add('on'); selectedNames[cat.dataset.cat]=tag.textContent; }
           if(e.target.classList.contains('exp-add')){
             const sum=num(cat.querySelector('.exp-sum').value);
-            let name=selectedNames[cat.dataset.cat] || '';
+            let name=cat.dataset.cat;
             if(cat.dataset.cat==='Дополнительное') name=$('extraExpName').value.trim();
             if(!name) name=cat.dataset.cat;
             if(!sum){ notify('Введите сумму расхода'); return; }
-            expenses.push({name: cat.dataset.cat+' · '+name, sum});
+            expenses.push({name: name, sum});
             expenseTotal+=sum; cat.querySelector('.exp-sum').value='';
             renderExpenses(); calc();
           }
@@ -1097,8 +1146,18 @@
         const extraChecked=[...document.querySelectorAll('#extraList .task-item input:checked')];
         if(extraChecked.length){ out+='Дополнительно\n'; extraChecked.forEach(ch=>out+=`  • ${ch.dataset.name} — ${money(ch.dataset.price)}\n`); out+='\n'; }
         if(expenses.length){ out+='Расходы\n'; expenses.forEach(e=>out+=`  • ${e.name} — ${money(e.sum)}\n`); out+='\n'; }
+        
         const gross=[...document.querySelectorAll('.task-item input:checked')].reduce((a,ch)=>a+num(ch.dataset.price),0);
-        out+=`Грязными: ${money(gross)}\nНалог 4%: ${money(gross*TAX)}\nК выплате: ${money(gross*(1-TAX))}\nРасходы: ${money(expenseTotal)}\nПосле расходов: ${money(gross*(1-TAX)-expenseTotal)}\nОплата по дням: ${money(getDayPaymentsTotal())}\n`;
+        const net = gross*(1-TAX);
+        const pay = getDayPaymentsTotal();
+        const afterExpenses = net - expenseTotal;
+        const finalSum = afterExpenses + (pay * (1 - TAX));
+
+        out+=`Грязными: ${money(gross)}\nНалог 4%: ${money(gross*TAX)}\nК выплате: ${money(net)}\nРасходы: ${money(expenseTotal)}\nПосле расходов: ${money(afterExpenses)}\nОплата по дням: ${money(pay)}\n`;
+        out+=`\n=== ИТОГО В ФИНАЛЕ ===\n`;
+        out+=`(После расходов + Оплата по дням - 4%)\n`;
+        out+=`${money(finalSum)}\n`;
+        
         $('reportText').value=out; $('reportText').classList.remove('hidden'); $('copyReport').classList.remove('hidden');
       }
       $('makeReport').onclick=generateReport;
@@ -1230,7 +1289,7 @@
 
       // ---------- Внутренние вкладки финансов ----------
       function openFin(tab){
-        finTab=tab; localStorage.setItem('activePage', tab);
+        finTab=tab;
         $('finTracker').classList.toggle('active', tab==='tracker');
         $('finNotes').classList.toggle('active', tab==='notes');
         if(tab!=='tracker') $('calendarPanel').classList.remove('open');
@@ -1245,14 +1304,14 @@
       const notes=$('userNotes'), status=$('notesStatus');
       let ns;
       function setStatus(t){ status.textContent=t; clearTimeout(ns); ns=setTimeout(()=>status.textContent='📌 Сохраняется автоматически', 1600); }
-      notes.value=localStorage.getItem('userNotes')||'';
-      notes.addEventListener('input',()=>{ localStorage.setItem('userNotes', notes.value); setStatus('✅ Сохранено'); saveFinance(); });
-      $('saveNotes').onclick=()=>{ localStorage.setItem('userNotes', notes.value); setStatus('✅ Сохранено'); };
+      notes.value=''; 
+      notes.addEventListener('input',()=>{ setStatus('✅ Сохранено'); });
+      $('saveNotes').onclick=()=>{ setStatus('✅ Сохранено'); };
       $('copyNotes').onclick=()=>{ copy(notes.value); setStatus('📋 Скопировано!'); };
-      $('clearNotes').onclick=()=>{ if(!confirm('Очистить заметки?')) return; notes.value=''; localStorage.removeItem('userNotes'); setStatus('🗑️ Очищено'); };
+      $('clearNotes').onclick=()=>{ if(!confirm('Очистить заметки?')) return; notes.value=''; setStatus('🗑️ Очищено'); };
 
       // ---------- Инициализация финансов ----------
-      renderDays(); loadBanks(); renderBanks(); saveBanks(); loadFinance(); initCalendar(); calc(); openFin(finTab==='notes'?'notes':'tracker');
+      renderDays(); loadBanks(); renderBanks(); saveBanks(); initCalendar(); calc(); openFin(finTab==='notes'?'notes':'tracker');
 
       // ================================================================
       // 3. РАСПИСАНИЕ ЗАНЯТИЙ (страница 4)
@@ -1265,16 +1324,13 @@
         violet: { bg: '#faf5ff', bd: '#ddd6fe', tx: '#3b0764', dot: '#8b5cf6' },
         cyan: { bg: '#f0fdfa', bd: '#a5f3fc', tx: '#115e59', dot: '#06b6d4' }
       };
-      let lessons = [];
-      try { lessons = JSON.parse(localStorage.getItem('lessons') || '[]'); } catch { lessons = []; }
+      let lessons = [
+        { id: 'a1', subject: 'Математика', person: 'Анна П.', day: '0', color: 'indigo', start: '16:00', end: '17:30', place: 'Zoom', price: '1500', note: 'Тригонометрия' },
+        { id: 'a2', subject: 'Английский', person: 'Марк', day: '2', color: 'emerald', start: '18:00', end: '19:00', place: 'дома', price: '1200', note: 'Разговорный урок' },
+        { id: 'a3', subject: 'Физика', person: 'Лена', day: '4', color: 'amber', start: '15:00', end: '16:30', place: 'Skype', price: '1800', note: 'Подготовка к ЕГЭ' }
+      ];
       let editId = null;
       const schedForm = $('scheduleForm');
-
-      function saveLessons() {
-        localStorage.setItem('lessons', JSON.stringify(lessons));
-        localStorage.setItem('schedTitle', $('scheduleTitle').value);
-        localStorage.setItem('schedSub', $('scheduleSubtitle').value);
-      }
 
       function renderSchedule() {
         const title = $('scheduleTitle').value || 'Расписание занятий';
@@ -1324,7 +1380,6 @@
         $('schedCount').textContent = lessons.length;
         $('schedHours').textContent = (Math.round(hours * 10) / 10) + ' ч';
         $('schedMoney').textContent = moneySum.toLocaleString('ru-RU') + ' ₽';
-        saveLessons();
       }
 
       schedForm.addEventListener('submit', e => {
@@ -1443,16 +1498,8 @@
 
       $('schedulePrint').onclick = () => window.print();
 
-      // Инициализация расписания
-      $('scheduleTitle').value = localStorage.getItem('schedTitle') || 'Расписание занятий';
-      $('scheduleSubtitle').value = localStorage.getItem('schedSub') || '';
-      if (!lessons.length) {
-        lessons = [
-          { id: 'a1', subject: 'Математика', person: 'Анна П.', day: '0', color: 'indigo', start: '16:00', end: '17:30', place: 'Zoom', price: '1500', note: 'Тригонометрия' },
-          { id: 'a2', subject: 'Английский', person: 'Марк', day: '2', color: 'emerald', start: '18:00', end: '19:00', place: 'дома', price: '1200', note: 'Разговорный урок' },
-          { id: 'a3', subject: 'Физика', person: 'Лена', day: '4', color: 'amber', start: '15:00', end: '16:30', place: 'Skype', price: '1800', note: 'Подготовка к ЕГЭ' }
-        ];
-      }
+      $('scheduleTitle').value = 'Расписание занятий';
+      $('scheduleSubtitle').value = '';
       renderSchedule();
 
       // ================================================================
@@ -1705,10 +1752,10 @@
       // ================================================================
       // 5. ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
       // ================================================================
-      const savedPage = localStorage.getItem('activeSitePage') || '1';
+      const savedPage = '1'; 
       openSitePage(Number(savedPage));
       document.querySelectorAll('.site-page-button').forEach(btn => {
-        btn.addEventListener('click', () => { localStorage.setItem('activeSitePage', btn.dataset.sitePage); });
+        btn.addEventListener('click', () => {  });
       });
     })();
   </script>
