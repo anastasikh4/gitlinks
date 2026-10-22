@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blox Academy: Grammar Obby</title>
+    <style>
+        :root {
+            --rbx-blue: #00a2ff;
+            --rbx-green: #00e676;
+            --rbx-dark: #393b3d;
+            --rbx-bg: #63b3ff;
+            --rbx-silver: #bdc3c7;
+            --rbx-red: #ff5252;
+        }
+        body {
+            font-family: 'Arial Black', sans-serif;
+            background-color: var(--rbx-bg);
+            background-image: radial-gradient(#ffffff 15%, transparent 15%);
+            background-size: 40px 40px;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .game-wrapper {
+            max-width: 700px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            border-bottom: 8px solid var(--rbx-silver);
+            padding: 25px;
+            position: relative;
+            text-align: center;
+        }
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            background: var(--rbx-dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .img-box {
+            width: 280px;
+            height: 200px;
+            margin: 15px auto;
+            border-radius: 12px;
+            border: 5px solid var(--rbx-silver);
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 10px;
+            border: none;
+            background: var(--rbx-blue);
+            color: white;
+            border-bottom: 5px solid #0076bb;
+            transition: 0.1s;
+        }
+        button:hover { background: #33b5ff; }
+        button:active { transform: translateY(3px); border-bottom-width: 2px; }
+        button:disabled { opacity: 0.7; cursor: default; transform: none; }
+
+        .feedback {
+            font-size: 24px;
+            height: 40px;
+            margin: 10px 0;
+            color: var(--rbx-dark);
+            font-weight: bold;
+        }
+
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            width: 12px; height: 12px;
+            border-radius: 3px; /* Blocky particles */
+            animation: shoot 0.7s ease-out forwards;
+        }
+        @keyframes shoot {
+            0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) rotate(360deg); opacity: 0; }
+        }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .active { animation: zoomIn 0.3s ease-out; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="game-wrapper" id="stage">
+        <h1 style="color: #333; margin-top:0;">BLOX ACADEMY: GRAMMAR 🏆</h1>
+        <div class="hud">
+            <span>STAGE: <span id="q-num">1</span>/10</span>
+            <span>ROBUX: <span id="score">0</span></span>
+        </div>
+
+        <div id="game-content" class="active">
+            <h2 id="question-text" style="color: #444; font-size: 1.3rem;">Loading Mission...</h2>
+            <div class="img-box">
+                <img id="main-img" src="" alt="Quest">
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <div class="btn-grid" id="options"></div>
+        </div>
+
+        <div id="win-screen" style="display:none;">
+            <h2 style="font-size: 40px; color: var(--rbx-green);">GG! WINNER! 🏆</h2>
+            <p style="font-size: 20px; color: #555;">You mastered all 10 grammar stages!</p>
+            <button onclick="location.reload()" style="background: var(--rbx-green); border-bottom-color: #00a354;">PLAY AGAIN</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentIdx = 0;
+
+    // Данные на основе картинок (10 вопросов)
+    const missionData = [
+        { 
+            q: "Are you good students?", 
+            img: "https://www.edapt.org.uk/wp-content/uploads/2018/10/Behaviour.jpeg", 
+            options: ["Yes, I am.", "No, we aren't."], 
+            ans: "No, we aren't." 
+        },
+        { 
+            q: "Is your dad a farmer?", 
+            img: "https://i.pinimg.com/736x/33/95/5f/33955f085a732c2da90f3cca159f4f5a.jpg", 
+            options: ["Yes, she is.", "Yes, he is."], 
+            ans: "Yes, he is." 
+        },
+        { 
+            q: "How old is your town?", 
+            img: "https://i.pinimg.com/474x/8c/00/6a/8c006a90ed57b53f973c5f198424fada.jpg", 
+            options: ["Yes, it is.", "18."], 
+            ans: "18." 
+        },
+        { 
+            q: "Who is that lovely child?", 
+            img: "https://bcip.ru/images/tild6335-6664-4134-b961-643130633830__vyyavlenie-potrebnos.png", 
+            options: ["Their dog.", "Their sister."], 
+            ans: "Their sister." 
+        },
+        { 
+            q: "Are you home?", 
+            img: "https://cdn.vectorstock.com/i/1000v/42/78/cheerful-open-door-welcome-vector-12304278.jpg", 
+            options: ["Thank you!", "Come in!"], 
+            ans: "Come in!" 
+        },
+        { 
+            q: "_____ your friend?", 
+            img: "https://bcip.ru/images/tild6335-6664-4134-b961-643130633830__vyyavlenie-potrebnos.png", 
+            options: ["Who's", "What's"], 
+            ans: "Who's" 
+        },
+        { 
+            q: "_____ your mum's name?", 
+            img: "https://bcip.ru/images/tild6335-6664-4134-b961-643130633830__vyyavlenie-potrebnos.png", 
+            options: ["Who's", "What's"], 
+            ans: "What's" 
+        },
+        { 
+            q: "_____ his brother?", 
+            img: "https://bcip.ru/images/tild6335-6664-4134-b961-643130633830__vyyavlenie-potrebnos.png", 
+            options: ["What's", "Who's"], 
+            ans: "Who's" 
+        },
+        { 
+            q: "_____ are you?", 
+            img: "https://bcip.ru/images/tild6335-6664-4134-b961-643130633830__vyyavlenie-potrebnos.png", 
+            options: ["How old", "Where are"], 
+            ans: "How old" 
+        },
+        { 
+            q: "_____ is your town?", 
+            img: "https://i.pinimg.com/originals/ad/69/4a/ad694a8dd3e756a3baa6619c96617147.jpg?nii=t", 
+            options: ["Where", "How old"], 
+            ans: "Where" 
+        }
+    ];
+
+    function triggerSalute() {
+        const stage = document.getElementById('stage');
+        for(let i=0; i<15; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const colors = ['#00a2ff', '#00e676', '#ff5252'];
+            p.style.background = colors[Math.floor(Math.random()*3)];
+            p.style.left = '50%';
+            p.style.top = '40%';
+            p.style.setProperty('--x', (Math.random()-0.5)*500 + 'px');
+            p.style.setProperty('--y', (Math.random()-0.5)*500 + 'px');
+            stage.appendChild(p);
+            setTimeout(() => p.remove(), 700);
+        }
+    }
+
+    function loadQuestion() {
+        const data = missionData[currentIdx];
+        document.getElementById('q-num').innerText = currentIdx + 1;
+        document.getElementById('question-text').innerText = data.q;
+        document.getElementById('main-img').src = data.img;
+        document.getElementById('feedback').innerText = "";
+        
+        const optionsBox = document.getElementById('options');
+        optionsBox.innerHTML = "";
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            optionsBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, btn) {
+        const data = missionData[currentIdx];
+        const allBtns = document.querySelectorAll('#options button');
+        allBtns.forEach(b => b.disabled = true);
+
+        if(choice === data.ans) {
+            btn.style.background = "var(--rbx-green)";
+            btn.style.borderBottomColor = "#00a354";
+            document.getElementById('feedback').style.color = "var(--rbx-green)";
+            document.getElementById('feedback').innerText = "CLEARED! +10 ROBUX";
+            score += 10;
+            document.getElementById('score').innerText = score;
+            triggerSalute();
+            setTimeout(nextQuestion, 1000);
+        } else {
+            btn.style.background = "var(--rbx-red)";
+            btn.style.borderBottomColor = "#b33939";
+            document.getElementById('feedback').style.color = "var(--rbx-red)";
+            document.getElementById('feedback').innerText = "OOF! TRY AGAIN";
+            allBtns.forEach(b => {
+                if(b.innerText === data.ans) {
+                    b.style.background = "var(--rbx-green)";
+                    b.style.borderBottomColor = "#00a354";
+                }
+            });
+            setTimeout(nextQuestion, 2000);
+        }
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if(currentIdx < missionData.length) {
+            loadQuestion();
+        } else {
+            document.getElementById('game-content').style.display = "none";
+            document.getElementById('win-screen').style.display = "block";
+        }
+    }
+
+    // Запуск игры после загрузки страницы
+    window.onload = loadQuestion;
+</script>
+
+</body>
+</html>

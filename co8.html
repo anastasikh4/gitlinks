@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Master: Family & Friends</title>
+    <style>
+        :root { --primary: #6c5ce7; --success: #00b894; --error: #d63031; --bg: #f7f9fc; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; margin: 0; min-height: 100vh; align-items: center; }
+        
+        .quiz-container { 
+            background: white; 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            text-align: center; 
+            border-top: 6px solid var(--primary); 
+            min-height: 500px; 
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .progress-header { font-weight: bold; color: #b2bec3; text-transform: uppercase; margin-bottom: 15px; font-size: 0.9rem; letter-spacing: 1px;}
+        #q-title { color: #2d3436; margin-bottom: 20px; font-size: 1.4rem; line-height: 1.5; }
+        .visual-box { font-size: 3.5rem; margin: 10px 0 20px; min-height: 80px; }
+        
+        /* Game UI */
+        #game-ui {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .instruction {
+            color: #636e72;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .sentence-builder { 
+            border: 2px dashed #dfe6e9; 
+            background: #fafbfc;
+            border-radius: 12px;
+            min-height: 100px; 
+            margin: 20px 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            padding: 15px; 
+        }
+        .word-tag { 
+            background: var(--primary); 
+            color: white; 
+            padding: 10px 18px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            animation: pop 0.3s;
+            box-shadow: 0 3px 0 #4b3bb3;
+        }
+        
+        /* Buttons */
+        .btn-pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: auto; padding-top: 20px; }
+        .action-btn { 
+            background: #fff; 
+            padding: 12px 20px; 
+            border: 2px solid #dfe6e9; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 1.1rem; 
+            color: #2d3436;
+            box-shadow: 0 3px 0 #dfe6e9; 
+            transition: 0.1s;
+        }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        .action-btn:hover { background: #f1f2f6; }
+        
+        .feedback { margin-top: 20px; font-size: 1.5rem; font-weight: bold; min-height: 40px; }
+
+        /* Notebook Phase */
+        #notebook-phase {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            animation: fadeIn 0.5s;
+            background: #f0fdf4;
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid var(--success);
+        }
+        .notebook-icon { font-size: 4rem; margin-bottom: 10px; }
+        .notebook-title { font-size: 1.8rem; color: var(--success); font-weight: bold; margin-bottom: 15px; }
+        .notebook-text { 
+            font-size: 1.6rem; 
+            color: #2d3436; 
+            background: white; 
+            padding: 15px 25px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-left: 5px solid var(--success);
+            line-height: 1.4;
+        }
+        .btn-continue {
+            background: var(--success);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #008f72;
+            transition: 0.1s;
+        }
+        .btn-continue:active { transform: translateY(4px); box-shadow: none; }
+        
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Loading...</div>
+    <h2 id="q-title">Make up the sentence</h2>
+    <div id="visual-content" class="visual-box"></div>
+
+    <!-- Phase 1: Game -->
+    <div id="game-ui">
+        <div class="instruction">Click the words in the correct order to build the sentence.</div>
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+
+    <!-- Phase 2: Notebook Prompt -->
+    <div id="notebook-phase">
+        <div class="notebook-icon">📝</div>
+        <div class="notebook-title">Запиши в тетрадь</div>
+        <div class="notebook-text" id="notebook-sentence"></div>
+        <button class="btn-continue" onclick="nextStep()">Continue →</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let currentSentence = [];
+
+    const rawData = [
+        { 
+            type: 'unscramble', 
+            title: "Questions with 'To Be'", 
+            visual: "🎓❓", 
+            words: ["Are", "you", "good", "students?"], 
+            correct: "Are you good students?"
+        },
+        { 
+            type: 'unscramble', 
+            title: "Questions with 'To Be'", 
+            visual: "👨‍🌾❓", 
+            words: ["Is", "your", "dad", "a", "farmer?"], 
+            correct: "Is your dad a farmer?"
+        },
+        { 
+            type: 'unscramble', 
+            title: "Introducing People", 
+            visual: "👦👋", 
+            words: ["This", "is", "my", "friend."], 
+            correct: "This is my friend."
+        },
+        { 
+            type: 'unscramble', 
+            title: "Possessive 'His'", 
+            visual: "📛🧑", 
+            words: ["His", "name", "is", "Starlie."], 
+            correct: "His name is Starlie."
+        },
+        { 
+            type: 'unscramble', 
+            title: "Possessive 'Her'", 
+            visual: "👩🎤", 
+            words: ["Her", "mum", "is", "a", "singer."], 
+            correct: "Her mum is a singer."
+        },
+        { 
+            type: 'unscramble', 
+            title: "Plural 'To Be'", 
+            visual: "🎵😂", 
+            words: ["Her", "songs", "are", "very", "funny."], 
+            correct: "Her songs are very funny."
+        },
+        { 
+            type: 'unscramble', 
+            title: "Negative 'To Be'", 
+            visual: "👨‍👩‍👧‍👦🚫😢", 
+            words: ["They", "aren't", "sad."], 
+            correct: "They aren't sad."
+        },
+        { 
+            type: 'unscramble', 
+            title: "Positive 'To Be'", 
+            visual: "👨‍👩‍👧‍👦😄", 
+            words: ["They", "are", "happy."], 
+            correct: "They are happy."
+        }
+    ];
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if(!q) return;
+
+        // Reset UI
+        document.getElementById('game-ui').style.display = 'flex';
+        document.getElementById('notebook-phase').style.display = 'none';
+        document.getElementById('feedback').innerText = "";
+        
+        document.getElementById('progress').innerText = `Sentence ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('q-title').innerText = q.title;
+        document.getElementById('visual-content').innerHTML = q.visual;
+        
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = ""; 
+        pool.innerHTML = "";
+        currentSentence = [];
+
+        // Shuffle words
+        let items = [...q.words];
+        items.sort(() => Math.random() - 0.5);
+
+        items.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            
+            btn.onclick = () => {
+                btn.style.visibility = "hidden";
+                currentSentence.push(item);
+                builder.innerHTML += `<span class="word-tag">${item}</span>`;
+                
+                let currentStr = currentSentence.join(" ");
+                
+                if (currentStr === q.correct) {
+                    showNotebookPhase(q.correct);
+                } else if (currentSentence.length === q.words.length) {
+                    document.getElementById('feedback').innerHTML = "<span style='color:var(--error)'>❌ Order is wrong, try again!</span>";
+                    setTimeout(loadGame, 1500); 
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function showNotebookPhase(correctSentence) {
+        // Hide the game UI
+        document.getElementById('game-ui').style.display = 'none';
+        
+        // Populate and show the notebook phase with the English sentence
+        document.getElementById('notebook-sentence').innerText = correctSentence;
+        document.getElementById('notebook-phase').style.display = 'flex';
+        document.getElementById('progress').innerText = "Success!";
+    }
+
+    function nextStep() {
+        currentStep++;
+        if (currentStep < rawData.length) {
+            loadGame();
+        } else {
+            showFinal();
+        }
+    }
+
+    function showFinal() {
+        document.querySelector('.quiz-container').innerHTML = `
+            <h1 style="color:#6c5ce7; font-size: 4rem;">🏆</h1>
+            <h2 style="color:#00b894; font-size: 2rem;">Grammar Master!</h2>
+            <p style="font-size:1.2rem; color:#636e72; margin-bottom: 30px;">
+                Excellent! You built and wrote down all the sentences perfectly!
+            </p>
+            <button onclick="location.reload()" style="padding:15px 40px; font-size:1.2rem; background:#6c5ce7; color:white; border:none; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow: 0 4px 0 #4b3bb3;">
+                Play Again
+            </button>
+        `;
+    }
+
+    loadGame();
+</script>
+</body>
+</html>

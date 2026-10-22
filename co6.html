@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Phonetic Step-by-Step</title>
+    <style>
+        :root {
+            --primary-purple: #7c4dff;
+            --light-purple: #ede7f6;
+            --bg-color: #e8eaf6;
+            
+            /* Phonetic Colors */
+            --sound-yellow: #ffeb3b;
+            --sound-green: #81c784;
+            --sound-pink: #f48fb1;
+        }
+        body { 
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif; 
+            background: var(--bg-color); 
+            text-align: center; color: #311b92; margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .game-container { 
+            max-width: 750px; margin: 0 auto; padding: 25px; background: white; 
+            border-radius: 30px; border: 6px solid var(--primary-purple); position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); z-index: 2;
+        }
+        .level { display: none; }
+        .active { display: block; }
+        
+        /* Phase Instruction */
+        .phase-instruction {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            background: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+            transition: 0.3s;
+        }
+
+        /* Paint Tools (Progress indicators) */
+        .paint-tools {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .paint-btn {
+            padding: 12px 20px;
+            border: 4px solid #ccc;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-family: inherit;
+            opacity: 0.5; /* Disabled look */
+            cursor: not-allowed;
+            transition: 0.3s;
+        }
+        
+        .paint-btn.active {
+            opacity: 1;
+            border-color: #333;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            cursor: default;
+        }
+        .paint-btn.completed {
+            opacity: 1;
+            border-color: #4caf50;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234caf50"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 5px center;
+            background-size: 20px;
+            padding-right: 35px;
+        }
+        
+        .btn-yellow { background-color: var(--sound-yellow); }
+        .btn-green { background-color: var(--sound-green); }
+        .btn-pink { background-color: var(--sound-pink); }
+
+        /* Reading Text Styling */
+        .text-display { 
+            font-size: 1.4em; 
+            line-height: 2.2; 
+            margin: 15px 0; 
+            padding: 25px; 
+            background: #fafafa; 
+            border-radius: 15px; 
+            border: 2px dashed var(--primary-purple);
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        /* Interactive Words */
+        .clickable-word {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transition: 0.2s;
+            display: inline-block;
+            border: 2px solid transparent;
+        }
+        .clickable-word:hover { background: #e0e0e0; }
+        
+        .clickable-word.correct-yellow { background-color: var(--sound-yellow); color: #333; font-weight: bold; pointer-events: none; }
+        .clickable-word.correct-green { background-color: var(--sound-green); color: #1b5e20; font-weight: bold; pointer-events: none; }
+        .clickable-word.correct-pink { background-color: var(--sound-pink); color: #880e4f; font-weight: bold; pointer-events: none; }
+        
+        .clickable-word.wrong-flash {
+            animation: shake 0.4s;
+            background-color: #ffcdd2;
+        }
+
+        /* Level 2 Specific */
+        .completed-text-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #1b5e20;
+            text-align: center;
+        }
+
+        .options-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .btn-option { 
+            padding: 12px 25px; font-size: 1.1em; cursor: pointer; 
+            color: white; border: none; border-radius: 12px; transition: 0.2s;
+            font-family: inherit; font-weight: bold;
+            background: var(--primary-purple);
+            box-shadow: 0 4px 0 #512da8;
+        }
+        .btn-option:hover { transform: scale(1.05); }
+        .btn-option:active { transform: translateY(4px); box-shadow: none; }
+        .btn-option:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none;}
+        
+        .feedback { font-weight: bold; height: 30px; margin-top: 15px; font-size: 1.2em; }
+        #score-board { font-size: 1.1em; background: var(--light-purple); padding: 10px 20px; border-radius: 20px; border: 2px solid var(--primary-purple); margin-bottom: 20px; display: inline-block; }
+
+        /* SALUTE ANIMATION */
+        .salute {
+            position: absolute; width: 10px; height: 10px; background: gold;
+            border-radius: 50%; pointer-events: none; z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🎨 Starlight Phonetics 🎨</h1>
+    <div id="score-board">Level: <span id="current-level">1</span> | Score: <span id="score">0</span></div>
+
+    <!-- LEVEL 1: Phonetic Coloring -->
+    <div id="level1" class="level active">
+        <div class="phase-instruction" id="phase-text">Step 1: Find and click all YELLOW words ([ɒ] sound).</div>
+        
+        <div class="paint-tools">
+            <button class="paint-btn btn-yellow active" id="btn-yellow">[ɒ] Yellow</button>
+            <button class="paint-btn btn-green" id="btn-green">[æ] Green</button>
+            <button class="paint-btn btn-pink" id="btn-pink">[ə] Pink</button>
+        </div>
+
+        <div id="l1-text" class="text-display">
+            <!-- Text will be injected by JS -->
+        </div>
+        
+        <div id="l1-feedback" class="feedback"></div>
+        <button id="next-l1-btn" class="btn-option" style="display:none; margin-top: 20px;" onclick="nextLevel()">Next Level ➡️</button>
+    </div>
+
+    <!-- LEVEL 2: Grammar & Comprehension -->
+    <div id="level2" class="level">
+        <h3>Exercise 2: Read and complete the sentences.</h3>
+        
+        <div class="completed-text-box">
+            Jack and Tom are brothers. Jack is a doctor. Tom is a farmer on the farm. Jack has got a black cat. Tom has got a box with sand. The brothers sing.
+        </div>
+
+        <div id="l2-question" class="text-display" style="text-align: center; font-weight: bold; font-size: 1.5em; padding: 15px; border: none; background: none;"></div>
+        <div id="l2-options" class="options-row"></div>
+        <div id="l2-feedback" class="feedback"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="level">
+        <h2 style="font-size: 2.5em; color: var(--primary-purple);">🌟 STAR STUDENT! 🌟</h2>
+        <p style="font-size: 1.2em;">You finished all the exercises!</p>
+        <button onclick="location.reload()" style="background: var(--primary-purple); color: white; padding: 15px 30px; border-radius: 10px; border: none; font-weight: bold; font-size: 1.2em; cursor: pointer; margin-top: 20px;">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let currentLvl = 1;
+    
+    // Sequential Game State
+    let currentPhase = 'yellow';
+    let yellowRemaining = 0;
+    let greenRemaining = 0;
+    let pinkRemaining = 0;
+
+    // --- LEVEL 1 DATA ---
+    // Updated: Pink is ONLY brothers, the/The, farmer. Others are 'none'.
+    const textWords = [
+        { text: "Jack", sound: "green" }, { text: "and", sound: "green" }, { text: "Tom", sound: "yellow" }, 
+        { text: "are", sound: "none" }, { text: "brothers", sound: "pink" }, { text: ". ", sound: "none" },
+        { text: "Jack", sound: "green" }, { text: "is", sound: "none" }, { text: "a", sound: "green" }, 
+        { text: "doctor", sound: "yellow" }, { text: ". ", sound: "none" },
+        { text: "Tom", sound: "yellow" }, { text: "is", sound: "none" }, { text: "a", sound: "green" }, 
+        { text: "farmer", sound: "pink" }, { text: "on", sound: "yellow" }, { text: "the", sound: "pink" }, 
+        { text: "farm", sound: "none" }, { text: ". ", sound: "none" },
+        { text: "Jack", sound: "green" }, { text: "has", sound: "green" }, { text: "got", sound: "yellow" }, 
+        { text: "a", sound: "green" }, { text: "black", sound: "green" }, { text: "cat", sound: "green" }, 
+        { text: ". ", sound: "none" },
+        { text: "Tom", sound: "yellow" }, { text: "has", sound: "green" }, { text: "got", sound: "yellow" }, 
+        { text: "a", sound: "green" }, { text: "box", sound: "yellow" }, { text: "with", sound: "none" }, 
+        { text: "sand", sound: "green" }, { text: ". ", sound: "none" },
+        { text: "The", sound: "pink" }, { text: "brothers", sound: "pink" }, { text: "sing", sound: "none" }, 
+        { text: ". ", sound: "none" }
+    ];
+
+    // --- LEVEL 2 DATA ---
+    const l2Data = [
+        { q: "Jack is a ___.", correct: "doctor", options: ["farmer", "doctor", "fireman"] },
+        { q: "Tom is a ___.", correct: "farmer", options: ["doctor", "teacher", "farmer"] },
+        { q: "Jack has got a black ___.", correct: "cat", options: ["dog", "cat", "box"] }
+    ];
+    let l2Index = 0;
+
+    // SALUTE EFFECT FUNCTION
+    function triggerSalute() {
+        const box = document.getElementById('main-box');
+        for (let i = 0; i < 10; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * 600;
+            const y = Math.random() * 300;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 150 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 150 + 'px');
+            part.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // --- LEVEL 1 LOGIC ---
+    function initLevel1() {
+        renderL1Text();
+        updateScore();
+        
+        // Count words per category
+        textWords.forEach(w => {
+            if (w.sound === 'yellow') yellowRemaining++;
+            if (w.sound === 'green') greenRemaining++;
+            if (w.sound === 'pink') pinkRemaining++;
+        });
+        
+        updatePhaseUI();
+    }
+
+    function renderL1Text() {
+        const textContainer = document.getElementById('l1-text');
+        let html = "";
+        
+        textWords.forEach(w => {
+            if (w.sound === 'none') {
+                html += w.text;
+            } else {
+                html += `<span class="clickable-word" data-sound="${w.sound}" onclick="checkWord(this)">${w.text}</span>${w.text === '. ' ? '' : ' '}`;
+            }
+        });
+        // Fix spacing before periods
+        html = html.replace(/ \. /g, '. ');
+
+        textContainer.innerHTML = html;
+    }
+
+    function checkWord(element) {
+        const wordSound = element.getAttribute('data-sound');
+        const feedback = document.getElementById('l1-feedback');
+        
+        if (wordSound === currentPhase) {
+            // Correct
+            element.classList.add('correct-' + wordSound);
+            element.onclick = null; // Disable further clicks
+            score += 10;
+            updateScore();
+            triggerSalute();
+            feedback.innerText = "";
+            
+            // Decrease counter
+            if (currentPhase === 'yellow') yellowRemaining--;
+            if (currentPhase === 'green') greenRemaining--;
+            if (currentPhase === 'pink') pinkRemaining--;
+            
+            checkPhaseCompletion();
+            
+        } else {
+            // Wrong
+            element.classList.add('wrong-flash');
+            setTimeout(() => element.classList.remove('wrong-flash'), 500);
+            feedback.innerText = `Oops! Look for ${currentPhase.toUpperCase()} words right now. ❌`;
+            feedback.style.color = "#c62828";
+        }
+    }
+
+    function checkPhaseCompletion() {
+        const phaseText = document.getElementById('phase-text');
+        
+        if (currentPhase === 'yellow' && yellowRemaining === 0) {
+            currentPhase = 'green';
+            document.getElementById('btn-yellow').classList.replace('active', 'completed');
+            document.getElementById('btn-green').classList.add('active');
+            phaseText.innerText = "Great! Now Step 2: Find all GREEN words ([æ] sound).";
+            phaseText.style.color = "#2e7d32";
+            triggerSalute();
+            
+        } else if (currentPhase === 'green' && greenRemaining === 0) {
+            currentPhase = 'pink';
+            document.getElementById('btn-green').classList.replace('active', 'completed');
+            document.getElementById('btn-pink').classList.add('active');
+            phaseText.innerText = "Awesome! Final Step: Find all PINK words ([ə] sound).";
+            phaseText.style.color = "#c2185b";
+            triggerSalute();
+            
+        } else if (currentPhase === 'pink' && pinkRemaining === 0) {
+            document.getElementById('btn-pink').classList.replace('active', 'completed');
+            phaseText.innerText = "Amazing! You colored all the words! 🎉";
+            phaseText.style.color = "#2e7d32";
+            phaseText.style.borderColor = "#4caf50";
+            document.getElementById('next-l1-btn').style.display = "inline-block";
+            triggerSalute();
+        }
+    }
+
+    // --- LEVEL 2 LOGIC ---
+    function initLevel2() {
+        if (l2Index >= l2Data.length) return showWin();
+        
+        const currentTask = l2Data[l2Index];
+        document.getElementById('l2-question').innerText = currentTask.q;
+        
+        const optionsContainer = document.getElementById('l2-options');
+        optionsContainer.innerHTML = "";
+        currentTask.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkL2(opt, btn);
+            optionsContainer.appendChild(btn);
+        });
+        
+        document.getElementById('l2-feedback').innerText = "";
+        updateScore();
+    }
+
+    function checkL2(choice, btn) {
+        const feed = document.getElementById('l2-feedback');
+        const currentTask = l2Data[l2Index];
+        
+        if (choice === currentTask.correct) {
+            score += 10; 
+            feed.innerText = "Correct! ✅"; 
+            feed.style.color = "#2e7d32";
+            triggerSalute();
+            
+            document.querySelectorAll('#l2-options button').forEach(b => b.disabled = true);
+            btn.style.background = "#4caf50";
+            
+            l2Index++;
+            setTimeout(initLevel2, 1200);
+        } else {
+            feed.innerText = "Try again! ❌";
+            feed.style.color = "#c62828";
+            btn.style.background = "#f44336";
+        }
+    }
+
+    function updateScore() { 
+        document.getElementById('score').innerText = score; 
+    }
+
+    function nextLevel() {
+        document.getElementById(`level${currentLvl}`).classList.remove('active');
+        currentLvl++; 
+        document.getElementById('current-level').innerText = currentLvl;
+        
+        if (currentLvl === 2) initLevel2();
+        
+        document.getElementById(`level${currentLvl}`).classList.add('active');
+    }
+
+    function showWin() {
+        document.getElementById('level2').classList.remove('active');
+        document.getElementById('win-screen').classList.add('active');
+        for(let i=0; i<5; i++) setTimeout(triggerSalute, i*300);
+    }
+
+    // Start the game
+    initLevel1();
+</script>
+</body>
+</html>

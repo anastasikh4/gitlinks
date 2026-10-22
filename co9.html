@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Master: Verb 'To Be'</title>
+    <style>
+        :root { --primary: #0984e3; --success: #00b894; --error: #d63031; --bg: #fdfdfd; --prompt-bg: #f1f2f6; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .quiz-container { background: white; width: 100%; max-width: 800px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border: 2px solid #e2e8f0; min-height: 600px; }
+        
+        .progress-header { font-weight: bold; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px; font-size: 0.9rem; }
+        h2 { color: #1e293b; font-size: 1.5rem; margin-bottom: 20px; }
+        
+        /* Prompt display like the textbook */
+        .prompt-box { background: var(--prompt-bg); padding: 15px; border-radius: 10px; font-size: 1.2rem; font-weight: bold; color: #475569; margin-bottom: 20px; border-left: 5px solid var(--primary); text-align: left;}
+        .prompt-box span { color: var(--primary); font-family: monospace; }
+        
+        .visual-box { font-size: 3.5rem; margin: 20px 0; display: flex; justify-content: center; gap: 20px; align-items: center; min-height: 100px; }
+        
+        /* Sentence Builder UI */
+        .sentence-builder { border-bottom: 3px dashed #cbd5e1; min-height: 80px; margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px; }
+        .word-tag { background: var(--primary); color: white; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 1.2rem; animation: pop 0.3s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        /* Buttons */
+        .btn-pool { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+        .action-btn { background: #fff; padding: 12px 20px; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 0 #cbd5e1; transition: 0.1s; color: #334155;}
+        .action-btn:hover { background: #f8fafc; }
+        .action-btn:active { transform: translateY(3px); box-shadow: none; }
+        .action-btn:disabled { visibility: hidden; }
+        
+        .feedback { margin-top: 20px; font-size: 1.5rem; font-weight: bold; min-height: 50px; }
+        @keyframes pop { 0% { transform: scale(0.8); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div id="progress" class="progress-header">Loading...</div>
+    
+    <div id="prompt-area"></div>
+    <div id="visual-content" class="visual-box"></div>
+
+    <div id="game-ui">
+        <div class="sentence-builder" id="builder"></div>
+        <div id="pool" class="btn-pool"></div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    let currentStep = 0;
+    let currentSentence = [];
+
+    const rawData = [
+        // A) my dad/a/careful/driver.
+        { 
+            title: "Make up the sentence!", 
+            prompt: "my dad / a / careful / driver.", 
+            visual: "👨 + 🚗", 
+            words: ["My", "dad", "is", "a", "careful", "driver."], 
+            correct: "My dad is a careful driver." 
+        },
+        // B) your friends/funny?
+        { 
+            title: "Make up the sentence!", 
+            prompt: "your friends / funny?", 
+            visual: "👫 + 😂", 
+            words: ["Are", "your", "friends", "funny?"], 
+            correct: "Are your friends funny?" 
+        },
+        // C) that girl/not/my sister.
+        { 
+            title: "Make up the sentence!", 
+            prompt: "that girl / not / my sister.", 
+            visual: "👧 + 🙅‍♀️", 
+            words: ["That", "girl", "is", "not", "my", "sister."], 
+            correct: "That girl is not my sister." 
+        },
+        // D) you/a student?
+        { 
+            title: "Make up the sentence!", 
+            prompt: "you / a student?", 
+            visual: "🧑‍🎓 + ❓", 
+            words: ["Are", "you", "a", "student?"], 
+            correct: "Are you a student?" 
+        },
+        // E) how old/you?
+        { 
+            title: "Make up the sentence!", 
+            prompt: "how old / you?", 
+            visual: "🎂 + ❓", 
+            words: ["How", "old", "are", "you?"], 
+            correct: "How old are you?" 
+        }
+    ];
+
+    function loadGame() {
+        const q = rawData[currentStep];
+        if(!q) return;
+
+        document.getElementById('progress').innerText = `Step ${currentStep + 1} of ${rawData.length}`;
+        document.getElementById('feedback').innerText = "";
+        
+        // Display the prompt
+        document.getElementById('prompt-area').innerHTML = `
+            <div class="prompt-box">
+                <strong>e.g. we/friends &rarr; We are friends.</strong><br><br>
+                <span>${q.prompt}</span>
+            </div>
+            <h2>${q.title}</h2>
+        `;
+        
+        document.getElementById('visual-content').innerHTML = q.visual;
+        
+        const builder = document.getElementById('builder');
+        const pool = document.getElementById('pool');
+        builder.innerHTML = ""; pool.innerHTML = "";
+        currentSentence = [];
+
+        // Shuffle the words for the pool
+        [...q.words].sort(() => Math.random() - 0.5).forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = "action-btn";
+            btn.innerText = item;
+            btn.onclick = () => {
+                btn.disabled = true;
+                currentSentence.push(item);
+                builder.innerHTML += `<span class="word-tag">${item}</span>`;
+                
+                let current = currentSentence.join(" ");
+                let target = q.correct;
+                
+                // Check for exact match
+                if (current === target) {
+                    nextStep();
+                } 
+                // Check if sentence length is exceeded without matching
+                else if (currentSentence.length >= q.words.length) {
+                    document.getElementById('feedback').innerHTML = "<span style='color:var(--error)'>❌ Try again!</span>";
+                    setTimeout(loadGame, 1500);
+                }
+            };
+            pool.appendChild(btn);
+        });
+    }
+
+    function nextStep() {
+        document.getElementById('feedback').innerHTML = "<span style='color:var(--success)'>🌟 PERFECT! 🌟</span>";
+        setTimeout(() => {
+            currentStep++;
+            if (currentStep < rawData.length) {
+                loadGame();
+            } else {
+                document.getElementById('prompt-area').innerHTML = "";
+                document.getElementById('visual-content').innerHTML = "🏆";
+                document.getElementById('progress').innerText = "Completed!";
+                document.getElementById('game-ui').innerHTML = "<h2>Excellent! You mastered the verb 'To Be'!</h2>";
+                document.getElementById('feedback').innerHTML = "<button class='action-btn' style='background:var(--success); color:white; border-color:#00a354;' onclick='location.reload()'>PLAY AGAIN</button>";
+            }
+        }, 1200);
+    }
+
+    loadGame();
+</script>
+</body>
+</html>
