@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Racing Rules Data Scan Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #ef4444;
+            --primary-green: #10b981;
+            --bg-light: #f8fafc;
+            --panel-bg: #ffffff;
+            --text-dark: #334155;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --gold: #f59e0b;
+        }
+        
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark); 
+            padding: 20px; 
+            margin: 0;
+        }
+
+        .hud-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            border: 2px solid var(--border-color); 
+            background: var(--panel-bg); 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+        
+        /* Progress Bar */
+        .progress-container { 
+            background: var(--border-color); 
+            height: 16px; 
+            margin-bottom: 30px; 
+            border-radius: 8px; 
+            overflow: hidden; 
+        }
+        #progress-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: var(--primary-green); 
+            transition: 0.5s ease; 
+            border-radius: 8px;
+        }
+
+        h1 { 
+            font-family: 'Press Start 2P', cursive; 
+            color: var(--primary-red); 
+            font-size: 1.1rem; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            line-height: 1.5; 
+        }
+
+        .mission-panel { 
+            border: 2px solid var(--border-color); 
+            margin-bottom: 25px; 
+            padding: 20px; 
+            border-radius: 12px; 
+            background: #f1f5f9; 
+        }
+
+        .mission-img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border: 2px solid var(--border-color); 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+        }
+
+        .question-block { 
+            margin-bottom: 20px; 
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .question-block:last-child { margin-bottom: 0; }
+        
+        .question-text { 
+            font-weight: 700; 
+            margin-bottom: 12px; 
+            color: var(--text-dark); 
+            font-size: 1rem; 
+        }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+        }
+        
+        .opt-btn {
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-bottom: 4px solid var(--border-color);
+            color: var(--text-dark);
+            padding: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.1s;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+
+        .opt-btn:hover:not(.disabled) { 
+            background: var(--bg-light); 
+            border-color: #cbd5e1; 
+        }
+        
+        .opt-btn:active:not(.disabled) {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .opt-btn.correct { 
+            background: #d1fae5 !important; 
+            color: #065f46 !important; 
+            font-weight: bold; 
+            border-color: var(--primary-green) !important; 
+            border-bottom-color: #047857 !important;
+        }
+        
+        .opt-btn.incorrect { 
+            background: #fee2e2 !important; 
+            color: #991b1b !important; 
+            border-color: var(--primary-red) !important; 
+            border-bottom-color: #b91c1c !important;
+            animation: shake 0.3s; 
+        }
+        
+        .disabled { pointer-events: none; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        .badge-slot { 
+            text-align: center; 
+            font-family: 'Press Start 2P'; 
+            font-size: 0.8rem; 
+            color: var(--gold); 
+            margin-top: 30px; 
+            letter-spacing: 1px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="hud-container">
+    <h1>[ MISSION: RACE TRACK DATA SCAN ]</h1>
+
+    <div class="progress-container">
+        <div id="progress-fill"></div>
+    </div>
+
+    <!-- MISSION 1: SUNSET SCENE -->
+    <div class="mission-panel">
+        <img src="https://avatars.mds.yandex.net/i?id=3add002a249d5b757fe4870b43849036_l-4722903-images-thumbs&n=13" class="mission-img" alt="Sunset Track">
+        <div class="question-block">
+            <p class="question-text">1. The sun is very ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 1)">A) bright</button>
+                <button class="opt-btn" onclick="check(this, false, 1)">B) dark</button>
+            </div>
+        </div>
+        <div class="question-block">
+            <p class="question-text">2. The car is driving ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 2)">A) safe</button>
+                <button class="opt-btn" onclick="check(this, true, 2)">B) dangerous</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION 2: DRIVER STEERING -->
+    <div class="mission-panel">
+        <img src="https://cdn-icons-png.flaticon.com/512/10981/10981230.png" class="mission-img" alt="Driver">
+        <div class="question-block">
+            <p class="question-text">3. He may turn ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 3)">A) right</button>
+                <button class="opt-btn" onclick="check(this, false, 3)">B) left</button>
+            </div>
+        </div>
+        <div class="question-block">
+            <p class="question-text">4. It's dangerous to turn ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, false, 4)">A) right</button>
+                <button class="opt-btn" onclick="check(this, true, 4)">B) left</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION 3: PIT LANE -->
+    <div class="mission-panel">
+        <img src="https://avatars.mds.yandex.net/i?id=71f059477de88d5159bfdab21fedd0466048d567-6379389-images-thumbs&n=13" class="mission-img" alt="Pit Lane">
+        <div class="question-block">
+            <p class="question-text">5. He is not on the road, but he is on the ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 5)">A) road pavement</button>
+                <button class="opt-btn" onclick="check(this, false, 5)">B) grass</button>
+            </div>
+        </div>
+        <div class="question-block">
+            <p class="question-text">6. It's safe to walk ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 6)">A) here</button>
+                <button class="opt-btn" onclick="check(this, false, 6)">B) on the track</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISSION 4: TRACK RULES -->
+    <div class="mission-panel">
+        <img src="https://f1.f-e-n.net/images/f1/2015/20150619/ferrari_hires/150016-aus.jpg" class="mission-img" alt="Track Rules">
+        <div class="question-block">
+            <p class="question-text">7. It is safe to drive straight ____.</p>
+            <div class="options-grid">
+                <button class="opt-btn" onclick="check(this, true, 7)">A) behind trees</button>
+                <button class="opt-btn" onclick="check(this, false, 7)">B) in front of the trees</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="badge-slot">STATUS: <span id="rank">INITIATE</span></div>
+</div>
+
+<script>
+    let correctCount = 0;
+    const answeredQuestions = new Set();
+
+    function check(btn, isCorrect, qId) {
+        const parent = btn.parentElement;
+        const buttons = parent.querySelectorAll('.opt-btn');
+        
+        if (isCorrect) {
+            btn.classList.add('correct');
+            buttons.forEach(b => b.classList.add('disabled'));
+            if (!answeredQuestions.has(qId)) {
+                answeredQuestions.add(qId);
+                correctCount++;
+                updateProgress();
+            }
+        } else {
+            btn.classList.add('incorrect');
+            setTimeout(() => {
+                btn.classList.remove('incorrect');
+            }, 500);
+        }
+    }
+
+    function updateProgress() {
+        const progress = (correctCount / 7) * 100;
+        document.getElementById('progress-fill').style.width = progress + "%";
+        
+        if (correctCount === 7) {
+            document.getElementById('rank').innerText = "ELITE COMMANDER";
+        } else if (correctCount >= 4) {
+            document.getElementById('rank').innerText = "VETERAN AGENT";
+        }
+    }
+</script>
+
+</body>
+</html>

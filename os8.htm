@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Grand Prix: Grammar Trial</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --racing-red: #e63946;
+            --racing-red-dark: #b02a37;
+            --racing-blue: #4a90d9;
+            --racing-blue-light: #7ab3e8;
+            --racing-cream: #fff8f0;
+            --racing-yellow: #ffd166;
+            --text-dark: #2d3748;
+            --text-mid: #4a5568;
+            --correct-green: #38a169;
+            --correct-green-light: #c6f6d5;
+            --wrong-red: #e53e3e;
+            --wrong-red-light: #fed7d7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe8d6 100%);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(230, 57, 70, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 85%, rgba(74, 144, 217, 0.08) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(230, 57, 70, 0.03) 0px, rgba(230, 57, 70, 0.03) 15px, transparent 15px, transparent 30px);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 520px;
+            background: #ffffff;
+            border: 3px solid var(--racing-red);
+            border-radius: 25px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15), 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        /* ===== HEADER ===== */
+        .header-ui {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            gap: 10px;
+        }
+
+        .rank-badge {
+            font-family: 'Rubik Mono One', sans-serif;
+            background: linear-gradient(135deg, var(--racing-red) 0%, #ff6b6b 100%);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 13px;
+            box-shadow: 0 4px 0 var(--racing-red-dark);
+            min-width: 100px;
+            text-align: center;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+
+        .hp-bar-outer {
+            flex-grow: 1;
+            height: 18px;
+            background-color: #f0e6dc;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #e8d5c4;
+        }
+
+        .hp-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--racing-blue) 0%, var(--racing-blue-light) 100%);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        #tracker {
+            font-weight: 700;
+            color: var(--text-mid);
+            font-size: 14px;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        /* ===== HEADINGS ===== */
+        h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 22px;
+            color: var(--racing-red);
+            margin: 0 0 8px 0;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .instruction {
+            font-size: 15px;
+            color: var(--text-mid);
+            text-align: center;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        /* ===== TASK BLOCKS ===== */
+        .task-block {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .task-block.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .visual-prompt {
+            background: linear-gradient(135deg, #fff5eb 0%, #ffe8d6 100%);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 19px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px dashed var(--racing-red);
+            line-height: 1.6;
+            color: var(--text-dark);
+        }
+
+        .visual-prompt span {
+            color: var(--racing-red);
+            text-decoration: underline;
+            text-decoration-thickness: 3px;
+            text-underline-offset: 4px;
+            font-weight: 700;
+        }
+
+        /* ===== CHOICE CARDS ===== */
+        .choices-stack {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .choice-card {
+            background: #ffffff;
+            border: 2px solid #e0d5c8;
+            border-radius: 15px;
+            padding: 15px 20px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            color: var(--text-dark);
+            box-shadow: 0 4px 0 #d4c8bc;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .choice-card:hover:not(.disabled) {
+            border-color: var(--racing-blue);
+            background-color: #f0f7ff;
+            box-shadow: 0 4px 0 var(--racing-blue-light);
+            transform: translateY(-2px);
+        }
+
+        .choice-card.correct {
+            background: var(--correct-green-light) !important;
+            border-color: var(--correct-green) !important;
+            color: #22543d !important;
+            box-shadow: 0 4px 0 var(--correct-green) !important;
+            font-weight: 700;
+        }
+
+        .choice-card.wrong {
+            background: var(--wrong-red-light) !important;
+            border-color: var(--wrong-red) !important;
+            color: #742a2a !important;
+            box-shadow: 0 4px 0 var(--wrong-red) !important;
+            font-weight: 700;
+        }
+
+        .choice-card.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert-panel {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: none;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .alert-panel.correct {
+            display: block;
+            background: var(--correct-green-light);
+            color: #22543d;
+            border: 2px solid var(--correct-green);
+        }
+
+        .alert-panel.wrong {
+            display: block;
+            background: var(--wrong-red-light);
+            color: #742a2a;
+            border: 2px solid var(--wrong-red);
+        }
+
+        /* ===== BUTTONS ===== */
+        .trigger-btn {
+            width: 100%;
+            background: linear-gradient(180deg, var(--racing-red) 0%, var(--racing-red-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #7a1a24;
+            margin-top: 15px;
+            transition: all 0.1s;
+            letter-spacing: 1.5px;
+            display: none;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .trigger-btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 0 #7a1a24;
+        }
+
+        .trigger-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #7a1a24;
+        }
+
+        /* ===== END VIEW ===== */
+        #end-view {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        #end-view h2 {
+            font-size: 24px;
+            color: var(--racing-red);
+            margin-bottom: 12px;
+            letter-spacing: 1.5px;
+        }
+
+        .rank-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--racing-red) 0%, #ff6b6b 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            font-weight: 900;
+            margin: 20px auto;
+            box-shadow: 0 10px 25px rgba(230, 57, 70, 0.3);
+            font-family: 'Rubik Mono One', sans-serif;
+            border: 4px solid #fff;
+            position: relative;
+        }
+
+        .rank-circle::before {
+            content: '🏆';
+            position: absolute;
+            top: -22px;
+            font-size: 30px;
+        }
+
+        .final-score {
+            font-size: 16px;
+            color: var(--text-mid);
+            margin: 15px 0 25px;
+            line-height: 1.6;
+            font-weight: 600;
+            padding: 0 10px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 450px) {
+            .game-container {
+                padding: 16px;
+            }
+            .visual-prompt {
+                font-size: 17px;
+                padding: 14px;
+            }
+            .choice-card {
+                font-size: 15px;
+                padding: 12px 14px;
+            }
+            .rank-badge {
+                font-size: 11px;
+                padding: 5px 8px;
+                min-width: 80px;
+            }
+            h2 {
+                font-size: 19px;
+            }
+            .rank-circle {
+                width: 100px;
+                height: 100px;
+                font-size: 42px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <!-- HEADER STATS -->
+        <div class="header-ui">
+            <span class="rank-badge" id="rank-display">RANK: D</span>
+            <div class="hp-bar-outer">
+                <div class="hp-bar-inner" id="hp-progress"></div>
+            </div>
+            <span id="tracker">1/8</span>
+        </div>
+
+        <!-- COMBAT WINDOW -->
+        <div id="combat-window">
+
+            <!-- ===== STAGE 1: Seatbelt ===== -->
+            <div class="task-block active" id="stage-1" data-ans="a seat belt inside">
+                <h2>🏁 Safety First</h2>
+                <div class="instruction">Choose the correct phrase:</div>
+                <div class="visual-prompt">
+                    "Always wear <span>_____</span> when driving."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'a seat belt inside')">a seat belt inside</div>
+                    <div class="choice-card" onclick="selectOption(this, 'fast when')">fast when</div>
+                    <div class="choice-card" onclick="selectOption(this, 'the radio if')">the radio if</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 2: Speed Limit ===== -->
+            <div class="task-block" id="stage-2" data-ans="fast when">
+                <h2>🏎️ Speed Limits</h2>
+                <div class="instruction">Complete the rule:</div>
+                <div class="visual-prompt">
+                    "Don't drive <span>_____</span> it's dangerous."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'fast when')">fast when</div>
+                    <div class="choice-card" onclick="selectOption(this, 'a seat belt inside')">a seat belt inside</div>
+                    <div class="choice-card" onclick="selectOption(this, 'at the traffic warden')">at the traffic warden</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 3: Pit Lane ===== -->
+            <div class="task-block" id="stage-3" data-ans="zone when">
+                <h2>🅿️ Pit Lane</h2>
+                <div class="instruction">Choose the correct phrase:</div>
+                <div class="visual-prompt">
+                    "Stop at the parking <span>_____</span> it's finish time."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'zone when')">zone when</div>
+                    <div class="choice-card" onclick="selectOption(this, 'fast when')">fast when</div>
+                    <div class="choice-card" onclick="selectOption(this, 'bright')">bright</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 4: Traffic Warden ===== -->
+            <div class="task-block" id="stage-4" data-ans="at the traffic warden">
+                <h2>🚦 Traffic Warden</h2>
+                <div class="instruction">Choose the correct phrase:</div>
+                <div class="visual-prompt">
+                    "Always look <span>_____</span> when you are on the road."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'at the traffic warden')">at the traffic warden</div>
+                    <div class="choice-card" onclick="selectOption(this, 'a seat belt inside')">a seat belt inside</div>
+                    <div class="choice-card" onclick="selectOption(this, 'the radio if')">the radio if</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 5: Sunset ===== -->
+            <div class="task-block" id="stage-5" data-ans="bright">
+                <h2>🌅 Sunset</h2>
+                <div class="instruction">Choose the correct word:</div>
+                <div class="visual-prompt">
+                    "The sun is very <span>_____</span>."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'bright')">bright</div>
+                    <div class="choice-card" onclick="selectOption(this, 'dark')">dark</div>
+                    <div class="choice-card" onclick="selectOption(this, 'safe')">safe</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 6: Turning ===== -->
+            <div class="task-block" id="stage-6" data-ans="right">
+                <h2>↩️ Turning</h2>
+                <div class="instruction">Choose the correct direction:</div>
+                <div class="visual-prompt">
+                    "He may turn <span>_____</span>."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'right')">right</div>
+                    <div class="choice-card" onclick="selectOption(this, 'left')">down</div>
+                    <div class="choice-card" onclick="selectOption(this, 'straight')">straight</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 7: Walking Zone ===== -->
+            <div class="task-block" id="stage-7" data-ans="pavement">
+                <h2>🚶 Walking Zone</h2>
+                <div class="instruction">Choose the correct place:</div>
+                <div class="visual-prompt">
+                    "He is not on the road, but he is on the <span>_____</span>."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'pavement')">pavement</div>
+                    <div class="choice-card" onclick="selectOption(this, 'grass')">grass</div>
+                    <div class="choice-card" onclick="selectOption(this, 'track')">track</div>
+                </div>
+            </div>
+
+            <!-- ===== STAGE 8: Danger ===== -->
+            <div class="task-block" id="stage-8" data-ans="if you don't stop">
+                <h2>⚠️ Danger!</h2>
+                <div class="instruction">Choose the correct clause:</div>
+                <div class="visual-prompt">
+                    "It's dangerous <span>_____</span>."
+                </div>
+                <div class="choices-stack">
+                    <div class="choice-card" onclick="selectOption(this, 'if you don\'t stop')">if you don't stop</div>
+                    <div class="choice-card" onclick="selectOption(this, 'on the finish')">on the finish</div>
+                    <div class="choice-card" onclick="selectOption(this, 'outside')">outside</div>
+                </div>
+            </div>
+
+            <!-- FEEDBACK PANEL -->
+            <div class="alert-panel" id="feedback-box"></div>
+
+            <!-- NEXT BUTTON -->
+            <button class="trigger-btn" id="next-btn" onclick="nextStage()">Next Lap ▶</button>
+        </div>
+
+        <!-- END VIEW -->
+        <div id="end-view">
+            <h2>🏆 GRAND PRIX EVALUATION</h2>
+            <p style="color: var(--text-mid); font-weight:700; margin:5px 0 15px;">FINAL STYLE RANK:</p>
+            <div class="rank-circle" id="final-rank">S</div>
+            <p class="final-score" id="final-score"></p>
+            <button class="trigger-btn" style="display:block;" onclick="resetTrial()">⟲ Restart Championship</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // GAME STATE
+        // ============================================================
+        const totalStages = 8;
+        let currentStage = 1;
+        let correctAnswers = 0;
+        let blockActive = false;
+
+        const ranks = ["D", "C", "B", "A", "S", "SS", "SSS"];
+
+        // ============================================================
+        // SHUFFLE LOGIC
+        // ============================================================
+        function shuffleChoices(container) {
+            const cards = Array.from(container.children);
+            // Fisher-Yates Shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            // Re-append in new order
+            cards.forEach(card => container.appendChild(card));
+        }
+
+        function shuffleAllChoices() {
+            document.querySelectorAll('.choices-stack').forEach(stack => {
+                shuffleChoices(stack);
+            });
+        }
+
+        // ============================================================
+        // RANK CALCULATION
+        // ============================================================
+        function getRankIndex(correct) {
+            const pct = correct / totalStages;
+            if (pct >= 1.0) return 6;
+            if (pct >= 0.85) return 5;
+            if (pct >= 0.70) return 4;
+            if (pct >= 0.55) return 3;
+            if (pct >= 0.40) return 2;
+            if (pct >= 0.20) return 1;
+            return 0;
+        }
+
+        // ============================================================
+        // UI UPDATE
+        // ============================================================
+        function updateUI() {
+            document.getElementById('tracker').innerText = `${currentStage}/${totalStages}`;
+            const pct = ((currentStage - 1) / totalStages) * 100;
+            document.getElementById('hp-progress').style.width = `${pct}%`;
+            const rankIndex = getRankIndex(correctAnswers);
+            document.getElementById('rank-display').innerText = `RANK: ${ranks[rankIndex]}`;
+        }
+
+        // ============================================================
+        // SELECT OPTION
+        // ============================================================
+        function selectOption(card, choice) {
+            if (blockActive) return;
+            blockActive = true;
+
+            const activeBlock = document.getElementById(`stage-${currentStage}`);
+            const correctAns = activeBlock.getAttribute('data-ans');
+            const feedback = document.getElementById('feedback-box');
+            const allCards = activeBlock.querySelectorAll('.choice-card');
+
+            allCards.forEach(c => c.classList.add('disabled'));
+
+            if (choice === correctAns) {
+                card.classList.add('correct');
+                feedback.className = 'alert-panel correct';
+                feedback.innerText = '🏁 FASTEST LAP! EXCELLENT SYNCHRONIZATION.';
+                correctAnswers++;
+            } else {
+                card.classList.add('wrong');
+                feedback.className = 'alert-panel wrong';
+                feedback.innerText = '💥 CRASH DETECTED! RESET TRACK PARAMETERS.';
+                allCards.forEach(c => {
+                    if (c.getAttribute('onclick') && c.getAttribute('onclick').includes(`'${correctAns}'`)) {
+                        c.classList.add('correct');
+                    }
+                });
+            }
+
+            updateUI();
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        // ============================================================
+        // NEXT STAGE
+        // ============================================================
+        function nextStage() {
+            const feedback = document.getElementById('feedback-box');
+            feedback.style.display = 'none';
+            feedback.className = 'alert-panel';
+            document.getElementById('next-btn').style.display = 'none';
+
+            document.getElementById(`stage-${currentStage}`).classList.remove('active');
+
+            currentStage++;
+            blockActive = false;
+
+            if (currentStage <= totalStages) {
+                document.getElementById(`stage-${currentStage}`).classList.add('active');
+                updateUI();
+            } else {
+                showResults();
+            }
+        }
+
+        // ============================================================
+        // SHOW RESULTS
+        // ============================================================
+        function showResults() {
+            document.getElementById('combat-window').style.display = 'none';
+            document.getElementById('tracker').style.display = 'none';
+            document.getElementById('hp-progress').style.width = '100%';
+
+            const endView = document.getElementById('end-view');
+            endView.style.display = 'block';
+
+            const rankIndex = getRankIndex(correctAnswers);
+            document.getElementById('rank-display').innerText = `RANK: ${ranks[rankIndex]}`;
+            document.getElementById('final-rank').innerText = ranks[rankIndex];
+            document.getElementById('final-score').innerText =
+                `You finished with ${correctAnswers} successful completions out of ${totalStages} racing trials!`;
+        }
+
+        // ============================================================
+        // RESET TRIAL
+        // ============================================================
+        function resetTrial() {
+            currentStage = 1;
+            correctAnswers = 0;
+            blockActive = false;
+
+            document.getElementById('end-view').style.display = 'none';
+            document.getElementById('combat-window').style.display = 'block';
+            document.getElementById('tracker').style.display = 'inline';
+
+            for (let i = 1; i <= totalStages; i++) {
+                const stage = document.getElementById(`stage-${i}`);
+                stage.classList.remove('active');
+                stage.querySelectorAll('.choice-card').forEach(c => {
+                    c.className = 'choice-card';
+                });
+            }
+
+            document.getElementById('stage-1').classList.add('active');
+
+            const feedback = document.getElementById('feedback-box');
+            feedback.style.display = 'none';
+            feedback.className = 'alert-panel';
+            document.getElementById('next-btn').style.display = 'none';
+
+            // Перемешиваем варианты заново при рестарте
+            shuffleAllChoices();
+            updateUI();
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        // Перемешиваем при первой загрузке
+        shuffleAllChoices();
+        updateUI();
+    </script>
+
+</body>
+</html>
