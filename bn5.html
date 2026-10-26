@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Yourself: Grammar & Irregular Verbs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+            --duo-purple: #ce82ff;
+            --duo-light-purple: #f3e5ff;
+            --duo-orange: #ff9f43;
+            --duo-light-orange: #ffeaa7;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            font-size: 14px;
+            padding-bottom: 100px;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 600px;
+            height: 12px;
+            background-color: var(--duo-gray);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--duo-green);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .card {
+            max-width: 600px;
+            width: 100%;
+            padding: 15px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            border-bottom: 2px solid var(--duo-gray);
+            padding-bottom: 5px;
+        }
+
+        /* Vocabulary Boxes */
+        .vocab-box {
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            box-shadow: 0 3px 0;
+        }
+
+        .purple-box {
+            background-color: var(--duo-light-purple);
+            border: 2px solid var(--duo-purple);
+            box-shadow: 0 3px 0 var(--duo-purple);
+        }
+        .purple-box strong { color: #9b59b6; font-weight: 800; }
+
+        .orange-box {
+            background-color: var(--duo-light-orange);
+            border: 2px solid var(--duo-orange);
+            box-shadow: 0 3px 0 var(--duo-orange);
+        }
+        .orange-box strong { color: #d35400; font-weight: 800; }
+
+        .vocab-box ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 8px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+        }
+
+        .vocab-box li {
+            background: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-weight: 700;
+        }
+
+        /* Question Boxes */
+        .letter-box {
+            border: 2px solid var(--duo-gray);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 2.4;
+            font-size: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 0 var(--duo-gray);
+            background: #fafafa;
+        }
+
+        .letter-box p {
+            margin: 10px 0;
+        }
+
+        select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 4px 10px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            color: var(--duo-blue);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+            min-width: 90px;
+        }
+
+        select:focus {
+            border-color: var(--duo-blue);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 2px solid var(--duo-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+        }
+
+        #check-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--duo-green-dark);
+            padding: 12px 45px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.1s;
+        }
+
+        #check-btn:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        /* Final Screen */
+        #final-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #final-screen h1 {
+            font-size: 32px;
+            color: var(--duo-green);
+            margin-bottom: 10px;
+        }
+
+        #final-screen .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        #final-screen p {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        #final-screen button {
+            background-color: var(--duo-blue);
+            color: white;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #final-screen button:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .success-msg {
+            color: #2e7d32;
+            font-weight: 800;
+            font-size: 16px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container" id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="card" id="quiz-container">
+        <h1>Check Yourself!</h1>
+
+        <!-- ================= SECTION 1: GRAMMAR ================= -->
+        <h2>4. Circle the correct answer</h2>
+        <div class="letter-box">
+            <p><strong>1.</strong> There <select id="g1" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="is">is</option>
+                <option value="are">are</option>
+            </select> some water in the bottle.</p>
+
+            <p><strong>2.</strong> There <select id="g2" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="is">is</option>
+                <option value="are">are</option>
+            </select> some cucumbers in the salad.</p>
+
+            <p><strong>3.</strong> Are there <select id="g3" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="some">some</option>
+                <option value="any">any</option>
+            </select> apples?</p>
+
+            <p><strong>4.</strong> How <select id="g4" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="many">many</option>
+                <option value="much">much</option>
+            </select> juice is there?</p>
+
+            <p><strong>5.</strong> How <select id="g5" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="many">many</option>
+                <option value="much">much</option>
+            </select> strawberries are there?</p>
+
+            <p><strong>6.</strong> There <select id="g6" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="is">is</option>
+                <option value="are">are</option>
+            </select> two packets of flour.</p>
+        </div>
+
+        <!-- ================= SECTION 2: IRREGULAR VERBS ================= -->
+        <h2>Irregular Verbs</h2>
+        <div class="letter-box">
+            <p>Yesterday I <select id="v1" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="go">go</option>
+                <option value="went">went</option>
+            </select> (go) to the market. I <select id="v2" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="see">see</option>
+                <option value="saw">saw</option>
+            </select> (see) a strange man. He <select id="v3" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="have">have</option>
+                <option value="had">had</option>
+            </select> (have) a weapon. He <select id="v4" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="say">say</option>
+                <option value="said">said</option>
+            </select> (say): "You need to trade." I <select id="v5" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="hear">hear</option>
+                <option value="heard">heard</option>
+            </select> (hear) a noise. I <select id="v6" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="run">run</option>
+                <option value="ran">ran</option>
+            </select> (run) away. He <select id="v7" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="do">do</option>
+                <option value="did">did</option>
+            </select> (do) nothing. She <select id="v8" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="buy">buy</option>
+                <option value="bought">bought</option>
+            </select> (buy) a new phone. They <select id="v9" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="come">come</option>
+                <option value="came">came</option>
+            </select> (come) to the party. He <select id="v10" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="drink">drink</option>
+                <option value="drank">drank</option>
+            </select> (drink) all the water.</p>
+        </div>
+
+        <!-- ================= SECTION 3: COMMUNICATION ================= -->
+        <h2>5. Complete the dialogue</h2>
+        <div class="vocab-box orange-box">
+            <strong>Words in the box:</strong>
+            <ul>
+                <li>Hi</li>
+                <li>go</li>
+                <li>love</li>
+                <li>nice</li>
+                <li>this</li>
+                <li>together</li>
+            </ul>
+        </div>
+
+        <div class="letter-box">
+            <p><strong>Katy:</strong> <select id="d1" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="Hi">Hi</option>
+                <option value="Nice">Nice</option>
+                <option value="This">This</option>
+            </select>, there! <select id="d2" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="this">this</option>
+                <option value="that">that</option>
+                <option value="he">he</option>
+            </select> is my friend, Paul.</p>
+
+            <p><strong>Matt:</strong> <select id="d3" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="Nice">Nice</option>
+                <option value="Good">Good</option>
+                <option value="Love">Love</option>
+            </select> to meet you, Paul. I'm Matt.</p>
+
+            <p><strong>Katy:</strong> Matt is my best friend. We go to school <select id="d4" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="together">together</option>
+                <option value="alone">alone</option>
+                <option value="go">go</option>
+            </select>.</p>
+
+            <p><strong>Matt:</strong> Yes, I <select id="d5" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="love">love</option>
+                <option value="like">like</option>
+                <option value="nice">nice</option>
+            </select> films!</p>
+
+            <p><strong>Katy:</strong> Cool. Would you like to come to the cinema with us? We often <select id="d6" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="go">go</option>
+                <option value="come">come</option>
+                <option value="together">together</option>
+            </select> there at the weekend.</p>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen">
+        <div class="emoji">🏆</div>
+        <h1>Lesson Complete!</h1>
+        <p id="final-score-text">You scored 0 out of 22</p>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button onclick="location.reload()">Restart</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()">Check</button>
+    </div>
+
+    <script>
+        // ================================================================
+        //  RESULTS TRACKING & CONFIGURATION
+        // ================================================================
+        const TEST_NAME = "Check Yourself: Grammar & Irregular Verbs";
+        let userMistakes = [];
+        let score = 0;
+
+        const answers = { 
+            // Grammar
+            g1: "is", g2: "are", g3: "any", g4: "much", g5: "many", g6: "are",
+            // Verbs
+            v1: "went", v2: "saw", v3: "had", v4: "said", v5: "heard", 
+            v6: "ran", v7: "did", v8: "bought", v9: "came", v10: "drank",
+            // Dialogue
+            d1: "Hi", d2: "this", d3: "Nice", d4: "together", d5: "love", d6: "go"
+        };
+        
+        const totalQuestions = Object.keys(answers).length;
+
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if(s.value !== "") filled++; });
+            document.getElementById('progress-bar').style.width = (filled / totalQuestions) * 100 + '%';
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const selects = document.querySelectorAll('select');
+            let allFilled = Array.from(selects).every(s => s.value !== "");
+
+            if(!allFilled) {
+                alert("Please fill in all blanks first!");
+                return;
+            }
+
+            for (let id in answers) {
+                const select = document.getElementById(id);
+                if (select.value === answers[id]) {
+                    correctCount++;
+                    select.style.borderColor = "var(--duo-green)";
+                    select.style.backgroundColor = "#f0ffe8";
+                } else {
+                    // Track wrong answer
+                    if (!userMistakes.includes(select.value)) {
+                        userMistakes.push(select.value);
+                    }
+                    select.style.borderColor = "var(--duo-red)";
+                    select.style.backgroundColor = "#fff0f0";
+                }
+            }
+
+            score = correctCount;
+
+            // Hide Quiz, Show Final Screen
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('footer').style.display = 'none';
+            document.getElementById('final-screen').style.display = 'block';
+
+            document.getElementById('final-score-text').innerText = `You scored ${score} out of ${totalQuestions}`;
+            
+            // Send Results
+            sendResultsToGoogle();
+        }
+
+        // ================================================================
+        //  GOOGLE SHEETS INTEGRATION
+        // ================================================================
+        async function sendResultsToGoogle() {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: score,
+                total: totalQuestions,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                // Display success message
+                const msgEl = document.getElementById('success-msg');
+                if (msgEl) {
+                    msgEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+    </script>
+</body>
+</html>
