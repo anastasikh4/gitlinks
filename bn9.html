@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparatives Mission</title>
+    <style>
+        :root {
+            --pink: #ff6b9d;
+            --blue: #4d96ff;
+            --yellow: #ffc93c;
+            --orange: #ff9f45;
+            --green: #58cc02;
+            --purple: #b14aff;
+            --text-dark: #2c3e50;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Comic Neue', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(180deg, #a8e6ff 0%, #d4b3ff 100%);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #game-frame {
+            background: rgba(255, 255, 255, 0.95);
+            width: 90%;
+            max-width: 640px;
+            padding: 26px;
+            border-radius: 40px;
+            text-align: center;
+            border: 6px solid #fff;
+            box-shadow: 0 15px 40px rgba(155, 89, 182, 0.25);
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+
+        .level-badge {
+            background: #f3e5ff;
+            color: var(--purple);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 14px;
+        }
+        .score-badge {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 14px;
+            box-shadow: 0 4px 0 rgba(155,89,182,0.3);
+        }
+
+        /* ═══════ HERO SCENE (character only) ═══════ */
+        .hero-scene {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0 18px;
+            padding: 18px 12px;
+            background: linear-gradient(180deg, #fef8ff 0%, #f3e9ff 100%);
+            border-radius: 24px;
+            border: 2px dashed #d5b8e8;
+        }
+
+        .hero-emoji {
+            font-size: 5rem;
+            line-height: 1;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* ═══════ SENTENCE BOX ═══════ */
+        .sentence-box {
+            background: #fdf9ff;
+            padding: 22px;
+            border-radius: 25px;
+            font-size: 1.3rem;
+            margin-bottom: 22px;
+            line-height: 2.2;
+            border: 2px dashed #d5b8e8;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 120px;
+            background: #fff3cd;
+            border-bottom: 3px solid var(--yellow);
+            padding: 3px 12px;
+            border-radius: 10px;
+            color: #e67e22;
+            font-weight: 900;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .gap.filled {
+            background: #d7ffb1;
+            border-bottom-color: var(--green);
+            color: #4a9c00;
+        }
+
+        /* ═══════ OPTIONS ═══════ */
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            border-bottom-width: 4px;
+            padding: 14px 22px;
+            font-size: 1.05rem;
+            font-weight: 900;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.15s;
+            color: var(--text-dark);
+            font-family: inherit;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: #f6f0ff;
+            border-color: var(--purple);
+            transform: translateY(-2px);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        .option-btn:disabled { cursor: default; opacity: 0.4; }
+        .option-btn.correct {
+            background: #d7ffb1 !important;
+            border-color: var(--green) !important;
+            color: #4a9c00 !important;
+            opacity: 1 !important;
+        }
+        .option-btn.wrong {
+            background: #ffdfe0 !important;
+            border-color: #ff4b4b !important;
+            color: #ea2b2b !important;
+            opacity: 1 !important;
+        }
+
+        /* ═══════ WIN SCREEN ═══════ */
+        #win-screen { display: none; }
+        #win-screen h1 {
+            font-size: 2rem;
+            color: var(--purple);
+            margin-bottom: 8px;
+        }
+        #win-screen p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        #win-screen button {
+            padding: 16px 36px;
+            border-radius: 20px;
+            border: none;
+            border-bottom: 5px solid #6c3483;
+            background: var(--purple);
+            color: white;
+            font-weight: 900;
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #win-screen button:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .final-stars {
+            font-size: 2rem;
+            letter-spacing: 6px;
+            margin: 10px 0 20px;
+        }
+
+        @media (max-width: 480px) {
+            .sentence-box { font-size: 1rem; padding: 14px; line-height: 2; }
+            .hero-emoji { font-size: 3.5rem; }
+            .option-btn { padding: 12px 14px; font-size: 0.9rem; }
+            .level-badge, .score-badge { font-size: 12px; padding: 6px 12px; }
+            .gap { min-width: 90px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-frame">
+    <div id="play-screen">
+        <div class="header">
+            <div class="level-badge">Level <span id="lvl-num">1</span>/10</div>
+            <div class="score-badge">⭐ Stars: <span id="score">0</span></div>
+        </div>
+
+        <div class="hero-scene">
+            <div class="hero-emoji" id="hero">🐈</div>
+        </div>
+
+        <div class="sentence-box" id="sentence"></div>
+        <div class="options" id="options"></div>
+    </div>
+
+    <div id="win-screen">
+        <h1>🏆 Great Job!</h1>
+        <p>You completed the comparatives mission!</p>
+        <div class="final-stars" id="final-stars">⭐⭐⭐</div>
+        <p id="success-msg" style="color: #2e7d32; font-weight: 900; margin-top: 10px; display: none;">Results sent successfully! ✅</p>
+        <button onclick="resetGame()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ================================================================
+    const TEST_NAME = "Comparatives Quiz: 10 Questions";
+    let userMistakes = [];
+    let score = 0;
+    const totalQuestions = 10;
+
+    /* ═══════════════════════════════════════════
+       MISSIONS DATA (Expanded to 10 variants)
+       ═══════════════════════════════════════════ */
+    const missions = [
+        {
+            hero: "🐈",
+            text: "Cats are <span class='gap' id='g1'>___</span> than elephants.",
+            answers: ["smaller"],
+            options: ["smaller", "bigger", "worse", "easier"]
+        },
+        {
+            hero: "🎒",
+            text: "Mary's schoolbag is <span class='gap' id='g1'>___</span> than my schoolbag. It takes more books.",
+            answers: ["bigger"],
+            options: ["bigger", "smaller", "more interesting", "worse"]
+        },
+        {
+            hero: "♟️",
+            text: "Dad says chess is <span class='gap' id='g1'>___</span> than video games, but I think it's boring.",
+            answers: ["more interesting"],
+            options: ["more interesting", "easier", "bigger", "smaller"]
+        },
+        {
+            hero: "🧹",
+            text: "Chores are <span class='gap' id='g1'>___</span> than homework. I don't like them.",
+            answers: ["worse"],
+            options: ["worse", "better", "easier", "more interesting"]
+        },
+        {
+            hero: "📝",
+            text: "This test is <span class='gap' id='g1'>___</span> than the last test. I know all the answers.",
+            answers: ["easier"],
+            options: ["easier", "harder", "worse", "smaller"]
+        },
+        {
+            hero: "🚲",
+            text: "A bike is <span class='gap' id='g1'>___</span> than a car.",
+            answers: ["slower"],
+            options: ["slower", "faster", "bigger", "better"]
+        },
+        {
+            hero: "🛏️",
+            text: "My bedroom is <span class='gap' id='g1'>___</span> than my brother's room. I clean it every day.",
+            answers: ["cleaner"],
+            options: ["cleaner", "dirtier", "smaller", "worse"]
+        },
+        {
+            hero: "📚",
+            text: "Reading a book is <span class='gap' id='g1'>___</span> than watching TV.",
+            answers: ["better"],
+            options: ["better", "worse", "bigger", "more interesting"]
+        },
+        {
+            hero: "❄️",
+            text: "Winter is <span class='gap' id='g1'>___</span> than summer.",
+            answers: ["colder"],
+            options: ["colder", "hotter", "worse", "easier"]
+        },
+        {
+            hero: "🏋️",
+            text: "This exercise is <span class='gap' id='g1'>___</span> than the previous one. I can't do it!",
+            answers: ["harder"],
+            options: ["harder", "easier", "better", "smaller"]
+        }
+    ];
+
+    let currentLevel = 0;
+    let currentStep = 0;
+
+    function loadLevel() {
+        const m = missions[currentLevel];
+
+        document.getElementById('lvl-num').innerText = currentLevel + 1;
+        document.getElementById('hero').innerText = m.hero;
+
+        document.getElementById('sentence').innerHTML = m.text;
+
+        const optionsEl = document.getElementById('options');
+        optionsEl.innerHTML = '';
+        const shuffled = [...m.options].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleChoice(btn, opt);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function handleChoice(btn, val) {
+        const m = missions[currentLevel];
+
+        if (val === m.answers[currentStep]) {
+            btn.classList.add('correct');
+            btn.disabled = true;
+
+            const gap = document.getElementById(`g${currentStep + 1}`);
+            gap.innerText = val;
+            gap.classList.add('filled');
+
+            score += 1;
+            document.getElementById('score').innerText = score;
+
+            if (navigator.vibrate) navigator.vibrate(25);
+
+            currentStep++;
+
+            if (currentStep === 1) { // Since there is only 1 blank per sentence
+                setTimeout(() => {
+                    currentLevel++;
+                    currentStep = 0;
+                    if (currentLevel < missions.length) loadLevel();
+                    else showWin();
+                }, 950);
+            }
+        } else {
+            btn.classList.add('wrong');
+            btn.disabled = true;
+            if (!userMistakes.includes(val)) {
+                userMistakes.push(val);
+            }
+            if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                btn.disabled = false;
+            }, 600);
+        }
+    }
+
+    function showWin() {
+        document.getElementById('play-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+
+        let stars = '⭐';
+        if (score === 10) stars = '⭐⭐⭐';
+        else if (score >= 7) stars = '⭐⭐';
+        document.getElementById('final-stars').innerText = stars;
+
+        launchConfetti();
+        sendResultsToGoogle();
+    }
+
+    function resetGame() {
+        location.reload();
+    }
+
+    function launchConfetti() {
+        const colors = ['#ff6b9d', '#4d96ff', '#ffc93c', '#58cc02', '#b14aff', '#ff9f45'];
+        for (let i = 0; i < 60; i++) {
+            const c = document.createElement('div');
+            c.style.position = 'fixed';
+            c.style.top = '-12px';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.width = '10px';
+            c.style.height = '14px';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.pointerEvents = 'none';
+            c.style.zIndex = '999';
+            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            c.style.animation = `fall ${Math.random() * 2 + 2}s linear ${Math.random() * 0.8}s forwards`;
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 5000);
+        }
+
+        if (!document.getElementById('confetti-style')) {
+            const style = document.createElement('style');
+            style.id = 'confetti-style';
+            style.textContent = `@keyframes fall {
+                0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(105vh) rotate(720deg); opacity: 0.4; }
+            }`;
+            document.head.appendChild(style);
+        }
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('success-msg');
+            if (msgEl) {
+                msgEl.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    loadLevel();
+</script>
+
+</body>
+</html>

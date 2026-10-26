@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Comparatives: Lily & Mia 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #F3E5F5 0%, #E1BEE7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 700px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #AB47BC;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #6A1B9A; font-size: 2em; margin-bottom: 10px; }
+        
+        .story-box {
+            background: #F3E5F5;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+            font-size: 1.05em;
+            color: #444;
+            border-left: 5px solid #AB47BC;
+        }
+
+        .story-box .chore-word {
+            background: #E1BEE7;
+            padding: 0 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            color: #6A1B9A;
+        }
+
+        .question-text { font-size: 1.4em; color: #8E24AA; margin-bottom: 20px; font-weight: bold; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .btn {
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: #333;
+        }
+        .btn:hover { border-color: #BA68C8; background: #F3E5F5; }
+        .btn.correct { background: #90EE90 !important; border-color: #2E7D32; color: #1B5E20; }
+        .btn.wrong { background: #FFB6C1 !important; border-color: #DC143C; color: #B71C1C; }
+
+        .progress-bar {
+            width: 100%; height: 10px; background: #eee;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #AB47BC; width: 0%; transition: 0.4s; }
+        
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; }
+        
+        @media (max-width: 600px) {
+            .title { font-size: 1.5em; }
+            .options { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
+            .story-box { font-size: 0.95em; padding: 15px; }
+            .question-text { font-size: 1.2em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">👯‍♀️ Lily & Mia</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div id="storySection" class="story-box">
+                <p><strong>Complete the sentences about Lily and Mia with the comparative form of the adjectives.</strong></p>
+                <br>
+                <p>📝 <strong>Adjectives:</strong> tall, friendly, outgoing, hard-working, pretty, smart.</p>
+                <p>Look at the sisters! Lily is <span class="chore-word">taller</span> than Mia. Mia is <span class="chore-word">friendlier</span> than her sister. She is also <span class="chore-word">more outgoing</span> and she's a <span class="chore-word">more hard-working</span> student than Lily. Lily thinks she is <span class="chore-word">prettier</span> and <span class="chore-word">smarter</span>, but Mia is happy anyway.</p>
+            </div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆👯‍♀️🎉</div>
+        <h1 style="color: #6A1B9A;">EXCELLENT!</h1>
+        <p style="font-size: 1.3em; margin: 15px 0;">You've mastered comparatives!</p>
+        <p id="success-msg" style="color: #2e7d32; font-weight: 900; margin-top: 10px; display: none;">Results sent successfully! ✅</p>
+        <button class="btn" onclick="location.reload()" style="padding: 10px 30px; margin-top: 20px;">Restart</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ================================================================
+    const TEST_NAME = "Comparatives Quiz: Lily & Mia";
+    let userMistakes = [];
+    let score = 0;
+
+    const questions = [
+        {
+            q: "1. Lily is ______ than Mia.",
+            a: ["taller", "more tall", "tallest", "tall"],
+            c: "taller"
+        },
+        {
+            q: "2. Mia is ______ than her sister.",
+            a: ["friendlier", "more friendly", "friendliest", "friendly"],
+            c: "friendlier"
+        },
+        {
+            q: "3. She is also ______ and she's...",
+            a: ["more outgoing", "outgoinger", "outgoing", "most outgoing"],
+            c: "more outgoing"
+        },
+        {
+            q: "4. ...a ______ student than Lily.",
+            a: ["more hard-working", "hard-workingest", "hard-working", "most hard-working"],
+            c: "more hard-working"
+        },
+        {
+            q: "5. Lily thinks she is ______...",
+            a: ["prettier", "more pretty", "prettiest", "pretty"],
+            c: "prettier"
+        },
+        {
+            q: "6. ...and ______, but Mia is happy anyway.",
+            a: ["smarter", "more smart", "smartest", "smart"],
+            c: "smarter"
+        }
+    ];
+
+    let current = 0;
+    const totalQuestions = questions.length;
+
+    function load() {
+        if (current >= totalQuestions) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            sendResultsToGoogle();
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('qText').innerText = data.q;
+        
+        // Show story for all questions
+        document.getElementById('storySection').style.display = "block";
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        // Shuffle options for each question
+        const shuffledOptions = [...data.a].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / totalQuestions) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        if (choice === questions[current].c) {
+            btn.classList.add('correct');
+            score++;
+            setTimeout(() => { current++; load(); }, 700);
+        } else {
+            btn.classList.add('wrong');
+            if (!userMistakes.includes(choice)) {
+                userMistakes.push(choice);
+            }
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Since mode: 'no-cors' always resolves, we show success here
+            const msgEl = document.getElementById('success-msg');
+            if (msgEl) {
+                msgEl.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    load();
+</script>
+
+</body>
+</html>

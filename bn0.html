@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Comparatives: Harry & George ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --pink: #ff8fab; 
+            --dark-pink: #fb6f92; 
+            --purple: #a084dc; 
+            --gray: #fce4ec; 
+            --text: #5d4037; 
+            --bg-gradient: linear-gradient(135deg, #fff0f5 0%, #f3e5f5 100%);
+        }
+        
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: var(--bg-gradient); 
+            color: var(--text); 
+            min-height: 100vh; 
+        }
+        
+        header { 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            box-sizing: border-box; 
+        }
+        
+        .progress-bar { 
+            flex-grow: 1; 
+            height: 16px; 
+            background: #f8bbd0; 
+            border-radius: 20px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        #fill { 
+            width: 0%; 
+            height: 100%; 
+            background: linear-gradient(90deg, #ff8fab, #a084dc); 
+            border-radius: 20px; 
+            transition: width 0.4s ease; 
+            position: relative;
+        }
+        
+        #fill::after {
+            content: "✨";
+            position: absolute;
+            right: -10px;
+            top: -8px;
+            font-size: 18px;
+        }
+
+        main { 
+            width: 100%; 
+            max-width: 500px; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        
+        h1 { 
+            font-family: 'Fredoka', sans-serif;
+            font-size: 26px; 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+            color: #ad1457;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 20px; 
+        }
+        
+        .card { 
+            background: white; 
+            border: 2px solid #f8bbd0; 
+            border-bottom: 4px solid #f8bbd0;
+            border-radius: 20px; 
+            padding: 15px; 
+            font-family: 'Quicksand', sans-serif;
+            font-size: 16px; 
+            font-weight: 700; 
+            color: #6a1b9a;
+            cursor: pointer; 
+            transition: all 0.2s; 
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(255, 143, 171, 0.15);
+        }
+        
+        .card:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 143, 171, 0.25);
+        }
+        
+        .card:active { transform: translateY(2px); }
+        
+        .card.selected { 
+            background: #fce4ec; 
+            border-color: #f06292; 
+            color: #ad1457; 
+        }
+        
+        .card.correct { 
+            background: #e8f5e9; 
+            border-color: #81c784; 
+            color: #2e7d32; 
+        }
+        
+        .card.wrong { 
+            background: #ffebee; 
+            border-color: #e57373; 
+            color: #c62828; 
+        }
+        
+        .hidden { display: none; }
+        
+        #feedback { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 20px; 
+            display: none; 
+            justify-content: center; 
+            background: #fce4ec; 
+            border-top: 3px dashed #f06292; 
+            z-index: 100; 
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .next-btn { 
+            background: var(--pink); 
+            color: white; 
+            border: none; 
+            border-bottom: 4px solid var(--dark-pink); 
+            padding: 12px 40px; 
+            border-radius: 25px; 
+            font-weight: 800; 
+            font-family: 'Quicksand', sans-serif;
+            font-size: 18px; 
+            cursor: pointer; 
+            transition: all 0.1s;
+            box-shadow: 0 4px 10px rgba(251, 111, 146, 0.3);
+        }
+        
+        .next-btn:active { 
+            transform: translateY(2px); 
+            border-bottom-width: 2px; 
+        }
+        
+        .listen-btn { 
+            background: #e1bee7; 
+            border: 2px solid #ce93d8; 
+            border-bottom: 4px solid #ab47bc; 
+            padding: 15px 24px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            font-family: 'Quicksand', sans-serif;
+            cursor: pointer; 
+            font-size: 18px; 
+            color: #4a148c;
+            width: 100%; 
+            margin-bottom: 20px; 
+            transition: all 0.1s;
+            box-shadow: 0 4px 10px rgba(186, 104, 200, 0.2);
+        }
+
+        .listen-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+        
+        .completion { 
+            padding: 30px 0; 
+            background: white;
+            border-radius: 30px;
+            border: 3px solid #f8bbd0;
+            box-shadow: 0 10px 20px rgba(255, 143, 171, 0.2);
+            margin-top: 20px;
+        }
+        
+        .completion h2 { 
+            font-family: 'Fredoka', sans-serif;
+            font-size: 28px; 
+            color: #ad1457; 
+            padding: 0 15px;
+        }
+        
+        .completion .icon { 
+            font-size: 80px; 
+            margin-bottom: 10px;
+        }
+
+        .completion p {
+            font-weight: 600;
+            color: #7b1fa2;
+        }
+        
+        @media (max-width: 480px) {
+            .card { font-size: 14px; padding: 12px; }
+            .grid { gap: 8px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">✨ Comparatives: Harry & George ✨</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">✨ NEXT ✨</button>
+</div>
+
+<script>
+    // ================================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ================================================================
+    const TEST_NAME = "Comparatives Quiz: Harry and George";
+    let userMistakes = [];
+    let score = 0;
+    const TOTAL_QUESTIONS = 9; // 1 matching, 4 MCQ, 4 Listening
+
+    // ================================================================
+    //  LEVEL 1: MATCHING (adjective ↔ comparative)
+    // ================================================================
+    const level1Data = [
+        { id: 1, text: 'young', type: 'adj' }, { id: 1, text: 'younger', type: 'comp' },
+        { id: 2, text: 'sporty', type: 'adj' }, { id: 2, text: 'sportier', type: 'comp' },
+        { id: 3, text: 'good', type: 'adj' }, { id: 3, text: 'better', type: 'comp' },
+        { id: 4, text: 'fast', type: 'adj' }, { id: 4, text: 'faster', type: 'comp' }
+    ];
+
+    // ================================================================
+    //  LEVEL 2: MULTIPLE CHOICE (fill in the blank)
+    // ================================================================
+    const questions2 = [
+        { question: 'Harry is ______ than George.', correct: 'younger', options: ['younger', 'young', 'more young', 'youngest'] },
+        { question: "He's ______ than his brother.", correct: 'sportier', options: ['sporty', 'more sporty', 'sportier', 'sportiest'] },
+        { question: "He's ______ at tennis.", correct: 'better', options: ['gooder', 'better', 'more good', 'best'] },
+        { question: "He's also a ______ runner than George.", correct: 'faster', options: ['fast', 'more fast', 'faster', 'fastest'] }
+    ];
+
+    // ================================================================
+    //  LEVEL 3: LISTENING (hear sentence → answer question)
+    // ================================================================
+    const level3Data = [
+        { sentence: "Harry is younger than George.", question: "Who is older?", correct: "George", options: ["George", "Harry", "Both", "Neither"] },
+        { sentence: "He's sportier than his brother.", question: "Who is sportier?", correct: "Harry", options: ["Harry", "George", "Both", "Neither"] },
+        { sentence: "He's better at tennis.", question: "Who is better at tennis?", correct: "Harry", options: ["Harry", "George", "Both", "Neither"] },
+        { sentence: "He's also a faster runner than George.", question: "Who is a faster runner?", correct: "Harry", options: ["Harry", "George", "Both", "Neither"] }
+    ];
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    let globalStep = 0;
+
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+        
+        document.getElementById('fill').style.width = ((globalStep / TOTAL_QUESTIONS) * 100) + '%';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "🌸 Match the words 🌸";
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            const shuffled = [...level1Data].sort(() => Math.random() - 0.5);
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.dataset.id = item.id;
+                card.dataset.type = item.type;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "🎀 Choose the correct answer 🎀";
+            const q = questions2[subStep];
+            area.innerHTML = `<div style="font-size: 22px; font-weight: 800; margin-bottom: 20px; color: #6a1b9a;">${q.question}</div>`;
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn, q.correct);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "🎧 Listen and answer 🎧";
+            const q = level3Data[subStep];
+            area.innerHTML = `
+                <button class="listen-btn" onclick="speakPhrase('${q.sentence}')">🎵 PLAY AUDIO 🎵</button>
+                <div style="font-size: 20px; font-weight: 800; margin-bottom: 15px; color: #6a1b9a;">${q.question}</div>
+                <div class="grid" id="listenGrid"></div>
+            `;
+            const grid = document.getElementById('listenGrid');
+            const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel3(opt, btn, q.correct);
+                grid.appendChild(btn);
+            });
+            setTimeout(() => speakPhrase(q.sentence), 600);
+        }
+    }
+
+    // ---- LEVEL 1: Matching ----
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(p => p.card === card)) return;
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const a = selectedCards[0];
+            const b = selectedCards[1];
+            if (a.item.id === b.item.id && a.item.type !== b.item.type) {
+                a.card.classList.remove('selected');
+                b.card.classList.remove('selected');
+                a.card.classList.add('correct');
+                b.card.classList.add('correct');
+                selectedCards = [];
+                
+                const allCorrect = document.querySelectorAll('.card.correct').length === level1Data.length;
+                if (allCorrect) {
+                    score++;
+                    showNext();
+                }
+            } else {
+                userMistakes.push(a.item.text);
+                userMistakes.push(b.item.text);
+                a.card.classList.add('wrong');
+                b.card.classList.add('wrong');
+                setTimeout(() => {
+                    a.card.classList.remove('selected', 'wrong');
+                    b.card.classList.remove('selected', 'wrong');
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+    }
+
+    // ---- LEVEL 2: Multiple Choice ----
+    function checkLevel2(choice, btn, correct) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (choice === correct) {
+            btn.classList.add('correct');
+            score++;
+            showNext();
+        } else {
+            userMistakes.push(choice);
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- LEVEL 3: Listening ----
+    function checkLevel3(choice, btn, correct) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (choice === correct) {
+            btn.classList.add('correct');
+            score++;
+            showNext();
+        } else {
+            userMistakes.push(choice);
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- show "Continue" button ----
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+    }
+
+    // ---- next step ----
+    function nextStep() {
+        globalStep++;
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) {
+                currentLevel = 3;
+                subStep = 0;
+            }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= level3Data.length) {
+                // Game complete!
+                document.getElementById('fill').style.width = '100%';
+                document.getElementById('game-area').innerHTML = `
+                    <div class="completion">
+                        <div class="icon">👑</div>
+                        <h2>Amazing job, superstar! 🌟</h2>
+                        <p>You scored ${score} out of ${TOTAL_QUESTIONS}.</p>
+                        <p id="success-msg" style="font-size:16px; font-weight:700; color:#2e7d32; display:none; margin-top:15px; background:#e8f5e9; padding:10px; border-radius:15px;"></p>
+                        <button onclick="location.reload()" style="background:var(--pink); color:white; border:none; border-bottom:4px solid var(--dark-pink); padding:12px 40px; border-radius:25px; font-weight:800; font-family:'Quicksand', sans-serif; cursor:pointer; font-size:18px; margin-top:20px; box-shadow: 0 4px 10px rgba(251, 111, 146, 0.3);">🔄 Play Again</button>
+                    </div>
+                `;
+                document.getElementById('feedback').style.display = 'none';
+                sendResultsToGoogle();
+                return;
+            }
+        }
+        initLevel();
+    }
+
+    // ---- Speech Synthesis ----
+    function speakPhrase(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.85;
+        msg.pitch = 1.1; // Slightly higher pitch for a cute voice
+        window.speechSynthesis.speak(msg);
+    }
+
+    // ---- Send Results to Google ----
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: TOTAL_QUESTIONS,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            const msgEl = document.getElementById('success-msg');
+            if (msgEl) {
+                msgEl.innerText = "Results sent successfully! ✅";
+                msgEl.style.display = 'block';
+            }
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // ---- start ----
+    initLevel();
+</script>
+
+</body>
+</html>
