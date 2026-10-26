@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete the Story & Emoji Match</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 70%;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* --- MATCHING EXERCISE STYLES --- */
+        .match-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .match-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid var(--chip-border);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .match-select {
+            padding: 10px;
+            font-size: 1.5rem;
+            border: 2px solid var(--quiz-light-purple);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            width: 100px;
+            text-align: center;
+            outline: none;
+        }
+
+        .match-select:focus {
+            border-color: var(--quiz-purple);
+        }
+
+        /* --- SENTENCE EXERCISE STYLES --- */
+        .sentence-display {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 120px;
+            border-bottom: 3px solid var(--quiz-light-purple);
+            color: var(--quiz-light-purple);
+            font-weight: bold;
+            margin: 0 5px;
+        }
+
+        .options-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #f8f9fa;
+            border: 3px solid var(--chip-border);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--chip-bg);
+            border-color: var(--quiz-light-purple);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background: #d4edda;
+            border-color: var(--quiz-green);
+            color: #155724;
+        }
+
+        .option-btn.wrong {
+            background: #f8d7da;
+            border-color: var(--quiz-red);
+            color: #721c24;
+        }
+
+        /* --- BUTTONS & FEEDBACK --- */
+        .btn {
+            background: var(--quiz-light-purple);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #6c44a3;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* --- FINAL SCREEN --- */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .final-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .final-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .success-msg {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    
+    <!-- PROGRESS HEADER -->
+    <div class="header" id="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Exercise 0</div>
+    </div>
+
+    <!-- EXERCISE 0: EMOJI MATCHING -->
+    <div id="matching-screen">
+        <div class="instruction">Match the words to the correct emojis.</div>
+        
+        <div class="match-grid">
+            <!-- Rows will have dynamically populated selects -->
+            <div class="match-row">
+                <span>1. Power cut</span>
+                <select class="match-select" id="match1">
+                    <option value="">❓</option>
+                </select>
+            </div>
+            <div class="match-row">
+                <span>2. Scared</span>
+                <select class="match-select" id="match2">
+                    <option value="">❓</option>
+                </select>
+            </div>
+            <div class="match-row">
+                <span>3. Confused</span>
+                <select class="match-select" id="match3">
+                    <option value="">❓</option>
+                </select>
+            </div>
+            <div class="match-row">
+                <span>4. Relieved</span>
+                <select class="match-select" id="match4">
+                    <option value="">❓</option>
+                </select>
+            </div>
+            <div class="match-row">
+                <span>5. Sighed</span>
+                <select class="match-select" id="match5">
+                    <option value="">❓</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn" id="check-match-btn" onclick="checkMatching()">Check Matches</button>
+    </div>
+
+    <!-- EXERCISES 1-5: FILL IN THE BLANKS -->
+    <div id="sentence-screen" class="hidden">
+        <div class="instruction">Complete the sentences using the words from the box.</div>
+        <div class="sentence-display" id="sentence-text"></div>
+        <div class="options-area" id="options-area"></div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="final-screen">
+        <h1>🏆</h1>
+        <h2>Story Complete!</h2>
+        <p>You scored: <strong id="final-score">0</strong> / 10</p>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button class="btn" style="width: auto; padding: 12px 30px;" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+
+</div>
+
+<script>
+    // ================================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ================================================================
+    const TEST_NAME = "Complete the Story & Emoji Match";
+    let userMistakes = [];
+    let score = 0;
+    
+    // State
+    let currentQ = 0; // 0 = matching, 1-5 = sentences
+    const totalQuestions = 10; // 5 matches + 5 sentences
+
+    // --- EXERCISE 0 DATA ---
+    const matchingAnswers = {
+        match1: "⚡🚫", // Power cut
+        match2: "😨",   // Scared
+        match3: "😕",   // Confused
+        match4: "😌",   // Relieved
+        match5: "😮‍💨"  // Sighed
+    };
+
+    // --- EXERCISES 1-5 DATA ---
+    const sentences = [
+        {
+            sentence: "There was a ______, so all the lights went out.",
+            correct: "power cut",
+            options: ["power cut", "confused", "sighed", "relieved", "scared"]
+        },
+        {
+            sentence: "The little girl was ______ of the dark.",
+            correct: "scared",
+            options: ["power cut", "confused", "sighed", "relieved", "scared"]
+        },
+        {
+            sentence: "Dad was ______ because he couldn't find the torch.",
+            correct: "confused",
+            options: ["power cut", "confused", "sighed", "relieved", "scared"]
+        },
+        {
+            sentence: "Everyone felt ______ when the lights came back.",
+            correct: "relieved",
+            options: ["power cut", "confused", "sighed", "relieved", "scared"]
+        },
+        {
+            sentence: "My brother ______ and went back to sleep.",
+            correct: "sighed",
+            options: ["power cut", "confused", "sighed", "relieved", "scared"]
+        }
+    ];
+
+    // Helper to shuffle arrays
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // ================================================================
+    //  INIT: POPULATE EMOJI SELECTS WITH SHUFFLED OPTIONS
+    // ================================================================
+    function populateEmojiSelects() {
+        const emojis = ["⚡🚫", "😨", "😕", "😌", "😮‍💨"];
+        const selects = document.querySelectorAll('.match-select');
+        
+        selects.forEach(select => {
+            // Create a fresh shuffled copy of emojis for each select
+            const shuffledEmojis = shuffleArray([...emojis]);
+            shuffledEmojis.forEach(emoji => {
+                const option = document.createElement('option');
+                option.value = emoji;
+                option.textContent = emoji;
+                select.appendChild(option);
+            });
+        });
+    }
+
+    // ================================================================
+    //  EXERCISE 0: MATCHING LOGIC
+    // ================================================================
+    function checkMatching() {
+        let allSelected = true;
+        let correctMatches = 0;
+
+        for (let id in matchingAnswers) {
+            const selectEl = document.getElementById(id);
+            const selectedVal = selectEl.value;
+
+            if (selectedVal === "") {
+                allSelected = false;
+                break;
+            }
+
+            if (selectedVal === matchingAnswers[id]) {
+                selectEl.style.borderColor = "var(--quiz-green)";
+                selectEl.style.backgroundColor = "#d4edda";
+                correctMatches++;
+            } else {
+                selectEl.style.borderColor = "var(--quiz-red)";
+                selectEl.style.backgroundColor = "#f8d7da";
+                if (!userMistakes.includes(selectedVal)) {
+                    userMistakes.push(selectedVal);
+                }
+            }
+        }
+
+        if (!allSelected) {
+            alert("Please select an emoji for every word!");
+            return;
+        }
+
+        // Add to global score
+        score += correctMatches;
+
+        // Update progress bar to 50%
+        document.getElementById('progress-bar').style.width = "50%";
+        document.getElementById('category').innerText = "Exercise 1 of 5";
+
+        // Disable selects
+        document.querySelectorAll('.match-select').forEach(s => s.disabled = true);
+        document.getElementById('check-match-btn').disabled = true;
+
+        // Move to next exercise after a short delay
+        setTimeout(() => {
+            document.getElementById('matching-screen').classList.add('hidden');
+            document.getElementById('sentence-screen').classList.remove('hidden');
+            currentQ = 1;
+            loadSentence();
+        }, 1200);
+    }
+
+    // ================================================================
+    //  EXERCISES 1-5: SENTENCE LOGIC
+    // ================================================================
+    function loadSentence() {
+        if (currentQ > 5) {
+            showResults();
+            return;
+        }
+
+        // Update Header
+        document.getElementById('category').innerText = `Question ${currentQ} of 5`;
+        // Progress: Q0 is 0-50%, Q1-5 is 50-100%
+        const progressPercent = 50 + ((currentQ - 1) / 5) * 50;
+        document.getElementById('progress-bar').style.width = progressPercent + "%";
+
+        const q = sentences[currentQ - 1];
+        
+        // Format sentence
+        const formattedSentence = q.sentence.replace("______", `<span class="blank">______</span>`);
+        document.getElementById('sentence-text').innerHTML = formattedSentence;
+
+        // Render options
+        const optionsArea = document.getElementById('options-area');
+        optionsArea.innerHTML = '';
+        
+        // Pick correct + 3 random wrong
+        let wrongOptions = q.options.filter(opt => opt !== q.correct);
+        wrongOptions = shuffleArray(wrongOptions).slice(0, 3);
+        const finalOptions = shuffleArray([q.correct, ...wrongOptions]);
+
+        finalOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn, q.correct);
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, btn, correctAnswer) {
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(b => b.disabled = true);
+
+        if (choice === correctAnswer) {
+            btn.classList.add('correct');
+            score++;
+            
+            setTimeout(() => {
+                currentQ++;
+                loadSentence();
+            }, 800);
+        } else {
+            btn.classList.add('wrong');
+            
+            // Highlight correct
+            allButtons.forEach(b => {
+                if (b.innerText === correctAnswer) {
+                    b.classList.add('correct');
+                }
+            });
+
+            if (!userMistakes.includes(choice)) {
+                userMistakes.push(choice);
+            }
+
+            setTimeout(() => {
+                currentQ++;
+                loadSentence();
+            }, 1500);
+        }
+    }
+
+    // ================================================================
+    //  RESULTS & GOOGLE SHEETS INTEGRATION
+    // ================================================================
+    function showResults() {
+        document.getElementById('header').classList.add('hidden');
+        document.getElementById('sentence-screen').classList.add('hidden');
+        document.getElementById('final-screen').style.display = 'block';
+        
+        document.getElementById('final-score').innerText = score;
+        
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            document.getElementById('success-msg').style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Initialize on page load
+    populateEmojiSelects();
+
+</script>
+
+</body>
+</html>

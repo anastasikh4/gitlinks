@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super English Hero: Museum Trip 🏛️</title>
+    <style>
+        :root {
+            --primary: #4A90E2;
+            --secondary: #7ED321;
+            --accent: #FF6B6B;
+            --bg-color: #F0F8FF;
+            --card-bg: #FFFFFF;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border-color: #B3D4FF;
+            --shadow-color: #A0C4FF;
+            
+            /* Button Colors */
+            --btn-true: #A8E6CF;
+            --btn-true-shadow: #7ECBA1;
+            --btn-true-text: #1B5E20;
+            
+            --btn-false: #FFD3B6;
+            --btn-false-shadow: #D4A373;
+            --btn-false-text: #8B4513;
+
+            --btn-gap: #E1BEE7;
+            --btn-gap-shadow: #BA68C8;
+            --btn-gap-text: #4A148C;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Nunito', 'Comic Sans MS', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex; justify-content: center; align-items: flex-start;
+            min-height: 100vh; padding: 20px 14px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            border: 6px solid var(--border-color);
+            border-radius: 30px;
+            padding: 30px 24px 26px;
+            width: 100%; max-width: 540px;
+            text-align: center;
+            box-shadow: 0 15px 0 var(--shadow-color);
+            position: relative;
+        }
+
+        .level-badge {
+            position: absolute; top: -18px; right: 20px;
+            background: var(--primary);
+            color: #fff;
+            padding: 6px 18px; border-radius: 20px;
+            font-weight: 900; font-size: 16px;
+            box-shadow: 0 4px 0 #2C6FB5;
+        }
+
+        .topic-badge {
+            display: inline-block;
+            background: #E0F7FA;
+            color: #006064;
+            padding: 6px 16px; border-radius: 20px;
+            font-weight: 800; font-size: 12px;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            margin-bottom: 14px;
+            border: 2px solid #80DEEA;
+        }
+
+        h1 {
+            font-size: 24px; margin: 0 0 10px 0;
+            letter-spacing: 1px;
+            color: var(--primary);
+        }
+
+        /* Reading Text Box */
+        .story-box {
+            background: #FFFDE7;
+            border: 3px dashed #FFD54F;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-main);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .story-box strong {
+            color: #F57F17;
+        }
+
+        .phrase {
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 22px;
+            color: var(--text-main);
+            line-height: 1.4;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .emoji-display {
+            font-size: 50px;
+            margin-bottom: 10px;
+            animation: pop 0.4s ease-out;
+        }
+
+        @keyframes pop {
+            0%   { transform: scale(0.85); }
+            60%  { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+
+        /* Layout for 2 buttons (T/F) */
+        .btn-grid.two-cols {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* Layout for 4 buttons (Gap Fill) */
+        .btn-grid.four-cols {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .hero-btn {
+            padding: 18px 14px;
+            font-size: 20px;
+            font-weight: 900;
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.1s;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        /* Specific styles for T/F */
+        .hero-btn.true {
+            background: var(--btn-true);
+            color: var(--btn-true-text);
+            box-shadow: 0 6px 0 var(--btn-true-shadow);
+        }
+
+        .hero-btn.false {
+            background: var(--btn-false);
+            color: var(--btn-false-text);
+            box-shadow: 0 6px 0 var(--btn-false-shadow);
+        }
+
+        /* Specific styles for Gap Fill */
+        .hero-btn.gap-option {
+            background: var(--btn-gap);
+            color: var(--btn-gap-text);
+            box-shadow: 0 6px 0 var(--btn-gap-shadow);
+            font-size: 18px;
+        }
+
+        .hero-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2) !important;
+        }
+        .hero-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        .hero-btn.reveal {
+            background: var(--secondary) !important;
+            color: #1B5E20 !important;
+            box-shadow: 0 6px 0 #5A9E15 !important;
+            opacity: 1 !important;
+        }
+        
+        .hero-btn.wrongPick {
+            background: #FFCDD2 !important;
+            color: #B71C1C !important;
+            box-shadow: 0 6px 0 #E57373 !important;
+            opacity: 1 !important;
+        }
+
+        #msg {
+            height: 30px;
+            margin-top: 25px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+        
+        .score-board {
+            margin-top: 10px;
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .score-board #xp { color: var(--primary); font-size: 18px;}
+
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-10px); }
+            40%      { transform: translateX(10px); }
+            60%      { transform: translateX(-8px); }
+            80%      { transform: translateX(8px); }
+        }
+
+        /* Win Screen */
+        .win-screen { text-align: center; padding: 20px 0; }
+        .win-screen .trophy { font-size: 90px; display: inline-block; animation: bob 2s infinite; }
+        @keyframes bob {
+            0%,100% { transform: translateY(0) rotate(-4deg); }
+            50%     { transform: translateY(-10px) rotate(4deg); }
+        }
+        .win-screen h1 { color: var(--primary); font-size: 28px; margin: 10px 0; }
+        .win-screen .final-score { font-size: 44px; color: var(--secondary); font-weight: 900; margin: 12px 0; text-shadow: 1px 1px 2px #ccc;}
+        .win-screen p { font-size: 16px; color: var(--text-muted); margin-bottom: 20px; }
+        
+        .success-msg {
+            color: #2E7D32 !important;
+            background: #E8F5E9;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .restart-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 17px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #2C6FB5;
+            transition: 0.1s;
+        }
+        .restart-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #2C6FB5;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed; top: -12px;
+            width: 10px; height: 14px;
+            pointer-events: none; z-index: 999;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            0%   { transform: translateY(-10px) rotate(0); opacity: 1; }
+            100% { transform: translateY(105vh) rotate(720deg); opacity: 0.4; }
+        }
+
+        @media (max-width: 420px) {
+            .container { padding: 26px 16px 22px; border-width: 5px; }
+            .phrase { font-size: 17px; }
+            .hero-btn { font-size: 16px; padding: 12px 8px; }
+            .hero-btn.gap-option { font-size: 15px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="mainBox">
+    <div class="level-badge">Q: <span id="lvl">1</span>/10</div>
+    <div id="content"></div>
+</div>
+
+<script>
+/* =========================================================
+   DATA & CONFIGURATION
+   ========================================================= */
+const TEST_NAME = "Reading Comprehension: Museum Trip (10 Questions)";
+let userMistakes = [];
+let score = 0;
+
+const READING_TEXT = `
+    Last Friday, our class went to the Science Museum. We traveled by bus. 
+    At the museum, we saw a huge dinosaur skeleton. Our teacher, Mr. Smith, 
+    told us interesting facts about fossils. After lunch, we watched a 3D movie 
+    about space. We arrived back at school at 4 PM. Everyone was tired but very happy.
+`;
+
+const DATA = [
+    // 1. True/False
+    {
+        type: 'tf',
+        display: 'The class went to the Science Museum last Friday.',
+        options: ['True', 'False'],
+        correct: 'True',
+        emoji: '🏛️'
+    },
+    // 2. Gap Fill
+    {
+        type: 'gap',
+        display: 'They traveled to the museum by _______.',
+        options: ['bus', 'train', 'car', 'plane'],
+        correct: 'bus',
+        emoji: '🚌'
+    },
+    // 3. True/False
+    {
+        type: 'tf',
+        display: 'They saw a giant dinosaur skeleton.',
+        options: ['True', 'False'],
+        correct: 'True',
+        emoji: '🦖'
+    },
+    // 4. Gap Fill
+    {
+        type: 'gap',
+        display: 'Our teacher, Mr. _______, told us about fossils.',
+        options: ['Smith', 'Jones', 'Brown', 'Davis'],
+        correct: 'Smith',
+        emoji: '👨‍🏫'
+    },
+    // 5. True/False
+    {
+        type: 'tf',
+        display: 'They watched a 2D movie about animals.',
+        options: ['True', 'False'],
+        correct: 'False',
+        emoji: '🎬'
+    },
+    // 6. Gap Fill
+    {
+        type: 'gap',
+        display: 'After lunch, they watched a 3D movie about _______.',
+        options: ['space', 'animals', 'dinosaurs', 'history'],
+        correct: 'space',
+        emoji: '🚀'
+    },
+    // 7. True/False
+    {
+        type: 'tf',
+        display: 'They got back to school at 4 PM.',
+        options: ['True', 'False'],
+        correct: 'True',
+        emoji: '⏰'
+    },
+    // 8. Gap Fill
+    {
+        type: 'gap',
+        display: 'Everyone was tired but very _______.',
+        options: ['happy', 'sad', 'angry', 'bored'],
+        correct: 'happy',
+        emoji: '😊'
+    },
+    // 9. True/False
+    {
+        type: 'tf',
+        display: 'They went to the museum by train.',
+        options: ['True', 'False'],
+        correct: 'False',
+        emoji: '🚆'
+    },
+    // 10. Gap Fill
+    {
+        type: 'gap',
+        display: 'They saw a huge _______ skeleton.',
+        options: ['dinosaur', 'whale', 'human', 'bird'],
+        correct: 'dinosaur',
+        emoji: '🦴'
+    }
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let queueIndex = 0;
+let answered = false;
+
+const container = document.getElementById('mainBox');
+const content   = document.getElementById('content');
+
+/* =========================================================
+   RENDER QUESTION
+   ========================================================= */
+function spawn() {
+    if (queueIndex >= DATA.length) return showWin();
+
+    const current = DATA[queueIndex];
+    answered = false;
+
+    // The story remains visible at the top of every question
+    const storyHtml = `
+        <div class="story-box">
+            <strong>Read the text:</strong><br>
+            ${READING_TEXT}
+        </div>
+    `;
+
+    let gridClass = '';
+    let btnsHtml = '';
+
+    // Render based on question type
+    if (current.type === 'tf') {
+        gridClass = 'two-cols';
+        btnsHtml = current.options.map((opt) => {
+            const btnClass = opt === 'True' ? 'true' : 'false';
+            return `<button class="hero-btn ${btnClass}" onclick="check(this)">${opt}</button>`;
+        }).join('');
+    } else if (current.type === 'gap') {
+        gridClass = 'four-cols';
+        // Shuffle the gap fill options
+        const shuffledOpts = [...current.options].sort(() => Math.random() - 0.5);
+        btnsHtml = shuffledOpts.map((opt) => {
+            return `<button class="hero-btn gap-option" onclick="check(this)">${opt}</button>`;
+        }).join('');
+    }
+
+    content.innerHTML = `
+        <div class="topic-badge">Reading Comprehension</div>
+        <h1>${current.type === 'tf' ? 'True or False? 🤔' : 'Fill in the Gap! 🧩'}</h1>
+        ${storyHtml}
+        <div class="phrase">
+            <span class="emoji-display">${current.emoji}</span>
+            "${current.display}"
+        </div>
+        <div class="btn-grid ${gridClass}" id="btnGrid">
+            ${btnsHtml}
+        </div>
+        <div id="msg">Pick the right answer! ⚡</div>
+        <div class="score-board">Score: <span id="xp">${score}</span> / ${DATA.length}</div>
+    `;
+    
+    document.getElementById('lvl').textContent = queueIndex + 1;
+}
+
+/* =========================================================
+   CHECK ANSWER
+   ========================================================= */
+function check(btn) {
+    if (answered) return;
+    answered = true;
+
+    const chosen = btn.innerText.trim();
+    const current = DATA[queueIndex];
+    const isCorrect = chosen.toLowerCase() === current.correct.toLowerCase();
+
+    const msg = document.getElementById('msg');
+    const allBtns = document.querySelectorAll('.hero-btn');
+
+    if (isCorrect) {
+        score++;
+        btn.classList.add('reveal');
+        allBtns.forEach(b => b.disabled = true);
+        msg.textContent = 'CORRECT! 🌟';
+        msg.style.color = 'var(--secondary)';
+        if (navigator.vibrate) navigator.vibrate(35);
+    } else {
+        // Track wrong answer
+        if (!userMistakes.includes(chosen)) {
+            userMistakes.push(chosen);
+        }
+        
+        btn.classList.add('wrongPick');
+        allBtns.forEach(b => {
+            b.disabled = true;
+            if (b.innerText.trim().toLowerCase() === current.correct.toLowerCase()) {
+                b.classList.add('reveal');
+            }
+        });
+        
+        msg.textContent = 'OOPS! Wrong answer. ⚡';
+        msg.style.color = 'var(--accent)';
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 500);
+        if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+    }
+
+    // Move to next question
+    queueIndex++;
+    setTimeout(spawn, 1600);
+}
+
+/* =========================================================
+   WIN SCREEN & GOOGLE SHEETS
+   ========================================================= */
+function showWin() {
+    content.innerHTML = `
+        <div class="win-screen">
+            <div class="trophy">🏆</div>
+            <h1>QUEST COMPLETE!</h1>
+            <p>You finished the reading comprehension.</p>
+            <div class="final-score">${score} / ${DATA.length}</div>
+            <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+            <button class="restart-btn" onclick="location.reload()">Play Again 🚀</button>
+        </div>
+    `;
+    document.getElementById('lvl').style.display = 'none';
+    launchConfetti();
+    sendResultsToGoogle();
+}
+
+function launchConfetti() {
+    const colors = ['#4A90E2', '#7ED321', '#FF6B6B', '#F5A623', '#50E3C2'];
+    for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        c.style.animationDelay = (Math.random() * 0.8) + 's';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 5000);
+    }
+}
+
+async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+        name: TEST_NAME,
+        score: score,
+        total: DATA.length,
+        mistakes: userMistakes.join(', ')
+    });
+
+    try {
+        await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        });
+        
+        // Display success message
+        const msgEl = document.getElementById('success-msg');
+        if (msgEl) msgEl.style.display = 'block';
+    } catch (error) {
+        console.error("Error sending results:", error);
+    }
+}
+
+/* =========================================================
+   START
+   ========================================================= */
+spawn();
+</script>
+
+</body>
+</html>

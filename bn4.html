@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sounds and Reactions: Mixed Exercises</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+            --duo-purple: #ce82ff;
+            --duo-light-purple: #f3e5ff;
+            --duo-orange: #ff9f43;
+            --duo-light-orange: #ffeaa7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            font-size: 14px;
+            padding-bottom: 100px; /* Space for footer */
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 600px;
+            height: 12px;
+            background-color: var(--duo-gray);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--duo-green);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .card {
+            max-width: 600px;
+            width: 100%;
+            padding: 15px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            border-bottom: 2px solid var(--duo-gray);
+            padding-bottom: 5px;
+        }
+
+        /* Reading Text Box */
+        .reading-box {
+            background-color: var(--duo-light-purple);
+            border: 2px solid var(--duo-purple);
+            box-shadow: 0 3px 0 var(--duo-purple);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .reading-box strong {
+            color: #9b59b6;
+        }
+
+        /* Question Boxes */
+        .letter-box {
+            border: 2px solid var(--duo-gray);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 2.4;
+            font-size: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 0 var(--duo-gray);
+            background: #fafafa;
+        }
+
+        .letter-box p {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .letter-box strong {
+            font-size: 16px;
+        }
+
+        select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 10px 15px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 12px;
+            cursor: pointer;
+            outline: none;
+            color: var(--duo-blue);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: white;
+            width: 100%;
+        }
+
+        select:focus {
+            border-color: var(--duo-blue);
+            background-color: #f0f8ff;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 2px solid var(--duo-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+        }
+
+        #check-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 4px solid var(--duo-green-dark);
+            padding: 12px 45px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.1s;
+        }
+
+        #check-btn:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        /* Final Screen */
+        #final-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #final-screen .emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        #final-screen h1 {
+            font-size: 32px;
+            color: var(--duo-green);
+            margin-bottom: 10px;
+        }
+
+        #final-screen p {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        #final-screen button {
+            background-color: var(--duo-blue);
+            color: white;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            padding: 12px 40px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        #final-screen button:active {
+            border-bottom-width: 2px;
+            transform: translateY(2px);
+        }
+
+        .success-msg {
+            color: #2e7d32;
+            font-weight: 800;
+            font-size: 16px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container" id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="card" id="quiz-container">
+        <h1>Sounds and Reactions</h1>
+
+        <div class="reading-box">
+            <strong>Read the text:</strong><br><br>
+            Last night, there was a loud <strong>scream</strong> outside my window. Then I heard a loud <strong>gust of wind</strong> hit the trees. My friend gave a <strong>gasp</strong> of surprise when she saw a shadow. Suddenly, I heard a <strong>whisper</strong> in the dark, and I let out a big <strong>yawn</strong> because I was very tired and wanted to sleep.
+        </div>
+
+        <!-- ================= LEVEL 1 (FORMERLY LEVEL 2): COMPREHENSION ================= -->
+        <h2>Exercise 1: Answer the questions</h2>
+        <div class="letter-box">
+            <p>
+                <strong>1. What was outside the window?</strong>
+                <select id="q1" onchange="updateProgress()">
+                    <option value="">--- Choose an answer ---</option>
+                    <option value="A loud scream">A loud scream</option>
+                    <option value="A gust of wind">A gust of wind</option>
+                    <option value="A shadow">A shadow</option>
+                    <option value="A whisper">A whisper</option>
+                </select>
+            </p>
+            <p>
+                <strong>2. What hit the trees?</strong>
+                <select id="q2" onchange="updateProgress()">
+                    <option value="">--- Choose an answer ---</option>
+                    <option value="A shadow">A shadow</option>
+                    <option value="A loud scream">A loud scream</option>
+                    <option value="A gust of wind">A gust of wind</option>
+                    <option value="A whisper">A whisper</option>
+                </select>
+            </p>
+            <p>
+                <strong>3. Why did the friend gasp?</strong>
+                <select id="q3" onchange="updateProgress()">
+                    <option value="">--- Choose an answer ---</option>
+                    <option value="Because she saw a shadow">Because she saw a shadow</option>
+                    <option value="Because she was tired">Because she was tired</option>
+                    <option value="Because she heard a whisper">Because she heard a whisper</option>
+                    <option value="Because of the wind">Because of the wind</option>
+                </select>
+            </p>
+            <p>
+                <strong>4. What did the person hear in the dark?</strong>
+                <select id="q4" onchange="updateProgress()">
+                    <option value="">--- Choose an answer ---</option>
+                    <option value="A scream">A scream</option>
+                    <option value="A gust of wind">A gust of wind</option>
+                    <option value="A whisper">A whisper</option>
+                    <option value="A yawn">A yawn</option>
+                </select>
+            </p>
+            <p>
+                <strong>5. Why did the person yawn?</strong>
+                <select id="q5" onchange="updateProgress()">
+                    <option value="">--- Choose an answer ---</option>
+                    <option value="Because they were scared">Because they were scared</option>
+                    <option value="Because they were tired">Because they were tired</option>
+                    <option value="Because they were cold">Because they were cold</option>
+                    <option value="Because they were hungry">Because they were hungry</option>
+                </select>
+            </p>
+        </div>
+
+        <!-- ================= LEVEL 2 (FORMERLY LEVEL 1): EMOJI MATCH ================= -->
+        <h2>Exercise 2: Match the word to the emoji</h2>
+        <div class="letter-box">
+            <p>
+                <strong>6. Scream</strong>
+                <select id="w1" onchange="updateProgress()">
+                    <option value="">--- Choose an emoji ---</option>
+                    <option value="😱">😱</option>
+                    <option value="💨">💨</option>
+                    <option value="😮">😮</option>
+                    <option value="🤫">🤫</option>
+                    <option value="🥱">🥱</option>
+                </select>
+            </p>
+            <p>
+                <strong>7. Gust of wind</strong>
+                <select id="w2" onchange="updateProgress()">
+                    <option value="">--- Choose an emoji ---</option>
+                    <option value="💨">💨</option>
+                    <option value="😱">😱</option>
+                    <option value="😮">😮</option>
+                    <option value="🤫">🤫</option>
+                    <option value="🥱">🥱</option>
+                </select>
+            </p>
+            <p>
+                <strong>8. Gasp</strong>
+                <select id="w3" onchange="updateProgress()">
+                    <option value="">--- Choose an emoji ---</option>
+                    <option value="😮">😮</option>
+                    <option value="😱">😱</option>
+                    <option value="💨">💨</option>
+                    <option value="🤫">🤫</option>
+                    <option value="🥱">🥱</option>
+                </select>
+            </p>
+            <p>
+                <strong>9. Whisper</strong>
+                <select id="w4" onchange="updateProgress()">
+                    <option value="">--- Choose an emoji ---</option>
+                    <option value="🤫">🤫</option>
+                    <option value="😱">😱</option>
+                    <option value="💨">💨</option>
+                    <option value="😮">😮</option>
+                    <option value="🥱">🥱</option>
+                </select>
+            </p>
+            <p>
+                <strong>10. Yawn</strong>
+                <select id="w5" onchange="updateProgress()">
+                    <option value="">--- Choose an emoji ---</option>
+                    <option value="🥱">🥱</option>
+                    <option value="😱">😱</option>
+                    <option value="💨">💨</option>
+                    <option value="😮">😮</option>
+                    <option value="🤫">🤫</option>
+                </select>
+            </p>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen">
+        <div class="emoji">🏆</div>
+        <h1>Lesson Complete!</h1>
+        <p id="final-score-text">You scored 0 out of 10</p>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button onclick="location.reload()">Restart</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()">Check</button>
+    </div>
+
+    <script>
+        // ================================================================
+        //  RESULTS TRACKING & CONFIGURATION
+        // ================================================================
+        const TEST_NAME = "Sounds and Reactions: Mixed Exercises";
+        let userMistakes = [];
+        let score = 0;
+
+        const answers = { 
+            // Exercise 1: Comprehension
+            q1: "A loud scream",
+            q2: "A gust of wind",
+            q3: "Because she saw a shadow",
+            q4: "A whisper",
+            q5: "Because they were tired",
+            
+            // Exercise 2: Emojis
+            w1: "😱",
+            w2: "💨",
+            w3: "😮",
+            w4: "🤫",
+            w5: "🥱"
+        };
+        
+        const totalQuestions = Object.keys(answers).length;
+
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if(s.value !== "") filled++; });
+            document.getElementById('progress-bar').style.width = (filled / totalQuestions) * 100 + '%';
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const selects = document.querySelectorAll('select');
+            let allFilled = Array.from(selects).every(s => s.value !== "");
+
+            if(!allFilled) {
+                alert("Please answer all questions first!");
+                return;
+            }
+
+            for (let id in answers) {
+                const select = document.getElementById(id);
+                if (select.value === answers[id]) {
+                    correctCount++;
+                    select.style.borderColor = "var(--duo-green)";
+                    select.style.backgroundColor = "#f0ffe8";
+                } else {
+                    // Track wrong answer
+                    if (!userMistakes.includes(select.value)) {
+                        userMistakes.push(select.value);
+                    }
+                    select.style.borderColor = "var(--duo-red)";
+                    select.style.backgroundColor = "#fff0f0";
+                }
+            }
+
+            score = correctCount;
+
+            // Transition to final screen
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('footer').style.display = 'none';
+            document.getElementById('final-screen').style.display = 'block';
+
+            document.getElementById('final-score-text').innerText = `You scored ${score} out of ${totalQuestions}`;
+            
+            // Send results
+            sendResultsToGoogle();
+        }
+
+        // ================================================================
+        //  GOOGLE SHEETS INTEGRATION
+        // ================================================================
+        async function sendResultsToGoogle() {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: score,
+                total: totalQuestions,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                // Show success message
+                const msgEl = document.getElementById('success-msg');
+                if (msgEl) {
+                    msgEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+    </script>
+</body>
+</html>
