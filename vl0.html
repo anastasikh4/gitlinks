@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tech Phonetics Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #475569;
+            
+            --accent-primary: #0284c7; /* Deep Tech Blue */
+            --accent-secondary: #2563eb;
+            --accent-green: #16a34a;
+            --accent-red: #dc2626;
+            
+            --btn-bg: #ffffff;
+            --btn-border: #cbd5e1;
+            --btn-shadow: #94a3b8;
+        }
+        
+        body { 
+            font-family: 'Rajdhani', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: var(--bg-gradient); 
+            color: var(--text-main); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        header { 
+            width: 100%; 
+            max-width: 650px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            box-sizing: border-box; 
+        }
+        
+        .progress-bar { 
+            flex-grow: 1; 
+            height: 12px; 
+            background: #e2e8f0; 
+            border-radius: 6px; 
+            border: 1px solid #cbd5e1;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #fill { 
+            width: 0%; 
+            height: 100%; 
+            background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary)); 
+            transition: width 0.4s; 
+        }
+        
+        main { 
+            width: 100%; 
+            max-width: 650px; 
+            padding: 20px; 
+            text-align: center; 
+            box-sizing: border-box;
+        }
+        
+        h1 { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px; 
+            font-weight: 800; 
+            margin-bottom: 25px; 
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ================== LEVEL 1: MATCHING GRID ================== */
+        .grid-match {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .match-card {
+            background: var(--card-bg);
+            border: 2px solid var(--btn-border);
+            border-bottom: 4px solid var(--btn-shadow);
+            border-radius: 8px;
+            padding: 15px 10px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-secondary);
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 80px;
+            box-shadow: 0 4px 0 var(--btn-shadow);
+        }
+
+        .match-card.english {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        .match-card:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 var(--btn-shadow); 
+        }
+        
+        .match-card.selected { 
+            border-color: var(--accent-primary); 
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .match-card.correct { 
+            background: #dcfce7; 
+            border-color: var(--accent-green); 
+            color: var(--accent-green);
+            box-shadow: 0 4px 0 #15803d;
+            pointer-events: none;
+        }
+        
+        .match-card.wrong { 
+            background: #fee2e2; 
+            border-color: var(--accent-red); 
+            color: var(--accent-red);
+            box-shadow: 0 4px 0 #b91c1c;
+            animation: shake 0.4s; 
+        }
+
+        /* ================== LEVEL 2: MCQ ================== */
+        .phonetic-box {
+            background: #f8fafc;
+            border: 2px dashed var(--accent-primary);
+            border-radius: 12px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            word-wrap: break-word;
+        }
+
+        .listen-btn { 
+            background: #fbbf24; 
+            border: 2px solid #f59e0b; 
+            border-bottom: 4px solid #b45309; 
+            padding: 15px 24px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 18px; 
+            width: 100%; 
+            margin-bottom: 20px; 
+            font-family: 'Orbitron', sans-serif;
+            color: #000;
+            transition: 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #b45309;
+        }
+        
+        .listen-btn:active { 
+            transform: translateY(4px); 
+            border-bottom-width: 2px;
+            box-shadow: 0 0 0 #b45309;
+        }
+
+        .grid-mcq { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 12px; 
+        }
+        
+        .mcq-btn {
+            background: var(--btn-bg); 
+            border: 2px solid var(--btn-border); 
+            border-bottom: 4px solid var(--btn-shadow);
+            border-radius: 8px; 
+            padding: 18px 15px; 
+            font-size: 18px; 
+            font-weight: 700;
+            cursor: pointer; 
+            transition: all 0.1s; 
+            text-align: center;
+            color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 var(--btn-shadow);
+        }
+        
+        .mcq-btn:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 var(--btn-shadow); 
+        }
+        
+        .mcq-btn.correct { 
+            background: #dcfce7; 
+            border-color: var(--accent-green); 
+            color: var(--accent-green); 
+            box-shadow: 0 4px 0 #15803d;
+        }
+        
+        .mcq-btn.wrong { 
+            background: #fee2e2; 
+            border-color: var(--accent-red); 
+            color: var(--accent-red); 
+            box-shadow: 0 4px 0 #b91c1c;
+        }
+        
+        .mcq-btn:disabled { cursor: default; }
+
+        /* ================== FEEDBACK BAR ================== */
+        #feedback { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 20px; 
+            display: none; 
+            justify-content: center; 
+            background: #ffffff; 
+            border-top: 2px solid var(--btn-border); 
+            z-index: 100; 
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
+        }
+        
+        .next-btn { 
+            background: var(--accent-primary); 
+            color: #ffffff; 
+            border: none; 
+            border-bottom: 4px solid #0369a1; 
+            padding: 14px 50px; 
+            border-radius: 8px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 18px; 
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 #0369a1;
+        }
+        
+        .next-btn:active { 
+            transform: translateY(4px); 
+            border-bottom-width: 2px;
+            box-shadow: 0 0 0 #0369a1;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* ================== COMPLETION ================== */
+        .completion { padding: 30px 0; }
+        .completion h2 { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--accent-primary); }
+        .completion .icon { font-size: 72px; }
+        
+        .success-msg { 
+            color: var(--accent-green); 
+            font-weight: 800; 
+            font-size: 16px; 
+            margin-top: 15px; 
+            display: none; 
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 500px) {
+            .phonetic-box { font-size: 20px; padding: 20px 10px; }
+            .mcq-btn { font-size: 16px; padding: 15px 10px; }
+            .match-card { font-size: 12px; padding: 10px 5px; min-height: 70px; }
+            .match-card.english { font-size: 14px; }
+            h1 { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">Match Protocol</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">CONTINUE</button>
+</div>
+
+<script>
+    // ================================================================
+    //  CONFIGURATION & RESULTS TRACKING
+    // ================================================================
+    const TEST_NAME = "Light Tech Phonetics: Match & MCQ";
+    let userMistakes = [];
+    let score = 0;
+
+    // ================================================================
+    //  DATA FROM THE IMAGE
+    // ================================================================
+    
+    // LEVEL 1: Match Phonetic to English
+    const level1Data = [
+        { id: 1, text: "['twenti faɪv 'bʌsɪz]", type: 'phonetic' }, { id: 1, text: "twenty five buses", type: 'english' },
+        { id: 2, text: "['θɜːti sɪks 'helɪkɒptəz]", type: 'phonetic' }, { id: 2, text: "thirty six helicopters", type: 'english' },
+        { id: 3, text: "['twenti sevn baɪks]", type: 'phonetic' }, { id: 3, text: "twenty seven bikes", type: 'english' },
+        { id: 4, text: "['fɔːti eɪt 'preznts]", type: 'phonetic' }, { id: 4, text: "forty eight presents", type: 'english' }
+    ];
+
+    // LEVEL 2: Multiple Choice
+    const level2Data = [
+        {
+            phonetic: "['twenti faɪv 'bʌsɪz]",
+            correct: "twenty five buses",
+            options: ["twenty five buses", "twenty five cars", "thirty five buses", "twenty four buses"],
+            audio: "twenty five buses"
+        },
+        {
+            phonetic: "['θɜːti sɪks 'helɪkɒptəz]",
+            correct: "thirty six helicopters",
+            options: ["thirty six planes", "forty six helicopters", "thirty six helicopters", "thirty five helicopters"],
+            audio: "thirty six helicopters"
+        },
+        {
+            phonetic: "['twenti sevn baɪks]",
+            correct: "twenty seven bikes",
+            options: ["twenty seven bikes", "twenty seven cars", "thirty seven bikes", "twenty seven buses"],
+            audio: "twenty seven bikes"
+        },
+        {
+            phonetic: "['fɔːti eɪt 'preznts]",
+            correct: "forty eight presents",
+            options: ["forty eight parents", "fifty eight presents", "forty eight presents", "forty seven presents"],
+            audio: "forty eight presents"
+        },
+        {
+            phonetic: "['fɪfti kɑːz]",
+            correct: "fifty cars",
+            options: ["fifteen cars", "fifty cars", "fifty buses", "fifty cats"],
+            audio: "fifty cars"
+        }
+    ];
+
+    // Game State
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    let matchedPairs = 0;
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "SYSTEM: Match Phonetics to Words";
+            const grid = document.createElement('div');
+            grid.className = 'grid-match';
+            
+            // Shuffle cards
+            const shuffled = [...level1Data].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `match-card ${item.type}`;
+                card.innerText = item.text;
+                card.dataset.id = item.id;
+                card.dataset.type = item.type;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "SYSTEM: Identify the Audio";
+            const q = level2Data[subStep];
+            
+            area.innerHTML = `
+                <div class="phonetic-box">${q.phonetic}</div>
+                <button class="listen-btn" onclick="speakPhrase('${q.audio}')">🔊 PLAY AUDIO</button>
+                <div class="grid-mcq" id="mcq-grid"></div>
+            `;
+
+            const grid = document.getElementById('mcq-grid');
+            const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOpts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'mcq-btn';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(btn, opt, q.correct);
+                grid.appendChild(btn);
+            });
+        }
+        updateProgress();
+    }
+
+    // ---- LEVEL 1: Matching ----
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(p => p.card === card)) return;
+        
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const a = selectedCards[0];
+            const b = selectedCards[1];
+            
+            // Check if ID matches and types are different (one phonetic, one english)
+            if (a.item.id === b.item.id && a.item.type !== b.item.type) {
+                a.card.classList.remove('selected');
+                b.card.classList.remove('selected');
+                a.card.classList.add('correct');
+                b.card.classList.add('correct');
+                selectedCards = [];
+                matchedPairs++;
+                score++;
+                
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                // If all pairs matched, show continue button
+                if (matchedPairs === 4) {
+                    document.getElementById('feedback').style.display = 'flex';
+                }
+            } else {
+                // Wrong match
+                a.card.classList.add('wrong');
+                b.card.classList.add('wrong');
+                
+                if (!userMistakes.includes(a.item.text)) userMistakes.push(a.item.text);
+                if (!userMistakes.includes(b.item.text)) userMistakes.push(b.item.text);
+                
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                
+                setTimeout(() => {
+                    a.card.classList.remove('selected', 'wrong');
+                    b.card.classList.remove('selected', 'wrong');
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+        updateProgress();
+    }
+
+    // ---- LEVEL 2: MCQ ----
+    function checkLevel2(btn, selected, correct) {
+        const allBtns = document.querySelectorAll('.mcq-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+            if (navigator.vibrate) navigator.vibrate(50);
+        } else {
+            btn.classList.add('wrong');
+            if (!userMistakes.includes(selected)) userMistakes.push(selected);
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            
+            allBtns.forEach(b => {
+                if (b.innerText === correct) b.classList.add('correct');
+            });
+        }
+
+        document.getElementById('feedback').style.display = 'flex';
+        updateProgress();
+    }
+
+    // ---- NEXT STEP ----
+    function nextStep() {
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        } else {
+            subStep++;
+            if (subStep >= level2Data.length) {
+                showFinalScreen();
+                return;
+            }
+        }
+        initLevel();
+    }
+
+    // ---- PROGRESS BAR ----
+    function updateProgress() {
+        let currentProgress = 0;
+        if (currentLevel === 1) {
+            currentProgress = matchedPairs / 4; // 4 pairs total
+        } else {
+            currentProgress = (4 + subStep) / (4 + level2Data.length);
+        }
+        document.getElementById('fill').style.width = (currentProgress * 100) + '%';
+    }
+
+    // ================================================================
+    //  SPEECH SYNTHESIS (Audio)
+    // ================================================================
+    function speakPhrase(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.85;
+        msg.pitch = 1;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // ================================================================
+    //  FINAL SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function showFinalScreen() {
+        document.getElementById('fill').style.width = '100%';
+        document.getElementById('feedback').style.display = 'none';
+        
+        document.getElementById('game-area').innerHTML = `
+            <div class="completion">
+                <div class="icon">🎖️</div>
+                <h2>MISSION ACCOMPLISHED</h2>
+                <p style="font-size:18px; color:var(--text-muted); margin-bottom:20px;">You mastered the phonetic decryption protocol.</p>
+                <p class="success-msg" id="send-msg">Results transmitted! ✅</p>
+                <button onclick="location.reload()" style="background:var(--accent-primary); color:#fff; border:none; border-bottom:4px solid #0369a1; padding:14px 40px; border-radius:8px; font-weight:800; cursor:pointer; font-size:16px; font-family:'Orbitron', sans-serif; margin-top:20px; text-transform:uppercase;">RESTART</button>
+            </div>
+        `;
+        
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: 9, // 4 matched pairs + 5 MCQs
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('send-msg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // ---- Start Game ----
+    initLevel();
+</script>
+
+</body>
+</html>

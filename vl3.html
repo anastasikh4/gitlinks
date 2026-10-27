@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grammar & Vocab Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f0f4ff 0%, #fdf2f8 100%);
+            --card-bg: #ffffff;
+            
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            
+            --accent-primary: #8b5cf6;
+            --accent-secondary: #ec4899;
+            
+            --correct-bg: #ecfdf5;
+            --correct-border: #10b981;
+            --correct-text: #047857;
+            
+            --wrong-bg: #fef2f2;
+            --wrong-border: #ef4444;
+            --wrong-text: #b91c1c;
+            
+            --btn-bg: #ffffff;
+            --btn-border: #e2e8f0;
+            --btn-shadow: #cbd5e1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 30px 15px 60px;
+            overflow-x: hidden;
+        }
+        
+        .game-card {
+            background: var(--card-bg);
+            padding: 35px 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.15), 
+                        0 8px 16px -4px rgba(236, 72, 153, 0.1);
+            width: 100%;
+            max-width: 750px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+        }
+        
+        /* ========== HEADER ======== */
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        
+        .mascot {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 25px;
+            letter-spacing: 5px;
+        }
+        
+        .section-title {
+            text-align: center;
+            color: var(--accent-primary);
+            font-size: 16px;
+            font-weight: 800;
+            margin: 35px 0 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed #e2e8f0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ======== QUESTIONS ======== */
+        .question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 18px;
+            background: #f8fafc;
+            border: 2px solid #f1f5f9;
+            border-radius: 18px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+        }
+        
+        .question:hover {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        
+        .question.correct { 
+            background: var(--correct-bg); 
+            border-color: var(--correct-border); 
+        }
+        
+        .question.wrong { 
+            background: var(--wrong-bg); 
+            border-color: var(--wrong-border); 
+        }
+        
+        .question-text {
+            flex: 1;
+            min-width: 220px;
+            font-size: 16.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .q-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-primary);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        
+        .q-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        
+        .q-btn {
+            padding: 12px 18px;
+            border: 2px solid var(--btn-border);
+            background: var(--btn-bg);
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 3px 0 var(--btn-shadow);
+            min-width: 90px;
+        }
+        
+        .q-btn:hover:not(:disabled) { 
+            border-color: #cbd5e1;
+            transform: translateY(-2px); 
+            box-shadow: 0 5px 0 var(--btn-shadow); 
+        }
+        
+        .q-btn:active:not(:disabled) { 
+            transform: translateY(3px); 
+            box-shadow: 0 0px 0 var(--btn-shadow); 
+        }
+        
+        .q-btn:disabled { 
+            cursor: default; 
+            opacity: 0.6; 
+        }
+        
+        /* Instant Feedback Classes */
+        .q-btn.chosen-correct {
+            background: var(--correct-border) !important;
+            color: #ffffff !important;
+            border-color: var(--correct-border) !important;
+            box-shadow: 0 3px 0 #047857 !important;
+            opacity: 1 !important;
+            transform: translateY(2px);
+        }
+
+        .q-btn.chosen-wrong {
+            background: var(--wrong-border) !important;
+            color: #ffffff !important;
+            border-color: var(--wrong-border) !important;
+            box-shadow: 0 3px 0 #b91c1c !important;
+            opacity: 1 !important;
+            animation: shake 0.4s;
+        }
+        
+        .q-btn.reveal-correct {
+            background: var(--correct-bg) !important;
+            color: var(--correct-text) !important;
+            border-color: var(--correct-border) !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            font-weight: 800;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            50% { transform: translateX(6px); }
+            75% { transform: translateX(-4px); }
+            100% { transform: translateX(0); }
+        }
+        
+        /* ======== SCORE BAR ======== */
+        .score-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fdf4ff;
+            border: 2px solid #fbcfe8;
+            border-radius: 18px;
+            padding: 18px 24px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .score-label { 
+            font-size: 13px; 
+            color: #db2777; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .score-value { 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px; 
+            color: var(--accent-primary); 
+            font-weight: 800;
+        }
+        
+        .score-stars { 
+            font-size: 24px; 
+            letter-spacing: 5px; 
+            color: #fbbf24;
+        }
+        
+        /* ======== CONTROLS ======== */
+        .controls { 
+            display: flex; 
+            justify-content: center;
+            margin-top: 10px; 
+        }
+        
+        #resetBtn {
+            background: #ffffff; 
+            width: 100%;
+            max-width: 280px;
+            padding: 16px; 
+            color: var(--text-main); 
+            border: 2px solid var(--btn-border); 
+            border-radius: 16px; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 0 var(--btn-shadow);
+        }
+        
+        #resetBtn:hover { 
+            background: #f8fafc;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 0 var(--btn-shadow);
+        }
+        
+        #resetBtn:active { 
+            transform: translateY(2px); 
+            box-shadow: 0 2px 0 var(--btn-shadow);
+        }
+        
+        #result-msg { 
+            margin-top: 25px; 
+            font-size: 20px; 
+            font-weight: 800; 
+            text-align: center; 
+            min-height: 30px; 
+            transition: 0.3s; 
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .success-msg { 
+            color: var(--correct-text); 
+            font-weight: 700; 
+            font-size: 16px; 
+            margin-top: 15px; 
+            display: none; 
+            text-align: center; 
+            background: var(--correct-bg);
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid var(--correct-border);
+        }
+        
+        /* ======== MOBILE ======== */
+        @media (max-width: 600px) {
+            .game-card { padding: 25px 20px; border-radius: 24px; }
+            h1 { font-size: 24px; }
+            .question { padding: 15px; }
+            .question-text { font-size: 15px; min-width: 100%; }
+            .q-buttons { width: 100%; justify-content: flex-start; }
+            .q-btn { flex: 1; padding: 12px 10px; font-size: 14px; min-width: auto; }
+            .score-value { font-size: 24px; }
+            #resetBtn { font-size: 15px; padding: 15px; }
+            #result-msg { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-card">
+        <h1>Grammar & Vocabulary</h1>
+        <div class="mascot">✨ 🎧 💖</div>
+        
+        <!-- ======== EXERCISE 1 ======== -->
+        <div class="section-title">Exercise 1: Negative Prefixes</div>
+        <div id="exercise1">
+            <div class="question" data-answer="dislike">
+                <div class="question-text"><span class="q-num">1</span> I ___ fish. I don't like the way it smells.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="like" onclick="selectAnswer(this)">like</button>
+                    <button class="q-btn" data-value="dislike" onclick="selectAnswer(this)">dislike</button>
+                    <button class="q-btn" data-value="mislike" onclick="selectAnswer(this)">mislike</button>
+                </div>
+            </div>
+            
+            <div class="question" data-answer="misplaced">
+                <div class="question-text"><span class="q-num">2</span> Dad can't find his glasses. I think he has ___ them.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="placed" onclick="selectAnswer(this)">placed</button>
+                    <button class="q-btn" data-value="displaced" onclick="selectAnswer(this)">displaced</button>
+                    <button class="q-btn" data-value="misplaced" onclick="selectAnswer(this)">misplaced</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="dishonest">
+                <div class="question-text"><span class="q-num">3</span> Don't trust Alex. He's very ___.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="honest" onclick="selectAnswer(this)">honest</button>
+                    <button class="q-btn" data-value="unhonest" onclick="selectAnswer(this)">unhonest</button>
+                    <button class="q-btn" data-value="dishonest" onclick="selectAnswer(this)">dishonest</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="disadvantage">
+                <div class="question-text"><span class="q-num">4</span> Heavy traffic is one of the biggest ___ of living in a city.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="advantages" onclick="selectAnswer(this)">advantages</button>
+                    <button class="q-btn" data-value="disadvantage" onclick="selectAnswer(this)">disadvantage</button>
+                    <button class="q-btn" data-value="misadvantage" onclick="selectAnswer(this)">misadvantage</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="misunderstand">
+                <div class="question-text"><span class="q-num">5</span> I'm not saying I like junk food, don't ___ me.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="understand" onclick="selectAnswer(this)">understand</button>
+                    <button class="q-btn" data-value="misunderstand" onclick="selectAnswer(this)">misunderstand</button>
+                    <button class="q-btn" data-value="disunderstand" onclick="selectAnswer(this)">disunderstand</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======== EXERCISE 2 ======== -->
+        <div class="section-title">Exercise 2: Match to Form Exchanges</div>
+        <div id="exercise2">
+            <div class="question" data-answer="In cash.">
+                <div class="question-text"><span class="q-num">6</span> How would you like to pay?</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="Sparkling or still?" onclick="selectAnswer(this)">Sparkling or still?</button>
+                    <button class="q-btn" data-value="In cash." onclick="selectAnswer(this)">In cash.</button>
+                    <button class="q-btn" data-value="Yes, I bought them last week." onclick="selectAnswer(this)">Yes, I bought them...</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="On Oxford Road, opposite WH Smith's.">
+                <div class="question-text"><span class="q-num">7</span> Whereabouts is it exactly?</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="On Oxford Road, opposite WH Smith's." onclick="selectAnswer(this)">On Oxford Road...</button>
+                    <button class="q-btn" data-value="In cash." onclick="selectAnswer(this)">In cash.</button>
+                    <button class="q-btn" data-value="No, I'm just looking, thanks." onclick="selectAnswer(this)">No, I'm just looking...</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="No, I'm just looking, thanks.">
+                <div class="question-text"><span class="q-num">8</span> Can I help you?</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="No, I'm just looking, thanks." onclick="selectAnswer(this)">No, I'm just looking...</button>
+                    <button class="q-btn" data-value="In cash." onclick="selectAnswer(this)">In cash.</button>
+                    <button class="q-btn" data-value="Sparkling or still?" onclick="selectAnswer(this)">Sparkling or still?</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="Sparkling or still?">
+                <div class="question-text"><span class="q-num">9</span> I'd like some water, please.</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="Sparkling or still?" onclick="selectAnswer(this)">Sparkling or still?</button>
+                    <button class="q-btn" data-value="On Oxford Road, opposite WH Smith's." onclick="selectAnswer(this)">On Oxford Road...</button>
+                    <button class="q-btn" data-value="Yes, I bought them last week." onclick="selectAnswer(this)">Yes, I bought them...</button>
+                </div>
+            </div>
+
+            <div class="question" data-answer="Yes, I bought them last week.">
+                <div class="question-text"><span class="q-num">10</span> What nice shoes! Are they new?</div>
+                <div class="q-buttons">
+                    <button class="q-btn" data-value="Yes, I bought them last week." onclick="selectAnswer(this)">Yes, I bought them...</button>
+                    <button class="q-btn" data-value="No, I'm just looking, thanks." onclick="selectAnswer(this)">No, I'm just looking...</button>
+                    <button class="q-btn" data-value="In cash." onclick="selectAnswer(this)">In cash.</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======== SCORE BAR ======== -->
+        <div class="score-bar">
+            <div>
+                <div class="score-label">Your Score</div>
+                <div class="score-value"><span id="score-num">0</span> / 10</div>
+            </div>
+            <div class="score-stars" id="score-stars">☆☆☆</div>
+        </div>
+
+        <!-- ======== CONTROLS ======== -->
+        <div class="controls">
+            <button id="resetBtn" onclick="resetQuiz()">Reset Quiz</button>
+        </div>
+        
+        <div id="result-msg"></div>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+    </div>
+
+    <script>
+        // ================================================================
+        //  CONFIGURATION & RESULTS TRACKING
+        // ================================================================
+        const TEST_NAME = "Light Teen Style: Instant Feedback Quiz";
+        let userMistakes = [];
+        let score = 0;
+        let answeredCount = 0;
+        const totalQuestions = 10;
+
+        /* =================================================
+           INSTANT FEEDBACK LOGIC
+        ================================================= */
+        function selectAnswer(btn) {
+            const parent = btn.closest('.question');
+            
+            // Prevent multiple clicks on the same question
+            if (parent.classList.contains('correct') || parent.classList.contains('wrong')) {
+                return; 
+            }
+            
+            const correct = parent.dataset.answer;
+            const chosen = btn.dataset.value;
+            const allBtns = parent.querySelectorAll('.q-btn');
+            
+            // Disable all buttons in this question
+            allBtns.forEach(b => b.disabled = true);
+            
+            // Check if answer is correct
+            if (chosen === correct) {
+                score++;
+                parent.classList.add('correct');
+                btn.classList.add('chosen-correct');
+                
+                // Mobile Vibration
+                if (navigator.vibrate) navigator.vibrate(50);
+            } else {
+                parent.classList.add('wrong');
+                btn.classList.add('chosen-wrong');
+                
+                // Highlight the correct answer
+                const correctBtn = parent.querySelector(`.q-btn[data-value="${correct}"]`);
+                if (correctBtn) correctBtn.classList.add('reveal-correct');
+                
+                // Track mistake
+                if (!userMistakes.includes(chosen)) {
+                    userMistakes.push(chosen);
+                }
+                
+                // Mobile Vibration
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            }
+            
+            // Update Score & UI
+            answeredCount++;
+            document.getElementById('score-num').textContent = score;
+            updateStars(score, totalQuestions);
+            
+            // If all questions are answered, show final results after a small delay
+            if (answeredCount === totalQuestions) {
+                setTimeout(showFinalResults, 1200);
+            }
+        }
+
+        /* ===================================================
+           FINAL RESULTS & GOOGLE SHEETS
+        =================================================== */
+        function showFinalResults() {
+            const msg = document.getElementById('result-msg');
+            const pct = Math.round((score / totalQuestions) * 100);
+            
+            if (pct === 100) {
+                msg.innerText = "🏆 PERFECT! You nailed it!";
+                msg.style.color = "var(--correct-text)";
+            } else if (pct >= 70) {
+                msg.innerText = `🌟 Great job! ${score} / ${totalQuestions} correct.`;
+                msg.style.color = "var(--correct-text)";
+            } else if (pct >= 40) {
+                msg.innerText = `💪 Good effort! ${score} / ${totalQuestions}. Review the rules!`;
+                msg.style.color = "#d97706";
+            } else {
+                msg.innerText = `📚 ${score} / ${totalQuestions}. Let's practice more!`;
+                msg.style.color = "var(--wrong-text)";
+            }
+
+            sendResultsToGoogle(score, totalQuestions);
+        }
+
+        /* ===================================================
+           RESET
+        =================================================== */
+        function resetQuiz() {
+            userMistakes = [];
+            score = 0;
+            answeredCount = 0;
+            
+            document.querySelectorAll('.question').forEach(q => {
+                q.classList.remove('correct', 'wrong');
+                q.querySelectorAll('.q-btn').forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('chosen-correct', 'chosen-wrong', 'reveal-correct');
+                });
+            });
+            
+            document.getElementById('score-num').textContent = '0';
+            document.getElementById('score-stars').textContent = '☆☆☆';
+            
+            const msg = document.getElementById('result-msg');
+            msg.innerText = '';
+            
+            document.getElementById('success-msg').style.display = 'none';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* =================================================
+           STARS
+        ================================================= */
+        function updateStars(score, total) {
+            const pct = score / total;
+            let stars = '☆☆☆';
+            if (pct === 1) stars = '⭐⭐⭐';
+            else if (pct >= 0.66) stars = '⭐⭐☆';
+            else if (pct >= 0.33) stars = '⭐☆☆';
+            document.getElementById('score-stars').textContent = stars;
+        }
+
+        /* =================================================
+           GOOGLE SHEETS INTEGRATION
+        ================================================= */
+        async function sendResultsToGoogle(score, total) {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: score,
+                total: total,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                document.getElementById('success-msg').style.display = 'block';
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+    </script>
+</body>
+</html>

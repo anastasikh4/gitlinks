@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shopping Grammar: Tech Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #e2e8f0;
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            --card-bg: #ffffff;
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            
+            --accent-primary: #0284c7;
+            --accent-secondary: #2563eb;
+            
+            --correct-bg: #dcfce7;
+            --correct-border: #16a34a;
+            --correct-text: #15803d;
+            
+            --wrong-bg: #fee2e2;
+            --wrong-border: #dc2626;
+            --wrong-text: #b91c1c;
+            
+            --btn-bg: #ffffff;
+            --btn-border: #cbd5e1;
+            --btn-shadow: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 30px 15px 60px;
+            overflow-x: hidden;
+        }
+        
+        .game-card {
+            background: var(--card-bg);
+            padding: 35px 30px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.15), 
+                        0 8px 16px -4px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 800px;
+            border: 2px solid #ffffff;
+            border-top: 6px solid var(--accent-primary);
+            position: relative;
+        }
+        
+        /* ========== HEADER ======== */
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .mascot {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 25px;
+            letter-spacing: 5px;
+        }
+        
+        .section-title {
+            text-align: center;
+            color: var(--accent-primary);
+            font-size: 18px;
+            font-weight: 700;
+            margin: 35px 0 20px;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ======== QUESTIONS ======== */
+        .question {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 18px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+        }
+        
+        .question:hover {
+            border-color: #bae6fd;
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question.correct { 
+            background: var(--correct-bg); 
+            border-color: var(--correct-border); 
+        }
+        
+        .question.wrong { 
+            background: var(--wrong-bg); 
+            border-color: var(--wrong-border); 
+        }
+        
+        .question-text {
+            flex: 1;
+            min-width: 220px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .q-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-primary);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(2, 132, 199, 0.3);
+        }
+        
+        .q-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        
+        .q-btn {
+            padding: 12px 18px;
+            border: 2px solid var(--btn-border);
+            background: var(--btn-bg);
+            border-radius: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 0 var(--btn-shadow);
+            min-width: 90px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .q-btn:hover:not(:disabled) { 
+            background: #f1f5f9;
+            border-color: var(--accent-primary);
+        }
+        
+        .q-btn:active:not(:disabled) { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0 var(--btn-shadow); 
+        }
+        
+        .q-btn:disabled { 
+            cursor: default; 
+            opacity: 0.6; 
+        }
+        
+        /* Instant Feedback Classes */
+        .q-btn.chosen-correct {
+            background: var(--correct-border) !important;
+            color: #ffffff !important;
+            border-color: var(--correct-border) !important;
+            box-shadow: 0 4px 0 #14532d !important;
+            opacity: 1 !important;
+            transform: translateY(3px);
+        }
+
+        .q-btn.chosen-wrong {
+            background: var(--wrong-border) !important;
+            color: #ffffff !important;
+            border-color: var(--wrong-border) !important;
+            box-shadow: 0 4px 0 #7f1d1d !important;
+            opacity: 1 !important;
+            animation: shake 0.4s;
+        }
+        
+        .q-btn.reveal-correct {
+            background: var(--correct-bg) !important;
+            color: var(--correct-text) !important;
+            border-color: var(--correct-border) !important;
+            box-shadow: none !important;
+            opacity: 1 !important;
+            font-weight: 900;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        /* ======== SCORE BAR ======== */
+        .score-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            border-radius: 8px;
+            padding: 18px 24px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .score-label { 
+            font-size: 14px; 
+            color: var(--accent-primary); 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .score-value { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px; 
+            color: #0f172a; 
+            font-weight: 900;
+        }
+        
+        .score-stars { 
+            font-size: 24px; 
+            letter-spacing: 5px; 
+            color: #f59e0b;
+        }
+        
+        /* ======== CONTROLS ======== */
+        .controls { 
+            display: flex; 
+            justify-content: center;
+            margin-top: 10px; 
+        }
+        
+        #resetBtn {
+            background: #ffffff; 
+            width: 100%;
+            max-width: 280px;
+            padding: 16px; 
+            color: var(--text-main); 
+            border: 2px solid var(--btn-border); 
+            border-radius: 8px; 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 0 var(--btn-shadow);
+        }
+        
+        #resetBtn:hover { 
+            background: #f8fafc;
+            border-color: var(--accent-primary);
+        }
+        
+        #resetBtn:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0px 0 var(--btn-shadow);
+        }
+        
+        #result-msg { 
+            margin-top: 25px; 
+            font-size: 22px; 
+            font-weight: 700; 
+            text-align: center; 
+            min-height: 30px; 
+            transition: 0.3s; 
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+        
+        .success-msg { 
+            color: var(--correct-text); 
+            font-weight: 700; 
+            font-size: 16px; 
+            margin-top: 15px; 
+            display: none; 
+            text-align: center; 
+            background: var(--correct-bg);
+            padding: 14px;
+            border-radius: 8px;
+            border: 2px solid var(--correct-border);
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* ======== MOBILE ======== */
+        @media (max-width: 650px) {
+            .game-card { padding: 25px 20px; }
+            h1 { font-size: 22px; }
+            .question { padding: 15px; }
+            .question-text { font-size: 16px; min-width: 100%; }
+            .q-buttons { width: 100%; justify-content: flex-start; }
+            .q-btn { flex: 1; padding: 12px 10px; font-size: 14px; min-width: auto; }
+            .score-value { font-size: 22px; }
+            #resetBtn { font-size: 12px; padding: 15px; }
+            #result-msg { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-card">
+        <h1>Grammar Protocol</h1>
+        <div class="mascot">🎮 🚀 🎯</div>
+        
+        <!-- ======== EXERCISE 1 ======== -->
+        <div class="section-title">Level 1: Comparatives & Superlatives</div>
+        
+        <div class="question" data-answer="the largest">
+            <div class="question-text"><span class="q-num">1</span> Kroger is ___ supermarket in the USA.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="larger" onclick="selectAnswer(this)">larger</button>
+                <button class="q-btn" data-value="the largest" onclick="selectAnswer(this)">the largest</button>
+                <button class="q-btn" data-value="the most large" onclick="selectAnswer(this)">the most large</button>
+            </div>
+        </div>
+        
+        <div class="question" data-answer="The hungrier / the more">
+            <div class="question-text"><span class="q-num">2</span> ___ the customers in a supermarket are, ___ they buy!</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="Hungrier / more" onclick="selectAnswer(this)">Hungrier / more</button>
+                <button class="q-btn" data-value="The hungrier / the more" onclick="selectAnswer(this)">The hungrier / the more</button>
+                <button class="q-btn" data-value="The most hungry / the most" onclick="selectAnswer(this)">The most hungry / the most</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="more expensive">
+            <div class="question-text"><span class="q-num">3</span> The sandwiches here are a lot ___ than those across the street.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="expensiver" onclick="selectAnswer(this)">expensiver</button>
+                <button class="q-btn" data-value="more expensive" onclick="selectAnswer(this)">more expensive</button>
+                <button class="q-btn" data-value="most expensive" onclick="selectAnswer(this)">most expensive</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="less and less">
+            <div class="question-text"><span class="q-num">4</span> Eco-friendly manufacturers are trying to use ___ packaging these days.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="fewer and fewer" onclick="selectAnswer(this)">fewer and fewer</button>
+                <button class="q-btn" data-value="less and less" onclick="selectAnswer(this)">less and less</button>
+                <button class="q-btn" data-value="least and least" onclick="selectAnswer(this)">least and least</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="good">
+            <div class="question-text"><span class="q-num">5</span> The shop's own brands are often as ___ as the brand names.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="better" onclick="selectAnswer(this)">better</button>
+                <button class="q-btn" data-value="good" onclick="selectAnswer(this)">good</button>
+                <button class="q-btn" data-value="best" onclick="selectAnswer(this)">best</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="the biggest">
+            <div class="question-text"><span class="q-num">6</span> This shopping centre is by far ___ I've ever been to.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="bigger" onclick="selectAnswer(this)">bigger</button>
+                <button class="q-btn" data-value="the biggest" onclick="selectAnswer(this)">the biggest</button>
+                <button class="q-btn" data-value="the most big" onclick="selectAnswer(this)">the most big</button>
+            </div>
+        </div>
+
+        <!-- ======== EXERCISE 2 ======== -->
+        <div class="section-title">Level 2: Gerunds & Infinitives</div>
+        
+        <div class="question" data-answer="to go">
+            <div class="question-text"><span class="q-num">7</span> I'm never too tired ___ shopping.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="going" onclick="selectAnswer(this)">going</button>
+                <button class="q-btn" data-value="to go" onclick="selectAnswer(this)">to go</button>
+                <button class="q-btn" data-value="go" onclick="selectAnswer(this)">go</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="to buy">
+            <div class="question-text"><span class="q-num">8</span> I'd like ___ some new clothes this Saturday.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="buying" onclick="selectAnswer(this)">buying</button>
+                <button class="q-btn" data-value="buy" onclick="selectAnswer(this)">buy</button>
+                <button class="q-btn" data-value="to buy" onclick="selectAnswer(this)">to buy</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="to be">
+            <div class="question-text"><span class="q-num">9</span> I want shops ___ open later at night.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="being" onclick="selectAnswer(this)">being</button>
+                <button class="q-btn" data-value="be" onclick="selectAnswer(this)">be</button>
+                <button class="q-btn" data-value="to be" onclick="selectAnswer(this)">to be</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="walking">
+            <div class="question-text"><span class="q-num">10</span> I don't mind ___ around the shopping centre all day.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="to walk" onclick="selectAnswer(this)">to walk</button>
+                <button class="q-btn" data-value="walking" onclick="selectAnswer(this)">walking</button>
+                <button class="q-btn" data-value="walk" onclick="selectAnswer(this)">walk</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="to pay">
+            <div class="question-text"><span class="q-num">11</span> I never regret ___ a little more for certain things.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="paying" onclick="selectAnswer(this)">paying</button>
+                <button class="q-btn" data-value="to pay" onclick="selectAnswer(this)">to pay</button>
+                <button class="q-btn" data-value="pay" onclick="selectAnswer(this)">pay</button>
+            </div>
+        </div>
+
+        <div class="question" data-answer="spending / saving">
+            <div class="question-text"><span class="q-num">12</span> I prefer ___ to ___.</div>
+            <div class="q-buttons">
+                <button class="q-btn" data-value="to spend / to save" onclick="selectAnswer(this)">to spend / to save</button>
+                <button class="q-btn" data-value="spending / saving" onclick="selectAnswer(this)">spending / saving</button>
+                <button class="q-btn" data-value="spend / save" onclick="selectAnswer(this)">spend / save</button>
+            </div>
+        </div>
+
+        <!-- ======== SCORE BAR ======== -->
+        <div class="score-bar">
+            <div>
+                <div class="score-label">Current Score</div>
+                <div class="score-value"><span id="score-num">0</span> / 12</div>
+            </div>
+            <div class="score-stars" id="score-stars">☆☆☆</div>
+        </div>
+
+        <!-- ======== CONTROLS ======== -->
+        <div class="controls">
+            <button id="resetBtn" onclick="resetQuiz()">System Reboot</button>
+        </div>
+        
+        <div id="result-msg"></div>
+        <p class="success-msg" id="success-msg">Data transmitted successfully! ✅</p>
+    </div>
+
+    <script>
+        // ================================================================
+        //  CONFIGURATION & RESULTS TRACKING
+        // ================================================================
+        const TEST_NAME = "Light Tech Style: Shopping Grammar Protocol";
+        let userMistakes = [];
+        let score = 0;
+        let answeredCount = 0;
+        const totalQuestions = 12;
+
+        /* =================================================
+           INSTANT FEEDBACK LOGIC
+        ================================================= */
+        function selectAnswer(btn) {
+            const parent = btn.closest('.question');
+            
+            // Prevent multiple clicks on the same question
+            if (parent.classList.contains('correct') || parent.classList.contains('wrong')) {
+                return; 
+            }
+            
+            const correct = parent.dataset.answer;
+            const chosen = btn.dataset.value;
+            const allBtns = parent.querySelectorAll('.q-btn');
+            
+            // Disable all buttons in this question
+            allBtns.forEach(b => b.disabled = true);
+            
+            // Check if answer is correct
+            if (chosen === correct) {
+                score++;
+                parent.classList.add('correct');
+                btn.classList.add('chosen-correct');
+                
+                // Mobile Vibration (if supported)
+                if (navigator.vibrate) navigator.vibrate(50);
+            } else {
+                parent.classList.add('wrong');
+                btn.classList.add('chosen-wrong');
+                
+                // Highlight the correct answer
+                const correctBtn = parent.querySelector(`.q-btn[data-value="${correct}"]`);
+                if (correctBtn) correctBtn.classList.add('reveal-correct');
+                
+                // Track mistake
+                if (!userMistakes.includes(chosen)) {
+                    userMistakes.push(chosen);
+                }
+                
+                // Mobile Vibration
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            }
+            
+            // Update Score & UI
+            answeredCount++;
+            document.getElementById('score-num').textContent = score;
+            updateStars(score, totalQuestions);
+            
+            // If all questions are answered, show final results after a small delay
+            if (answeredCount === totalQuestions) {
+                setTimeout(showFinalResults, 1200);
+            }
+        }
+
+        /* ===================================================
+           FINAL RESULTS & GOOGLE SHEETS
+        =================================================== */
+        function showFinalResults() {
+            const msg = document.getElementById('result-msg');
+            const pct = Math.round((score / totalQuestions) * 100);
+            
+            if (pct === 100) {
+                msg.innerText = "🏆 LEGENDARY! Perfect Score!";
+                msg.style.color = "var(--correct-text)";
+            } else if (pct >= 70) {
+                msg.innerText = `🌟 GREAT JOB! ${score} / ${totalQuestions} correct.`;
+                msg.style.color = "var(--correct-text)";
+            } else if (pct >= 40) {
+                msg.innerText = `💪 GOOD EFFORT! ${score} / ${totalQuestions}. Review the rules!`;
+                msg.style.color = "#d97706";
+            } else {
+                msg.innerText = `📚 ${score} / ${totalQuestions}. Let's practice more!`;
+                msg.style.color = "var(--wrong-text)";
+            }
+
+            sendResultsToGoogle(score, totalQuestions);
+        }
+
+        /* ===================================================
+           RESET
+        =================================================== */
+        function resetQuiz() {
+            userMistakes = [];
+            score = 0;
+            answeredCount = 0;
+            
+            document.querySelectorAll('.question').forEach(q => {
+                q.classList.remove('correct', 'wrong');
+                q.querySelectorAll('.q-btn').forEach(b => {
+                    b.disabled = false;
+                    b.classList.remove('chosen-correct', 'chosen-wrong', 'reveal-correct');
+                });
+            });
+            
+            document.getElementById('score-num').textContent = '0';
+            document.getElementById('score-stars').textContent = '☆☆☆';
+            
+            const msg = document.getElementById('result-msg');
+            msg.innerText = '';
+            
+            document.getElementById('success-msg').style.display = 'none';
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /* =================================================
+           STARS
+        ================================================= */
+        function updateStars(score, total) {
+            const pct = score / total;
+            let stars = '☆☆☆';
+            if (pct === 1) stars = '⭐⭐⭐';
+            else if (pct >= 0.66) stars = '⭐⭐☆';
+            else if (pct >= 0.33) stars = '⭐☆☆';
+            document.getElementById('score-stars').textContent = stars;
+        }
+
+        /* =================================================
+           GOOGLE SHEETS INTEGRATION
+        ================================================= */
+        async function sendResultsToGoogle(score, total) {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: score,
+                total: total,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                document.getElementById('success-msg').style.display = 'block';
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+    </script>
+</body>
+</html>

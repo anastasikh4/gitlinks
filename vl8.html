@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlight 2: Make up Sentences</title>
+    <style>
+        :root {
+            --primary-purple: #7c4dff;
+            --light-purple: #ede7f6;
+            --correct-btn: #4caf50;
+            --wrong-btn: #f44336;
+            --bg-color: #e8eaf6;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+            background: var(--bg-color);
+            text-align: center;
+            color: #311b92;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 30px 25px;
+            background: white;
+            border-radius: 30px;
+            border: 6px solid var(--primary-purple);
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            z-index: 2;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: var(--primary-purple);
+            font-size: 2em;
+            text-shadow: 2px 2px 0px #d1c4e9;
+        }
+
+        #score-board {
+            font-size: 1.1em;
+            background: var(--light-purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid var(--primary-purple);
+            margin-bottom: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .level { display: none; }
+        .active { display: block; }
+
+        /* Text Styling */
+        .text-display {
+            font-size: 1.5em;
+            line-height: 1.6;
+            margin: 15px 0;
+            padding: 25px 20px;
+            background: var(--light-purple);
+            border-radius: 15px;
+            border: 2px dashed var(--primary-purple);
+            text-align: center;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Emoji Feedback - Always Visible */
+        #emoji-feedback {
+            height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            padding: 10px;
+        }
+
+        #emoji-feedback .emoji {
+            font-size: 3.5em;
+            line-height: 1;
+            margin-bottom: 5px;
+            transition: transform 0.3s;
+        }
+
+        #emoji-feedback .label {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Animation when answering */
+        .emoji-pop .emoji {
+            animation: pop 0.4s ease;
+        }
+
+        @keyframes pop {
+            50% { transform: scale(1.3); }
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 60px;
+            border-bottom: 3px solid var(--primary-purple);
+            text-align: center;
+            font-weight: bold;
+            color: var(--primary-purple);
+            background: #fff9c4;
+            border-radius: 4px;
+            padding: 0 10px;
+            transition: 0.3s;
+        }
+
+        .blank.filled {
+            color: #2e7d32;
+            border-bottom: 3px solid #4caf50;
+            background: #e8f5e9;
+        }
+
+        /* Options */
+        .options-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            transition: 0.1s;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #5e35b1;
+        }
+
+        .btn-option {
+            background: var(--primary-purple);
+        }
+
+        .btn-option:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #5e35b1;
+        }
+
+        .btn-option:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #5e35b1;
+        }
+
+        .btn-option.correct {
+            background: var(--correct-btn);
+            box-shadow: 0 4px 0 #2e7d32;
+        }
+
+        .btn-option.wrong {
+            background: var(--wrong-btn);
+            box-shadow: 0 4px 0 #c62828;
+            animation: shake 0.4s;
+        }
+
+        .btn-option:disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .feedback {
+            font-weight: bold;
+            min-height: 30px;
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+
+        .win-screen {
+            text-align: center;
+            padding: 20px 0;
+            display: none;
+        }
+
+        .win-screen h2 {
+            font-size: 2.5em;
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+        }
+
+        .success-msg {
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+            display: none;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #4caf50;
+        }
+
+        .btn-restart {
+            background: var(--primary-purple);
+            margin-top: 25px;
+            padding: 15px 40px;
+            box-shadow: 0 4px 0 #5e35b1;
+        }
+
+        /* Confetti */
+        .salute {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            animation: explode 0.8s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        
+        @media (max-width: 500px) {
+            .options-row { grid-template-columns: 1fr; }
+            .text-display { font-size: 1.2em; }
+            #emoji-feedback { height: 90px; }
+            #emoji-feedback .emoji { font-size: 2.5em; }
+            #emoji-feedback .label { font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <h1>🌟 Starlight English 🌟</h1>
+    <div id="score-board">Score: <span id="score">0</span> / 7</div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="level active">
+        <h3>Make up sentences. Choose the correct verb.</h3>
+        
+        <div id="text-display" class="text-display">
+            <!-- Sentence will be injected here -->
+        </div>
+        
+        <!-- Emoji Feedback Area - Always Visible -->
+        <div id="emoji-feedback">
+            <div class="emoji" id="emoji-icon">👍</div>
+            <div class="label" id="emoji-label">Positive Sentence</div>
+        </div>
+
+        <div id="options-container" class="options-row">
+            <!-- Buttons injected here -->
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win-screen" class="win-screen">
+        <h2>🌟 STAR STUDENT! 🌟</h2>
+        <p style="font-size: 1.2em;" id="final-score-text">You scored 0 out of 7.</p>
+        <p class="success-msg" id="send-msg">Results sent successfully! ✅</p>
+        <button class="btn-restart" onclick="location.reload()">Play Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ================================================================
+    const TEST_NAME = "Starlight 2: Positive & Negative Sentences (Always Visible)";
+    let userMistakes = [];
+    let score = 0;
+    let currentIndex = 0;
+
+    // ================================================================
+    //  QUIZ DATA
+    // ================================================================
+    const quizData = [
+        {
+            subject: "These cars",
+            complement: "nice",
+            correct: "are",
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "That lorry",
+            complement: "small",
+            correct: "is",
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "These roller-skates",
+            complement: "for you!",
+            correct: "are",
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "This teddy bear",
+            complement: "funny",
+            correct: "is not", 
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "Those bikes",
+            complement: "red",
+            correct: "are",
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "Here",
+            complement: "your present!",
+            correct: "is",
+            options: ["is", "are", "is not", "are not"]
+        },
+        {
+            subject: "Those dogs",
+            complement: "friendly",
+            correct: "are not", 
+            options: ["is", "are", "is not", "are not"]
+        }
+    ];
+
+    const totalQuestions = quizData.length;
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    function loadQuestion() {
+        if (currentIndex >= totalQuestions) {
+            showWin();
+            return;
+        }
+
+        const q = quizData[currentIndex];
+        
+        // Update text
+        document.getElementById('text-display').innerHTML = `
+            ${q.subject} <span class="blank" id="the-blank">___</span> ${q.complement}
+        `;
+
+        // Determine Emoji & Label based on the Correct Answer
+        const isNegative = q.correct.includes('not');
+        const emojiContainer = document.getElementById('emoji-feedback');
+        const emojiIcon = document.getElementById('emoji-icon');
+        const emojiLabel = document.getElementById('emoji-label');
+        
+        emojiIcon.innerText = isNegative ? '👎' : '👍';
+        emojiLabel.innerText = isNegative ? 'Negative Sentence' : 'Positive Sentence';
+        emojiLabel.style.color = isNegative ? "#c62828" : "#2e7d32";
+        
+        // Remove animation class if it was there
+        emojiContainer.classList.remove('emoji-pop');
+
+        // Render options
+        const optionsContainer = document.getElementById('options-container');
+        optionsContainer.innerHTML = '';
+        
+        const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
+
+        shuffledOpts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, q.correct);
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('feedback').innerText = '';
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        // Disable all buttons
+        const allBtns = document.querySelectorAll('.btn-option');
+        allBtns.forEach(b => b.disabled = true);
+
+        const blank = document.getElementById('the-blank');
+        const feedback = document.getElementById('feedback');
+        const emojiContainer = document.getElementById('emoji-feedback');
+
+        if (selected === correct) {
+            score++;
+            document.getElementById('score').innerText = score;
+            
+            btn.classList.add('correct');
+            blank.innerText = selected;
+            blank.classList.add('filled');
+            
+            feedback.innerText = "Correct! ✅";
+            feedback.style.color = "#2e7d32";
+            
+            // Pop the emoji
+            emojiContainer.classList.add('emoji-pop');
+            
+            triggerConfetti();
+            if (navigator.vibrate) navigator.vibrate(50);
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 2000);
+
+        } else {
+            btn.classList.add('wrong');
+            
+            if (!userMistakes.includes(selected)) {
+                userMistakes.push(selected);
+            }
+
+            // Highlight correct answer
+            allBtns.forEach(b => {
+                if (b.innerText === correct) {
+                    b.classList.add('correct');
+                }
+            });
+
+            feedback.innerText = "Try again! ❌";
+            feedback.style.color = "#c62828";
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+            setTimeout(() => {
+                blank.innerText = correct;
+                blank.classList.add('filled');
+                // Pop the emoji to show the revealed answer
+                emojiContainer.classList.add('emoji-pop');
+            }, 500);
+
+            setTimeout(() => {
+                currentIndex++;
+                loadQuestion();
+            }, 2500);
+        }
+    }
+
+    // ================================================================
+    //  WIN SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function showWin() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('win-screen').style.display = 'block';
+        document.getElementById('score-board').style.display = 'none';
+        
+        document.getElementById('final-score-text').innerText = `You scored ${score} out of ${totalQuestions}.`;
+        
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            document.getElementById('send-msg').style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // ================================================================
+    //  CONFETTI EFFECT
+    // ================================================================
+    function triggerConfetti() {
+        const box = document.getElementById('main-box');
+        const colors = ['#7c4dff', '#4caf50', '#f44336', '#ffeb3b', '#03a9f4'];
+        
+        for (let i = 0; i < 15; i++) {
+            const part = document.createElement('div');
+            part.className = 'salute';
+            const x = Math.random() * box.offsetWidth;
+            const y = Math.random() * box.offsetHeight;
+            part.style.left = x + 'px';
+            part.style.top = y + 'px';
+            part.style.setProperty('--tx', (Math.random() - 0.5) * 200 + 'px');
+            part.style.setProperty('--ty', (Math.random() - 0.5) * 200 + 'px');
+            part.style.background = colors[Math.floor(Math.random() * colors.length)];
+            box.appendChild(part);
+            setTimeout(() => part.remove(), 800);
+        }
+    }
+
+    // ---- Start Game ----
+    loadQuestion();
+</script>
+
+</body>
+</html>
