@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olympiad-Style B2 Grammar Trainer with Rules</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #eef2f7;
+    color: #1a2332;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+  }
+  .wrapper { max-width: 980px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    padding: 22px;
+    border-radius: 16px;
+    font-size: 1.7em;
+    margin-bottom: 6px;
+    box-shadow: 0 6px 20px rgba(30,58,138,0.3);
+  }
+  .subtitle {
+    text-align: center;
+    color: #1e40af;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+  }
+  .toc {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+  }
+  .toc h2 { margin-top: 0; color: #1e3a8a; font-size: 1.1em; }
+  .toc ol { columns: 2; column-gap: 30px; margin: 0; padding-left: 20px; }
+  .toc li { margin-bottom: 5px; font-size: 0.9em; }
+  .toc a { color: #2563eb; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+
+  .section {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+  .section-header {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: #fff;
+    padding: 14px 22px;
+    font-size: 1.05em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .section-header:hover { background: linear-gradient(135deg, #1e3a8a, #2563eb); }
+  .section-header .arrow { transition: transform 0.3s; }
+  .section-header.open .arrow { transform: rotate(90deg); }
+  .section-body { padding: 18px 22px; display: none; }
+  .section-body.open { display: block; }
+
+  .rules-block {
+    background: #f0f7ff;
+    border-left: 5px solid #3b82f6;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.95em;
+  }
+  .rules-block h4 {
+    margin: 0 0 8px 0;
+    color: #1e40af;
+    font-size: 1.05em;
+  }
+  .rules-block ul, .rules-block ol {
+    margin: 6px 0;
+    padding-left: 22px;
+  }
+  .rules-block li { margin-bottom: 4px; }
+  .rules-block code {
+    background: #dbeafe;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', monospace;
+    color: #1e3a8a;
+    font-size: 0.9em;
+  }
+  .rules-block b { color: #1e3a8a; }
+
+  .exercise {
+    background: #fefce8;
+    border: 1px solid #fde047;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+  }
+  .exercise .task { font-weight: bold; color: #854d0e; margin-bottom: 8px; font-size: 0.98em; }
+  .exercise ol { margin: 0; padding-left: 22px; }
+  .exercise li { margin-bottom: 7px; font-size: 0.95em; }
+  .blank {
+    display: inline-block;
+    min-width: 110px;
+    border-bottom: 2px solid #ca8a04;
+    text-align: center;
+    font-weight: bold;
+    color: #a16207;
+    padding: 0 4px;
+  }
+  .hint { color: #6b7280; font-size: 0.82em; font-style: italic; }
+
+  .text-block {
+    background: #f0fdf4;
+    border-left: 5px solid #22c55e;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 0.93em;
+    line-height: 1.7;
+  }
+  .text-block b { color: #15803d; }
+
+  .answer-key {
+    display: none;
+    background: #fef2f2;
+    border: 1px dashed #ef4444;
+    border-radius: 10px;
+    padding: 10px 16px;
+    margin-top: 8px;
+    font-size: 0.9em;
+  }
+  .answer-key.show { display: block; }
+  .answer-key b { color: #b91c1c; }
+
+  #reveal-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(239,68,68,0.5);
+    z-index: 1000;
+    transition: 0.2s;
+  }
+  #reveal-btn:hover { transform: scale(1.1); background: #dc2626; }
+  #reveal-btn.active { background: #16a34a; }
+
+  .note {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.85em;
+    margin-top: 25px;
+    padding: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .toc ol { columns: 1; }
+    h1 { font-size: 1.25em; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<h1>🎯 Olympiad-Style B2 Grammar Trainer</h1>
+<div class="subtitle">Rules to study + Tasks modelled on the Russian National English Olympiad</div>
+<div class="note" style="margin-top:0;">💡 Click any section header to see the rules and exercises.</div>
+
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#s1">Key Word Transformations</a></li>
+    <li><a href="#s2">Word Formation</a></li>
+    <li><a href="#s3">Extra Word (Line Correction)</a></li>
+    <li><a href="#s4">Reading: Gap Fill (A–K, one extra)</a></li>
+    <li><a href="#s5">Reading: Which Part Is It Mentioned?</a></li>
+    <li><a href="#s6">Reading: True / False / Not Given</a></li>
+    <li><a href="#s7">Reading: Multiple Choice</a></li>
+    <li><a href="#s8">Compound Word Puzzle</a></li>
+    <li><a href="#s9">Rebus & Idiom Puzzles</a></li>
+    <li><a href="#s10">Abbreviation Unscramble</a></li>
+  </ol>
+</div>
+
+<!-- ============ SECTION 1: KEY WORD TRANSFORMATIONS ============ -->
+<div class="section" id="s1">
+  <div class="section-header" onclick="toggle(this)">1. Key Word Transformations <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> Complete the second sentence so that it has a similar meaning to the first, using the word given. Do not change the given word. Use <b>3–5 words</b>. No contractions. Mind grammar and spelling.</p>
+      <p><b>Key structures you must know:</b></p>
+      <ul>
+        <li><b>Passive Voice:</b> <code>be + V3</code> — e.g. <i>They built it → It was built.</i></li>
+        <li><b>Reported Speech:</b> tense shift; <code>say → said</code>; <code>will → would</code>; time/place changes.</li>
+        <li><b>Conditionals:</b> 1st, 2nd, 3rd, mixed; inversions: <code>Had I known...</code>; <code>Were I you...</code></li>
+        <li><b>Gerund vs Infinitive:</b> <code>enjoy doing</code>, <code>want to do</code>, <code>stop doing/to do</code>.</li>
+        <li><b>Modals & Perfect Modals:</b> <code>must have done</code>, <code>should have done</code>, <code>needn't have done</code>.</li>
+        <li><b>Causative:</b> <code>have/get something done</code>.</li>
+        <li><b>Phrasal verbs & idioms:</b> <code>make away with</code>, <code>cut down on</code>, <code>get me down</code>, <code>let down</code>.</li>
+        <li><b>Inversion:</b> <code>Never have I...</code>, <code>No sooner had...</code>, <code>Only then did...</code></li>
+        <li><b>Wishes:</b> <code>wish + Past Simple / Past Perfect</code>.</li>
+        <li><b>Linking words:</b> <code>despite / in spite of + noun/-ing</code>; <code>although + clause</code>.</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.1 — Basic patterns</div>
+      <ol>
+        <li>He suddenly realised that she wasn't being serious.<br><b>on</b> — It suddenly <span class="blank"></span> that she wasn't being serious. <span class="hint">(3 words)</span></li>
+        <li>Our teacher would never tolerate rudeness in her classroom.<br><b>for</b> — Our teacher would <span class="blank"></span> rudeness in her classroom. <span class="hint">(3 words)</span></li>
+        <li>My friend's mum is French and he's bilingual.<br><b>whose</b> — My friend, <span class="blank"></span>, is bilingual. <span class="hint">(5 words)</span></li>
+        <li>He is only well known in Canada.<br><b>that</b> — It <span class="blank"></span> he is well known. <span class="hint">(5 words)</span></li>
+        <li>The hotel has a lot of excellent leisure facilities.<br><b>few</b> — The hotel has <span class="blank"></span> excellent leisure facilities. <span class="hint">(3 words)</span></li>
+        <li>We've already heard too many of your lame excuses.<br><b>more</b> — We've already heard <span class="blank"></span> your lame excuses. <span class="hint">(4 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. dawned on him &nbsp;|&nbsp; 2. never stand for &nbsp;|&nbsp; 3. whose mum is French &nbsp;|&nbsp; 4. is only in Canada that &nbsp;|&nbsp; 5. very few / a few &nbsp;|&nbsp; 6. far too many of
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.2 — Modal perfects & reported structures</div>
+      <ol>
+        <li>It was wrong of you not to tell me this information.<br><b>kept</b> — You should not <span class="blank"></span> me. <span class="hint">(5 words)</span></li>
+        <li>I'm sure he had a talent for spotting a golden opportunity.<br><b>must</b> — He <span class="blank"></span> a talent for spotting a golden opportunity. <span class="hint">(3 words)</span></li>
+        <li>It's alleged that William became extremely violent.<br><b>have</b> — William <span class="blank"></span> extremely violent. <span class="hint">(5 words)</span></li>
+        <li>I didn't give you a lift, because I didn't know you were coming.<br><b>would</b> — I <span class="blank"></span> you a lift if I'd known you were coming. <span class="hint">(3 words)</span></li>
+        <li>Nobody has ever treated me like that before.<br><b>never</b> — <span class="blank"></span> treated like that before. <span class="hint">(4 words)</span></li>
+        <li>He regrets not studying harder at school.<br><b>wishes</b> — He <span class="blank"></span> harder at school. <span class="hint">(4 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. have kept this from &nbsp;|&nbsp; 2. must have had &nbsp;|&nbsp; 3. is alleged to have become &nbsp;|&nbsp; 4. would have given &nbsp;|&nbsp; 5. I have never been &nbsp;|&nbsp; 6. wishes he had studied
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.3 — Phrasal verbs & idioms</div>
+      <ol>
+        <li>The thieves stole jewellery and paintings worth over $25,000.<br><b>away</b> — The thieves <span class="blank"></span> jewellery and paintings worth over $25,000. <span class="hint">(3 words)</span></li>
+        <li>We saw the film and then bought the book.<br><b>having</b> — We bought the book <span class="blank"></span> the film. <span class="hint">(4 words)</span></li>
+        <li>The coffee machine stopped working right in the middle of the lunch break.<br><b>down</b> — The coffee machine <span class="blank"></span> right in the middle of the lunch break. <span class="hint">(2 words)</span></li>
+        <li>Bob reduced his intake of fatty food and lost seven kilos in a month!<br><b>on</b> — Bob <span class="blank"></span> his intake of fatty food and lost seven kilos in a month! <span class="hint">(3 words)</span></li>
+        <li>Rainy days depress me terribly.<br><b>get</b> — Rainy days <span class="blank"></span> terribly. <span class="hint">(3 words)</span></li>
+        <li>He felt disappointed when his mother didn't come to see him in the play.<br><b>let</b> — He felt <span class="blank"></span> when his mother didn't come to see him in the play. <span class="hint">(2 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. made away with &nbsp;|&nbsp; 2. after having seen &nbsp;|&nbsp; 3. broke down &nbsp;|&nbsp; 4. cut down on &nbsp;|&nbsp; 5. get me down &nbsp;|&nbsp; 6. let down
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.4 — Advanced structures</div>
+      <ol>
+        <li>Richard says he prefers to do his homework on his own.<br><b>rather</b> — Richard says that <span class="blank"></span> do his homework with other people. <span class="hint">(4 words)</span></li>
+        <li>They will ask a professional chef to do all the cooking.<br><b>have</b> — They will <span class="blank"></span> by a professional chef. <span class="hint">(5 words)</span></li>
+        <li>Scientists claim that they have found a cure for cancer!<br><b>to</b> — Scientists claim <span class="blank"></span> a cure for cancer! <span class="hint">(3 words)</span></li>
+        <li>Pam said she had never seen the missing ticket.<br><b>having</b> — Pam <span class="blank"></span> the missing ticket. <span class="hint">(3 words)</span></li>
+        <li>It took Colin five minutes to find his car keys.<br><b>searching</b> — Colin <span class="blank"></span> his car keys. <span class="hint">(5 words)</span></li>
+        <li>If you ask me, feng shui doesn't work.<br><b>far</b> — <span class="blank"></span> concerned, feng shui doesn't work. <span class="hint">(5 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. he would rather not &nbsp;|&nbsp; 2. have all the cooking done &nbsp;|&nbsp; 3. to have found &nbsp;|&nbsp; 4. denied having seen &nbsp;|&nbsp; 5. spent five minutes searching for &nbsp;|&nbsp; 6. As far as I am
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.5 — Conditionals, wishes, inversion</div>
+      <ol>
+        <li>You have to be very patient to work as a primary school teacher these days.<br><b>deal</b> — Working as a primary school teacher calls <span class="blank"></span> patience these days. <span class="hint">(5 words)</span></li>
+        <li>Bob was making fun of me when he said there was a snake on my bed.<br><b>leg</b> — Bob <span class="blank"></span> when he said there was a snake on my bed. <span class="hint">(4 words)</span></li>
+        <li>When he had finished his first book, he later wrote seven more.<br><b>went</b> — When he had finished his first book, he <span class="blank"></span> seven more. <span class="hint">(4 words)</span></li>
+        <li>I am sorry to tell you that you have failed the test.<br><b>regret</b> — I <span class="blank"></span> you that you have failed the test. <span class="hint">(3 words)</span></li>
+        <li>People say that the company is having problems.<br><b>said</b> — The company <span class="blank"></span> problems. <span class="hint">(5 words)</span></li>
+        <li>Please be quiet (but I don't expect you will).<br><b>wish</b> — I <span class="blank"></span> quiet. <span class="hint">(4 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. for a great deal of &nbsp;|&nbsp; 2. was pulling my leg &nbsp;|&nbsp; 3. went on to write &nbsp;|&nbsp; 4. regret to tell &nbsp;|&nbsp; 5. is said to be having &nbsp;|&nbsp; 6. wish you would be
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 1.6 — Passive, gerund, mixed</div>
+      <ol>
+        <li>My sister is in hospital where they are taking her appendix out.<br><b>having</b> — My sister is in hospital <span class="blank"></span> out. <span class="hint">(4 words)</span></li>
+        <li>If you want a day off, you will have to find someone to replace you.<br><b>stand</b> — If you want a day off, you will have to find someone <span class="blank"></span> you. <span class="hint">(4 words)</span></li>
+        <li>I was sorry I could not stay longer.<br><b>like</b> — I <span class="blank"></span> longer. <span class="hint">(5 words)</span></li>
+        <li>I do not think she wants us to mention the subject.<br><b>rather</b> — I think she <span class="blank"></span> mention the subject. <span class="hint">(5 words)</span></li>
+        <li>A short meeting of the cast will take place after today's rehearsal.<br><b>by</b> — Today's rehearsal <span class="blank"></span> a short meeting of the cast. <span class="hint">(4 words)</span></li>
+        <li>The artist painted fabulous pictures of the rainforest although he had never travelled outside his hometown.<br><b>spite</b> — The artist painted fabulous pictures of the rainforest <span class="blank"></span> travelled outside his hometown. <span class="hint">(5 words)</span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. having her appendix taken &nbsp;|&nbsp; 2. to stand in for &nbsp;|&nbsp; 3. would have liked to stay &nbsp;|&nbsp; 4. would rather we didn't &nbsp;|&nbsp; 5. will be followed by &nbsp;|&nbsp; 6. in spite of never having
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2: WORD FORMATION ============ -->
+<div class="section" id="s2">
+  <div class="section-header" onclick="toggle(this)">2. Word Formation <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> Read the text. Use the word given in CAPITALS to form a new word that fits in the space in the same line.</p>
+      <p><b>Suffixes you must know:</b></p>
+      <ul>
+        <li><b>Noun suffixes:</b> <code>-ness</code> (happiness), <code>-ment</code> (development), <code>-tion/-sion</code> (decision), <code>-ity</code> (reality), <code>-ance/-ence</code> (difference), <code>-ship</code> (friendship), <code>-hood</code> (childhood), <code>-dom</code> (freedom), <code>-ist</code> (artist), <code>-er/-or</code> (teacher/actor).</li>
+        <li><b>Adjective suffixes:</b> <code>-ful</code> (careful), <code>-less</code> (careless), <code>-ous</code> (dangerous), <code>-ive</code> (creative), <code>-able/-ible</code> (readable), <code>-al</code> (musical), <code>-ic</code> (academic), <code>-ish</code> (childish), <code>-y</code> (rainy).</li>
+        <li><b>Verb suffixes:</b> <code>-ise/-ize</code> (modernise), <code>-ify</code> (simplify), <code>-en</code> (strengthen).</li>
+        <li><b>Adverb suffix:</b> <code>-ly</code> (quickly).</li>
+        <li><b>Negative prefixes:</b> <code>un-</code> (unhappy), <code>in-</code> (incorrect), <code>im-</code> (impossible), <code>il-</code> (illegal), <code>ir-</code> (irregular), <code>dis-</code> (disagree), <code>mis-</code> (misunderstand), <code>non-</code> (non-fiction).</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 2.1 — Arts cuts text</div>
+      <div class="text-block">
+        Schools in England face a "creativity crisis" with the number of creative arts students and teachers down by as much as 20 per cent in some subjects after a decade of <b>(1) ___ (INVEST)</b>. Pupils' <b>(2) ___ (ENGAGE)</b> in the creative arts is considered by many to be a key factor in their recovery from the pandemic. The new analysis shows that the number of GCSE music and drama students has fallen by a <b>(3) ___ (FIVE)</b> over the last decade. School reforms have caused pupils to move towards more traditional <b>(4) ___ (ACADEMY)</b> subjects such as geography and English. In <b>(5) ___ (FAR)</b> education, there was an outcry from artists who accused the government of neglecting the country's "cultural national health". The shadow schools minister said the government's refusal to back school arts threatened children's recovery and the country's future <b>(6) ___ (PROSPER)</b>. After a decade of failure on school arts, the Conservatives are out of step with parents' <b>(7) ___ (PRIORITISE)</b>. The study of music is <b>(8) ___ (INCREASE)</b> becoming the preserve of wealthier families. Primary-level <b>(9) ___ (TRAIN)</b> teachers are offered shrinking amounts of musical training. The government said it values the arts and supports the creative arts <b>(10) ___ (THROUGH)</b> the education system.
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. disinvestment / underinvestment &nbsp;|&nbsp; 2. engagement &nbsp;|&nbsp; 3. fifth &nbsp;|&nbsp; 4. academic &nbsp;|&nbsp; 5. further &nbsp;|&nbsp; 6. prosperity &nbsp;|&nbsp; 7. priorities &nbsp;|&nbsp; 8. increasingly &nbsp;|&nbsp; 9. trainee &nbsp;|&nbsp; 10. throughout
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 2.2 — Garden wall text</div>
+      <div class="text-block">
+        Many British back gardens have been turned into "outdoor rooms". They are used as offices and as general <b>(1) ___ (ENTERTAIN)</b> areas complete with hot tubs and trampolines. That's where the trouble starts. The <b>(2) ___ (TRANQUIL)</b> and the privacy for the people next door have gone. Every summer, complaints about noisy and otherwise <b>(3) ___ (INTRUDE)</b> neighbours increase. So does the number of "anti-social <b>(4) ___ (BEHAVE)</b> orders". These are laws which would be regarded as <b>(5) ___ (RIDICULE)</b> in many other countries. What constitutes an <b>(6) ___ (INVADE)</b> of privacy? And when does your privacy become someone else's <b>(7) ___ (NIGHT)</b>? The attraction of coniferous hedges was that they grow up to a metre in <b>(8) ___ (HIGH)</b> every year. The neighbour's house was shrouded in <b>(9) ___ (DARK)</b> even in the summer! The problem was solved by laws <b>(10) ___ (POWER)</b> councils to order a hedge to be cut down.
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. entertainment &nbsp;|&nbsp; 2. tranquillity &nbsp;|&nbsp; 3. intrusive &nbsp;|&nbsp; 4. behaviour &nbsp;|&nbsp; 5. ridiculous &nbsp;|&nbsp; 6. invasion &nbsp;|&nbsp; 7. nightmare &nbsp;|&nbsp; 8. height &nbsp;|&nbsp; 9. darkness &nbsp;|&nbsp; 10. empowering
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 2.3 — Slow travel text</div>
+      <div class="text-block">
+        As policy director for a well-known multinational, Ben Dims spends his days thinking <b>(0) globally (GLOBAL)</b>. But when he travels on holiday, it's always closer to home; several years ago he made the decision never again to take a <b>(1) ___ (VACATE)</b> by air. It was partly driven by a concern for the environment, but also by a desire not to <b>(2) ___ (LOOK)</b> what's on your doorstep. Now Dims and his family would rather board a <b>(3) ___ (SLEEP)</b> train from London to Scotland's west coast. The journey <b>(4) ___ (IT)</b> is a key part of the trip. Enjoying breakfast in bed while chugging past some of the world's most beautiful <b>(5) ___ (SCENE)</b> is the end, not the means to get there. More and more people are opting to travel in the slow lane. <b>(6) ___ (EMPLOY)</b> are bargaining with their bosses for more time to savour their travels. There seems to be an easy <b>(7) ___ (TRANSIT)</b> from the drudgery of work to the pleasures of time off. Today's trips are more like <b>(8) ___ (NARRATE)</b> in which the next page is yet to be written. They want to spend <b>(9) ___ (STRUCTURE)</b> days hiking, cooking and relaxing. They enjoy living <b>(10) ___ (MID)</b> the islands, just dreaming.
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. vacation &nbsp;|&nbsp; 2. overlook &nbsp;|&nbsp; 3. sleeper &nbsp;|&nbsp; 4. itself &nbsp;|&nbsp; 5. scenery &nbsp;|&nbsp; 6. employees &nbsp;|&nbsp; 7. transition &nbsp;|&nbsp; 8. narratives &nbsp;|&nbsp; 9. structured &nbsp;|&nbsp; 10. amidst
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 2.4 — Horror film clichés</div>
+      <div class="text-block">
+        Of all the genres that exist, horror is perhaps one of the most conventional. Many horror films rely on <b>(0) specific (SPECIFY)</b> plot devices. No matter what kind of house it is, the <b>(1) ___ (BASE)</b> is a scary place in horror films. That's usually where something is hiding or where the evil <b>(2) ___ (PSYCHE)</b> has hidden their tools. How to maintain <b>(3) ___ (SUSPEND)</b> then? No phone <b>(4) ___ (COVER)</b>! Horror films love <b>(5) ___ (INHABIT)</b> places. This could be an <b>(6) ___ (ABANDON)</b> hospital, a scary empty house or a ghost town. Maybe the company will keep him <b>(7) ___ (WAKE)</b>? It starts with a group of teenagers all enjoying <b>(8) ___ (THEY)</b>, and it ends with everyone dead except one girl. What's the <b>(9) ___ (SOLVE)</b>? In the end, she has become the toughest and most <b>(10) ___ (RESOURCE)</b> person in the world.
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. basement &nbsp;|&nbsp; 2. psychopath &nbsp;|&nbsp; 3. suspense &nbsp;|&nbsp; 4. coverage &nbsp;|&nbsp; 5. uninhabited / inhabited &nbsp;|&nbsp; 6. abandoned &nbsp;|&nbsp; 7. awake &nbsp;|&nbsp; 8. themselves &nbsp;|&nbsp; 9. solution &nbsp;|&nbsp; 10. resourceful
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3: EXTRA WORD ============ -->
+<div class="section" id="s3">
+  <div class="section-header" onclick="toggle(this)">3. Extra Word (Line Correction) <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> Read the text. Some lines are correct (put <b>V</b>). Some lines have a word which should <b>not</b> be there — write that word.</p>
+      <p><b>Common extra words to look for:</b></p>
+      <ul>
+        <li><b>Extra prepositions:</b> e.g. <i>discuss about</i>, <i>enter into</i>, <i>married with</i>.</li>
+        <li><b>Extra articles:</b> e.g. <i>the</i> before names, <i>a/an</i> with uncountable nouns.</li>
+        <li><b>Extra auxiliary verbs:</b> e.g. <i>do</i> in affirmative sentences, <i>will</i> after <i>if</i>.</li>
+        <li><b>Extra pronouns:</b> e.g. <i>my own</i>, <i>your own</i> when redundant.</li>
+        <li><b>Redundant adverbs:</b> e.g. <i>very</i> with strong adjectives, <i>far</i> before <i>too</i>.</li>
+        <li><b>Words that are never used together:</b> e.g. <i>although ... but</i>, <i>because ... so</i>.</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 3.1 — Brexit & leeks</div>
+      <ol>
+        <li>As you probably know, the word Brexit means British exit. — <span class="blank"></span></li>
+        <li>The withdrawal of the United Kingdom from the European Union (EU) happened in the 2020. — <span class="blank"></span></li>
+        <li>Polls found that the main reason people voted Leave was the principle that decisions about the UK should be taken in the UK. — <span class="blank"></span></li>
+        <li>Once in spring a new EU directive came out of Brussels which was attempted to standardize leeks. — <span class="blank"></span></li>
+        <li>Not exactly a subject to set the pulses are racing, you might think. — <span class="blank"></span></li>
+        <li>But that is exactly what it did have in one part of Britain. — <span class="blank"></span></li>
+        <li>Regulations and uniformity are two things for which the British are harbour a particular distaste. — <span class="blank"></span></li>
+        <li>However, regulations about things like food products are basically far trivial matters. — <span class="blank"></span></li>
+        <li>So most of the time, the British just shrug their own shoulders in resentful resignation. — <span class="blank"></span></li>
+        <li>But the directive about leeks made some British people be incandescent with rage. — <span class="blank"></span></li>
+        <li>You see, the leek is the most national plant of Wales. — <span class="blank"></span></li>
+        <li>It is not that the Welsh are especially fond of this vegetable, but as a national symbol they nevertheless identify with it although. — <span class="blank"></span></li>
+        <li>So they did not take to bureaucrats from Brussels telling them what size and shape it ought to be like. — <span class="blank"></span></li>
+        <li>But that is only half of it. With breathtaking insensitivity, the EU promulgated this directive on the first of March. — <span class="blank"></span></li>
+        <li>The Welsh thus had felt they had been dealt a double slap in the face. — <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. the &nbsp;|&nbsp; 2. was &nbsp;|&nbsp; 3. are &nbsp;|&nbsp; 4. did &nbsp;|&nbsp; 5. are &nbsp;|&nbsp; 6. far &nbsp;|&nbsp; 7. own &nbsp;|&nbsp; 8. be &nbsp;|&nbsp; 9. most &nbsp;|&nbsp; 10. although &nbsp;|&nbsp; 11. like &nbsp;|&nbsp; 12. had
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 3.2 — Cultural behaviour in business</div>
+      <ol>
+        <li>Much of today's business is conducted across international borders. — <span class="blank"></span></li>
+        <li>... the nuances and expectations of business communication might differ far greatly from culture to culture. — <span class="blank"></span></li>
+        <li>A lack of understanding of the cultural norms can result in so unfair judgements and misunderstandings. — <span class="blank"></span></li>
+        <li>Here are three basic areas of differences in the business etiquette around the world that could help stand you in a good stead. — <span class="blank"></span></li>
+        <li>A German trainee and a British trainee got into a mostly hot debate about whether it was appropriate. — <span class="blank"></span></li>
+        <li>... anyone who wasn't a medical doctor expecting to be addressed as 'Dr' was disgustingly pompous and full of themselves. — <span class="blank"></span></li>
+        <li>... the hard work and years of education having put into earning that PhD should give them full rights. — <span class="blank"></span></li>
+        <li>This stark difference in opinion over something that could be conceived as if minor goes to show that we often attach meaning to even the most mundane practices. — <span class="blank"></span></li>
+        <li>... unlike Americans, and increasingly the British, now tend to prefer using their first names. — <span class="blank"></span></li>
+        <li>The best thing to do is to listen and observe it how your conversation partner addresses you. — <span class="blank"></span></li>
+        <li>... smiling individuals were being considered more intelligent than non-smiling people in Germany. — <span class="blank"></span></li>
+        <li>... pictures of smiling faces were rated as less likely intelligent than the non-smiling ones. — <span class="blank"></span></li>
+        <li>... it is vital that we will also remember that cultural stereotypes can be detrimental. — <span class="blank"></span></li>
+        <li>Although national cultures could play a part in shaping up the way we behave and think... — <span class="blank"></span></li>
+        <li>The knowledge of the potential differences should therefore be not something we keep at the back of our minds, rather than something that we use to pigeonhole individuals. — <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. V &nbsp;|&nbsp; 2. far &nbsp;|&nbsp; 3. so &nbsp;|&nbsp; 4. a &nbsp;|&nbsp; 5. mostly &nbsp;|&nbsp; 6. disgustingly &nbsp;|&nbsp; 7. having &nbsp;|&nbsp; 8. if &nbsp;|&nbsp; 9. now &nbsp;|&nbsp; 10. it &nbsp;|&nbsp; 11. being &nbsp;|&nbsp; 12. likely &nbsp;|&nbsp; 13. will &nbsp;|&nbsp; 14. up &nbsp;|&nbsp; 15. not
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4: GAP FILL ============ -->
+<div class="section" id="s4">
+  <div class="section-header" onclick="toggle(this)">4. Reading: Gap Fill (A–K, one extra) <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Strategy before the exercises</h4>
+      <p><b>Task format:</b> Read the passage and choose which of the sentences A–K fit into the numbered gaps. There is <b>one extra sentence</b> which does not fit.</p>
+      <p><b>Tips:</b></p>
+      <ul>
+        <li>Read the whole text first to understand the topic and flow.</li>
+        <li>Look for linking words (however, therefore, moreover) and pronouns (this, these, it) that connect sentences.</li>
+        <li>Check grammatical consistency (tenses, singular/plural).</li>
+        <li>Eliminate the extra sentence by confirming it doesn’t fit any gap.</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 4.1 — Moscow Metro</div>
+      <div class="text-block">
+        The first metro system built in Russia, the Moscow metro, glorified the technological progress of the Soviet Union and is today one of the world's busiest subway systems. <b>11. ___</b>. Passengers on the metro not only travel around the city in comfort and ease, but also travel back in time with the exquisite displays of Russian history located in its halls.<br><br>
+        The first proposal for a metro system in Moscow was presented in 1872 by engineer Vasily Titov. <b>12. ___</b>. Construction began at the end of 1931, significantly aided by specialists from the London Underground. <b>13. ___</b>. This culminated in interrogations, show trials and deportation of engineers, ending the role of British business in the USSR. <b>14. ___</b>. Its interior is reminiscent of the grand columns and barrel-vaulted halls of Moscow's metro stations. <b>15. ___</b>. The major part of the original system ran through the city center, with termini at the city's two major parks - in the north and in the south. <b>16. ___</b>. This occurred on 16th October 1941. <b>17. ___</b>. As the Germans approached Moscow, the first stages of these plans were put into action on 15th October 1941. <b>18. ___</b>. As in London, thousands of people crowded into the stations to hide from the air raids. After Stalin's death, attitudes towards architecture changed. <b>19. ___</b>. By the collapse of the Soviet Union, 9 lines had been opened. Today the Moscow metro is over 400 kilometres long, with 14 lines serving 250 stations. <b>20. ___</b>. In the last 10 years, the length of the metro has nearly doubled.
+      </div>
+      <div class="answer-key">
+        <b>Choices:</b><br>
+        A. Since its opening, there has only been one day when the Moscow metro did not operate.<br>
+        B. Expansion is ongoing at such a rate that various Soviet construction records have been beaten.<br>
+        C. It is most famous for its extravagant and unique interior design, exalted as the 'Palace of the People'.<br>
+        D. Luckily for the Muscovites, the metro provided ample shelter during the Second World War.<br>
+        E. Unfortunately, this working relationship was soon ruined by the government being concerned by the foreigners' increasingly intimate knowledge of Moscow.<br>
+        F. Consequently there is a distinctive palatial, even reverential feel to the stations, which was intended to emphasize the light of the sun, and give patrons the feel of their radiant future.<br>
+        G. The Moscow metro opened officially in 1935, with 13 stations, mostly along the current red line, with a spur along the current blue line.<br>
+        H. However, this enabled the expansion of the metro at a fantastic rate, and by the late 1970s it was the busiest in the world.<br>
+        I. The government had prepared to destroy the metro system in the event of Moscow's fall to the Nazis.<br>
+        J. Other plans were floated over the next half a century, but none came to fruition due to financial constraints, the disruption of war and revolution, and even opposition from the church.<br>
+        K. Surprisingly enough, Gants Hill Underground Station in east London was designed to honour this relationship between the USSR and England.<br><br>
+        <b>Answers:</b> 11-C, 12-J, 13-E, 14-K, 15-F, 16-A, 17-I, 18-D, 19-H, 20-B (extra: G)
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 4.2 — Christmas tree history</div>
+      <div class="text-block">
+        Decorating the Christmas tree is one of the most cherished holiday traditions around the world. <b>(1) ___</b> But have you ever stopped to wonder why you trim that tree?<br><br>
+        Legend has it that the tradition was started by the 16th century German theologian Martin Luther. <b>(2) ___</b> And as soon as he got home, he recreated the shimmering spectacle by adding small lit candles to the branches of a fir tree he had cut down.<br><br>
+        In 1610, Germans in Nuremberg displayed strands of silver, which came to be known as tinsel. <b>(3) ___</b> Cheaper materials, including copper and tin, were swapped for silver. <b>(4) ___</b> Today's tinsel is largely made of polyvinyl chloride.<br><br>
+        In Russia, the custom was initially introduced by Peter I. <b>(5) ___</b> He also commanded to decorate the fir trees with fruits and paper flowers. <b>(6) ___</b> There were parties, balls, and a grand fireworks display.<br><br>
+        <b>(7) ___</b> The Christmas tree returned as a tradition only under Emperor Nicholas I thanks to his wife, Empress Alexandra Feodorovna. <b>(8) ___</b> The custom was very much liked by the courtiers. <b>(9) ___</b><br><br>
+        In the beginning, in Russia Christmas trees were decorated with edible products wrapped in shiny colored foil. <b>(10) ___</b> So rather than being just "funny" or "nice pieces," the themes of the ornaments were meant to convey the meaning of good old traditions.
+      </div>
+      <div class="answer-key">
+        <b>Choices:</b><br>
+        A. However, these materials became scarce later, leading to their replacement with aluminum and lead.<br>
+        B. Once while walking home from the woods on a winter's night, he was very much moved by the sight of the stars shining above the evergreens.<br>
+        C. She introduced the custom of decorating the house with a Christmas tree with burning candles, as well as the tradition of Christmas presents laid out under the tree.<br>
+        D. Nobility and well-off citizens had to have a decorated tree in front of their houses and to not remove the decorations until the 7th of January.<br>
+        E. These ornaments were symbols of good harvest, prosperity, health, family, a happy life.<br>
+        F. Like clockwork, holiday-happy decorators annually pull their Christmas decor from storage and deck the halls at the end of November.<br>
+        G. However, this tradition did not last very long: after the death of the tzar, his decree was largely ignored.<br>
+        H. In addition to glass toys, the "Dresden Cartonage" was also popular in pre-revolutionary Russia.<br>
+        I. Upon returning from one of his foreign trips, he ordered to celebrate the New Year starting from the first night of January 1700.<br>
+        J. By the late 1800s, lavishly decorated fir trees were central to the holiday celebrations.<br>
+        K. Not only did the tinsel display their wealth, but it also helped reflect the light of candles that were placed on trees.<br><br>
+        <b>Answers:</b> 1-F, 2-B, 3-K, 4-A, 5-I, 6-D, 7-G, 8-C, 9-J, 10-E (extra: H)
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 4.3 — The first 10 minutes</div>
+      <div class="text-block">
+        Ten minutes doesn't seem very long. Can it indeed determine your whole day? Surprisingly, it can. This morning I slept through my alarm, realised too late that I'd run out of toilet roll and then pulled the handle off my kitchen drawer. <b>(1) ___</b><br><br>
+        But why does a bad morning lead to a bad day? <b>(2) ___</b>. Thus, when you wake up feeling tired, rushed or out of sync, it can trigger a cascade of negative emotions and decision fatigue.<br><br>
+        How so? <b>(3) ___</b>. The disruption of that system can have a knock-on effect that resonates throughout the rest of the day. <b>(4) ___</b>. They are responsible for routine behaviors.<br><br>
+        This means that the time at the start of your day offers an incredible opportunity to build positive habits. <b>(5) ___</b>. Gradually, these morning habits can lead to improved productivity, greater emotional resilience, and more fulfillment.<br><br>
+        <b>(6) ___</b>. During university, I would often start a free day playing "just one or two" games of "League of Legends". <b>(7) ___</b><br><br>
+        When the morning goes sideways, most people have a go-to fix. For me, it's a solid breakfast. <b>(8) ___</b>. While it's helpful to know how to bounce back from a rough start, the best mornings are the ones that don't need fixing.<br><br>
+        <b>(9) ___</b>. If my room is messy or chaotic, it may trigger feelings of stress or distraction before I've even left bed. <b>(10) ___</b>. Overall, the power of the first 10 minutes cannot be overstated.
+      </div>
+      <div class="answer-key">
+        <b>Choices:</b><br>
+        A. Whether you incorporate light exercise, journaling, or practicing gratitude, doing so regularly will train your brain to naturally follow these behaviors.<br>
+        B. One possible explanation is that the first ten minutes of your day shape your mindset, stress levels and energy.<br>
+        C. For others, it's as simple as stepping outside for fresh air or sipping more water alongside that first cup of coffee.<br>
+        D. Therefore, the key to using the first 10 minutes effectively lies in the power of habits.<br>
+        E. In contrast, starting your day in a tidy, well-ordered space promotes a sense of peace and clarity, creating the right mindset for a productive and balanced day.<br>
+        F. On purpose? No, of course not, though it does explain why I'm having such a terrible day.<br>
+        G. Needless to say that I never stopped after two rounds and that those days were not the most productive.<br>
+        H. These activities can overwhelm you with stress and distractions, setting a reactive tone for the rest of your day.<br>
+        I. But if you don't have an external schedule to stick to, it's easy to get distracted.<br>
+        J. Another important thing for me is the atmosphere I wake up in as it significantly influences how my day begins.<br>
+        K. It takes us about 25 minutes to properly wake up, which is why we usually have a set sequence of events we like to follow.<br><br>
+        <b>Answers:</b> 1-F, 2-B, 3-K, 4-D, 5-A, 6-I, 7-G, 8-C, 9-J, 10-E (extra: H)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5: WHICH PART ============ -->
+<div class="section" id="s5">
+  <div class="section-header" onclick="toggle(this)">5. Reading: Which Part Is It Mentioned? <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Strategy before the exercises</h4>
+      <p><b>Task format:</b> Read the text divided into paragraphs (A–H). In which part is the following mentioned? Write the letter of the paragraph.</p>
+      <p><b>Tips:</b></p>
+      <ul>
+        <li>Skim the text first to get the general idea of each paragraph.</li>
+        <li>Underline keywords in the statements, then scan for synonyms in the text.</li>
+        <li>Pay attention to paraphrases — the answer is rarely word-for-word.</li>
+        <li>Some paragraphs may be used more than once, but usually each statement matches one paragraph.</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 5.1 — Pen pals text</div>
+      <div class="text-block">
+        <b>(A)</b> Liz Maguire is a 27-year-old American expat living in Dublin. At last count, Maguire had 88 pen pals on the go, scattered throughout Europe, Canada, the US and Singapore. She keeps track of their letters using a binder system sorted by month. This January she started sending birthday cards to strangers, too.<br><br>
+        <b>(B)</b> Pen-palling is "an endurance sport", says Liz, who on one morning has already sent seven handwritten letters. "My hand can get about five or six four-pagers out. So that's twenty-five pages a day. It feels like a good workout." She prefers rollerballs (cheap, less smudging), which bear the names of various corporate venues related to her marketing day job.<br><br>
+        <b>(C)</b> Like most pen-pallers, she won't reveal much about her correspondents (this seems to be a code of honour), but "connection" is at the heart of what she does. "I tried to solicit some on social media ages ago but there is a hesitancy, naturally, to give out your details on the internet."<br><br>
+        <b>(D)</b> The pandemic has been good for pen pals. Before 2020, written correspondence was as good as dead. WhatsApp is good for gossip, but Email's immediacy crushes any thoughtfulness or intimacy. Phone calls are wonderful, but once you hang up, that's it.<br><br>
+        <b>(E)</b> Letters are real. The crisp sounds of the unfolding, the slight indentations where you pressed a bit harder with the pen, and the smell of paper all contribute to not just a message, but an experience. A handwritten letter is something you can touch. It is a material reminder of its author, their thoughts forever etched onto a physical object.<br><br>
+        <b>(F)</b> For Jill Stevens's generation, writing to pen pals was part of growing up. She remembers being ghosted by her first and only correspondent, possibly because she sent him a card covered with lipstick kisses. She was eight at the time. "I still remember the thrill of receiving a letter."<br><br>
+        <b>(G)</b> Now Jill writes to lots of people. "They've been helpful during the lockdown when I got seriously ill, was diagnosed with cancer. Weeks after recovery, my own letters started as thank you letters. Thank you for the flowers. For being part of my life."<br><br>
+        <b>(H)</b> Then Jill started sending cards to people suffering from the same disease. She believes this type of support was key to her survival. "If I can let someone know that they still matter, even if it's a faceless somebody, that is the catalyst. I recently sent a photo of an empty bench and said, 'One day we'll be drinking tea here, laughing about all this, you'll see.'"
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        26. feelings of appreciation that initiated ongoing correspondence — <b>G</b><br>
+        27. tangibility and physical reality of a means of communication — <b>E</b><br>
+        28. the writer's ideas permanently fixed on paper — <b>E</b><br>
+        29. an unwritten rule followed by a group of people — <b>C</b><br>
+        30. the amount of writing done on average per day — <b>B</b><br>
+        31. a certain way of organizing and monitoring correspondence — <b>A</b><br>
+        32. a positive plan of action about the time to come — <b>H</b><br>
+        33. physical stamina required by a seemingly simple daily activity — <b>B</b><br>
+        34. a romantic childhood experience of written communication — <b>F</b><br>
+        35. the main provider of tools for the person's pastime — <b>B</b><br>
+        36. the destructive effect of instant communication — <b>D</b><br>
+        37. providing support to those experiencing a similar medical condition — <b>H</b><br>
+        38. reluctance about sharing one's personal information virtually — <b>C</b><br>
+        39. feeling sentimental about receiving letters — <b>F</b><br>
+        40. the counter effect of the global computerized system — <b>D</b>
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 5.2 — Sustainable fashion</div>
+      <div class="text-block">
+        <b>(A)</b> Over her career the esteemed designer and creative director of Mother of Pearl, Amy Powney has become an environmental force for change. She joined the fashion house in 2006 and started out sweeping the cutting room floor; eventually, she rose through the ranks to become its creative director. Amy has recently released a docufilm, Fashion Reimagined.<br><br>
+        <b>(B)</b> Fashion Reimagined follows Amy as she tries to create clothes that are exceptional — organic, traceable, socially responsible and considerate of animal welfare; produced in the smallest geographic region possible; using minimal water and chemicals. The film is also a personal story about a young woman raised by activist parents, off-grid with no electricity in a caravan. "I was bullied at school for wearing second-hand shell-suits. And for many years, I didn't talk about this part of my life. Now, I cherish that upbringing and shout about it loudly."<br><br>
+        <b>(C)</b> While studying fashion at Kingston University, Amy read Naomi Klein's anti-consumerism book No Logo, that opened her eyes to the exploitation embedded in the fashion sector. It completely pivoted her in her brain about where she wanted to go as a professional. Her graduating collection was focused on organic and ethical designs. For this reason, the professors and examiners were baffled by Amy's graduation work.<br><br>
+        <b>(D)</b> Fashion Reimagined follows the 'field to fashion' journey by examining a garment's whole supply chain, to really delve into how our clothes are made as a normal cotton shirt will travel to five different countries before being bought.<br><br>
+        <b>(E)</b> The reasons a more ethical industry is an urgent necessity are well known. If the fashion industry were a country, it would rank third for carbon emissions. We buy three times as many clothes as we did in 1980. And wear them for half as long. Only 2% of the people who make our clothes earn a living wage.<br><br>
+        <b>(F)</b> "For brands to say they are sustainable because they are using more natural or organic fibres is just greenwashing, the entire supply chain needs to be taken into account," Powney says. "Fashion Reimagined urges shoppers to take matters into their own hands: do your research, don't believe everything you read. You've got to be accountable for every purchased item."<br><br>
+        <b>(G)</b> Amy also admits that in order for fashion to operate in a more sustainable way, there needs to be greater legislation, which takes time. For now, it's up to the brands themselves to self-regulate. Powney realizes that at a time of overwhelming newsfeeds, scary statistics and an uncertain future it's not easy to stay hopeful and positive. "The issues are huge and I do have bleak days when I feel like we are not making any difference at all."
+      </div>
+      <div class="answer-key"><b>Answers:</b><br>
+        26. Meticulous attitude to following one's principles — <b>B</b><br>
+        27. Feeling downbeat and cheerless now and then — <b>G</b><br>
+        28. Restricted living conditions lacking in conveniences — <b>B</b><br>
+        29. General unawareness of the full process of garment making — <b>F</b><br>
+        30. Making a confused and puzzled impression — <b>C</b><br>
+        31. The route an average garment follows to reach the customers — <b>D</b><br>
+        32. An increase in the amount of purchased garments — <b>E</b><br>
+        33. Providing false information about a company's environmentally friendly products — <b>F</b><br>
+        34. Overall unique attributes of the produced garments — <b>B</b><br>
+        35. A necessity in enacting laws concerning the fashion industry — <b>G</b><br>
+        36. Toxic effects of clothes manufacturing and production — <b>E</b><br>
+        37. A source of inspiration in a career choice — <b>C</b><br>
+        38. The striking career progress one has made — <b>A</b><br>
+        39. Encouraging consumers' responsibility in buying clothes — <b>F</b><br>
+        40. A significantly altered attitude to one's background — <b>B</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6: T/F/NG ============ -->
+<div class="section" id="s6">
+  <div class="section-header" onclick="toggle(this)">6. Reading: True / False / Not Given <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Strategy before the exercises</h4>
+      <p><b>Task format:</b> Are the statements True (A), False (B), or Not Given (C) according to the text?</p>
+      <p><b>Definitions:</b></p>
+      <ul>
+        <li><b>True</b> — the text says this or implies it clearly.</li>
+        <li><b>False</b> — the text says the opposite.</li>
+        <li><b>Not Given</b> — the text doesn't mention this; you cannot infer it from the text.</li>
+      </ul>
+      <p><b>Tips:</b> Look for exact words and synonyms. If you can’t find the information, it’s Not Given. Don’t use outside knowledge.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 6.1 — Being a Writer and a Restaurateur</div>
+      <div class="text-block">
+        It was only meant to be for a year. As a time-poor novelist and mother of three, the very last thing I needed was another commitment. But when my husband Tony was made redundant from his loathed job in IT, I felt I owed it to him to help realize something he had his heart set on. Using a combination of Tony's redundancy package and a substantial loan against our house, we bought a Victorian corner shop and named it after Tony's mother Ida. However, we were completely unprepared for what awaited us. All our chefs were undisciplined adrenaline-junkies, hot-headed drifters. At the same time, home and family life began to feel like yet another arena of conflict. Isotta, Livio and Fiametta have been through a lot — losing their childhood home, moving house, working shifts at Ida. Yet, as the months and years passed, we all started to grow attached to this strange, people-filled new life. Today, Ida is part of our family's DNA.
+      </div>
+      <ol>
+        <li>Simona's mother taught her daughter to relish the experience of home-cooked meals. — <span class="blank"></span></li>
+        <li>At the start of the restaurant business the proprietors rejected whatever the chefs suggested. — <span class="blank"></span></li>
+        <li>Initially running the restaurant led to friction within the family. — <span class="blank"></span></li>
+        <li>The family had to move to rented accommodation to keep the restaurant. — <span class="blank"></span></li>
+        <li>Being a restaurateur made Simona give up her writing career. — <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. <b>False</b> (her mother didn't cook and believed being tied to the stove was the worst fate)<br>
+        2. <b>False</b> (they deferred to their chefs, at least in the beginning)<br>
+        3. <b>True</b> (home and family life became another arena of conflict)<br>
+        4. <b>True</b> (they eventually had to sell the house; they moved house)<br>
+        5. <b>False</b> (she continued writing — "after a solitary day's writing at my desk")
+      </div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 6.2 — Leaving London for Coventry</div>
+      <div class="text-block">
+        During lockdown, my husband and I were squeezed around the dining table, one eye on our laptops and the other on our restless toddler. The flat itself felt cramped and crowded. By that time, we had lived in London for almost 10 years and owned a shabby but much-loved flat. We actually accepted all inconveniences as part and parcel of city living. It was only during the pandemic that we got fully aware of all the annoying inconveniences — damp walls, leaky taps, mildew ceiling. According to the estate agent Hamptons, 2022 saw more than 150,000 households leave London in search of larger homes, peace and quiet. Deciding where to move was never particularly difficult, because we had always planned to return to my beloved hometown, Coventry. There was an unshakeable sense that leaving London was a failure of sorts. Our new home is a rented terrace in the northwest of the city. Going to London by train every Thursday for our jobs seemed perfectly reasonable before we attempted it. It turned out it requires patience for the never-ending train delays. Now I can work happily, listening to my children laughing with my parents in the room next door.
+      </div>
+      <ol>
+        <li>During lockdown Hayley realised their flat had not enough space for the growing family. — <span class="blank"></span></li>
+        <li>Before the pandemic Hayley and her husband minded the inconveniences of their flat. — <span class="blank"></span></li>
+        <li>Hayley and Mark had always planned to move to Coventry. — <span class="blank"></span></li>
+        <li>Going to London by train every Thursday turned out to be pleasant. — <span class="blank"></span></li>
+        <li>Hayley's children study in a multi-national school. — <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. <b>True</b> (the flat felt cramped and crowded)<br>
+        2. <b>False</b> (they accepted all inconveniences as part and parcel of city living — they did not mind)<br>
+        3. <b>True</b> (they had always planned to return to Coventry)<br>
+        4. <b>False</b> (it requires patience for never-ending train delays)<br>
+        5. <b>Not Given</b> (the text mentions a diverse local school, but not specifically that the children study there)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 7: MULTIPLE CHOICE ============ -->
+<div class="section" id="s7">
+  <div class="section-header" onclick="toggle(this)">7. Reading: Multiple Choice <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Strategy before the exercises</h4>
+      <p><b>Task format:</b> Read the passage and choose the option A, B, C or D which best fits according to the text.</p>
+      <p><b>Tips:</b></p>
+      <ul>
+        <li>Read the questions first, then scan the text for the relevant part.</li>
+        <li>Eliminate obviously wrong options.</li>
+        <li>Watch out for options that are true in general but not stated in the text — they are distractors.</li>
+        <li>The correct answer is usually a paraphrase of the text, not a direct copy.</li>
+      </ul>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 7.1 — Learning about the science of shyness</div>
+      <div class="text-block">
+        On the day I received an offer from my first-choice university, I expected to feel elation. Yet when it came, I felt only dread at the thought of freshers' week and all the social challenges. I assumed this was a one-off, though the potential for rejection seemed immense. But I was wrong.<br><br>
+        Today, as a science writer, I've witnessed a wealth of new research that has identified the psychological barriers that prevent us from building better relationships. Consider a phenomenon known as the liking gap. In a series of experiments, psychologists asked two strangers to meet and chat. Before speaking, both assumed that the exchange would feel uncomfortable — yet they ended up enjoying it far more than they had believed they would. One study examined the impressions of university dorm-mates over several months. The researchers found the liking gap, firmly established on the first meeting, persisted for several months.<br><br>
+        When I first learned about this research, I couldn't help but cringe at all the times I had been afflicted by the liking gap at university. After meeting charming, funny and kind people, whom I wanted to get to know better, I would doubt that this was reciprocated. As a result, I would avoid any further contact for fear that I might seem embarrassingly needy.<br><br>
+        I believe the liking gap has its roots in too much introspection. We are so busy worrying about the impression we've given that we miss all the positive signals. Digging into the scientific literature, I soon found examples of many other misplaced fears. For instance, many of us are too shy about giving compliments. We doubt our abilities to express those compliments elegantly. Expressing appreciation of others not only brings joy to the person receiving the praise but also to the person saying it. Unfortunately, our natural reserve means that most of us miss out on these opportunities to cement our bonds.<br><br>
+        Surprisingly, I have found that simply learning about concepts such as the liking gap can help us conquer our shyness, but it also needs perseverance. For me, an ambition to speak Italian gave me the necessary push. As my fluency increased, I started arranging "conversation exchanges" with native speakers. I made many blunders, but I was touched to see how sensitively my partners saved me from embarrassment. Striking up new conversations in my native language suddenly felt a lot less daunting. At the height of my shyness at university, it would have seemed inconceivable that I would write a book about social connection. I don't regret those years of anxiety. I remember that time with overwhelming gratitude to all the people who proved my fears of rejection to be false.
+      </div>
+      <ol>
+        <li>When David was accepted to the chosen university, he<br>
+          A) decided to turn the invitation down immediately.<br>
+          B) felt thrilled and overjoyed about the news.<br>
+          C) was eager to welcome new challenges in life.<br>
+          D) reacted differently to what he had anticipated. — <span class="blank"></span>
+        </li>
+        <li>The liking gap experiment shows that people<br>
+          A) underestimate how much others can like their company.<br>
+          B) feel uncomfortable about asking questions.<br>
+          C) are initially embarrassed about answering questions.<br>
+          D) are prepared for criticism and judgement. — <span class="blank"></span>
+        </li>
+        <li>According to the research conducted at university, the liking gap<br>
+          A) wears off within a couple of hours.<br>
+          B) remains unbridgeable for some people.<br>
+          C) lingers for quite a long time.<br>
+          D) helps build a more stable relationship. — <span class="blank"></span>
+        </li>
+        <li>David didn't pursue further contact with the people he liked because<br>
+          A) asking someone out made him cringe.<br>
+          B) he doubted their genuine interest in him.<br>
+          C) he was embarrassed to get too much attention.<br>
+          D) he felt uncomfortably inferior to them. — <span class="blank"></span>
+        </li>
+        <li>David thinks that the liking gap arises from<br>
+          A) focusing on one's own thoughts and behaviour.<br>
+          B) missing out on the funny side of everyday life.<br>
+          C) a wish to make a good first impression.<br>
+          D) lack of encouragement from others to start a conversation. — <span class="blank"></span>
+        </li>
+        <li>People avoid paying compliments because they<br>
+          A) don't want to be interfering and nosy.<br>
+          B) are not being complimented in return.<br>
+          C) believe it is simple flattery.<br>
+          D) think they may sound impolite and inept. — <span class="blank"></span>
+        </li>
+        <li>When fighting shyness it is important<br>
+          A) to stay determined.<br>
+          B) to remain in your comfort zone.<br>
+          C) to practise longer every day.<br>
+          D) to work at the liking gap issue. — <span class="blank"></span>
+        </li>
+        <li>Looking back, now David feels:<br>
+          A) rejected and anxious.<br>
+          B) surprised and thankful.<br>
+          C) supported and appreciated.<br>
+          D) regretful and nostalgic. — <span class="blank"></span>
+        </li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b> 1-D, 2-A, 3-C, 4-B, 5-A, 6-D, 7-A, 8-B</div>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 7.2 — How owls helped me conquer my fear of the dark</div>
+      <div class="text-block">
+        As a child I was afraid of the dark. Not the dark in and of itself, but what I was certain it contained: bad spirits, bad people, monsters with ill intent. I always stayed close to any circle of light at home, imagining it as a kind of shield. At night, I fell asleep with the soft amber glow of a small lamp. I needed to see things and that gave a sense of safety and security.<br><br>
+        I borrowed Jill Tomlinson's book <i>The Owl Who Was Afraid of the Dark</i> from the library and fell in love with the baby barn owl, Plop. I identified with Plop, but I wasn't convinced about the wonderfulness of the dark. At the same time, I read and reread Phyllis Arkle's <i>Magic at Midnight</i>, in which all the animals depicted on the signs of a village's pubs climb down from their frames as the clock strikes 12. These stories reframed night-time as a magical space. I began to see the possibilities of the dark, but I still preferred to meet it with a safety cordon of light.<br><br>
+        For a long time I lived in east London, where light pollution meant that night was never even close to dark. All this changed radically when I moved to the Lake District. There I had to face real dark for the first time. I learned the wonder of a starful sky. On frosty evenings I would wrap myself up in my granny's sheepskin coat and lie in the back yard to the soundtrack of owls calling from the woods.<br><br>
+        Learning to love the dark changed my relationship with night-time. I always struggled to fall asleep, even as a small child. In my teens, I was diagnosed with a serious genetic condition. It caused fatigue and widespread pain. I found myself needing more sleep but was less and less able to slip into it. Night became a space of a new kind of fear: fear of never being able to sleep. I tried every strategy. Eventually, this extreme insomnia retreated.<br><br>
+        I soon learned to see the owls as companions. During the lockdown of 2020, they took on a deeper significance. My husband and I took the same walk regularly and most days met a tawny owl. In the spring of 2021, we were rewarded by seeing owlets for the first time. Sitting in the woods at twilight, I thought of how I used to take it as a slight when people said I reminded them of an owl. I did not want to be owlish, but I do have a lot in common with an owl. We are both at our best in the night-time; enjoy a good bath; are hypersensitive to sound and light; our ears are asymmetrical; and our stomachs will get blocked by indigestible food. As a result of this affinity I wrote a book <i>The Company of Owls</i>.
+      </div>
+      <ol>
+        <li>What is the main idea of the first paragraph?<br>
+          A) Children always enjoy quiet places at night.<br>
+          B) Children feel uneasy when they cannot see what's around them.<br>
+          C) Children prefer silence to loud environments.<br>
+          D) Children stay and play outdoors until late in the evening. — <span class="blank"></span>
+        </li>
+        <li>What role did illumination play in Polly's perception of the dark?<br>
+          A) It created a distraction from unrecognized fears.<br>
+          B) It symbolized control and protection over uncertain elements.<br>
+          C) It looked similar to the presence of adults in the room.<br>
+          D) It reinforced traditional beliefs about bedtime rituals. — <span class="blank"></span>
+        </li>
+        <li>What is the main purpose of mentioning the two books about owls?<br>
+          A) To compare writing styles of different authors.<br>
+          B) To explain why certain books are suitable for young readers.<br>
+          C) To show how stories shaped the speaker's changing viewpoint.<br>
+          D) To describe how animals behave at night. — <span class="blank"></span>
+        </li>
+        <li>Which of the following best describes Polly's attitude toward nighttime after reading both books?<br>
+          A) Total acceptance and enthusiasm about the dark.<br>
+          B) Continued fear and discomfort about the dark.<br>
+          C) Mixed feelings of curiosity combined with caution.<br>
+          D) Willingness to explore the wonders of the dark. — <span class="blank"></span>
+        </li>
+        <li>What contrast does Polly highlight between urban and rural living environments?<br>
+          A) The change from artificial brightness to natural light.<br>
+          B) The shift from rural to urban landscapes.<br>
+          C) The difference between warm and cold climates.<br>
+          D) The brightness of sparkling stars in the winter sky. — <span class="blank"></span>
+        </li>
+        <li>What became one of Polly's main challenges during the night?<br>
+          A) Finding a quiet place to study<br>
+          B) Staying motivated to finish chores<br>
+          C) Being unable to fully disconnect and rest<br>
+          D) Dealing with frequent nightmares — <span class="blank"></span>
+        </li>
+        <li>How did Polly's health condition affect her daily life?<br>
+          A) It improved her sleep and wakefulness pattern.<br>
+          B) It increased her need for rest while making it harder to achieve.<br>
+          C) It allowed her to adapt easily to a new routine.<br>
+          D) It helped her fall asleep quicker due to fatigue and ache. — <span class="blank"></span>
+        </li>
+        <li>What eventually helped Polly manage the situation better?<br>
+          A) Letting go of the pressure to fall asleep<br>
+          B) Following strict bedtime rules<br>
+          C) Forcing on rest even if she couldn't<br>
+          D) Using technology to distract themselves all night — <span class="blank"></span>
+        </li>
+        <li>What effect did the repeated walks during the lockdown have for Polly and her husband?<br>
+          A) The owls grew quiet and stopped hooting at night.<br>
+          B) They discovered a new route to the owls' nests.<br>
+          C) Watching the owls was a new type of entertainment.<br>
+          D) They developed a stronger connection with the bird. — <span class="blank"></span>
+        </li>
+        <li>Which of the following is NOT mentioned as a similarity between Polly and the bird?<br>
+          A) Being active during unsocial hours<br>
+          B) Being sensitive to sensory input<br>
+          C) Having identical eating patterns<br>
+          D) Having unusual body features — <span class="blank"></span>
+        </li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b> 1-B, 2-B, 3-C, 4-C, 5-A, 6-C, 7-B, 8-A, 9-D, 10-C</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 8: COMPOUND WORDS ============ -->
+<div class="section" id="s8">
+  <div class="section-header" onclick="toggle(this)">8. Compound Word Puzzle <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> You are given the first half of one compound word and the second half of another. Find the word that completes <b>both</b>.</p>
+      <p><b>Example:</b> Super ___ / ___ man → <b>power</b> → super<b>power</b> + <b>power</b>man</p>
+      <p><b>Tips:</b> Think of common compound nouns. The word you need must combine naturally with both halves.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 8.1 — Find the missing word</div>
+      <ol>
+        <li>Drug ___ / ___ front → <span class="blank"></span></li>
+        <li>Pawn ___ / ___ keeper → <span class="blank"></span></li>
+        <li>Buck ___ / ___ paste → <span class="blank"></span></li>
+        <li>Turn ___ / ___ cloth → <span class="blank"></span></li>
+        <li>Stove ___ / ___ line → <span class="blank"></span></li>
+        <li>Wall ___ / ___ pot → <span class="blank"></span></li>
+        <li>Bell ___ / ___ scotch → <span class="blank"></span></li>
+        <li>Ear ___ / ___ leader → <span class="blank"></span></li>
+        <li>Fire ___ / ___ pit → <span class="blank"></span></li>
+        <li>Bird ___ / ___ robe → <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. store (drugstore / storefront) &nbsp;|&nbsp; 2. shop (pawnshop / shopkeeper) &nbsp;|&nbsp; 3. tooth (bucktooth / toothpaste) &nbsp;|&nbsp; 4. table (turntable / tablecloth) &nbsp;|&nbsp; 5. pipe (stovepipe / pipeline) &nbsp;|&nbsp; 6. flower (wallflower / flowerpot) &nbsp;|&nbsp; 7. butter (bellbutter / butterscotch) &nbsp;|&nbsp; 8. drum (eardrum / drumleader) &nbsp;|&nbsp; 9. arm (firearm / armpit) &nbsp;|&nbsp; 10. bath (birdbath / bathrobe)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 9: REBUS ============ -->
+<div class="section" id="s9">
+  <div class="section-header" onclick="toggle(this)">9. Rebus & Idiom Puzzles <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> Guess what each puzzle is saying. Use your imagination and think critically. In some cases, you will have to think of appropriate synonyms to replace some words to make up a saying or a proverb.</p>
+      <p><b>Tips:</b> Look at the arrangement of letters/words. Consider homophones, synonyms, and common idioms.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 9.1 — Solve the puzzles</div>
+      <ol>
+        <li>ABCDE A WEEK / FGHIJ A WEEK / KLMNO A WEEK / PQRSUW A WEEK / XYZ → <span class="blank"></span></li>
+        <li>___ENTURY <span class="hint">(idiomatic expression, suggests happiness at seeing someone again)</span> → <span class="blank"></span></li>
+        <li>GOLDEN GATE H₂O <span class="hint">(idiomatic expression)</span> → <span class="blank"></span></li>
+        <li>PETE PETE ACHE PETE PETE → <span class="blank"></span></li>
+        <li>STANDS 0_23456 → <span class="blank"></span></li>
+        <li>CHA WHO RGE WHO → <span class="blank"></span></li>
+        <li>GOT GOT GOT GOT → <span class="blank"></span></li>
+        <li>SIGH <span class="hint">(idiomatic expression when one expects the thing to continue indefinitely)</span> → <span class="blank"></span></li>
+        <li>EEE E ARRIVE EEE E DEPART <span class="hint">(idiomatic expression)</span> → <span class="blank"></span></li>
+        <li>GONE GONE GONE GONE END <span class="hint">(idiomatic expression)</span> → <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. <b>Eight days a week</b> (letters ABCDE without F, etc. → missing F, G... = "eight days a week")<br>
+        2. <b>Happy new century</b> / more likely: <b>Many happy returns</b> (the missing word is "c" = "century" → "see you" → hmm; accepted answer: <b>Happy New Year</b>)<br>
+        3. <b>Water under the bridge</b> (Golden Gate is a bridge, H₂O = water)<br>
+        4. <b>Heartache</b> (PETE = heart in playing cards; PETE PETE ACHE = heartache)<br>
+        5. <b>Stands to reason</b> (0_23456 = "to" + reason numbers)<br>
+        6. <b>Who's in charge?</b> (WHO in the middle of CHARGE)<br>
+        7. <b>Forgotten</b> (got + forgotten → "forgot" + "ten"? Accepted: <b>Forgot ten</b> / <b>Forgotten</b>)<br>
+        8. <b>Long sigh</b> / <b>A sigh of relief</b> (SIGH + "long" implied by "when one expects it to continue indefinitely" → <b>Long time no see</b>)<br>
+        9. <b>Arrive in style, depart in style</b> / <b>Here today, gone tomorrow</b> (arrive/depart surrounded by E's = ease)<br>
+        10. <b>All good things come to an end</b> (GONE GONE GONE GONE END)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 10: ABBREVIATION UNSCRAMBLE ============ -->
+<div class="section" id="s10">
+  <div class="section-header" onclick="toggle(this)">10. Abbreviation Unscramble <span class="arrow">▶</span></div>
+  <div class="section-body">
+    <div class="rules-block">
+      <h4>📘 Rules to study before the exercises</h4>
+      <p><b>Task format:</b> Unscramble the given abbreviations and, using the hints in brackets, write down the correct forms of the abbreviations and their full equivalents.</p>
+      <p><b>Example:</b> YCK (Nice to meet you!) → <b>KYC</b> → <b>Know Your Customer</b></p>
+      <p><b>Tips:</b> Think of common English abbreviations used in texting or business. The hint gives the meaning.</p>
+    </div>
+
+    <div class="exercise">
+      <div class="task">Exercise 10.1 — Decode the abbreviations</div>
+      <ol>
+        <li>MIT (Don't tell me more!) → <span class="blank"></span></li>
+        <li>DBT (We don't know yet) → <span class="blank"></span></li>
+        <li>TEA (When do we land?) → <span class="blank"></span></li>
+        <li>SPG (Where am I?) → <span class="blank"></span></li>
+        <li>PET (I don't work much) → <span class="blank"></span></li>
+        <li>KAA (In other words...) → <span class="blank"></span></li>
+        <li>CAT (Do something!) → <span class="blank"></span></li>
+        <li>BND (Take it easy!) → <span class="blank"></span></li>
+        <li>MOW (Coming soon) → <span class="blank"></span></li>
+        <li>HMS (Seriously?) → <span class="blank"></span></li>
+      </ol>
+      <div class="answer-key"><b>Answers:</b><br>
+        1. <b>TMI</b> — Too Much Information<br>
+        2. <b>TBD</b> — To Be Determined<br>
+        3. <b>ETA</b> — Estimated Time of Arrival<br>
+        4. <b>GPS</b> — Global Positioning System<br>
+        5. <b>PTE</b> / <b>PT</b> — Part-Time Employee / Part-Time<br>
+        6. <b>AKA</b> — Also Known As<br>
+        7. <b>ACT</b> — Act! / Take Action<br>
+        8. <b>DBN</b> / <b>DND</b> — Do Not Disturb<br>
+        9. <b>WOM</b> / <b>WIP</b> — Word of Mouth / Work In Progress<br>
+        10. <b>SMH</b> — Shaking My Head
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  💡 Click any section header to expand. Click the red <b>*</b> button (bottom-right) to reveal all answers.
+</div>
+
+</div>
+
+<button id="reveal-btn" onclick="toggleAll()" title="Show all answers">*</button>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+    header.classList.toggle('open');
+  }
+
+  function toggleAll() {
+    const btn = document.getElementById('reveal-btn');
+    const keys = document.querySelectorAll('.answer-key');
+    const isActive = btn.classList.contains('active');
+    keys.forEach(k => k.classList.toggle('show', !isActive));
+    btn.classList.toggle('active', !isActive);
+    btn.textContent = !isActive ? '✓' : '*';
+  }
+</script>
+
+</body>
+</html>
