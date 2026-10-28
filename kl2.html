@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional English: Grammar Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a; /* Deep Slate */
+            --primary-hover: #334155;
+            --accent: #2563eb; /* Professional Blue */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            
+            --correct-bg: #dcfce7;
+            --correct-text: #166534;
+            --correct-border: #22c55e;
+            
+            --wrong-bg: #fee2e2;
+            --wrong-text: #991b1b;
+            --wrong-border: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            font-size: 15px;
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            max-width: 700px;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .card {
+            max-width: 700px;
+            width: 100%;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-area {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: var(--primary);
+        }
+
+        .instruction-box {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* Questions */
+        .letter-box {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .question-row {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 8px;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .q-number {
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 24px;
+            margin-top: 2px;
+        }
+
+        .q-text {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        select {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            outline: none;
+            color: var(--text-main);
+            font-size: 15px;
+            transition: all 0.2s;
+            background: var(--bg-color);
+            min-width: 150px;
+            text-align: center;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        select.correct-select {
+            border-color: var(--correct-border);
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
+            border-bottom-width: 2px;
+        }
+
+        select.wrong-select {
+            border-color: var(--wrong-border);
+            background-color: var(--wrong-bg);
+            color: var(--wrong-text);
+            border-bottom-width: 2px;
+        }
+
+        /* Footer & Buttons */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
+        }
+
+        #check-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 50px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        #check-btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        #check-btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* Feedback Bar */
+        .feedback-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            padding: 0 10%;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 101;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .feedback-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .continue-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .continue-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .feedback-bar.correct-ui { display: flex; background-color: var(--correct-bg); color: var(--correct-text); }
+        .feedback-bar.incorrect-ui { display: flex; background-color: var(--wrong-bg); color: var(--wrong-text); }
+
+        /* Final Screen */
+        .final-screen {
+            display: none;
+            text-align: center;
+            padding: 50px 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .final-screen h2 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .final-screen .score-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .success-msg {
+            color: var(--correct-text);
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 20px;
+            display: none;
+            background: var(--correct-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--correct-border);
+        }
+
+        @media (max-width: 600px) {
+            .card { padding: 20px; }
+            .question-row { font-size: 15px; }
+            select { font-size: 14px; padding: 6px 8px; min-width: 120px; }
+            .feedback-bar { padding: 0 5%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="card" id="quiz-card">
+        <div class="header-area">
+            <h1>Professional English Assessment</h1>
+            <div class="instruction-box">
+                Complete the sentences by selecting the most appropriate word or phrase for an adult/professional context.
+            </div>
+        </div>
+
+        <div class="letter-box">
+            <div class="question-row">
+                <span class="q-number">1.</span> 
+                <div class="q-text">
+                    If I 
+                    <select id="Q1" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="had">had</option>
+                        <option value="have">have</option>
+                        <option value="will have">will have</option>
+                    </select> more free time, I would take a longer vacation.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">2.</span> 
+                <div class="q-text">
+                    The team 
+                    <select id="Q2" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="has been working">has been working</option>
+                        <option value="is working">is working</option>
+                        <option value="worked">worked</option>
+                    </select> on the new project since Monday.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">3.</span> 
+                <div class="q-text">
+                    By the time we arrived at the airport, the plane 
+                    <select id="Q3" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="had already left">had already left</option>
+                        <option value="has already left">has already left</option>
+                        <option value="already left">already left</option>
+                    </select>.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">4.</span> 
+                <div class="q-text">
+                    I'm looking forward to 
+                    <select id="Q4" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="meeting">meeting</option>
+                        <option value="meet">meet</option>
+                        <option value="met">met</option>
+                    </select> you at the conference next week.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">5.</span> 
+                <div class="q-text">
+                    I don't mind 
+                    <select id="Q5" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="working">working</option>
+                        <option value="to work">to work</option>
+                        <option value="work">work</option>
+                    </select> overtime, as long as I get paid for it.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">6.</span> 
+                <div class="q-text">
+                    Could you please 
+                    <select id="Q6" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="send">send</option>
+                        <option value="sending">sending</option>
+                        <option value="sent">sent</option>
+                    </select> me the details of the meeting?
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">7.</span> 
+                <div class="q-text">
+                    He's used to 
+                    <select id="Q7" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="getting">getting</option>
+                        <option value="get">get</option>
+                        <option value="got">got</option>
+                    </select> up early, even on weekends.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">8.</span> 
+                <div class="q-text">
+                    We haven't decided 
+                    <select id="Q8" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="when">when</option>
+                        <option value="that">that</option>
+                        <option value="which">which</option>
+                    </select> we're going to launch the product yet.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">9.</span> 
+                <div class="q-text">
+                    This app is very useful, but it 
+                    <select id="Q9" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="uses">uses</option>
+                        <option value="is using">is using</option>
+                        <option value="used">used</option>
+                    </select> a lot of battery.
+                </div>
+            </div>
+
+            <div class="question-row">
+                <span class="q-number">10.</span> 
+                <div class="q-text">
+                    I would appreciate it if you 
+                    <select id="Q10" onchange="updateProgress()">
+                        <option value="">---</option>
+                        <option value="could provide">could provide</option>
+                        <option value="can provide">can provide</option>
+                        <option value="provided">provided</option>
+                    </select> your feedback by Friday.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="final-screen">
+        <h2>Assessment Complete</h2>
+        <div class="score-text" id="final-score-text">Your Score: 0 / 10</div>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button class="continue-btn" style="background: var(--accent);" onclick="location.reload()">Restart Assessment</button>
+    </div>
+
+    <div id="feedback-bar" class="feedback-bar">
+        <div class="feedback-text" id="feedback-message">Evaluation Complete</div>
+        <button class="continue-btn" onclick="showFinalScreen()">VIEW RESULTS</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()" disabled>Submit Assessment</button>
+    </div>
+
+    <script>
+        // ================================================================
+        //  CONFIGURATION & RESULTS TRACKING
+        // ================================================================
+        const TEST_NAME = "Professional English: Mixed Grammar Assessment";
+        let userMistakes = [];
+        let finalScore = 0;
+
+        const answers = { 
+            Q1: "had", 
+            Q2: "has been working", 
+            Q3: "had already left", 
+            Q4: "meeting", 
+            Q5: "working", 
+            Q6: "send", 
+            Q7: "getting", 
+            Q8: "when", 
+            Q9: "uses", 
+            Q10: "could provide"
+        };
+        
+        const totalQuestions = Object.keys(answers).length;
+
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if(s.value !== "") filled++; });
+            
+            // Update progress bar
+            document.getElementById('progress-bar').style.width = (filled / totalQuestions) * 100 + '%';
+            
+            // Enable check button only when all are filled
+            document.getElementById('check-btn').disabled = (filled !== totalQuestions);
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const selects = document.querySelectorAll('select');
+            
+            // Reset user mistakes for this run
+            userMistakes = [];
+
+            for (let id in answers) {
+                const select = document.getElementById(id);
+                
+                // Use === for strict equality
+                if (select.value === answers[id]) {
+                    correctCount++;
+                    select.classList.add('correct-select');
+                    select.classList.remove('wrong-select');
+                } else {
+                    select.classList.add('wrong-select');
+                    select.classList.remove('correct-select');
+                    
+                    // Track mistakes
+                    if (!userMistakes.includes(select.value)) {
+                        userMistakes.push(select.value);
+                    }
+                }
+                // Disable to prevent changes
+                select.disabled = true;
+            }
+
+            finalScore = correctCount;
+
+            const bar = document.getElementById('feedback-bar');
+            const msg = document.getElementById('feedback-message');
+            const footer = document.getElementById('footer');
+            
+            if (correctCount === totalQuestions) {
+                bar.className = "feedback-bar correct-ui";
+                msg.innerHTML = "Excellent. All answers are correct.";
+            } else {
+                bar.className = "feedback-bar incorrect-ui";
+                msg.innerHTML = `Evaluation Complete: ${correctCount}/${totalQuestions} Correct`;
+            }
+            
+            footer.style.display = 'none';
+            bar.style.display = 'flex';
+        }
+
+        // ================================================================
+        //  FINAL SCREEN & GOOGLE SHEETS
+        // ================================================================
+        function showFinalScreen() {
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('feedback-bar').style.display = 'none';
+            document.querySelector('.progress-container').style.display = 'none';
+            document.getElementById('final-screen').style.display = 'block';
+            
+            // Format text for final screen
+            document.getElementById('final-score-text').innerText = `Your Score: ${finalScore} / ${totalQuestions}`;
+            
+            sendResultsToGoogle();
+        }
+
+        async function sendResultsToGoogle() {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: finalScore,
+                total: totalQuestions,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                // Display success message
+                document.getElementById('success-msg').style.display = 'block';
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+    </script>
+</body>
+</html>

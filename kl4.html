@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technical English: Grammar & Questions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap');
+
+:root {
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --correct: #16a34a;
+    --correct-bg: #dcfce7;
+    --wrong: #dc2626;
+    --wrong-bg: #fee2e2;
+    --border-color: #e2e8f0;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.header-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.stats-container {
+    display: flex;
+    gap: 15px;
+}
+
+.stat-box {
+    font-size: 1rem;
+    background: var(--bg-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--primary);
+    border: 1px solid var(--border-color);
+}
+
+.level {
+    display: none;
+}
+
+.level.active {
+    display: block;
+}
+
+h3 {
+    font-size: 1.2em;
+    color: var(--text-muted);
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- LEVEL 1: QUESTIONS --- */
+.question-box {
+    background: var(--bg-color);
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.question-box p {
+    margin: 0;
+}
+
+.q-label {
+    font-size: 0.9em;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 10px !important;
+    text-transform: uppercase;
+}
+
+.q-text {
+    font-size: 1.4em;
+    line-height: 1.6;
+    font-weight: 600;
+}
+
+.gap {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 2px solid var(--primary);
+    text-align: center;
+    color: var(--primary);
+    padding: 0 5px;
+    margin: 0 3px;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.option-btn {
+    padding: 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1.05em;
+    color: var(--text-main);
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+}
+
+.option-btn:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--bg-color);
+}
+
+.option-btn:disabled {
+    cursor: default;
+}
+
+.option-btn.correct {
+    background: var(--correct-bg);
+    color: var(--correct);
+    border-color: var(--correct);
+    font-weight: 700;
+}
+
+.option-btn.wrong {
+    background: var(--wrong-bg);
+    color: var(--wrong);
+    border-color: var(--wrong);
+    font-weight: 700;
+}
+
+/* --- LEVEL 2: MATCHING --- */
+.match-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.match-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.match-item {
+    padding: 15px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-size: 1.05em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+}
+
+.match-item.word {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--primary);
+}
+
+.match-item:hover:not(.matched) {
+    border-color: var(--primary);
+}
+
+.match-item.selected {
+    border-color: var(--primary);
+    background: var(--bg-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.match-item.matched {
+    background: var(--correct-bg);
+    border-color: var(--correct);
+    color: var(--correct);
+    cursor: default;
+    opacity: 0.7;
+}
+
+.match-item.shake {
+    animation: shake 0.4s ease-in-out;
+    border-color: var(--wrong);
+    background: var(--wrong-bg);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+}
+
+/* --- FEEDBACK & BUTTONS --- */
+.feedback {
+    font-weight: 600;
+    min-height: 30px;
+    margin-top: 20px;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.btn-next {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 1.05em;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    font-family: 'Inter', sans-serif;
+    margin-top: 15px;
+    display: none;
+    width: 100%;
+}
+
+.btn-next:hover {
+    background: var(--primary-hover);
+}
+
+/* --- FINAL SCREEN --- */
+.final-screen {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.final-screen h2 {
+    font-size: 2.2em;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.final-screen p {
+    font-size: 1.2em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.score-highlight {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.mistakes-display {
+    background: var(--bg-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    font-size: 0.95em;
+    color: var(--text-muted);
+}
+
+.mistakes-display strong {
+    color: var(--wrong);
+    display: block;
+    margin-bottom: 5px;
+}
+
+.success-msg {
+    color: var(--correct);
+    font-weight: 600;
+    margin-top: 20px;
+    display: none;
+}
+
+.btn-restart {
+    background: var(--text-main);
+    color: white;
+    border: none;
+    padding: 14px 30px;
+    font-size: 1.05em;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+    font-family: 'Inter', sans-serif;
+    margin-top: 10px;
+}
+
+.btn-restart:hover {
+    background: #0f172a;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .game-container { padding: 20px; }
+    .options-grid { grid-template-columns: 1fr; }
+    .match-container { grid-template-columns: 1fr; }
+    .q-text { font-size: 1.2em; }
+    .header-area { flex-direction: column; gap: 15px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="game-container" id="main-box">
+    <div class="header-area">
+        <h1>Technical English</h1>
+        <div class="stats-container">
+            <div class="stat-box" id="progress-box">Progress: 0 / 22</div>
+            <div class="stat-box">Score: <span id="score">0</span></div>
+        </div>
+    </div>
+
+    <!-- LEVEL 1: Complete the Questions -->
+    <div id="level1" class="level active">
+        <h3>Level 1: Complete the IT Questions</h3>
+        <div id="question-container"></div>
+        <div id="feedback" class="feedback"></div>
+        <button class="btn-next" id="next1" onclick="nextLevel()">Next Level</button>
+    </div>
+
+    <!-- LEVEL 2: Match Question Words -->
+    <div id="level2" class="level">
+        <h3>Level 2: Match Question Words to IT Answers</h3>
+        <div class="match-container" id="match-container"></div>
+        <div id="feedback2" class="feedback"></div>
+        <button class="btn-next" id="next2" onclick="showFinal()">Finish Quiz</button>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div id="final-screen" class="level final-screen">
+        <h2>Quiz Complete</h2>
+        <p>You scored <span class="score-highlight" id="final-score">0</span> out of <span id="total-questions">0</span></p>
+        
+        <div class="mistakes-display" id="mistakes-box" style="display:none;">
+            <strong>Review your mistakes:</strong>
+            <span id="mistakes-list"></span>
+        </div>
+        
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button class="btn-restart" onclick="initGame()">Try Again</button>
+    </div>
+</div>
+
+<script>
+// =====================================================
+// RESULTS TRACKING & CONFIGURATION
+// =====================================================
+const TEST_NAME = "Technical English: Grammar & Questions";
+let userMistakes = [];
+let score = 0;
+let currentQuestion = 0;
+let totalQuestions = 0;
+let totalProgress = 0;
+const maxProgress = 22; // 12 Questions + 10 Matches
+
+// Helper to shuffle arrays (Mix up variants)
+function shuffleArray(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
+// --- LEVEL 1 DATA: 12 Tech Questions ---
+const level1Questions = [
+    {
+        question: "How many servers <span class='gap'>___</span> they <span class='gap'>___</span>?",
+        options: ["do / maintain", "are / maintaining", "did / maintained", "does / maintain"],
+        correct: "do / maintain"
+    },
+    {
+        question: "When <span class='gap'>___</span> the system crash?",
+        options: ["did", "do", "are", "does"],
+        correct: "did"
+    },
+    {
+        question: "What <span class='gap'>___</span> the developers <span class='gap'>___</span> at the moment?",
+        options: ["are / coding", "do / code", "did / code", "is / coding"],
+        correct: "are / coding"
+    },
+    {
+        question: "Why <span class='gap'>___</span> the database <span class='gap'>___</span> anymore?",
+        options: ["isn't / responding", "don't / respond", "didn't / respond", "aren't / responding"],
+        correct: "isn't / responding"
+    },
+    {
+        question: "How much memory <span class='gap'>___</span> the application <span class='gap'>___</span>?",
+        options: ["did / allocate", "does / allocate", "is / allocating", "do / allocate"],
+        correct: "does / allocate"
+    },
+    {
+        question: "Where <span class='gap'>___</span> they <span class='gap'>___</span> the new update?",
+        options: ["did / deploy", "do / deploy", "are / deploying", "does / deploy"],
+        correct: "did / deploy"
+    },
+    {
+        question: "Who <span class='gap'>___</span> they <span class='gap'>___</span> to hire next year?",
+        options: ["are / going", "do / go", "did / go", "does / go"],
+        correct: "are / going"
+    },
+    {
+        question: "How long <span class='gap'>___</span> it <span class='gap'>___</span> to compile the code?",
+        options: ["does / take", "do / take", "is / taking", "did / took"],
+        correct: "does / take"
+    },
+    {
+        question: "Which framework <span class='gap'>___</span> they <span class='gap'>___</span>?",
+        options: ["are / using", "do / use", "did / use", "is / using"],
+        correct: "are / using"
+    },
+    {
+        question: "What <span class='gap'>___</span> the bug <span class='gap'>___</span> to the system?",
+        options: ["did / do", "does / do", "is / doing", "has / did"],
+        correct: "did / do"
+    },
+    {
+        question: "Who <span class='gap'>___</span> managing the database right now?",
+        options: ["is", "are", "do", "does"],
+        correct: "is"
+    },
+    {
+        question: "How much <span class='gap'>___</span> the new hardware <span class='gap'>___</span>?",
+        options: ["did / cost", "does / cost", "is / costing", "do / cost"],
+        correct: "did / cost"
+    }
+];
+
+// --- LEVEL 2 DATA: Match Question Words ---
+const level2Matches = [
+    { word: "What ... ?", answer: "A new API." },
+    { word: "Who ... ?", answer: "The lead developer." },
+    { word: "Where ... ?", answer: "In the cloud." },
+    { word: "When ... ?", answer: "At 3:00 AM." },
+    { word: "Why ... ?", answer: "Because of a memory leak." },
+    { word: "How many ... ?", answer: "Three microservices." },
+    { word: "How much ... ?", answer: "10GB of RAM." },
+    { word: "How long ... ?", answer: "For 2 hours." },
+    { word: "Whose ... ?", answer: "It's the CTO's laptop." },
+    { word: "Which ... ?", answer: "The Linux server." }
+];
+
+let selectedWord = null;
+let selectedAnswer = null;
+let matchesFound = 0;
+
+// --- GAME LOGIC ---
+function initGame() {
+    score = 0;
+    currentQuestion = 0;
+    userMistakes = [];
+    matchesFound = 0;
+    selectedWord = null;
+    selectedAnswer = null;
+    totalQuestions = level1Questions.length + level2Matches.length;
+    totalProgress = 0;
+    
+    updateProgress(0);
+    document.getElementById('score').innerText = score;
+    document.getElementById('final-screen').classList.remove('active');
+    document.getElementById('level2').classList.remove('active');
+    document.getElementById('level1').classList.add('active');
+    document.getElementById('feedback').innerText = "";
+    document.getElementById('feedback2').innerText = "";
+    document.getElementById('next1').style.display = 'none';
+    document.getElementById('next2').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'none';
+    document.getElementById('mistakes-box').style.display = 'none';
+    
+    renderQuestion();
+}
+
+function updateProgress(completed) {
+    document.getElementById('progress-box').innerText = `Progress: ${completed} / ${maxProgress}`;
+}
+
+function renderQuestion() {
+    const container = document.getElementById('question-container');
+    const q = level1Questions[currentQuestion];
+    
+    // Mix up variants (shuffle options)
+    const shuffledOptions = shuffleArray([...q.options]);
+    
+    container.innerHTML = `
+        <div class="question-box">
+            <p class="q-label">Question ${currentQuestion + 1} of ${level1Questions.length}:</p>
+            <p class="q-text">${q.question}</p>
+        </div>
+        <div class="options-grid" id="options-grid"></div>
+    `;
+    
+    const grid = document.getElementById('options-grid');
+    shuffledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerText = opt;
+        // Safe event listener instead of inline onclick
+        btn.onclick = () => checkAnswer(opt, q.correct, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function checkAnswer(selected, correct, btnElement) {
+    const buttons = document.querySelectorAll('.option-btn');
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        if (btn.innerText === correct) {
+            btn.classList.add('correct');
+        } else if (btn === btnElement && selected !== correct) {
+            btn.classList.add('wrong');
+            if (!userMistakes.includes(selected)) {
+                userMistakes.push(selected);
+            }
+        }
+    });
+    
+    const feedback = document.getElementById('feedback');
+    if (selected === correct) {
+        score++;
+        document.getElementById('score').innerText = score;
+        feedback.innerText = "Correct!";
+        feedback.style.color = "var(--correct)";
+    } else {
+        feedback.innerText = `Incorrect. The answer is: ${correct}`;
+        feedback.style.color = "var(--wrong)";
+    }
+    
+    currentQuestion++;
+    totalProgress++;
+    updateProgress(totalProgress);
+    
+    if (currentQuestion < level1Questions.length) {
+        setTimeout(() => {
+            feedback.innerText = "";
+            renderQuestion();
+        }, 1500);
+    } else {
+        document.getElementById('next1').style.display = 'inline-block';
+    }
+}
+
+function nextLevel() {
+    document.getElementById('level1').classList.remove('active');
+    document.getElementById('level2').classList.add('active');
+    renderMatches();
+}
+
+function renderMatches() {
+    const container = document.getElementById('match-container');
+    container.innerHTML = '';
+    
+    // Mix up variants for both columns independently
+    const shuffledWords = shuffleArray([...level2Matches]);
+    const shuffledAnswers = shuffleArray([...level2Matches]);
+    
+    const col1 = document.createElement('div');
+    col1.className = 'match-column';
+    shuffledWords.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'match-item word';
+        div.dataset.type = 'word';
+        div.dataset.match = item.answer;
+        div.innerText = item.word;
+        div.onclick = () => selectMatch(div, 'word');
+        col1.appendChild(div);
+    });
+    
+    const col2 = document.createElement('div');
+    col2.className = 'match-column';
+    shuffledAnswers.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'match-item';
+        div.dataset.type = 'answer';
+        div.dataset.match = item.word;
+        div.innerText = item.answer;
+        div.onclick = () => selectMatch(div, 'answer');
+        col2.appendChild(div);
+    });
+    
+    container.appendChild(col1);
+    container.appendChild(col2);
+}
+
+function selectMatch(element, type) {
+    if (element.classList.contains('matched')) return;
+    
+    if (type === 'word') {
+        if (selectedWord) selectedWord.classList.remove('selected');
+        selectedWord = element;
+    } else {
+        if (selectedAnswer) selectedAnswer.classList.remove('selected');
+        selectedAnswer = element;
+    }
+    
+    element.classList.add('selected');
+    
+    if (selectedWord && selectedAnswer) {
+        checkMatch();
+    }
+}
+
+function checkMatch() {
+    if (!selectedWord || !selectedAnswer) return;
+    
+    const wordMatch = selectedWord.dataset.match;
+    const answerMatch = selectedAnswer.dataset.match;
+    
+    if (wordMatch === answerMatch) {
+        score++;
+        matchesFound++;
+        totalProgress++;
+        updateProgress(totalProgress);
+        document.getElementById('score').innerText = score;
+        
+        selectedWord.classList.add('matched');
+        selectedAnswer.classList.add('matched');
+        selectedWord.classList.remove('selected');
+        selectedAnswer.classList.remove('selected');
+        
+        document.getElementById('feedback2').innerText = "Match found!";
+        document.getElementById('feedback2').style.color = "var(--correct)";
+        
+        if (matchesFound === level2Matches.length) {
+            document.getElementById('next2').style.display = 'inline-block';
+        }
+    } else {
+        const mistakeText = `${selectedWord.innerText} ↔ ${selectedAnswer.innerText}`;
+        if (!userMistakes.includes(mistakeText)) {
+            userMistakes.push(mistakeText);
+        }
+        
+        selectedWord.classList.add('shake');
+        selectedAnswer.classList.add('shake');
+        
+        document.getElementById('feedback2').innerText = "Try again";
+        document.getElementById('feedback2').style.color = "var(--wrong)";
+        
+        setTimeout(() => {
+            if (selectedWord) selectedWord.classList.remove('selected', 'shake');
+            if (selectedAnswer) selectedAnswer.classList.remove('selected', 'shake');
+            document.getElementById('feedback2').innerText = "";
+        }, 800);
+    }
+    
+    selectedWord = null;
+    selectedAnswer = null;
+}
+
+function showFinal() {
+    document.getElementById('level2').classList.remove('active');
+    document.getElementById('final-screen').classList.add('active');
+    document.getElementById('final-score').innerText = score;
+    document.getElementById('total-questions').innerText = totalQuestions;
+    
+    if (userMistakes.length > 0) {
+        document.getElementById('mistakes-box').style.display = 'block';
+        document.getElementById('mistakes-list').innerText = userMistakes.join(', ');
+    }
+    
+    sendResultsToGoogle();
+}
+
+// =====================================================
+// GOOGLE SHEETS INTEGRATION
+// =====================================================
+async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+        name: TEST_NAME,
+        score: score,
+        total: totalQuestions,
+        mistakes: userMistakes.join(', ')
+    });
+    
+    try {
+        await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        });
+        
+        document.getElementById('success-msg').style.display = 'block';
+        
+    } catch (error) {
+        console.error("Error sending results:", error);
+        document.getElementById('success-msg').innerText = "Error sending results. Please try again.";
+        document.getElementById('success-msg').style.color = "var(--wrong)";
+        document.getElementById('success-msg').style.display = 'block';
+    }
+}
+
+// Start the game
+initGame();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listening Comprehension: Catching Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            
+            --correct-bg: #dcfce7;
+            --correct-text: #166534;
+            --correct-border: #22c55e;
+            
+            --wrong-bg: #fee2e2;
+            --wrong-text: #991b1b;
+            --wrong-border: #ef4444;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 100px;
+            min-height: 100vh;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent);
+            transition: width 0.4s ease;
+        }
+
+        .card {
+            max-width: 800px;
+            width: 100%;
+            padding: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 24px;
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .instruction-box {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Audio Player */
+        .audio-section {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        audio {
+            width: 100%;
+            max-width: 400px;
+            outline: none;
+        }
+
+        /* Questions List */
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .q-type {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .q-text {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .opt-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-btn:hover:not(.disabled) {
+            border-color: var(--accent);
+            background-color: #f8fafc;
+        }
+
+        /* Selection State */
+        .opt-btn.selected {
+            border-color: var(--accent);
+            background-color: #eff6ff;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Feedback States */
+        .opt-btn.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+            font-weight: 600;
+        }
+
+        .opt-btn.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--wrong-text);
+            font-weight: 600;
+        }
+        
+        .opt-btn.disabled {
+            cursor: default;
+        }
+
+        .opt-btn.correct::after { content: '✅'; font-size: 1.1rem; }
+        .opt-btn.wrong::after { content: '❌'; font-size: 1.1rem; }
+
+        /* Submit Button */
+        .submit-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn-submit {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 50px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn-submit:hover:not(:disabled) { background: #1d4ed8; }
+        .btn-submit:disabled { background: var(--border-color); cursor: not-allowed; }
+
+        /* Final Screen */
+        .final-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            margin-top: 30px;
+        }
+
+        .final-screen h2 {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .score-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+
+        .success-msg {
+            color: var(--correct-text);
+            font-weight: 600;
+            background: var(--correct-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid var(--correct-border);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="progress-track">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h1>Listening Comprehension</h1>
+        <div class="instruction-box">
+            Listen to the audio recording "song10" and answer all the questions below.
+        </div>
+
+        <!-- AUDIO PLAYER -->
+        <div class="audio-section">
+            <audio controls>
+                <source src="https://raw.githubusercontent.com/anastasikh4/gitlinks/main/song10.mp3" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+        <!-- ALL QUESTIONS CONTAINER -->
+        <div id="questions-container">
+            <!-- Questions injected via JS -->
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <div class="submit-container" id="submit-container">
+            <button class="btn-submit" id="submit-btn" onclick="submitQuiz()" disabled>Submit Answers</button>
+        </div>
+
+        <!-- FINAL SCREEN -->
+        <div class="final-screen" id="final-screen">
+            <h2>Quiz Complete</h2>
+            <div class="score-text" id="final-score-text">You scored 0 / 9</div>
+            <div class="success-msg" id="success-msg">Results sent successfully! ✅</div>
+            <button class="btn-submit" style="margin-top: 20px;" onclick="location.reload()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  CONFIGURATION & RESULTS TRACKING
+        // ================================================================
+        const TEST_NAME = "B1+ Listening Comprehension: Catching Up (List View)";
+        let userMistakes = [];
+        let score = 0;
+        let userSelections = {}; // Tracks selected answers
+
+        // Mix of True/False and Multiple Choice
+        const questions = [
+            // --- True/False (4) ---
+            {
+                id: "q1",
+                type: "True / False",
+                text: "The speaker was busy this week because of a project deadline.",
+                options: ["True", "False"],
+                correct: "True"
+            },
+            {
+                id: "q2",
+                type: "True / False",
+                text: "The speaker finished their project today.",
+                options: ["True", "False"],
+                correct: "False"
+            },
+            {
+                id: "q3",
+                type: "True / False",
+                text: "The friend went to a new Mexican restaurant.",
+                options: ["True", "False"],
+                correct: "False"
+            },
+            {
+                id: "q4",
+                type: "True / False",
+                text: "The speaker is planning a surprise party for their brother.",
+                options: ["True", "False"],
+                correct: "True"
+            },
+            // --- Multiple Choice (5) ---
+            {
+                id: "q5",
+                type: "Multiple Choice",
+                text: "Why is the speaker late?",
+                options: ["Traffic was bad", "They had a crazy week at work", "They forgot the time"],
+                correct: "They had a crazy week at work"
+            },
+            {
+                id: "q6",
+                type: "Multiple Choice",
+                text: "What kind of restaurant did the friend go to?",
+                options: ["Italian", "Mexican", "French"],
+                correct: "Italian"
+            },
+            {
+                id: "q7",
+                type: "Multiple Choice",
+                text: "When is the surprise party?",
+                options: ["Next Friday", "Next Saturday", "Next Sunday"],
+                correct: "Next Saturday"
+            },
+            {
+                id: "q8",
+                type: "Multiple Choice",
+                text: "What does the speaker need help with?",
+                options: ["Cooking food", "Sending invitations", "Decorations"],
+                correct: "Decorations"
+            },
+            {
+                id: "q9",
+                type: "Multiple Choice",
+                text: "When will they finish decorating?",
+                options: ["By lunchtime", "In the evening", "Tomorrow morning"],
+                correct: "By lunchtime"
+            }
+        ];
+
+        const totalQuestions = questions.length;
+        const container = document.getElementById('questions-container');
+        const progressBar = document.getElementById('progress-bar');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // ================================================================
+        //  RENDER ALL QUESTIONS
+        // ================================================================
+        function renderQuestions() {
+            let html = '';
+            
+            questions.forEach((q, index) => {
+                html += `
+                    <div class="question-block">
+                        <div class="q-type">${q.type} (${index + 1} of ${totalQuestions})</div>
+                        <div class="q-text">${q.text}</div>
+                        <div class="options-grid">
+                `;
+                
+                q.options.forEach(opt => {
+                    html += `
+                        <button class="opt-btn" id="${q.id}_${opt.replace(/\s+/g, '')}" 
+                                onclick="selectOption('${q.id}', '${opt}')">
+                            ${opt}
+                        </button>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ================================================================
+        //  SELECTION LOGIC
+        // ================================================================
+        function selectOption(qId, optText) {
+            // Check if already submitted
+            if (submitBtn.disabled && score > 0) return; 
+
+            // Store selection
+            userSelections[qId] = optText;
+
+            // Find all buttons for this question and remove 'selected' class
+            const qObj = questions.find(q => q.id === qId);
+            qObj.options.forEach(opt => {
+                const btn = document.getElementById(`${qId}_${opt.replace(/\s+/g, '')}`);
+                btn.classList.remove('selected');
+            });
+
+            // Add 'selected' class to the clicked button
+            const selectedBtn = document.getElementById(`${qId}_${optText.replace(/\s+/g, '')}`);
+            selectedBtn.classList.add('selected');
+
+            // Update Progress Bar
+            const answeredCount = Object.keys(userSelections).length;
+            progressBar.style.width = (answeredCount / totalQuestions) * 100 + '%';
+
+            // Enable submit button if all answered
+            if (answeredCount === totalQuestions) {
+                submitBtn.disabled = false;
+                submitBtn.style.background = 'var(--accent)';
+            }
+        }
+
+        // ================================================================
+        //  SUBMIT & EVALUATION LOGIC
+        // ================================================================
+        function submitQuiz() {
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Evaluation Complete";
+
+            // Loop through questions to evaluate
+            questions.forEach(q => {
+                const selectedText = userSelections[q.id];
+                const selectedBtn = document.getElementById(`${q.id}_${selectedText.replace(/\s+/g, '')}`);
+                const correctBtn = document.getElementById(`${q.id}_${q.correct.replace(/\s+/g, '')}`);
+
+                // Disable all buttons for this question
+                q.options.forEach(opt => {
+                    document.getElementById(`${q.id}_${opt.replace(/\s+/g, '')}`).classList.add('disabled');
+                });
+
+                if (selectedText === q.correct) {
+                    score++;
+                    selectedBtn.classList.remove('selected');
+                    selectedBtn.classList.add('correct');
+                } else {
+                    // User got it wrong
+                    selectedBtn.classList.remove('selected');
+                    selectedBtn.classList.add('wrong');
+                    
+                    // Track mistake
+                    if (!userMistakes.includes(selectedText)) {
+                        userMistakes.push(selectedText);
+                    }
+
+                    // Highlight correct answer
+                    correctBtn.classList.add('correct');
+                }
+            });
+
+            // Show final score
+            showFinalScreen();
+        }
+
+        // ================================================================
+        //  FINAL SCREEN & GOOGLE SHEETS
+        // ================================================================
+        function showFinalScreen() {
+            document.getElementById('submit-container').style.display = 'none';
+            document.getElementById('final-screen').style.display = 'block';
+            
+            document.getElementById('final-score-text').innerText = `You scored ${score} / ${totalQuestions}`;
+            
+            // Scroll to final screen
+            document.getElementById('final-screen').scrollIntoView({ behavior: 'smooth' });
+
+            sendResultsToGoogle();
+        }
+
+        async function sendResultsToGoogle() {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const params = new URLSearchParams({
+                name: TEST_NAME,
+                score: score,
+                total: totalQuestions,
+                mistakes: userMistakes.join(', ')
+            });
+
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                
+                // Show success message on the final screen
+                document.getElementById('success-msg').style.display = 'block';
+            } catch (error) {
+                console.error("Error sending results:", error);
+            }
+        }
+
+        // Initialize App
+        renderQuestions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fill in the Blank - Purple Aesthetic 💜</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Cute Purple Palette */
+            --bg-color: #fdf5ff;
+            --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            --primary-purple: #9c27b0;
+            --light-purple: #e1bee7;
+            --text-dark: #4a148c;
+            --text-muted: #7b1fa2;
+            
+            /* Buttons */
+            --btn-bg: #ffffff;
+            --btn-border: #e1bee7;
+            --btn-shadow: #ce93d8;
+            
+            /* Feedback */
+            --correct-bg: #e8f5e9;
+            --correct-border: #81c784;
+            --correct-text: #2e7d32;
+            --wrong-bg: #ffebee;
+            --wrong-border: #e57373;
+            --wrong-text: #c62828;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Quicksand', 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        /* Top Progress Bar */
+        .progress-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            background: transparent;
+            z-index: 10;
+        }
+
+        .progress-track {
+            height: 18px;
+            background-color: #ffffff;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(156, 39, 176, 0.1);
+            border: 2px solid #ffffff;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #e91e63, #9c27b0);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '✨';
+            position: absolute;
+            right: 10px;
+            top: -2px;
+            font-size: 14px;
+        }
+
+        /* Main Quiz Area */
+        .quiz-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 80px 20px 120px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-card {
+            background: #ffffff;
+            border: 3px dashed #e1bee7;
+            border-radius: 30px;
+            padding: 35px 25px;
+            box-shadow: 0 15px 35px rgba(156, 39, 176, 0.12);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Flash Effects */
+        .flash-correct {
+            animation: flashGreen 0.6s ease-out;
+        }
+
+        .flash-wrong {
+            animation: flashRed 0.6s ease-out, shake 0.5s ease-in-out;
+        }
+
+        @keyframes flashGreen {
+            0% { background-color: #fff; border-color: #e1bee7; }
+            30% { background-color: var(--correct-bg); border-color: var(--correct-border); }
+            100% { background-color: #fff; border-color: #e1bee7; }
+        }
+
+        @keyframes flashRed {
+            0% { background-color: #fff; border-color: #e1bee7; }
+            30% { background-color: var(--wrong-bg); border-color: var(--wrong-border); }
+            100% { background-color: #fff; border-color: #e1bee7; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-1deg); }
+            40% { transform: translateX(8px) rotate(1deg); }
+            60% { transform: translateX(-6px) rotate(-1deg); }
+            80% { transform: translateX(6px) rotate(1deg); }
+        }
+
+        /* Hint (Russian Translation) */
+        .hint-badge {
+            display: inline-block;
+            background-color: #f3e5f5;
+            color: var(--primary-purple);
+            font-weight: 700;
+            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid #e1bee7;
+        }
+
+        /* Sentence Text */
+        .sentence-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            color: var(--text-dark);
+            text-align: center;
+            min-height: 80px;
+        }
+
+        .blank-space {
+            display: inline-block;
+            min-width: 90px;
+            border-bottom: 4px solid var(--primary-purple);
+            background-color: #fdf5ff;
+            color: var(--primary-purple);
+            margin: 0 6px;
+            border-radius: 6px 6px 0 0;
+            padding: 0 10px;
+            transition: 0.3s;
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        /* Buttons (Soft Jelly Style) */
+        .option-btn {
+            background: var(--btn-bg);
+            border: 2px solid var(--btn-border);
+            border-bottom: 6px solid var(--btn-shadow);
+            border-radius: 20px;
+            padding: 18px 16px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            outline: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+            border-color: var(--btn-shadow);
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #fdf5ff;
+            border-color: #ce93d8;
+        }
+
+        /* Correct State */
+        .option-btn.correct {
+            background: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+            border-bottom-width: 6px;
+            border-bottom-color: #4caf50;
+        }
+
+        /* Wrong State */
+        .option-btn.wrong {
+            background: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--wrong-text);
+            border-bottom-width: 6px;
+            border-bottom-color: #d32f2f;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .option-btn.correct:disabled,
+        .option-btn.wrong:disabled {
+            opacity: 1;
+        }
+
+        /* Final Screen */
+        .final-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            animation: slideIn 0.5s ease both;
+        }
+
+        .final-screen .trophy {
+            font-size: 90px;
+            margin-bottom: 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-15px) scale(1.1); }
+        }
+
+        .final-screen h1 {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 32px;
+            color: var(--primary-purple);
+            margin: 0 0 10px 0;
+        }
+
+        .final-screen .score-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: #e91e63;
+            margin-bottom: 30px;
+        }
+
+        .retry-btn {
+            background: linear-gradient(135deg, #e91e63, #9c27b0);
+            color: white;
+            border: none;
+            border-bottom: 5px solid #6a1b9a;
+            border-radius: 25px;
+            padding: 18px 45px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.1s;
+            box-shadow: 0 10px 20px rgba(156, 39, 176, 0.3);
+        }
+
+        .retry-btn:active {
+            transform: translateY(4px);
+            border-bottom-width: 2px;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            .sentence-text { font-size: 22px; }
+            .option-btn {
+                padding: 16px 14px;
+                font-size: 17px;
+            }
+            .hint-badge { font-size: 14px; padding: 10px 15px; }
+            .quiz-card { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Progress Bar -->
+    <div class="progress-container" id="progress-container">
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Main Quiz Area -->
+    <div class="quiz-container" id="quiz-container">
+        <div class="quiz-card" id="quiz-card">
+            <div class="hint-badge" id="hint-text">Russian phrase 💜</div>
+            <div class="sentence-text" id="sentence-text">English sentence</div>
+            <div class="options-grid" id="options-grid">
+                <!-- Buttons will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Screen -->
+    <div class="final-screen" id="final-screen" style="width: 100%; max-width: 600px;">
+        <div class="trophy">🦄👑</div>
+        <h1>You did it!</h1>
+        <div class="score-text">You scored <span id="final-score-val">0</span> / 10</div>
+        <button class="retry-btn" onclick="location.reload()">Play Again ✨</button>
+    </div>
+
+    <script>
+        // Data provided in the prompt
+        const phrases = [
+            { ru: "Ты никогда не сосредотачиваешься на уроке.", en: "You never focus in class.", blank: "focus" },
+            { ru: "Во сколько ты лег спать прошлой ночью?", en: "What time did you go to bed last night?", blank: "bed" },
+            { ru: "Я играл в компьютерную игру.", en: "I was playing a computer game.", blank: "playing" },
+            { ru: "Время летит, когда я играю в компьютерные игры.", en: "Time flies when I play computer games.", blank: "flies" },
+            { ru: "Что мне делать?", en: "What should I do?", blank: "should" },
+            { ru: "Поставь будильник, чтобы он сработал.", en: "Set the alarm to go off.", blank: "alarm" },
+            { ru: "У тебя есть другие хобби?", en: "Do you have any other hobbies?", blank: "hobbies" },
+            { ru: "Мне нравятся футбол и скейтбординг.", en: "I like soccer and skateboarding.", blank: "skateboarding" },
+            { ru: "Я умею прыгать на скейтборде!", en: "I can hop while skateboarding!", blank: "hop" },
+            { ru: "Я надеюсь увидеть положительные изменения.", en: "I hope to see positive changes.", blank: "positive" }
+        ];
+
+        // Game State
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        // DOM Elements
+        const progressBar = document.getElementById('progress-bar');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizCard = document.getElementById('quiz-card');
+        const hintText = document.getElementById('hint-text');
+        const sentenceText = document.getElementById('sentence-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const finalScreen = document.getElementById('final-screen');
+        const progressContainer = document.getElementById('progress-container');
+
+        // Helper: Shuffle Array
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Initialize Game
+        function initGame() {
+            // Shuffle questions
+            questions = shuffleArray(phrases);
+            
+            // Extract all blank words for distractors
+            const allBlankWords = phrases.map(p => p.blank);
+
+            // Build options for each question
+            questions = questions.map(q => {
+                // Get 3 random distractors from other questions
+                const distractors = allBlankWords.filter(w => w !== q.blank);
+                const shuffledDistractors = shuffleArray(distractors).slice(0, 3);
+                
+                // Combine and shuffle correct + distractors
+                const options = shuffleArray([q.blank, ...shuffledDistractors]);
+                
+                return {
+                    ...q,
+                    options: options
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+            
+            loadQuestion();
+        }
+
+        // Load Question
+        function loadQuestion() {
+            if (currentIndex >= questions.length) {
+                showFinalScreen();
+                return;
+            }
+
+            isAnswered = false;
+            const q = questions[currentIndex];
+
+            // Update Progress Bar
+            progressBar.style.width = ((currentIndex / questions.length) * 100) + '%';
+
+            // Update Hint
+            hintText.textContent = q.ru;
+            
+            // Format sentence: Replace the blank word with ___ (case insensitive)
+            const regex = new RegExp(`\\b${q.blank}\\b`, 'gi');
+            const displaySentence = q.en.replace(regex, '<span class="blank-space">___</span>');
+            sentenceText.innerHTML = displaySentence;
+
+            // Render Options
+            optionsGrid.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.onclick = () => handleAnswer(btn, opt, q.blank);
+                optionsGrid.appendChild(btn);
+            });
+
+            // Reset card animations
+            quizCard.className = 'quiz-card';
+        }
+
+        // Handle Answer Click
+        function handleAnswer(btn, selected, correct) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const allBtns = document.querySelectorAll('.option-btn');
+
+            if (selected === correct) {
+                // CORRECT
+                score++;
+                btn.classList.add('correct');
+                quizCard.classList.add('flash-correct');
+                
+                // Vibrate lightly on mobile
+                if (navigator.vibrate) navigator.vibrate(50);
+
+                // Disable all buttons
+                allBtns.forEach(b => b.disabled = true);
+
+                // Move to next question after delay
+                setTimeout(nextQuestion, 1000);
+            } else {
+                // WRONG
+                btn.classList.add('wrong');
+                quizCard.classList.add('flash-wrong');
+                
+                // Vibrate on mobile
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+                // Reveal correct answer
+                allBtns.forEach(b => {
+                    b.disabled = true;
+                    if (b.textContent === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+
+                // Move to next question after longer delay to see correct answer
+                setTimeout(nextQuestion, 1800);
+            }
+        }
+
+        // Next Question
+        function nextQuestion() {
+            currentIndex++;
+            loadQuestion();
+        }
+
+        // Final Screen
+        function showFinalScreen() {
+            progressBar.style.width = '100%';
+            progressContainer.style.display = 'none';
+            quizContainer.style.display = 'none';
+            finalScreen.style.display = 'block';
+            document.getElementById('final-score-val').textContent = score;
+        }
+
+        // Start game on load
+        window.onload = initGame;
+    </script>
+</body>
+</html>

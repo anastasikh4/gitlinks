@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Quest: Amy & Tom</title>
+    <style>
+        :root {
+            --spring-green: #97d700;
+            --blossom-pink: #ffb7c5;
+            --sky-blue: #a2d2ff;
+            --petal-white: #f9fdf9;
+            --flower-gold: #ffd700;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f0fff0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            color: #333;
+        }
+        #app {
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        /* Header */
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .bar-bg {
+            flex-grow: 1;
+            height: 16px;
+            background: #eee;
+            border-radius: 20px;
+            margin: 0 15px;
+            border: 2px solid #e0e0e0;
+        }
+        #bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--blossom-pink), var(--spring-green));
+            border-radius: 20px;
+            transition: width 0.5s ease-out;
+        }
+        .stat {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .heart { color: #ff4b4b; }
+        .streak { color: #ff9d00; }
+
+        /* Question Box */
+        .quest-box {
+            min-height: 300px;
+            margin-top: 20px;
+        }
+        .owl-avatar {
+            font-size: 60px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .bubble {
+            border: 3px solid var(--sky-blue);
+            border-radius: 20px;
+            padding: 20px;
+            font-size: 1.25rem;
+            background: var(--petal-white);
+            margin-bottom: 30px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .bubble::after {
+            content: '🏫';
+            position: absolute;
+            top: -15px;
+            right: -10px;
+            font-size: 24px;
+        }
+
+        /* Buttons */
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        .opt-btn {
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-bottom: 5px solid #e5e5e5;
+            border-radius: 18px;
+            padding: 18px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.1s;
+            font-family: inherit;
+        }
+        .opt-btn:hover {
+            background-color: #f7fff7;
+            border-color: var(--spring-green);
+        }
+        .opt-btn.selected {
+            background-color: #f0f7ff;
+            border-color: var(--sky-blue);
+            color: #0077cc;
+        }
+
+        /* Footer Feedback */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 3px solid #eee;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #feedback-panel {
+            width: 100%;
+            max-width: 480px;
+            display: none;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        .correct-panel {
+            background-color: #d7ffb8;
+            color: #46a302;
+        }
+        .wrong-panel {
+            background-color: #ffdfe0;
+            color: #ee2c2c;
+        }
+        #action-btn {
+            width: 100%;
+            max-width: 480px;
+            padding: 18px;
+            border-radius: 18px;
+            border: none;
+            background: var(--spring-green);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-bottom: 5px solid #7cb300;
+            text-transform: uppercase;
+            font-family: inherit;
+        }
+        #action-btn:disabled {
+            background: #e5e5e5;
+            border-bottom-color: #ccc;
+            color: #999;
+            cursor: default;
+        }
+        
+        .success-msg {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <div class="top-nav">
+        <span class="stat streak">🔥 <span id="streak-val">0</span></span>
+        <div class="bar-bg"><div id="bar-fill"></div></div>
+        <span class="stat heart">❤️ <span id="lives-val">5</span></span>
+    </div>
+
+    <div id="game-body">
+        <div class="quest-box">
+            <span class="owl-avatar">🦉✏️</span>
+            <div class="bubble" id="question-text">Loading mission...</div>
+            <div class="options" id="options-grid"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div id="feedback-panel"></div>
+        <button id="action-btn" onclick="handleBtnClick()" disabled>Check Answer</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  CONFIGURATION & RESULTS TRACKING
+    // ================================================================
+    const TEST_NAME = "Present Simple: Rewrite about Amy & Tom";
+    let userMistakes = [];
+    let finalScore = 0;
+    
+    const questions = [
+        { 
+            q: "I have breakfast at home.<br><br><i>(Rewrite for Amy)</i>", 
+            a: ["She has breakfast at home.", "She have breakfast at home.", "He has breakfast at home."], 
+            c: 0 
+        },
+        { 
+            q: "I meet my friends before class.<br><br><i>(Rewrite for Amy)</i>", 
+            a: ["She meet her friends before class.", "She meets her friends before class.", "She meets my friends before class."], 
+            c: 1 
+        },
+        { 
+            q: "I like my teachers.<br><br><i>(Rewrite for Amy)</i>", 
+            a: ["She like her teachers.", "She likes her teachers.", "He likes his teachers."], 
+            c: 1 
+        },
+        { 
+            q: "I love football.<br><br><i>(Rewrite for Tom)</i>", 
+            a: ["He loves football.", "He love football.", "She loves football."], 
+            c: 0 
+        },
+        { 
+            q: "I bring my football to school.<br><br><i>(Rewrite for Tom)</i>", 
+            a: ["He bring his football to school.", "He brings his football to school.", "She brings her football to school."], 
+            c: 1 
+        },
+        { 
+            q: "I play football with my friends.<br><br><i>(Rewrite for Tom)</i>", 
+            a: ["He play football with his friends.", "She plays football with her friends.", "He plays football with his friends."], 
+            c: 2 
+        }
+    ];
+
+    let current = 0;
+    let lives = 5;
+    let streak = 0;
+    let selected = null;
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    function loadQ() {
+        const data = questions[current];
+        document.getElementById('question-text').innerHTML = data.q;
+        
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+        selected = null; // Reset selection
+
+        data.a.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = opt;
+            b.onclick = () => {
+                selected = i;
+                document.querySelectorAll('.opt-btn').forEach(btn => btn.classList.remove('selected'));
+                b.classList.add('selected');
+                document.getElementById('action-btn').disabled = false;
+            };
+            grid.appendChild(b);
+        });
+
+        document.getElementById('feedback-panel').style.display = 'none';
+        
+        const btn = document.getElementById('action-btn');
+        btn.innerText = "Check Answer";
+        btn.style.background = "var(--spring-green)";
+        btn.style.borderBottomColor = "#7cb300";
+        btn.disabled = true;
+    }
+
+    function handleBtnClick() {
+        const btn = document.getElementById('action-btn');
+        
+        // If moving to next question
+        if (btn.innerText === "CONTINUE" || btn.innerText === "FINISH") {
+            current++;
+            if (current < questions.length) {
+                loadQ();
+                updateBar();
+            } else {
+                finishGame();
+            }
+            return;
+        }
+
+        // Checking answer
+        const isCorrect = (selected === questions[current].c);
+        const panel = document.getElementById('feedback-panel');
+        panel.style.display = 'block';
+
+        if (isCorrect) {
+            streak++;
+            panel.className = 'feedback-panel correct-panel';
+            panel.innerText = "🍏 Correct! Great job!";
+        } else {
+            lives--;
+            streak = 0;
+            panel.className = 'feedback-panel wrong-panel';
+            panel.innerText = "🍎 Almost! The correct answer is: " + questions[current].a[questions[current].c];
+            
+            // Track the mistake (push the word they clicked)
+            const wrongWord = questions[current].a[selected];
+            if (!userMistakes.includes(wrongWord)) {
+                userMistakes.push(wrongWord);
+            }
+
+            if (lives <= 0) {
+                alert("Oh no! You ran out of lives. Try again!");
+                location.reload();
+                return;
+            }
+        }
+
+        document.getElementById('streak-val').innerText = streak;
+        document.getElementById('lives-val').innerText = lives;
+        
+        // Update button to "Continue"
+        if (current === questions.length - 1) {
+            btn.innerText = "FINISH";
+        } else {
+            btn.innerText = "CONTINUE";
+        }
+        
+        // Disable option buttons so they can't change answer
+        document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+        btn.disabled = false;
+    }
+
+    function updateBar() {
+        const p = (current / questions.length) * 100;
+        document.getElementById('bar-fill').style.width = p + "%";
+    }
+
+    // ================================================================
+    //  FINAL SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function finishGame() {
+        document.getElementById('bar-fill').style.width = "100%";
+        
+        // Calculate score based on remaining lives or streak
+        // For Google Sheets, let's send the number of correct answers (questions.length - missed)
+        // Actually, since we track wrong answers, score = total - mistakes.length
+        // BUT the user can make multiple mistakes per question. 
+        // Let's just use the streak if they finished, or score = 6 - (5 - lives)
+        finalScore = Math.max(0, questions.length - (5 - lives));
+
+        document.getElementById('game-body').innerHTML = `
+            <h1 style="font-size:80px">🏆✨</h1>
+            <h2 style="color:var(--spring-green)">Quest Complete!</h2>
+            <p style="font-size:1.1rem">You mastered the grammar missions!</p>
+            <p>Final Score: <strong>${finalScore} / ${questions.length}</strong></p>
+            <p class="success-msg" id="send-msg">Results sent successfully! ✅</p>
+            <button style="margin-top:20px; background:var(--sky-blue); border:none; padding:15px 30px; border-radius:15px; font-weight:bold; font-size:1.1rem; cursor:pointer; border-bottom:4px solid #6ba3d6;" onclick="location.reload()">PLAY AGAIN</button>
+        `;
+        document.querySelector('.footer').style.display = 'none';
+        
+        // Send results
+        sendResultsToGoogle(finalScore, questions.length);
+    }
+
+    async function sendResultsToGoogle(score, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: total,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success text
+            const msgEl = document.getElementById('send-msg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Start Game
+    loadQ();
+</script>
+</body>
+</html>

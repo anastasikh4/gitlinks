@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business English: Q&A Matching</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3a8a; /* Corporate Navy */
+            --primary-hover: #1e40af;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --correct-bg: #dcfce7;
+            --correct-text: #166534;
+            --wrong-bg: #fee2e2;
+            --wrong-text: #991b1b;
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+        
+        #app {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Header & Progress */
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-blue);
+            transition: width 0.4s ease;
+        }
+        
+        /* Question Area */
+        .question-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+        }
+        
+        .question-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        #question-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+        
+        /* Options */
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+        
+        .opt-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--primary-blue);
+            background-color: #f1f5f9;
+        }
+        
+        .opt-btn.selected {
+            border-color: var(--primary-blue);
+            background-color: #e0e7ff;
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .opt-btn.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-text);
+            color: var(--correct-text);
+            font-weight: 600;
+        }
+        
+        .opt-btn.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-text);
+            color: var(--wrong-text);
+        }
+        
+        .opt-btn:disabled {
+            cursor: default;
+            opacity: 0.8;
+        }
+        
+        .opt-btn.correct::after { content: '✅'; font-size: 1.1rem; }
+        .opt-btn.wrong::after { content: '❌'; font-size: 1.1rem; }
+        
+        /* Action Button */
+        .btn-action {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 20px;
+            width: 100%;
+            font-family: inherit;
+        }
+        
+        .btn-action:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        
+        .btn-action:disabled {
+            background: var(--border-color);
+            color: var(--text-muted);
+            cursor: default;
+        }
+        
+        /* Final Screen */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .final-screen h2 {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .final-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+        
+        .final-score span {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .success-msg {
+            color: #16a34a;
+            font-weight: 600;
+            background: #dcfce7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <span>Business English Assessment</span>
+            <span id="progress-text">0 / 10</span>
+        </div>
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+    
+    <!-- Game Body -->
+    <div id="game-body">
+        <div class="question-card">
+            <div class="question-label">Select the most appropriate response</div>
+            <div id="question-text">Loading question...</div>
+        </div>
+        <div class="options" id="options-grid"></div>
+        <button class="btn-action" id="action-btn" onclick="handleBtnClick()" disabled>Submit Answer</button>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    //  CONFIGURATION & RESULTS TRACKING
+    // ================================================================
+    const TEST_NAME = "Business English: Q&A Matching Assessment";
+    let userMistakes = [];
+    let finalScore = 0;
+
+    // 10 Business English Q&A Pairs
+    const baseQuestions = [
+        { q: "What is your role in the company?", correct: "I'm the Marketing Manager." },
+        { q: "Who is the client for this project?", correct: "The team from Acme Corp." },
+        { q: "Where is your headquarters located?", correct: "In the financial district." },
+        { q: "When is the deadline for the proposal?", correct: "Next Friday at 5 PM." },
+        { q: "Why did the meeting get postponed?", correct: "Because the CEO is traveling." },
+        { q: "How many people are attending the conference?", correct: "About fifty employees." },
+        { q: "How much did the new software cost?", correct: "Five thousand dollars." },
+        { q: "How are the sales figures this quarter?", correct: "They are up by 15%." },
+        { q: "Whose signature is required on this contract?", correct: "The Director of Finance." },
+        { q: "Which department handles customer complaints?", correct: "The Customer Support team." }
+    ];
+
+    // All possible answers (for generating distractors)
+    const allAnswers = baseQuestions.map(q => q.correct);
+
+    // Helper: Shuffle array
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // Build questions with 1 correct option + 3 distractors
+    const questions = baseQuestions.map(q => {
+        const distractors = allAnswers.filter(ans => ans !== q.correct);
+        const selectedDistractors = shuffleArray(distractors).slice(0, 3);
+        const options = shuffleArray([q.correct, ...selectedDistractors]);
+        
+        return {
+            q: q.q,
+            options: options,
+            correctText: q.correct
+        };
+    });
+
+    let current = 0;
+    let selected = null;
+    let isAnswered = false;
+
+    // ================================================================
+    //  GAME LOGIC
+    // ================================================================
+    function loadQ() {
+        if (current >= questions.length) {
+            finishGame();
+            return;
+        }
+
+        isAnswered = false;
+        selected = null;
+        const data = questions[current];
+        
+        // Update text
+        document.getElementById('question-text').innerText = data.q;
+        document.getElementById('progress-text').innerText = `${current} / ${questions.length}`;
+        document.getElementById('progress-bar').style.width = `${(current / questions.length) * 100}%`;
+        
+        // Render options
+        const grid = document.getElementById('options-grid');
+        grid.innerHTML = '';
+
+        data.options.forEach((opt, i) => {
+            const b = document.createElement('button');
+            b.className = 'opt-btn';
+            b.innerText = opt;
+            b.onclick = () => {
+                if (isAnswered) return;
+                selected = i;
+                document.querySelectorAll('.opt-btn').forEach(btn => btn.classList.remove('selected'));
+                b.classList.add('selected');
+                document.getElementById('action-btn').disabled = false;
+            };
+            grid.appendChild(b);
+        });
+
+        // Reset button
+        const btn = document.getElementById('action-btn');
+        btn.innerText = "Submit Answer";
+        btn.disabled = true;
+    }
+
+    function handleBtnClick() {
+        const btn = document.getElementById('action-btn');
+        
+        // Move to next question
+        if (isAnswered) {
+            current++;
+            loadQ();
+            return;
+        }
+
+        // Check answer
+        isAnswered = true;
+        const currentQ = questions[current];
+        const chosenText = currentQ.options[selected];
+        const isCorrect = (chosenText === currentQ.correctText);
+        
+        const allBtns = document.querySelectorAll('.opt-btn');
+        allBtns.forEach(b => b.disabled = true);
+
+        if (isCorrect) {
+            allBtns[selected].classList.add('correct');
+            allBtns[selected].classList.remove('selected');
+        } else {
+            allBtns[selected].classList.add('wrong');
+            allBtns[selected].classList.remove('selected');
+            
+            // Track mistake
+            if (!userMistakes.includes(chosenText)) {
+                userMistakes.push(chosenText);
+            }
+
+            // Highlight correct answer
+            allBtns.forEach(b => {
+                if (b.innerText === currentQ.correctText) {
+                    b.classList.add('correct');
+                }
+            });
+        }
+
+        // Change button to Continue
+        btn.innerText = "Continue";
+        btn.disabled = false;
+    }
+
+    // ================================================================
+    //  FINAL SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function finishGame() {
+        // Final score calculation: total questions - number of mistakes
+        // (assuming 1 mistake per missed question due to the multiple choice)
+        finalScore = questions.length - userMistakes.length;
+
+        document.getElementById('progress-bar').style.width = `100%`;
+        document.getElementById('progress-text').innerText = `${questions.length} / ${questions.length}`;
+        
+        document.getElementById('game-body').innerHTML = `
+            <div class="final-screen">
+                <h2>Assessment Complete</h2>
+                <div class="final-score">${finalScore} <span>/ ${questions.length}</span></div>
+                <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+                <button class="btn-action" onclick="location.reload()">Restart Assessment</button>
+            </div>
+        `;
+
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: finalScore,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('success-msg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Start Game
+    loadQ();
+</script>
+
+</body>
+</html>

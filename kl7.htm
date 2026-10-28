@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adverbs of Frequency & Sentence Order</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --chip-bg: #f1f2f6;
+            --chip-border: #dfe4ea;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 650px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            width: 70%;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* --- QUESTION STYLES --- */
+        .question-display {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed var(--chip-border);
+        }
+
+        .options-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 3px solid var(--chip-border);
+            border-radius: 15px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--chip-bg);
+            border-color: var(--quiz-light-purple);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.correct {
+            background: #d4edda;
+            border-color: var(--quiz-green);
+            color: #155724;
+        }
+
+        .option-btn.wrong {
+            background: #f8d7da;
+            border-color: var(--quiz-red);
+            color: #721c24;
+        }
+
+        /* --- FINAL SCREEN --- */
+        .final-screen {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        .final-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .final-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .success-msg {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .btn-restart {
+            background: var(--quiz-light-purple);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn-restart:hover {
+            background: #6c44a3;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+    <!-- PROGRESS HEADER -->
+    <div class="header" id="header">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">Question 1 of 10</div>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen">
+        <div class="instruction">Choose the correct option based on the grammar rules.</div>
+        <div class="question-display" id="question-text"></div>
+        <div class="options-area" id="options-area"></div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="final-screen" id="final-screen">
+        <h1>🏆</h1>
+        <h2>Mission Complete!</h2>
+        <p>You scored: <strong id="final-score">0</strong> / 10</p>
+        <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+        <button class="btn-restart" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+</div>
+
+<script>
+    // ==============================================================
+    //  RESULTS TRACKING & CONFIGURATION
+    // ==============================================================
+    const TEST_NAME = "Adverbs of Frequency & Sentence Order";
+    let userMistakes = [];
+    let score = 0;
+    let currentQ = 0;
+    
+    // --- QUIZ DATA ---
+    // Mix of Ex 8 (Fill in the blank) and Ex 9 (Sentence Order)
+    const questions = [
+        {
+            q: "Put the words in the correct order:<br><br><b>always We on Friday have Art .</b>",
+            options: [
+                "We always have Art on Friday.",
+                "We have always Art on Friday.",
+                "Always we have Art on Friday."
+            ],
+            c: 0
+        },
+        {
+            q: "Put the words in the correct order:<br><br><b>are Elena and Amy noisy in Science class sometimes .</b>",
+            options: [
+                "Elena and Amy are sometimes noisy in Science class.",
+                "Elena and Amy sometimes are noisy in Science class.",
+                "Sometimes Elena and Amy are noisy in Science class."
+            ],
+            c: 0
+        },
+        {
+            q: "Put the words in the correct order:<br><br><b>never in class send text messages I .</b>",
+            options: [
+                "I never send text messages in class.",
+                "I send never text messages in class.",
+                "Never I send text messages in class."
+            ],
+            c: 0
+        },
+        {
+            q: "Put the words in the correct order:<br><br><b>often We in the park play football .</b>",
+            options: [
+                "We often play football in the park.",
+                "We play often football in the park.",
+                "Often we play football in the park."
+            ],
+            c: 0
+        },
+        {
+            q: "Put the words in the correct order:<br><br><b>watches TV Tom usually after dinner .</b>",
+            options: [
+                "Tom usually watches TV after dinner.",
+                "Tom watches usually TV after dinner.",
+                "Usually Tom watches TV after dinner."
+            ],
+            c: 0
+        },
+        {
+            q: "Put the words in the correct order:<br><br><b>always late for English You are !</b>",
+            options: [
+                "You are always late for English!",
+                "You always are late for English!",
+                "Always you are late for English!"
+            ],
+            c: 0
+        },
+        {
+            q: "Complete the sentence:<br><br>He is _______ late for school.",
+            options: ["often", "often is", "is often"],
+            c: 0
+        },
+        {
+            q: "Complete the sentence:<br><br>I _______ have an egg for breakfast.",
+            options: ["usually", "usual", "am usually"],
+            c: 0
+        },
+        {
+            q: "Complete the sentence:<br><br>I _______ listen to music.",
+            options: ["never", "not never", "am never"],
+            c: 0
+        },
+        {
+            q: "Complete the sentence:<br><br>I am _______ happy.",
+            options: ["always", "usual", "often am"],
+            c: 0
+        }
+    ];
+
+    // Helper to shuffle arrays
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    // ==============================================================
+    //  QUIZ LOGIC
+    // ==============================================================
+    function loadQuestion() {
+        if (currentQ >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const q = questions[currentQ];
+        
+        // Update UI
+        document.getElementById('category').innerText = `Question ${currentQ + 1} of 10`;
+        document.getElementById('progress-bar').style.width = ((currentQ / questions.length) * 100) + "%";
+        document.getElementById('question-text').innerHTML = q.q;
+
+        // Render options
+        const optionsArea = document.getElementById('options-area');
+        optionsArea.innerHTML = '';
+
+        // Shuffle options but keep track of the correct text
+        const correctText = q.options[q.c];
+        const shuffledOptions = shuffleArray([...q.options]);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = opt;
+            btn.onclick = () => checkAnswer(btn, opt, correctText);
+            optionsArea.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selectedText, correctText) {
+        // Disable all buttons immediately
+        const allButtons = document.querySelectorAll('.option-btn');
+        allButtons.forEach(b => b.disabled = true);
+
+        if (selectedText === correctText) {
+            btn.classList.add('correct');
+            score++;
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            // Move to next question after a short delay
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 800);
+        } else {
+            btn.classList.add('wrong');
+            
+            // Track mistake
+            if (!userMistakes.includes(selectedText)) {
+                userMistakes.push(selectedText);
+            }
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+            // Highlight the correct answer
+            allButtons.forEach(b => {
+                if (b.innerHTML === correctText) {
+                    b.classList.add('correct');
+                }
+            });
+
+            // Move to next question after a longer delay to see the correct answer
+            setTimeout(() => {
+                currentQ++;
+                loadQuestion();
+            }, 2000);
+        }
+    }
+
+    // ==============================================================
+    //  RESULTS & GOOGLE SHEETS INTEGRATION
+    // ==============================================================
+    function showResults() {
+        document.getElementById('header').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('final-screen').style.display = 'block';
+        document.getElementById('final-score').innerText = score;
+        
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            document.getElementById('success-msg').style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Initialize on page load
+    loadQuestion();
+
+</script>
+</body>
+</html>
