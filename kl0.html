@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Detective Agency: Comparatives & Superlatives</title>
+    <style>
+        :root {
+            --detective-blue: #2c3e50;
+            --clue-yellow: #f1c40f;
+            --danger-red: #e74c3c;
+            --solve-green: #27ae60;
+            --folder-tan: #fdf5e6;
+            --accent-orange: #e67e22;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a252f;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #case-file {
+            background-color: var(--folder-tan);
+            width: 95%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+            border-left: 20px solid var(--accent-orange);
+        }
+
+        .header { 
+            border-bottom: 2px solid #333; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .lvl-stamp { 
+            background: var(--danger-red); 
+            color: white; 
+            padding: 5px 10px; 
+            transform: rotate(-3deg); 
+            font-weight: bold; 
+            font-size: 0.8rem; 
+        }
+        
+        .score-board {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        /* LEVEL 0: MEMORY CARDS */
+        .memory-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+            perspective: 1000px; 
+        }
+        .card { 
+            height: 100px; 
+            cursor: pointer; 
+            position: relative; 
+            transform-style: preserve-3d; 
+            transition: transform 0.6s; 
+        }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            backface-visibility: hidden; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 8px; 
+            border: 2px solid #333; 
+            font-size: 0.9rem; 
+            text-align: center; 
+            padding: 5px; 
+            box-sizing: border-box; 
+            font-weight: bold;
+        }
+        .card-front { background: var(--detective-blue); color: white; }
+        .card-back { background: white; transform: rotateY(180deg); flex-direction: column; }
+        .card-back span { font-size: 1.8rem; margin-bottom: 5px;}
+
+        /* GENERAL STYLES */
+        .evidence-box { 
+            background: white; 
+            border: 2px solid #ddd; 
+            padding: 20px; 
+            margin: 20px 0; 
+            text-align: center; 
+            border-radius: 8px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .emoji-clue { font-size: 5rem; display: block; margin-bottom: 10px; }
+        
+        /* Sentence layout for Level 1 */
+        .sentence-hint { 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            color: var(--detective-blue); 
+            line-height: 1.5;
+            text-transform: none;
+        }
+        .blank-underline {
+            display: inline-block;
+            border-bottom: 3px solid var(--danger-red);
+            width: 100px;
+            margin: 0 5px;
+            vertical-align: bottom;
+        }
+
+        /* Layout for Levels 2 & 3 */
+        .word-hint { font-size: 1.5rem; font-weight: bold; text-transform: uppercase; color: var(--detective-blue); }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detective-btn { 
+            background: var(--detective-blue); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-family: inherit; 
+            transition: background 0.2s;
+        }
+        .detective-btn:hover { background: #34495e; }
+        
+        .code-display { 
+            font-size: 2rem; 
+            letter-spacing: 5px; 
+            border-bottom: 3px solid #333; 
+            margin-bottom: 20px; 
+            display: inline-block; 
+            padding: 0 10px;
+            min-height: 40px;
+        }
+        .letter-btn { 
+            background: var(--clue-yellow); 
+            border: 2px solid #333; 
+            width: 40px; 
+            height: 40px; 
+            font-size: 1.2rem; 
+            margin: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border-radius: 4px;
+        }
+
+        .hidden { display: none; }
+        .progress-container { height: 8px; background: #ddd; margin-top: 20px; border-radius: 4px; overflow: hidden; }
+        #fill { height: 100%; background: var(--solve-green); width: 0%; transition: 0.3s; }
+        
+        .correct { background: var(--solve-green) !important; animation: pop 0.4s; color: white !important; }
+        .wrong { background: var(--danger-red) !important; color: white !important; }
+        
+        @keyframes pop { 50% { transform: scale(1.1); } }
+        
+        .success-msg {
+            color: var(--solve-green);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: none;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="case-file">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-stamp">LEVEL 0: MEMORY</div>
+        <div class="score-board">SOLVED: <span id="score">0</span></div>
+    </div>
+
+    <!-- LEVEL 0: MEMORY GAME -->
+    <div id="lvl0" class="screen">
+        <p style="text-align:center;"><strong>MISSION:</strong> Match the adjective to its comparative form!</p>
+        <div id="memory-grid" class="memory-grid"></div>
+    </div>
+
+    <!-- LEVEL 1: IDENTIFY (Comparatives with "than") -->
+    <div id="lvl1" class="screen hidden">
+        <p><strong>MISSION:</strong> Complete the sentence with the correct COMPARATIVE form!</p>
+        <div class="evidence-box">
+            <span id="l1-emoji" class="emoji-clue">🐜</span>
+            <div id="l1-label" class="sentence-hint">Sentence goes here...</div>
+        </div>
+        <div id="l1-btns" class="options-grid"></div>
+    </div>
+
+    <!-- LEVEL 2: PHOTO RECOGNITION (Superlatives) -->
+    <div id="lvl2" class="hidden">
+        <p><strong>MISSION:</strong> Identify the SUPERLATIVE form for this emoji!</p>
+        <div class="evidence-box">
+            <span id="l2-emoji" class="emoji-clue">🐘</span>
+            <div id="l2-label" class="word-hint">This is the ____</div>
+        </div>
+        <div id="l2-btns" class="options-grid"></div>
+    </div>
+
+    <!-- LEVEL 3: SECRET CODES -->
+    <div id="lvl3" class="hidden">
+        <p><strong>MISSION:</strong> Type the COMPARATIVE form!</p>
+        <div class="evidence-box">
+            <span id="l3-emoji" class="emoji-clue">👎</span>
+            <div id="l3-label" class="word-hint">Adjective: BAD</div>
+            <div id="l3-display" class="code-display">____</div>
+            <div id="l3-letters" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+        </div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win" class="hidden" style="text-align: center;">
+        <h1 style="font-size: 4rem; margin: 10px 0;">🕵️‍♂️</h1>
+        <h2>MISSION ACCOMPLISHED!</h2>
+        <p>Case closed. You are a Grammar Master.</p>
+        <p class="success-msg" id="send-msg">Results sent successfully! ✅</p>
+        <button class="detective-btn" onclick="location.reload()" style="width: 100%; margin-top: 20px;">RESTART CASE</button>
+    </div>
+
+    <div class="progress-container"><div id="fill"></div></div>
+</div>
+
+<script>
+    // ================================================================
+    //  CONFIGURATION & DATA
+    // ================================================================
+    const TEST_NAME = "Grammar Detective: Comparatives & Superlatives";
+    let userMistakes = [];
+    let score = 0;
+    let currentLvl = 0;
+    let currentIdx = 0;
+    let l3Input = "";
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    // Data derived from the image (Short, Long, Irregular)
+    const data = [
+        { 
+            base: "small", comp: "smaller", sup: "the smallest", emoji: "🐜", id: 1,
+            compSentence: "This ant is <span class='blank-underline'></span> than that elephant.",
+            compOptions: ["smaller", "more small", "smallest", "the smaller"]
+        },
+        { 
+            base: "big", comp: "bigger", sup: "the biggest", emoji: "🐘", id: 2,
+            compSentence: "That elephant is <span class='blank-underline'></span> than this ant.",
+            compOptions: ["bigger", "more big", "biggest", "the bigger"]
+        },
+        { 
+            base: "boring", comp: "more boring", sup: "the most boring", emoji: "🥱", id: 3,
+            compSentence: "This book is <span class='blank-underline'></span> than that movie.",
+            compOptions: ["more boring", "boringer", "most boring", "the boring"]
+        },
+        { 
+            base: "good", comp: "better", sup: "the best", emoji: "👍", id: 4,
+            compSentence: "My score is <span class='blank-underline'></span> than yours.",
+            compOptions: ["better", "gooder", "more good", "best"]
+        },
+        { 
+            base: "bad", comp: "worse", sup: "the worst", emoji: "👎", id: 5,
+            compSentence: "The weather today is <span class='blank-underline'></span> than yesterday.",
+            compOptions: ["worse", "badder", "more bad", "worst"]
+        }
+    ];
+
+    const totalSteps = 1 + (data.length * 3); // 1 for memory game + 5 items across 3 levels
+
+    function initLevel() {
+        updateProgress();
+        if(currentLvl === 0) loadL0();
+        else if(currentLvl === 1) loadL1();
+        else if(currentLvl === 2) loadL2();
+        else if(currentLvl === 3) loadL3();
+    }
+
+    // ================================================================
+    //  LEVEL 0: MEMORY MATCH
+    // ================================================================
+    function loadL0() {
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        let cardsData = [];
+        data.forEach(item => {
+            cardsData.push({ text: item.base, emo: "📝", id: item.id, type: 'base' });
+            cardsData.push({ text: item.comp, emo: "⚖️", id: item.id, type: 'comp' });
+        });
+        cardsData.sort(() => Math.random() - 0.5);
+
+        cardsData.forEach(cardInfo => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-face card-front">CASE FILE</div>
+                <div class="card-face card-back"><span>${cardInfo.emo}</span>${cardInfo.text}</div>
+            `;
+            card.onclick = () => flipCard(card, cardInfo.id, cardInfo.type);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard(card, id, type) {
+        if(flippedCards.length < 2 && !card.classList.contains('flipped')) {
+            card.classList.add('flipped');
+            flippedCards.push({ card, id, type });
+
+            if(flippedCards.length === 2) {
+                const isMatch = flippedCards[0].id === flippedCards[1].id && flippedCards[0].type !== flippedCards[1].type;
+                
+                if(isMatch) {
+                    matchedPairs++;
+                    score++;
+                    document.getElementById('score').innerText = score;
+                    flippedCards = [];
+                    if(matchedPairs === data.length) {
+                        setTimeout(nextLevel, 1000);
+                    }
+                } else {
+                    userMistakes.push("Memory Match Failed");
+                    setTimeout(() => {
+                        flippedCards.forEach(c => c.card.classList.remove('flipped'));
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+        updateProgress();
+    }
+
+    // ================================================================
+    //  LEVEL 1: IDENTIFY (COMPARATIVE WITH "THAN")
+    // ================================================================
+    function loadL1() {
+        const item = data[currentIdx];
+        
+        // Set emoji
+        document.getElementById('l1-emoji').innerText = item.emoji;
+        
+        // Set sentence
+        document.getElementById('l1-label').innerHTML = item.compSentence;
+        
+        const box = document.getElementById('l1-btns');
+        box.innerHTML = '';
+        
+        // Use the specific options for this sentence
+        let opts = [...item.compOptions].sort(() => Math.random() - 0.5);
+        
+        opts.forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = 'detective-btn';
+            btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.comp) { 
+                    btn.classList.add('correct'); 
+                    score++; 
+                    setTimeout(nextIdx, 700); 
+                } else { 
+                    btn.classList.add('wrong'); 
+                    if (!userMistakes.includes(o)) userMistakes.push(o);
+                    setTimeout(() => btn.classList.remove('wrong'), 500); 
+                }
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // ================================================================
+    //  LEVEL 2: PHOTO (SUPERLATIVE)
+    // ================================================================
+    function loadL2() {
+        const item = data[currentIdx];
+        document.getElementById('l2-emoji').innerText = item.emoji;
+        document.getElementById('l2-label').innerText = "This is the ______ !";
+        
+        const box = document.getElementById('l2-btns');
+        box.innerHTML = '';
+        
+        let opts = [item.sup, item.comp, item.base, "most " + item.base];
+        opts = [...new Set(opts)].slice(0, 4).sort(() => Math.random() - 0.5);
+        
+        opts.forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = 'detective-btn';
+            btn.innerText = o;
+            btn.onclick = () => {
+                if(o === item.sup) { 
+                    btn.classList.add('correct'); 
+                    score++; 
+                    setTimeout(nextIdx, 700); 
+                } else { 
+                    btn.classList.add('wrong'); 
+                    if (!userMistakes.includes(o)) userMistakes.push(o);
+                    setTimeout(() => btn.classList.remove('wrong'), 500); 
+                }
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    // ================================================================
+    //  LEVEL 3: CODES (TYPE COMPARATIVE)
+    // ================================================================
+    function loadL3() {
+        const item = data[currentIdx];
+        l3Input = "";
+        document.getElementById('l3-emoji').innerText = item.emoji;
+        document.getElementById('l3-label').innerText = "Adjective: " + item.base.toUpperCase();
+        document.getElementById('l3-display').innerText = "_".repeat(item.comp.length);
+        
+        const box = document.getElementById('l3-letters');
+        box.innerHTML = '';
+        
+        // Add extra random letters to make it a code breaker
+        let letters = item.comp.split('');
+        const extraLetters = ["X", "Z", "Q", "Y", "W", "K", "V"];
+        for(let i=0; i<3; i++) {
+            letters.push(extraLetters[i]);
+        }
+        
+        letters.sort(() => Math.random() - 0.5).forEach(l => {
+            const b = document.createElement('button');
+            b.className = 'letter-btn';
+            b.innerText = l;
+            b.onclick = () => {
+                l3Input += l;
+                document.getElementById('l3-display').innerText = l3Input + "_".repeat(item.comp.length - l3Input.length);
+                b.style.visibility = 'hidden';
+                
+                if(l3Input.length === item.comp.length) {
+                    if(l3Input === item.comp) { 
+                        score++; 
+                        setTimeout(nextIdx, 700); 
+                    } else { 
+                        if (!userMistakes.includes(l3Input)) userMistakes.push(l3Input);
+                        setTimeout(loadL3, 600); 
+                    }
+                }
+            };
+            box.appendChild(b);
+        });
+    }
+
+    // ================================================================
+    //  GAME FLOW & PROGRESS
+    // ================================================================
+    function nextIdx() {
+        currentIdx++;
+        if(currentIdx >= data.length) {
+            currentIdx = 0;
+            nextLevel();
+        } else {
+            initLevel();
+        }
+    }
+
+    function nextLevel() {
+        currentLvl++;
+        document.querySelectorAll('.screen, #win').forEach(s => s.classList.add('hidden'));
+        
+        const tags = ["MEMORY", "COMPARATIVES", "SUPERLATIVES", "SECRET CODES", "CLOSED"];
+        document.getElementById('lvl-tag').innerText = "LEVEL " + currentLvl + ": " + (tags[currentLvl] || "END");
+        
+        if(currentLvl === 1) document.getElementById('lvl1').classList.remove('hidden');
+        else if(currentLvl === 2) document.getElementById('lvl2').classList.remove('hidden');
+        else if(currentLvl === 3) document.getElementById('lvl3').classList.remove('hidden');
+        else {
+            document.getElementById('win').classList.remove('hidden');
+            showWinScreen();
+        }
+        
+        initLevel();
+    }
+
+    function updateProgress() {
+        let currentStep = 0;
+        if(currentLvl === 0) currentStep = matchedPairs;
+        else if(currentLvl === 1) currentStep = 1 + currentIdx;
+        else if(currentLvl === 2) currentStep = 1 + data.length + currentIdx;
+        else if(currentLvl === 3) currentStep = 1 + (data.length * 2) + currentIdx;
+        else currentStep = totalSteps;
+
+        document.getElementById('fill').style.width = (currentStep / totalSteps * 100) + "%";
+        document.getElementById('score').innerText = score;
+    }
+
+    // ================================================================
+    //  WIN SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function showWinScreen() {
+        document.getElementById('fill').style.width = "100%";
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalSteps, 
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            document.getElementById('send-msg').style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Start the game
+    initLevel();
+</script>
+</body>
+</html>
