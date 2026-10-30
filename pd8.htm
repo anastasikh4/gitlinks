@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Bull Racing: English Mission</title>
+
+    <style>
+        :root {
+            --f1-red: #e10600;
+            --f1-red-dark: #b80500;
+            --bg-color: #f0f2f5; /* Light background */
+            --card-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-bg: #f9fafb;
+            
+            --neon-green: #10b981;
+            --correct-bg: #d1fae5;
+            --correct-border: #10b981;
+            --incorrect-bg: #fee2e2;
+            --incorrect-border: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-top: 6px solid var(--f1-red);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--f1-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .score-item span {
+            color: var(--f1-red);
+        }
+
+        .quest-card {
+            background: var(--input-bg);
+            border-left: 5px solid var(--f1-red);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quest-title {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: block;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Emoji grid for Picture Matching */
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .emoji-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .big-emoji {
+            font-size: 4rem;
+            line-height: 1;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #ffffff;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        label {
+            font-size: 1rem;
+            color: var(--text-dark);
+            flex: 1 1 250px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        select {
+            background: var(--input-bg);
+            border: 1px solid #d1d5db;
+            color: var(--text-dark);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 280px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        select:focus {
+            border-color: var(--f1-red);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(225, 6, 0, 0.1);
+        }
+
+        .btn-check {
+            background: var(--f1-red);
+            color: #ffffff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            transition: background 0.2s, transform 0.2s;
+            width: 100%;
+            margin-top: 20px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(225, 6, 0, 0.2);
+        }
+
+        .btn-check:hover {
+            background: var(--f1-red-dark);
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: none;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .success {
+            color: var(--correct-border);
+            background: var(--correct-bg);
+            border: 2px solid var(--correct-border);
+        }
+
+        .error {
+            color: var(--incorrect-border);
+            background: var(--incorrect-bg);
+            border: 2px solid var(--incorrect-border);
+        }
+
+        .correct-field {
+            border-color: var(--correct-border) !important;
+            background-color: var(--correct-bg) !important;
+            color: #065f46 !important;
+        }
+
+        .incorrect-field {
+            border-color: var(--incorrect-border) !important;
+            background-color: var(--incorrect-bg) !important;
+            color: #991b1b !important;
+        }
+
+        .final-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 2px solid var(--f1-red);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .final-screen h2 {
+            font-size: 2.5rem;
+            color: var(--f1-red);
+            margin-bottom: 10px;
+        }
+
+        .final-score {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+
+        .success-msg {
+            color: var(--correct-border);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+            background: var(--correct-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--correct-border);
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .game-container { padding: 15px; }
+            h1 { font-size: 1.5rem; }
+            .input-group { flex-direction: column; align-items: stretch; }
+            select { max-width: 100%; }
+            .emoji-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game-container" id="quiz-card">
+
+    <header>
+        <h1>🏎️ F1 English Mission</h1>
+        <div class="scoreboard">
+            <div class="score-item">
+                Score: <span id="score-display">0</span> / 11
+            </div>
+        </div>
+    </header>
+
+    <!-- QUEST 1: VOCABULARY SENTENCES -->
+    <div class="quest-card">
+        <span class="quest-title">Part 1: Rules & Vocabulary</span>
+
+        <div class="input-group">
+            <label>1. You can't ride bikes on the...</label>
+            <select id="q1">
+                <option value="">-- Select --</option>
+                <option value="pavement">bike lane</option>
+                <option value="road">fast roads</option>
+                <option value="sign">area in the park</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>2. You must wear a ... in a car.</label>
+            <select id="q2">
+                <option value="">-- Select --</option>
+                <option value="helmet">helmet</option>
+                <option value="seatbelt">seatbelt</option>
+                <option value="sign">sign</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>3. You can't cross the ... it's not safe.</label>
+            <select id="q3">
+                <option value="">-- Select --</option>
+                <option value="zebra crossing">zebra crossing</option>
+                <option value="road">road</option>
+                <option value="pavement">pavement</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- QUEST 2: PICTURE MATCHING (Emojis) -->
+    <div class="quest-card">
+        <span class="quest-title">Part 2: Match the Emoji</span>
+
+        <div class="emoji-grid">
+            <!-- Emoji 1: Traffic Warden (Male) -->
+            <div class="emoji-card">
+                <div class="big-emoji">👮‍♂️</div>
+                <select id="q4">
+                    <option value="">-- Select --</option>
+                    <option value="It is a traffic warden">It is a traffic warden</option>
+                    <option value="It is safe to walk">It is safe to walk</option>
+                    <option value="You can't go straight now">You can't go straight now</option>
+                </select>
+            </div>
+
+            <!-- Emoji 2: Walk -->
+            <div class="emoji-card">
+                <div class="big-emoji">🚶‍♂️</div>
+                <select id="q5">
+                    <option value="">-- Select --</option>
+                    <option value="It is safe to walk">It is safe to walk</option>
+                    <option value="It is a pavement">It is a pavement</option>
+                    <option value="You can drive now">You can drive now</option>
+                </select>
+            </div>
+
+            <!-- Emoji 3: No straight -->
+            <div class="emoji-card">
+                <div class="big-emoji">⛔</div>
+                <select id="q6">
+                    <option value="">-- Select --</option>
+                    <option value="You can't go straight now">You can't go straight now</option>
+                    <option value="He is driving very dangerous">He is driving very dangerous</option>
+                    <option value="You can drive now">You can drive now</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUEST 3: TEAM RADIO -->
+    <div class="quest-card">
+        <span class="quest-title">Part 3: Team Radio</span>
+
+        <div class="input-group">
+            <label>7. Проверьте шины (Check the...)</label>
+            <select id="q7">
+                <option value="">-- Select --</option>
+                <option value="check">check</option>
+                <option value="tires">tires</option>
+                <option value="soft tires">soft tires</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>8. Я хочу мягкие шины (I want...)</label>
+            <select id="q8">
+                <option value="">-- Select --</option>
+                <option value="the tires">the tires</option>
+                <option value="soft tires">soft tires</option>
+                <option value="anything">anything</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>9. Что-то еще профессор (Anything... professor?)</label>
+            <select id="q9">
+                <option value="">-- Select --</option>
+                <option value="else professor?">else professor?</option>
+                <option value="anything">anything</option>
+                <option value="hope is">hope is</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>10. Переходим к плану С (Let's go...)</label>
+            <select id="q10">
+                <option value="">-- Select --</option>
+                <option value="for plan c">for plan c</option>
+                <option value="let's go">let's go</option>
+                <option value="not a strategy">not a strategy</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>11. Я только что так сказал (I just...)</label>
+            <select id="q11">
+                <option value="">-- Select --</option>
+                <option value="said that">said that</option>
+                <option value="check">check</option>
+                <option value="hope is">hope is</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-check" onclick="submitQuiz()">Submit Answers</button>
+    <div class="feedback" id="feedback"></div>
+
+</div>
+
+<!-- FINAL SCREEN -->
+<div class="game-container final-screen" id="final-screen">
+    <h2>🏆 Mission Complete!</h2>
+    <div class="final-score" id="final-score-text">You scored 0 / 11</div>
+    <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+    <button class="btn-check" style="max-width: 300px; margin: 0 auto;" onclick="location.reload()">Try Again</button>
+</div>
+
+<script>
+    // ================================================================
+    //  CONFIGURATION & RESULTS TRACKING
+    // ================================================================
+    const TEST_NAME = "F1 English Mission: Light Theme";
+    let userMistakes = [];
+    let finalScore = 0;
+    let isSubmitted = false;
+
+    // Correct answers mapping
+    const correctAnswers = {
+        q1: "pavement",
+        q2: "seatbelt",
+        q3: "road",
+        q4: "It is a traffic warden",
+        q5: "It is safe to walk",
+        q6: "You can't go straight now",
+        q7: "check",
+        q8: "soft tires",
+        q9: "anything",
+        q10: "for plan c",
+        q11: "said that"
+    };
+
+    const totalQuestions = Object.keys(correctAnswers).length;
+
+    // ================================================================
+    //  SUBMIT & EVALUATION
+    // ================================================================
+    function submitQuiz() {
+        if (isSubmitted) return;
+        
+        // Check if all are answered
+        let allAnswered = true;
+        for (let id in correctAnswers) {
+            const el = document.getElementById(id);
+            if (el.value === "") {
+                allAnswered = false;
+                el.classList.add('incorrect-field');
+            }
+        }
+
+        if (!allAnswered) {
+            const feed = document.getElementById('feedback');
+            feed.innerText = "⚠️ Please answer all questions before submitting.";
+            feed.className = "feedback error";
+            feed.style.display = "block";
+            return;
+        }
+
+        isSubmitted = true;
+        const submitBtn = document.querySelector('.btn-check');
+        submitBtn.style.display = 'none';
+
+        // Evaluate
+        for (let id in correctAnswers) {
+            const el = document.getElementById(id);
+            const correctVal = correctAnswers[id];
+            
+            el.disabled = true; // Lock the select
+
+            if (el.value === correctVal) {
+                finalScore++;
+                el.classList.add('correct-field');
+            } else {
+                el.classList.add('incorrect-field');
+                
+                // Track mistake (push the wrongly selected text)
+                if (!userMistakes.includes(el.value)) {
+                    userMistakes.push(el.value);
+                }
+            }
+        }
+
+        // Show final message
+        const feed = document.getElementById('feedback');
+        if (finalScore === totalQuestions) {
+            feed.innerText = "✅ Perfect! All answers are correct. +XP!";
+            feed.className = "feedback success";
+        } else {
+            feed.innerText = `❌ You scored ${finalScore}/${totalQuestions}. Check the highlighted fields.`;
+            feed.className = "feedback error";
+        }
+        feed.style.display = "block";
+
+        // Trigger final screen after a short delay
+        setTimeout(showFinalScreen, 1500);
+    }
+
+    // ================================================================
+    //  FINAL SCREEN & GOOGLE SHEETS
+    // ================================================================
+    function showFinalScreen() {
+        document.getElementById('quiz-card').style.display = 'none';
+        document.getElementById('final-screen').style.display = 'block';
+        document.getElementById('final-score-text').innerText = `You scored ${finalScore} / ${totalQuestions}`;
+        
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: finalScore,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Display success message
+            document.getElementById('success-msg').style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+</script>
+
+</body>
+</html>

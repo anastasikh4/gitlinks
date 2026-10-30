@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Road Safety & Word Order Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-color: #f7f9fa;
+    --card-bg: #ffffff;
+    --text-dark: #3c3c3c;
+    --text-muted: #afafaf;
+    --primary-color: #58cc02;
+    --primary-dark: #46a302;
+    --warning-color: #f39c12;
+    --border-color: #e5e5e5;
+    --font-heading: 'Fredoka', sans-serif;
+    --font-body: 'Quicksand', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+
+  .quiz-wrapper {
+    background: var(--card-bg);
+    width: 100%;
+    max-width: 650px;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 0 var(--border-color);
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress-track {
+    flex-grow: 1;
+    height: 16px;
+    background-color: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .counter-display {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .screen {
+    display: none;
+    animation: slideUpFade 0.4s ease forwards;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-box {
+    background: #e1f5fe;
+    border: 2px solid #b3e5fc;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0288d1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 200px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 2px solid var(--border-color);
+    overflow: hidden;
+    background: #f1f5f9;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .question-sentence {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 25px;
+    color: var(--text-dark);
+    text-align: left;
+  }
+
+  .blank-space {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--text-dark);
+    text-align: center;
+    color: var(--primary-color);
+    padding: 0 4px;
+  }
+
+  .options-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 5px;
+  }
+
+  .option-btn {
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-bottom: 4px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s;
+    user-select: none;
+    outline: none;
+  }
+
+  .option-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  .option-btn.state-correct {
+    background-color: #d7ffb8 !important;
+    border-color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-dark) !important;
+    color: #527e02 !important;
+  }
+
+  .option-btn.state-incorrect {
+    background-color: #fff3cd !important;
+    border-color: var(--warning-color) !important;
+    border-bottom-color: #b45309 !important;
+    color: #b45309 !important;
+  }
+
+  .finish-layout {
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .award-icon {
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+    animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scalePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .finish-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffc800;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 0 #e6b400;
+  }
+
+  .finish-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #666;
+    margin-bottom: 35px;
+  }
+
+  .success-msg {
+    color: var(--primary-dark);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    display: none;
+    background: #d7ffb8;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--primary-color);
+  }
+
+  .action-trigger {
+    width: 100%;
+    background-color: var(--primary-color);
+    border: none;
+    border-bottom: 4px solid var(--primary-dark);
+    border-radius: 14px;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .action-trigger:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 5px; }
+    .quiz-wrapper { border-radius: 16px; padding: 18px; }
+    .question-sentence { font-size: 1.15rem; }
+    .option-btn { font-size: 1.05rem; padding: 14px; }
+    .image-container { height: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrapper" id="masterContainer">
+  <div class="quiz-header" id="trackerHeader">
+    <div class="progress-track">
+      <div class="progress-fill" id="statusBar"></div>
+    </div>
+    <div class="counter-display" id="indexCounter">1/8</div>
+  </div>
+
+  <div class="screen active" id="gameboard">
+    <div class="hint-box">
+      <span>💡</span>
+      <span id="translationHint">Task: Choose the correct answer</span>
+    </div>
+    <div class="image-container" id="imageBox">
+      <img src="" id="taskImage" alt="Context Image">
+    </div>
+    <div class="question-sentence" id="sentencePrompt">
+      Loading item...
+    </div>
+    <div class="options-stack" id="buttonGrid"></div>
+  </div>
+
+  <div class="screen" id="summaryBoard">
+    <div class="finish-layout">
+      <div class="award-icon" id="badgeIcon">🏆</div>
+      <div class="finish-title" id="performanceTitle">Quiz Complete!</div>
+      <div class="finish-score" id="scoreOverview">Your score: 0/8</div>
+      <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+      <button class="action-trigger" id="resetAction">Start Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ================================================================
+  //  CONFIGURATION & RESULTS TRACKING
+  // ================================================================
+  const TEST_NAME = "Road Safety & Word Order Challenge (8 Questions)";
+  let userMistakes = [];
+  let currentStep = 0;
+  let score = 0;
+  let inputLocked = false;
+
+  // Data expanded to 8 questions
+  const quizData = [
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://media.kasperskycontenthub.com/wp-content/uploads/sites/20/2016/02/06234824/ferrari-f1-2016-livigno-italy-6-2-960x600.jpg",
+      en: "The car is turning left on a <span class='blank-space'>______</span>", 
+      correct: "cold mountain with much snow", 
+      pool: ["He has and wears a crash", "He is driving and looking", "A traffic warden works outside"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://yandex-images.clstorage.net/5de61sT29/94f9cbVQU/UraZm-rBdDptYkDZ2gE6TjOiC64RDVO0HBE82jg4yAQoE931HwqibROGv0kl-V7WpwTecEyeCiO3WzgIV51cfR-r3JqPyA0mbXYR9fMxUn5z9zvbHVhb0AwMWOttiDiV6cslXIr_b4G6p_9keKx-vvdVboQUXxN2xw8JdDecyXi-hsWjKsG1MlWyZSkKAaZmDw_7Bl2YWx3UnfGOASh8tf0TDSwOR1cFCktb6OAQSxYbRT5VMIuDZk9DsXy_7C2IksqZ_865Fdo5osHtAp1CPu-P05Kp4FtVoJVFjjnk3BnN91V80n_n-Tp7VwgwlLNe22XSRQgv61KTg7nIt7R9NLJmxX-K1XXm5VK1qY4BnkbDn5teUXTfwTQRdWIxoOTRLf9dbCZzx00ey1tsRKALEhsJok1IL2dWRz-RDK-krXACDg17Ik1xMsHi2bl64UoWQ6cnth1MQ728pbEGNcD4oS0fZYTiTz8Flmd3fFgAz957ERYpQDc7yoPz6Yxz5Kmwjj6Bnzo13aYJ0inxOg2adgv3j16ZOFOtWCWp9ulErAlph4XQou9H8UpzKwy0_LO-i2ne8YDX27qb9500lzRBEOY6hftOjVmi6ZLtQVpZamaHm2_O1dgPzWypSYIdcEDx8ccBVCY7k_XS61tY2CzfOv-5IilYQ_tWZ2N9OOeUiXz6XtF7DhnRagXWRW2Szc6Gq3_3ph24c8VMUbVm8exYQaUrlchaa5NpLiM32Kx4P6I32frBdIubrpsLmQifqH2AioZVIwbtYaqVItlZHjky_gP__7KBACe1uP0RTkXg9D3BE4EA_gvL7Y7vYwBMIIe622GGOSAf87ZDc6EAo6DxuG7KQUNaLem2nZbV8TZNCobrT7s-zTQPTQgJaUatOGSJCWNlUIKPI23Cc_80WLAPLt891p3U58uiF2cJ2MMkRQj2Wk3vBhWNxvUSMfniMdqKt6MLTk1IOxW0IUnqKdgc",
+      en: "<span class='blank-space'>______</span> helmet to be safe when it's racing time.", 
+      correct: "He has and wears a crash", 
+      pool: ["The car is turning right on a", "He is driving and looking", "A traffic warden works outside"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://i0.wp.com/boingboing.net/wp-content/uploads/2022/07/Screen-Shot-2022-07-26-at-9.21.47-AM-1.png?fit=1200%2C767&ssl=1",
+      en: "<span class='blank-space'>______</span> at the yellow lines to see problems.", 
+      correct: "He is driving and looking", 
+      pool: ["The car is turning right on a", "He has and wears a crash", "A traffic warden works outside"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://avatars.mds.yandex.net/i?id=17d39ae046ba7f393138d0cf5b53f1ab_l-4026732-images-thumbs&n=13",
+      en: "<span class='blank-space'>______</span> to make roads safe all the time.", 
+      correct: "A traffic warden works outside", 
+      pool: ["The car is turning right on a", "He has and wears a crash", "He is driving and looking"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://i.pinimg.com/736x/bf/08/63/bf086376b3cc833d90eaf15afb97213f.jpg",
+      en: "You must stop when the traffic light is <span class='blank-space'>______</span>.", 
+      correct: "red", 
+      pool: ["green", "blue", "yellow"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://ae-pic-a1.aliexpress-media.com/kf/Sff94b2021332474dab423072a6359f27E.png",
+      en: "Cyclists should always wear a <span class='blank-space'>______</span> on their head.", 
+      correct: "helmet", 
+      pool: ["seatbelt", "hat", "cap"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://thumbs.dreamstime.com/b/two-businessmen-crossing-road-african-american-businessman-caucasian-businessman-78608899.jpg",
+      en: "Before crossing the road, you should look <span class='blank-space'>______</span> and left.", 
+      correct: "right", 
+      pool: ["down", "up", "behind"] 
+    },
+    { 
+      hint: "Task: Complete the sentence logically", 
+      img: "https://cdn-storage-media.tass.ru/resize/1312x868/tass_media/2026/05/24/j/1779659076450287_jOk0cdao.jpg",
+      en: "Drivers must not use their <span class='blank-space'>______</span> while driving.", 
+      correct: "mobile phones", 
+      pool: ["seatbelts", "soft tires", " traffic lights"] 
+    }
+  ];
+
+  // ================================================================
+  //  GAME LOGIC
+  // ================================================================
+  function initGame() {
+    currentStep = 0;
+    score = 0;
+    inputLocked = false;
+    userMistakes = [];
+    document.getElementById('gameboard').classList.add('active');
+    document.getElementById('summaryBoard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'flex';
+    document.getElementById('success-msg').style.display = 'none';
+    loadTask();
+  }
+
+  function loadTask() {
+    if (currentStep >= quizData.length) {
+      showResults();
+      return;
+    }
+
+    inputLocked = false;
+    const task = quizData[currentStep];
+
+    document.getElementById('indexCounter').innerText = `${currentStep + 1}/${quizData.length}`;
+    const percent = (currentStep / quizData.length) * 100;
+    document.getElementById('statusBar').style.width = `${percent}%`;
+
+    document.getElementById('translationHint').innerText = task.hint;
+    document.getElementById('sentencePrompt').innerHTML = task.en;
+    
+    // Load the image
+    document.getElementById('taskImage').src = task.img;
+
+    const allOptions = [task.correct, ...task.pool].sort(() => Math.random() - 0.5);
+    const grid = document.getElementById('buttonGrid');
+    grid.innerHTML = '';
+    allOptions.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.addEventListener('click', () => checkAnswer(opt, btn));
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedText, btn) {
+    if (inputLocked) return;
+    inputLocked = true;
+
+    const task = quizData[currentStep];
+    const correct = task.correct;
+    const allBtns = document.querySelectorAll('#buttonGrid .option-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    const isCorrect = selectedText === correct;
+    if (isCorrect) {
+      btn.classList.add('state-correct');
+      score++;
+    } else {
+      btn.classList.add('state-incorrect');
+      
+      // Track the wrong word
+      if (!userMistakes.includes(selectedText)) {
+        userMistakes.push(selectedText);
+      }
+
+      allBtns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('state-correct');
+      });
+    }
+
+    document.getElementById('statusBar').style.width = `${((currentStep + 1) / quizData.length) * 100}%`;
+
+    setTimeout(() => {
+      currentStep++;
+      loadTask();
+    }, 1500);
+  }
+
+  // ================================================================
+  //  RESULTS & GOOGLE SHEETS
+  // ================================================================
+  function showResults() {
+    document.getElementById('gameboard').classList.remove('active');
+    document.getElementById('summaryBoard').classList.add('active');
+    document.getElementById('statusBar').style.width = '100%';
+    document.getElementById('scoreOverview').innerText = `Your score: ${score}/${quizData.length}`;
+
+    let title = 'Quiz Complete!';
+    let icon = '🏆';
+    if (score === quizData.length) {
+      title = 'Perfect Score! 👑';
+      icon = '🏁';
+    } else if (score >= 5) {
+      title = 'Great Effort! 🏎️';
+      icon = '🏅';
+    } else {
+      title = 'Keep Practicing! 🔧';
+      icon = '⚙️';
+    }
+    document.getElementById('performanceTitle').innerText = title;
+    document.getElementById('badgeIcon').innerText = icon;
+
+    sendResultsToGoogle();
+  }
+
+  async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+      name: TEST_NAME,
+      score: score,
+      total: quizData.length,
+      mistakes: userMistakes.join(', ')
+    });
+
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      
+      // Show success message
+      const msgEl = document.getElementById('success-msg');
+      if (msgEl) msgEl.style.display = 'block';
+    } catch (error) {
+      console.error("Error sending results:", error);
+    }
+  }
+
+  document.getElementById('resetAction').addEventListener('click', initGame);
+  window.addEventListener('DOMContentLoaded', initGame);
+</script>
+
+</body>
+</html>

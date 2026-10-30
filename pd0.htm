@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Road Safety & Emoji Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Raleway:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --f1-red: #e10600;
+    --f1-dark: #15151e;
+    --f1-carbon: #2d2d35;
+    --f1-neon-green: #00ff66;
+    --f1-gold: #f1c40f;
+    --f1-blue: #00b4d8;
+    --f1-border: #3d3d4e;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--f1-dark);
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(225,6,0,0.15) 0%, transparent 45%),
+      radial-gradient(circle at 80% 80%, rgba(0,255,102,0.08) 0%, transparent 45%);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+
+  .quiz-wrapper::before {
+    content: "";
+    display: block;
+    height: 12px;
+    background-image: linear-gradient(45deg, #fff 25%, transparent 25%),
+                      linear-gradient(-45deg, #fff 25%, transparent 25%),
+                      linear-gradient(45deg, transparent 75%, #fff 75%),
+                      linear-gradient(-45deg, transparent 75%, #fff 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #000;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 15px;
+    opacity: 0.8;
+  }
+
+  .quiz-wrapper {
+    background: rgba(30, 30, 40, 0.92);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 600px;
+    border: 3px solid var(--f1-red);
+    border-radius: 20px;
+    padding: 24px 24px 28px;
+    box-shadow: 0 0 30px rgba(225,6,0,0.3), inset 0 0 20px rgba(0,0,0,0.5);
+    margin-top: 15px;
+    position: relative;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .progress-track {
+    flex-grow: 1;
+    height: 14px;
+    background-color: var(--f1-carbon);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--f1-border);
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--f1-red), #ff5e3a);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(225,6,0,0.5);
+  }
+
+  .counter-display {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--f1-gold);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+  }
+
+  .screen {
+    display: none;
+    animation: slideUpFade 0.4s ease forwards;
+  }
+
+  .screen.active {
+    display: block;
+  }
+
+  @keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hint-box {
+    background: rgba(0,180,216,0.15);
+    border: 2px solid var(--f1-blue);
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #aee6f5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 20px;
+    border-radius: 14px;
+    border: 2px solid var(--f1-red);
+    overflow: hidden;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.9;
+  }
+  
+  /* Replaced Word Search grid with Emoji Clue box */
+  .emoji-clue-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.5rem;
+    background: linear-gradient(145deg, #1a1a24, #252530);
+    border: 2px dashed var(--f1-gold);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(241,196,15,0.1);
+  }
+
+  .question-sentence {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    color: #ffffff;
+    text-align: left;
+  }
+
+  .blank-space {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--f1-gold);
+    text-align: center;
+    color: var(--f1-gold);
+    padding: 0 4px;
+  }
+
+  .options-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 5px;
+  }
+
+  .option-btn {
+    background: #252530;
+    border: 2px solid var(--f1-border);
+    border-bottom: 4px solid #1a1a24;
+    border-radius: 14px;
+    padding: 16px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f0f0f0;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s, transform 0.1s, border-color 0.1s;
+    user-select: none;
+    outline: none;
+  }
+
+  .option-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  .option-btn.state-correct {
+    background: rgba(0,255,102,0.15) !important;
+    border-color: var(--f1-neon-green) !important;
+    border-bottom-color: #00b84c !important;
+    color: #d0ffdd !important;
+    box-shadow: 0 0 20px rgba(0,255,102,0.3);
+  }
+
+  .option-btn.state-incorrect {
+    background: rgba(241,196,15,0.15) !important;
+    border-color: var(--f1-gold) !important;
+    border-bottom-color: #b38a2a !important;
+    color: #ffe08a !important;
+  }
+
+  .finish-layout {
+    text-align: center;
+    padding: 15px 0;
+  }
+
+  .award-icon {
+    font-size: 5.5rem;
+    margin-bottom: 15px;
+    animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes scalePop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .finish-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--f1-gold);
+    margin-bottom: 12px;
+    text-shadow: 0 2px 0 #b38a2a;
+    letter-spacing: 1px;
+  }
+
+  .finish-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #cccccc;
+    margin-bottom: 25px;
+  }
+
+  .success-msg {
+    color: var(--f1-neon-green);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    display: none;
+    background: rgba(0,255,102,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid var(--f1-neon-green);
+  }
+
+  .action-trigger {
+    width: 100%;
+    background-color: var(--f1-red);
+    border: none;
+    border-bottom: 4px solid #990400;
+    border-radius: 14px;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .action-trigger:active {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+
+  @media (max-width: 480px) {
+    body { padding: 10px 5px; }
+    .quiz-wrapper { border-radius: 16px; padding: 18px; }
+    .question-sentence { font-size: 1.1rem; }
+    .option-btn { font-size: 1rem; padding: 14px; }
+    .image-container { height: 140px; }
+    .emoji-clue-box { font-size: 3.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrapper" id="masterContainer">
+  <div class="quiz-header" id="trackerHeader">
+    <div class="progress-track">
+      <div class="progress-fill" id="statusBar"></div>
+    </div>
+    <div class="counter-display" id="indexCounter">1/6</div>
+  </div>
+
+  <div class="screen active" id="gameboard">
+    <div class="hint-box">
+      <span>💡</span>
+      <span id="translationHint">Task: Choose the correct answer</span>
+    </div>
+    
+    <!-- Image for picture matching -->
+    <div class="image-container" id="imageBox" style="display: none;">
+      <img src="" id="taskImage" alt="Context">
+    </div>
+    
+    <!-- Emoji clue box for word search replacement -->
+    <div class="emoji-clue-box" id="emojiBox" style="display: none;">
+      Loading emoji...
+    </div>
+
+    <div class="question-sentence" id="sentencePrompt">
+      Loading item...
+    </div>
+    
+    <div class="options-stack" id="buttonGrid">
+      <!-- Options rendered dynamically -->
+    </div>
+  </div>
+
+  <div class="screen" id="summaryBoard">
+    <div class="finish-layout">
+      <div class="award-icon" id="badgeIcon">🏆</div>
+      <div class="finish-title" id="performanceTitle">Mission Complete!</div>
+      <div class="finish-score" id="scoreOverview">Your score: 0/6</div>
+      <p class="success-msg" id="success-msg">Results sent successfully! ✅</p>
+      <button class="action-trigger" id="resetAction">Start Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ================================================================
+  //  CONFIGURATION & RESULTS TRACKING
+  // ================================================================
+  const TEST_NAME = "Road Safety & Emoji Challenge";
+  let userMistakes = [];
+  let currentStep = 0;
+  let score = 0;
+  let inputLocked = false;
+
+  // Data from the image, converted to emoji clues
+  const quizData = [
+    // --- Word Search Sentences (Emoji version) ---
+    { 
+      type: "emoji",
+      hint: "Word Clue: Complete the rule", 
+      emoji: "🚶‍♂️🛣️",
+      en: "You can't ride bikes on the <span class='blank-space'>______</span> only walk.", 
+      correct: "pavement", 
+      pool: ["road", "traffic warden", "seatbelt"] 
+    },
+    { 
+      type: "emoji",
+      hint: "Word Clue: Complete the rule", 
+      emoji: "🔒🚗💥",
+      en: "You must wear a <span class='blank-space'>______</span> in a car.", 
+      correct: "seatbelt", 
+      pool: ["helmet", "pavement", "sign"] 
+    },
+    { 
+      type: "emoji",
+      hint: "Word Clue: Complete the rule", 
+      emoji: "🚫🦓🚦",
+      en: "You can't cross the <span class='blank-space'>______</span> it's not safe.", 
+      correct: "road", 
+      pool: ["sign", "zebra crossing", "seatbelt"] 
+    },
+    // --- Picture Matching ---
+    { 
+      type: "image",
+      hint: "Picture Match: Look at the photo.", 
+      img: "https://i2-prod.nottinghampost.com/article8684588.ece/ALTERNATES/s1200f/0_GettyImages-985025192.jpg",
+      en: "What do you see in the first picture?", 
+      correct: "It is a traffic warden.", 
+      pool: ["You can drive now", "He is driving very dangerous"] 
+    },
+    { 
+      type: "image",
+      hint: "Picture Match: Look at the photo.", 
+      img: "https://i.pinimg.com/736x/5e/9b/80/5e9b8085793d3cbc875d18e381f61b5d.jpg",
+      en: "What do you see in the second picture?", 
+      correct: "It is safe to walk.", 
+      pool: ["You can't go straight now", "You can drive now"] 
+    },
+    { 
+      type: "image",
+      hint: "Picture Match: Look at the photo.", 
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Korean_Traffic_sign_%28No_Straight%29.svg/1280px-Korean_Traffic_sign_%28No_Straight%29.svg.png",
+      en: "What do you see in the third picture?", 
+      correct: "You can't go straight now.", 
+      pool: ["It is a pavement", "It is safe to walk"] 
+    }
+  ];
+
+  // ================================================================
+  //  GAME LOGIC
+  // ================================================================
+  function initGame() {
+    currentStep = 0;
+    score = 0;
+    inputLocked = false;
+    userMistakes = [];
+    document.getElementById('gameboard').classList.add('active');
+    document.getElementById('summaryBoard').classList.remove('active');
+    document.getElementById('trackerHeader').style.display = 'flex';
+    document.getElementById('success-msg').style.display = 'none';
+    loadTask();
+  }
+
+  function loadTask() {
+    if (currentStep >= quizData.length) {
+      showResults();
+      return;
+    }
+
+    inputLocked = false;
+    const task = quizData[currentStep];
+
+    // Update Header
+    document.getElementById('indexCounter').innerText = `${currentStep + 1}/${quizData.length}`;
+    document.getElementById('statusBar').style.width = `${(currentStep / quizData.length) * 100}%`;
+
+    // Update Hint & Sentence
+    document.getElementById('translationHint').innerText = task.hint;
+    document.getElementById('sentencePrompt').innerHTML = task.en;
+
+    // Toggle Image vs Emoji Box
+    const imgBox = document.getElementById('imageBox');
+    const emojiBox = document.getElementById('emojiBox');
+
+    if (task.type === 'image') {
+      imgBox.style.display = 'flex';
+      emojiBox.style.display = 'none';
+      document.getElementById('taskImage').src = task.img;
+    } else {
+      imgBox.style.display = 'none';
+      emojiBox.style.display = 'flex';
+      emojiBox.innerText = task.emoji;
+    }
+
+    // Render Options
+    const grid = document.getElementById('buttonGrid');
+    grid.innerHTML = '';
+    
+    // Shuffle options
+    const allOptions = [task.correct, ...task.pool].sort(() => Math.random() - 0.5);
+    
+    allOptions.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerText = opt;
+      btn.onclick = () => checkAnswer(opt, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  function checkAnswer(selectedText, btn) {
+    if (inputLocked) return;
+    inputLocked = true;
+
+    const task = quizData[currentStep];
+    const correct = task.correct;
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    if (selectedText === correct) {
+      btn.classList.add('state-correct');
+      score++;
+    } else {
+      btn.classList.add('state-incorrect');
+      
+      // Track the wrong word
+      if (!userMistakes.includes(selectedText)) {
+        userMistakes.push(selectedText);
+      }
+
+      // Highlight correct
+      allBtns.forEach(b => {
+        if (b.innerText === correct) b.classList.add('state-correct');
+      });
+    }
+
+    document.getElementById('statusBar').style.width = `${((currentStep + 1) / quizData.length) * 100}%`;
+
+    setTimeout(() => {
+      currentStep++;
+      loadTask();
+    }, 1500);
+  }
+
+  // ================================================================
+  //  RESULTS & GOOGLE SHEETS
+  // ================================================================
+  function showResults() {
+    document.getElementById('gameboard').classList.remove('active');
+    document.getElementById('summaryBoard').classList.add('active');
+    document.getElementById('statusBar').style.width = '100%';
+    document.getElementById('scoreOverview').innerText = `Your score: ${score}/${quizData.length}`;
+
+    let title = 'Mission Complete!';
+    let icon = '🏆';
+    if (score === quizData.length) {
+      title = 'Perfect Score! 👑';
+      icon = '🏁';
+    } else if (score >= 4) {
+      title = 'Great Job! 🏎️';
+      icon = '🏅';
+    } else {
+      title = 'Keep Practicing! 🔧';
+      icon = '⚙️';
+    }
+    document.getElementById('performanceTitle').innerText = title;
+    document.getElementById('badgeIcon').innerText = icon;
+
+    sendResultsToGoogle();
+  }
+
+  async function sendResultsToGoogle() {
+    const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+    
+    const params = new URLSearchParams({
+      name: TEST_NAME,
+      score: score,
+      total: quizData.length,
+      mistakes: userMistakes.join(', ')
+    });
+
+    try {
+      await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+      
+      // Show success message
+      const msgEl = document.getElementById('success-msg');
+      if (msgEl) msgEl.style.display = 'block';
+    } catch (error) {
+      console.error("Error sending results:", error);
+    }
+  }
+
+  document.getElementById('resetAction').addEventListener('click', initGame);
+  window.addEventListener('DOMContentLoaded', initGame);
+</script>
+
+</body>
+</html>
