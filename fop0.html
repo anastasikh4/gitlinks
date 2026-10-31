@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary: Word List & Unscramble</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #f7f7f7;
+    color: #3c3c3c;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    max-width: 640px;
+    width: 100%;
+    background: #fff;
+    border-radius: 16px;
+    border: 2px solid #e5e5e5;
+    padding: 28px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  }
+  .progress-container {
+    height: 14px;
+    background: #e5e5e5;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #ce82ff;
+    border-radius: 8px;
+    transition: width 0.35s ease;
+  }
+  .mode-label {
+    font-size: 13px;
+    font-weight: 900;
+    color: #ce82ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .question-number {
+    font-size: 13px;
+    color: #afafaf;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .prompt {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .hint {
+    font-size: 16px;
+    color: #888;
+    margin-bottom: 18px;
+    font-style: italic;
+  }
+  .slide { display: none; animation: fadeIn 0.3s ease; }
+  .slide.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Word List Styles */
+  .word-list-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .word-item {
+    background: #f0f9ff;
+    border: 2px solid #e3f4ff;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1cb0f6;
+    text-align: center;
+  }
+  .word-item span {
+    display: block;
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  /* Unscramble Styles */
+  .highlight {
+    display: block;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: #1cb0f6;
+    letter-spacing: 8px;
+    margin: 20px 0;
+    text-transform: uppercase;
+  }
+  .input-group { margin-bottom: 16px; }
+  input[type="text"] {
+    width: 100%;
+    padding: 16px;
+    font-size: 24px;
+    font-family: inherit;
+    font-weight: 900;
+    text-align: center;
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    outline: none;
+    letter-spacing: 2px;
+    text-transform: lowercase;
+  }
+  input[type="text"]:focus { border-color: #1cb0f6; }
+  input:not(:placeholder-shown):valid {
+    border-color: #58cc02;
+    background: #e8f5e9;
+    color: #58cc02;
+  }
+  input:not(:placeholder-shown):invalid {
+    border-color: #ea2b2b;
+    background: #ffebee;
+    color: #ea2b2b;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 900;
+    font-family: inherit;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+    background: #58cc02;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #46a302;
+    margin-top: 8px;
+  }
+  .action-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #46a302; }
+  .action-btn:disabled {
+    background: #e5e5e5;
+    color: #afafaf;
+    box-shadow: 0 4px 0 #d1d1d1;
+    cursor: not-allowed;
+  }
+
+  .end-screen { text-align: center; padding: 30px 10px; }
+  .end-screen h2 { color: #ce82ff; font-size: 30px; margin-bottom: 10px; }
+  .end-screen p { font-size: 18px; color: #666; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="progress-container">
+    <div class="progress-fill" id="progressBar"></div>
+  </div>
+
+  <form onsubmit="event.preventDefault();">
+
+    <!-- 0. WORD LIST -->
+    <div class="slide active" id="slide-0">
+      <div class="mode-label">Study</div>
+      <div class="prompt">Vocabulary Word List</div>
+      <div class="hint">Read the words and emojis carefully before you start.</div>
+      
+      <div class="word-list-grid">
+        <div class="word-item"><span>💡</span> inspired</div>
+        <div class="word-item"><span>🌟</span> extraordinary</div>
+        <div class="word-item"><span>🧩</span> solve</div>
+        <div class="word-item"><span>🕵️</span> mysterious</div>
+        <div class="word-item"><span>📁</span> case</div>
+        <div class="word-item"><span>🐕</span> faithful</div>
+        <div class="word-item"><span>🧠</span> intelligent</div>
+        <div class="word-item"><span>🦸‍♂️</span> cape</div>
+        <div class="word-item"><span>🔍</span> magnifying glass</div>
+        <div class="word-item"><span>🎨</span> imagination</div>
+        <div class="word-item"><span>🔢</span> several</div>
+        <div class="word-item"><span>🌊</span> underwater</div>
+        <div class="word-item"><span>🤯</span> obsession</div>
+        <div class="word-item"><span>👤</span> appearance</div>
+        <div class="word-item"><span>🧹</span> neat</div>
+        <div class="word-item"><span>📋</span> order</div>
+        <div class="word-item"><span>🔎</span> investigations</div>
+        <div class="word-item"><span>👀</span> at first glance</div>
+      </div>
+
+      <button type="button" class="action-btn" onclick="startGame()">Continue to Unscramble</button>
+    </div>
+
+    <!-- 1 -->
+    <div class="slide" id="slide-1">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">1 / 20</div>
+      <span class="highlight">T N E A</span>
+      <div class="prompt">Hint: 🧹 Clean and tidy</div>
+      <div class="input-group">
+        <input type="text" id="input1" placeholder="type the word..." pattern="[Nn]eat" oninput="check('input1','btn1')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn1" disabled onclick="goNext(1)">Check</button>
+    </div>
+
+    <!-- 2 -->
+    <div class="slide" id="slide-2">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">2 / 20</div>
+      <span class="highlight">E P A C</span>
+      <div class="prompt">Hint: 🦸‍♂️ Superheroes wear it</div>
+      <div class="input-group">
+        <input type="text" id="input2" placeholder="type the word..." pattern="[Cc]ape" oninput="check('input2','btn2')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn2" disabled onclick="goNext(2)">Check</button>
+    </div>
+
+    <!-- 3 -->
+    <div class="slide" id="slide-3">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">3 / 20</div>
+      <span class="highlight">R E D O</span>
+      <div class="prompt">Hint: 📋 Everything in its place</div>
+      <div class="input-group">
+        <input type="text" id="input3" placeholder="type the word..." pattern="[Oo]rder" oninput="check('input3','btn3')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn3" disabled onclick="goNext(3)">Check</button>
+    </div>
+
+    <!-- 4 -->
+    <div class="slide" id="slide-4">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">4 / 20</div>
+      <span class="highlight">V L O S E</span>
+      <div class="prompt">Hint: 🧩 To find the answer</div>
+      <div class="input-group">
+        <input type="text" id="input4" placeholder="type the word..." pattern="[Ss]olve" oninput="check('input4','btn4')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn4" disabled onclick="goNext(4)">Check</button>
+    </div>
+
+    <!-- 5 -->
+    <div class="slide" id="slide-5">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">5 / 20</div>
+      <span class="highlight">S E V L A R E</span>
+      <div class="prompt">Hint: 🔢 More than two, but not many</div>
+      <div class="input-group">
+        <input type="text" id="input5" placeholder="type the word..." pattern="[Ss]everal" oninput="check('input5','btn5')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn5" disabled onclick="goNext(5)">Check</button>
+    </div>
+
+    <!-- 6 -->
+    <div class="slide" id="slide-6">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">6 / 20</div>
+      <span class="highlight">E D I R P S N I</span>
+      <div class="prompt">Hint: 💡 Motivated to do something</div>
+      <div class="input-group">
+        <input type="text" id="input6" placeholder="type the word..." pattern="[Ii]nspired" oninput="check('input6','btn6')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn6" disabled onclick="goNext(6)">Check</button>
+    </div>
+
+    <!-- 7 -->
+    <div class="slide" id="slide-7">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">7 / 20</div>
+      <span class="highlight">I C E N L I T L E N T</span>
+      <div class="prompt">Hint: 🧠 Smart</div>
+      <div class="input-group">
+        <input type="text" id="input7" placeholder="type the word..." pattern="[Ii]ntelligent" oninput="check('input7','btn7')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn7" disabled onclick="goNext(7)">Check</button>
+    </div>
+
+    <!-- 8 -->
+    <div class="slide" id="slide-8">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">8 / 20</div>
+      <span class="highlight">F L A I T U H</span>
+      <div class="prompt">Hint: 🐕 Loyal</div>
+      <div class="input-group">
+        <input type="text" id="input8" placeholder="type the word..." pattern="[Ff]aithful" oninput="check('input8','btn8')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn8" disabled onclick="goNext(8)">Check</button>
+    </div>
+
+    <!-- 9 -->
+    <div class="slide" id="slide-9">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">9 / 20</div>
+      <span class="highlight">C A N E A R P A P</span>
+      <div class="prompt">Hint: 👤 How someone looks</div>
+      <div class="input-group">
+        <input type="text" id="input9" placeholder="type the word..." pattern="[Aa]ppearance" oninput="check('input9','btn9')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn9" disabled onclick="goNext(9)">Check</button>
+    </div>
+
+    <!-- 10 -->
+    <div class="slide" id="slide-10">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">10 / 20</div>
+      <span class="highlight">E N I T T I G A S V I O N</span>
+      <div class="prompt">Hint: 🔎 Looking for clues</div>
+      <div class="input-group">
+        <input type="text" id="input10" placeholder="type the word..." pattern="[Ii]nvestigations" oninput="check('input10','btn10')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn10" disabled onclick="goNext(10)">Check</button>
+    </div>
+
+    <!-- 11 -->
+    <div class="slide" id="slide-11">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">11 / 20</div>
+      <span class="highlight">R D A Y I N O R T X E Y</span>
+      <div class="prompt">Hint: 🦄 Very special or unusual</div>
+      <div class="input-group">
+        <input type="text" id="input11" placeholder="type the word..." pattern="[Ee]xtraordinary" oninput="check('input11','btn11')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn11" disabled onclick="goNext(11)">Check</button>
+    </div>
+
+    <!-- 12 -->
+    <div class="slide" id="slide-12">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">12 / 20</div>
+      <span class="highlight">E C S A</span>
+      <div class="prompt">Hint: 📁 A mystery to solve</div>
+      <div class="input-group">
+        <input type="text" id="input12" placeholder="type the word..." pattern="[Cc]ase" oninput="check('input12','btn12')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn12" disabled onclick="goNext(12)">Check</button>
+    </div>
+
+    <!-- 13 -->
+    <div class="slide" id="slide-13">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">13 / 20</div>
+      <span class="highlight">G A I T I M A N I O N</span>
+      <div class="prompt">Hint: 🎨 Using your mind to create</div>
+      <div class="input-group">
+        <input type="text" id="input13" placeholder="type the word..." pattern="[Ii]magination" oninput="check('input13','btn13')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn13" disabled onclick="goNext(13)">Check</button>
+    </div>
+
+    <!-- 14 -->
+    <div class="slide" id="slide-14">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">14 / 20</div>
+      <span class="highlight">R U W E N D A T E</span>
+      <div class="prompt">Hint: 🌊 Below the water</div>
+      <div class="input-group">
+        <input type="text" id="input14" placeholder="type the word..." pattern="[Uu]nderwater" oninput="check('input14','btn14')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn14" disabled onclick="goNext(14)">Check</button>
+    </div>
+
+    <!-- 15 -->
+    <div class="slide" id="slide-15">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">15 / 20</div>
+      <span class="highlight">S I O B S E S N O</span>
+      <div class="prompt">Hint: 🤯 Thinking about one thing all the time</div>
+      <div class="input-group">
+        <input type="text" id="input15" placeholder="type the word..." pattern="[Oo]bsession" oninput="check('input15','btn15')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn15" disabled onclick="goNext(15)">Check</button>
+    </div>
+
+    <!-- 16 -->
+    <div class="slide" id="slide-16">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">16 / 20</div>
+      <span class="highlight">S M Y T I R O U S E</span>
+      <div class="prompt">Hint: 🕵️ Strange and secret</div>
+      <div class="input-group">
+        <input type="text" id="input16" placeholder="type the word..." pattern="[Mm]ysterious" oninput="check('input16','btn16')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn16" disabled onclick="goNext(16)">Check</button>
+    </div>
+
+    <!-- 17 -->
+    <div class="slide" id="slide-17">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">17 / 20</div>
+      <span class="highlight">G A N Y I F I N G S L A S G</span>
+      <div class="prompt">Hint: 🔍 A tool to see small things (2 words)</div>
+      <div class="input-group">
+        <input type="text" id="input17" placeholder="type the phrase..." pattern="[Mm]agnifying glass" oninput="check('input17','btn17')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn17" disabled onclick="goNext(17)">Check</button>
+    </div>
+
+    <!-- 18 -->
+    <div class="slide" id="slide-18">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">18 / 20</div>
+      <span class="highlight">P S Y C H O L O G Y</span>
+      <div class="prompt">Hint: 🧠 The study of the mind</div>
+      <div class="input-group">
+        <input type="text" id="input18" placeholder="type the word..." pattern="[Pp]sychology" oninput="check('input18','btn18')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn18" disabled onclick="goNext(18)">Check</button>
+    </div>
+
+    <!-- 19 -->
+    <div class="slide" id="slide-19">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">19 / 20</div>
+      <span class="highlight">O R I N V E T I G A S</span>
+      <div class="prompt">Hint: 🔎 Plural of looking for clues</div>
+      <div class="input-group">
+        <input type="text" id="input19" placeholder="type the word..." pattern="[Ii]nvestigations" oninput="check('input19','btn19')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn19" disabled onclick="goNext(19)">Check</button>
+    </div>
+
+    <!-- 20 -->
+    <div class="slide" id="slide-20">
+      <div class="mode-label">Unscramble</div>
+      <div class="question-number">20 / 20</div>
+      <span class="highlight">G L A N C E  (F I R S T)</span>
+      <div class="prompt">Hint: 👀 A quick look (3 words)</div>
+      <div class="input-group">
+        <input type="text" id="input20" placeholder="type the phrase..." pattern="[Aa]t first glance" oninput="check('input20','btn20')" autocomplete="off">
+      </div>
+      <button type="button" class="action-btn" id="btn20" disabled onclick="goNext(20)">Check</button>
+    </div>
+
+    <!-- END -->
+    <div class="slide" id="slide-end">
+      <div class="end-screen">
+        <h2>🎉 Unscramble Complete!</h2>
+        <p>You solved all 20 words!</p>
+        <button type="button" class="action-btn" onclick="location.reload()" style="margin-top:20px; background:#ce82ff; box-shadow: 0 4px 0 #a85ed9;">Play again</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  const total = 20;
+
+  // Start the game from the word list
+  function startGame() {
+    document.getElementById('slide-0').classList.remove('active');
+    document.getElementById('slide-1').classList.add('active');
+    updateProgress(0); // Reset progress to 0 for the actual quiz
+  }
+
+  function goNext(current) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    const next = current + 1;
+    
+    if (current === total) {
+      document.getElementById('slide-end').classList.add('active');
+      updateProgress(100);
+    } else {
+      document.getElementById('slide-' + next).classList.add('active');
+      updateProgress((current / total) * 100);
+    }
+  }
+
+  function updateProgress(p) {
+    document.getElementById('progressBar').style.width = p + '%';
+  }
+
+  function check(inputId, btnId) {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    if (input.checkValidity() && input.value.length > 0) {
+      btn.disabled = false;
+    } else {
+      btn.disabled = true;
+    }
+  }
+
+  // Initialize empty progress
+  updateProgress(0);
+</script>
+</body>
+</html>
