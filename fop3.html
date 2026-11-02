@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Starlight: Prefixes & "too" Quest 2 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #14213d 0%, #2a3b5c 50%, #0d1b2a 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            overflow-x: hidden;
+        }
+        .app { max-width: 800px; width: 95%; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { font-family: 'Arial Black', sans-serif; font-size: 2.5em; color: #ffb703; text-shadow: 0 0 15px #ff8c00; margin-bottom: 10px; }
+        
+        .progress-container { width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: #ffb703; width: 0%; border-radius: 10px; transition: width 0.4s; }
+        
+        .stats { display: flex; justify-content: space-between; font-size: 1.5em; margin-bottom: 20px; }
+        .hearts { color: #ff4757; }
+
+        .card { background: rgba(255,255,255,0.07); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 40px; text-align: center; }
+        
+        .question-text { font-size: 1.6em; margin-bottom: 30px; color: #f0f0f0; line-height: 1.6; }
+        .options { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .btn { 
+            padding: 18px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); 
+            border-radius: 20px; cursor: pointer; font-size: 1.1em; font-weight: bold; color: white;
+            transition: 0.3s; font-family: inherit;
+        }
+        .btn:hover { background: rgba(255,255,255,0.2); border-color: #ffb703; transform: scale(1.02); }
+        .btn.correct { background: #00ff88 !important; color: #000; border-color: #00ff88; }
+        .btn.wrong { background: #ff4757 !important; border-color: #ff4757; }
+        .btn:disabled { cursor: not-allowed; opacity: 0.8; }
+
+        .win-screen { display: none; text-align: center; padding: 20px; }
+        .success-msg { color: #00ff88; font-weight: bold; font-size: 1.2em; margin-top: 20px; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="logo">Prefixes Quest 2</div>
+            <div class="progress-container"><div class="progress-fill" id="pFill"></div></div>
+            <div class="stats">
+                <div id="qCounter">Question 1/12</div>
+                <div class="hearts" id="heartBox">❤️❤️❤️</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="question-text" id="qText">...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen">
+        <h1 style="font-size: 4em; color: #ffb703; margin-bottom: 10px;">MISSION COMPLETE!</h1>
+        <p style="font-size: 1.8em; margin-bottom: 15px;">Score: <span id="finalScore"></span></p>
+        <p id="successMsg" class="success-msg">Results sent successfully! ✅</p>
+        <button class="btn" onclick="location.reload()" style="margin-top:30px; padding: 20px 50px; width: 100%; max-width: 300px; margin-left: auto; margin-right: auto;">Play Again</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Prefixes Quiz 2 (A1+) - 12 Questions";
+    let userMistakes = [];
+    let score = 0;
+
+    // New sentences, same prefixes
+    const questions = [
+        { 
+            q: "1. I totally ___ with your idea. It's a bad plan.", 
+            a: ["disagree", "unagree", "misagree"], 
+            c: "disagree" 
+        },
+        { 
+            q: "2. The math test was very hard. I think I ___ the last question.", 
+            a: ["overstood", "misunderstood", "disunderstood"], 
+            c: "misunderstood" 
+        },
+        { 
+            q: "3. This jacket is ___ expensive. I can't buy it.", 
+            a: ["too", "to", "two"], 
+            c: "too" 
+        },
+        { 
+            q: "4. It's not polite to talk with food in your mouth. It's very ___.", 
+            a: ["dispolite", "mispolite", "impolite"], 
+            c: "impolite" // Wait, the rule only had un-, dis-, mis-. Let's use 'unkind' instead.
+        },
+        { 
+            q: "4. It's not polite to talk with food in your mouth. It's very ___.", 
+            a: ["dispolite", "unkind", "mispolite"], 
+            c: "unkind" 
+        },
+        { 
+            q: "5. My phone is ___ 1%. It will turn off soon.", 
+            a: ["undereats", "undercooked", "underage"], 
+            c: "underage" // Wait, I need a better sentence for under-. 
+        },
+        { 
+            q: "5. I didn't study enough for the test. I feel ___.", 
+            a: ["overprepared", "underprepared", "disprepared"], 
+            c: "underprepared" 
+        },
+        { 
+            q: "6. I missed the bus because I ___ the time.", 
+            a: ["misread", "unread", "disread"], 
+            c: "misread" 
+        },
+        { 
+            q: "7. This soup is ___ salty. Add some water.", 
+            a: ["too", "to", "two"], 
+            c: "too" 
+        },
+        { 
+            q: "8. My little brother is very ___. He hides my toys!", 
+            a: ["unfriendly", "disfriendly", "misfriendly"], 
+            c: "unfriendly" 
+        },
+        { 
+            q: "9. The meat is ___. It's still cold in the middle.", 
+            a: ["overcooked", "undercooked", "uncooked"], 
+            c: "undercooked" 
+        },
+        { 
+            q: "10. You work too much! You need to stop ___.", 
+            a: ["underworking", "overworking", "unworking"], 
+            c: "overworking" 
+        },
+        { 
+            q: "11. The weather is very ___. I need an umbrella.", 
+            a: ["unpleasant", "displeasant", "mispleasant"], 
+            c: "unpleasant" 
+        },
+        { 
+            q: "12. I ordered a coffee, but they brought me tea. They made a ___.", 
+            a: ["distake", "mistake", "untake"], 
+            c: "mistake" 
+        }
+    ];
+
+    // Fix the array to exactly 12 questions
+    const finalQuestions = [
+        { 
+            q: "1. I totally ___ with your idea. It's a bad plan.", 
+            a: ["disagree", "unagree", "misagree"], 
+            c: "disagree" 
+        },
+        { 
+            q: "2. The math test was very hard. I think I ___ the last question.", 
+            a: ["overstood", "misunderstood", "disunderstood"], 
+            c: "misunderstood" 
+        },
+        { 
+            q: "3. This jacket is ___ expensive. I can't buy it.", 
+            a: ["too", "to", "two"], 
+            c: "too" 
+        },
+        { 
+            q: "4. It's not nice to talk with food in your mouth. It's very ___.", 
+            a: ["dispolite", "unkind", "mispolite"], 
+            c: "unkind" 
+        },
+        { 
+            q: "5. I didn't study enough for the test. I feel ___.", 
+            a: ["overprepared", "underprepared", "disprepared"], 
+            c: "underprepared" 
+        },
+        { 
+            q: "6. I missed the bus because I ___ the time.", 
+            a: ["misread", "unread", "disread"], 
+            c: "misread" 
+        },
+        { 
+            q: "7. This soup is ___ salty. Add some water.", 
+            a: ["too", "to", "two"], 
+            c: "too" 
+        },
+        { 
+            q: "8. My little brother is very ___. He hides my toys!", 
+            a: ["unfriendly", "disfriendly", "misfriendly"], 
+            c: "unfriendly" 
+        },
+        { 
+            q: "9. The meat is ___. It's still cold in the middle.", 
+            a: ["overcooked", "undercooked", "uncooked"], 
+            c: "undercooked" 
+        },
+        { 
+            q: "10. You work too much! You need to stop ___.", 
+            a: ["underworking", "overworking", "unworking"], 
+            c: "overworking" 
+        },
+        { 
+            q: "11. The weather is very ___. I need an umbrella.", 
+            a: ["unpleasant", "displeasant", "mispleasant"], 
+            c: "unpleasant" 
+        },
+        { 
+            q: "12. I ordered a coffee, but they brought me tea. They made a ___.", 
+            a: ["distake", "mistake", "untake"], 
+            c: "mistake" 
+        }
+    ];
+
+    let current = 0;
+    let lives = 3;
+
+    function load() {
+        if (current >= finalQuestions.length) {
+            showFinalScreen();
+            return;
+        }
+
+        const data = finalQuestions[current];
+        document.getElementById('qText').innerText = data.q;
+        document.getElementById('qCounter').innerText = `Question ${current + 1}/${finalQuestions.length}`;
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        // Shuffle options slightly for replayability
+        const shuffledOptions = [...data.a].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / finalQuestions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+        const correctAnswer = finalQuestions[current].c;
+
+        if (choice === correctAnswer) {
+            btn.classList.add('correct');
+            score++;
+            setTimeout(() => { current++; load(); }, 800);
+        } else {
+            btn.classList.add('wrong');
+            // Track mistake
+            userMistakes.push(choice);
+            
+            // Highlight the correct one
+            document.querySelectorAll('.btn').forEach(b => {
+                if (b.innerText === correctAnswer) b.classList.add('correct');
+            });
+
+            lives--;
+            updateHearts();
+            
+            if (lives <= 0) {
+                setTimeout(() => {
+                    alert("Game Over! Let's try again from the start.");
+                    location.reload();
+                }, 1000);
+            } else {
+                setTimeout(() => { current++; load(); }, 1800);
+            }
+        }
+    }
+
+    function updateHearts() {
+        let h = "";
+        for(let i=0; i<3; i++) h += i < lives ? "❤️" : "🖤";
+        document.getElementById('heartBox').innerText = h;
+    }
+
+    function showFinalScreen() {
+        document.getElementById('pFill').style.width = '100%';
+        document.getElementById('gameUI').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+        
+        document.getElementById('finalScore').innerText = `${score} / ${finalQuestions.length}`;
+        
+        // Send to Google Sheets
+        sendResultsToGoogle();
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: finalQuestions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    load();
+</script>
+
+</body>
+</html>
