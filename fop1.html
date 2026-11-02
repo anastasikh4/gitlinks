@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Superlative Adjectives Quest 🌟</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #E3F2FD 0%, #BBDEFB 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 700px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border: 5px solid #1976D2;
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .title { color: #0D47A1; font-size: 2em; margin-bottom: 10px; }
+        
+        .rule-box {
+            background: #FFF9E6;
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            font-size: 1.05em;
+            color: #444;
+            border-left: 5px solid #FFB300;
+        }
+        .rule-box strong { color: #E65100; font-size: 1.1em; }
+        .rule-box .highlight { background: #FFE0B2; padding: 0 4px; border-radius: 3px; font-weight: 700; color: #E65100;}
+
+        .question-text { font-size: 1.3em; color: #2E7D32; margin-bottom: 20px; font-weight: bold; line-height: 1.5; }
+        .options { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .btn {
+            padding: 15px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            background: #f9f9f9;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .btn:hover { border-color: #1976D2; background: #E3F2FD; }
+        .btn.correct { background: #90EE90 !important; border-color: #2E7D32; }
+        .btn.wrong { background: #FFB6C1 !important; border-color: #DC143C; }
+        .btn:disabled { cursor: not-allowed; }
+
+        .progress-bar {
+            width: 100%; height: 10px; background: #eee;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #1976D2; width: 0%; transition: 0.4s; }
+        
+        .win-screen { display: none; text-align: center; }
+        .emoji { font-size: 4em; margin-bottom: 15px; }
+        
+        .success-msg {
+            color: #2E7D32;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .title { font-size: 1.5em; }
+            .card { padding: 20px; }
+            .question-text { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">🏆 Superlative Adjectives</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div class="rule-box">
+                <strong>📝 Write the sentences using the superlative form of the adjectives.</strong><br>
+                Remember: Short adjectives add <span class="highlight">-est</span> (fast → fastest). Long adjectives use <span class="highlight">the most</span> (intelligent → the most intelligent). Don't forget "the"!
+            </div>
+            
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🌟🏆🌟</div>
+        <h1 style="color: #0D47A1;">TEST COMPLETE!</h1>
+        <p style="font-size: 1.3em; margin: 15px 0;" id="finalScoreText">You scored X out of Y.</p>
+        <button class="btn" onclick="location.reload()" style="padding: 10px 30px; text-align: center; background: #E3F2FD;">Restart Quiz</button>
+        <div class="success-msg" id="successMsg">Results sent successfully! ✅</div>
+    </div>
+</div>
+
+<script>
+    // --- GOOGLE SHEETS INTEGRATION VARIABLES ---
+    const TEST_NAME = "Superlative Adjectives Quiz";
+    let userMistakes = [];
+    let score = 0;
+    
+    // --- QUIZ DATA (9 Questions) ---
+    const questions = [
+        {
+            q: "Mark / intelligent student / in my class",
+            options: [
+                "Mark is the most intelligent student in my class.",
+                "Mark is the intelligentest student in my class.",
+                "Mark is more intelligent student in my class."
+            ],
+            correct: "Mark is the most intelligent student in my class."
+        },
+        {
+            q: "Ice Age 5 / good film / at the cinema / this week",
+            options: [
+                "Ice Age 5 is the goodest film at the cinema this week.",
+                "Ice Age 5 is the best film at the cinema this week.",
+                "Ice Age 5 is the most good film at the cinema this week."
+            ],
+            correct: "Ice Age 5 is the best film at the cinema this week."
+        },
+        {
+            q: "Basketball / exciting sport / I know",
+            options: [
+                "Basketball is the excitingest sport I know.",
+                "Basketball is the most exciting sport I know.",
+                "Basketball is more exciting sport I know."
+            ],
+            correct: "Basketball is the most exciting sport I know."
+        },
+        {
+            q: "My friend, Jack, / funny boy / in our school",
+            options: [
+                "My friend, Jack, is the funniest boy in our school.",
+                "My friend, Jack, is the most funny boy in our school.",
+                "My friend, Jack, is the funnyest boy in our school."
+            ],
+            correct: "My friend, Jack, is the funniest boy in our school."
+        },
+        {
+            q: "This / bad restaurant / in the city",
+            options: [
+                "This is the baddest restaurant in the city.",
+                "This is the worst restaurant in the city.",
+                "This is the most bad restaurant in the city."
+            ],
+            correct: "This is the worst restaurant in the city."
+        },
+        {
+            q: "Sarah / beautiful girl / in our class",
+            options: [
+                "Sarah is the beautifulest girl in our class.",
+                "Sarah is the most beautiful girl in our class.",
+                "Sarah is more beautiful girl in our class."
+            ],
+            correct: "Sarah is the most beautiful girl in our class."
+        },
+        {
+            q: "The cheetah / fast animal / on Earth",
+            options: [
+                "The cheetah is the most fast animal on Earth.",
+                "The cheetah is the fastest animal on Earth.",
+                "The cheetah is the faster animal on Earth."
+            ],
+            correct: "The cheetah is the fastest animal on Earth."
+        },
+        {
+            q: "My grandma / kind person / I know",
+            options: [
+                "My grandma is the kindest person I know.",
+                "My grandma is the most kind person I know.",
+                "My grandma is the kinder person I know."
+            ],
+            correct: "My grandma is the kindest person I know."
+        },
+        {
+            q: "That hotel / expensive / in the town",
+            options: [
+                "That hotel is the expensivest in the town.",
+                "That hotel is the most expensive in the town.",
+                "That hotel is more expensive in the town."
+            ],
+            correct: "That hotel is the most expensive in the town."
+        }
+    ];
+
+    let current = 0;
+
+    // --- QUIZ LOGIC ---
+    function load() {
+        if (current >= questions.length) {
+            showResults();
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('qText').innerText = (current + 1) + ". " + data.q;
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        // Shuffle options for variety
+        const shuffledOptions = [...data.options].sort(() => Math.random() - 0.5);
+        
+        shuffledOptions.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        // Disable all buttons to prevent multiple clicks
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+
+        if (choice === questions[current].correct) {
+            btn.classList.add('correct');
+            score++;
+            setTimeout(() => { current++; load(); }, 1000);
+        } else {
+            btn.classList.add('wrong');
+            
+            // Highlight the correct answer
+            document.querySelectorAll('.btn').forEach(b => {
+                if (b.innerText === questions[current].correct) {
+                    b.classList.add('correct');
+                }
+            });
+
+            // Add wrong choice to mistakes array
+            userMistakes.push(choice);
+
+            setTimeout(() => { current++; load(); }, 2000);
+        }
+    }
+
+    // --- RESULTS & GOOGLE SHEETS SENDING ---
+    function showResults() {
+        document.getElementById('pFill').style.width = '100%';
+        document.getElementById('gameUI').style.display = 'none';
+        document.getElementById('winScreen').style.display = 'block';
+        
+        document.getElementById('finalScoreText').innerText = `You scored ${score} out of ${questions.length}.`;
+
+        // Call the function to send data
+        sendResultsToGoogle();
+    }
+
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        // Prepare data
+        const params = new URLSearchParams();
+        params.append('name', TEST_NAME);
+        params.append('score', score);
+        params.append('total', questions.length);
+        params.append('mistakes', userMistakes.join(', '));
+
+        // Send data using fetch with no-cors
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+        .then(() => {
+            document.getElementById('successMsg').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error sending results:', error);
+        });
+    }
+
+    // Start the quiz
+    load();
+</script>
+
+</body>
+</html>

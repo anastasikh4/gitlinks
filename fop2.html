@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparative Detective Agency</title>
+    <style>
+        :root {
+            --detective-blue: #2c3e50;
+            --clue-yellow: #f1c40f;
+            --danger-red: #e74c3c;
+            --solve-green: #27ae60;
+            --folder-tan: #fdf5e6;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a252f;
+            color: #333;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #case-file {
+            background-color: var(--folder-tan);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+            border-left: 20px solid #d35400;
+        }
+
+        .header { border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .lvl-stamp { background: var(--danger-red); color: white; padding: 5px 10px; transform: rotate(-3deg); font-weight: bold; font-size: 0.8rem; }
+        
+        /* LEVEL 0: MEMORY CARDS */
+        .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; perspective: 1000px; }
+        .card { height: 100px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+        .card.flipped { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 2px solid #333; font-size: 0.85rem; text-align: center; padding: 5px; box-sizing: border-box; }
+        .card-front { background: var(--detective-blue); color: white; }
+        .card-back { background: white; transform: rotateY(180deg); flex-direction: column; font-weight: bold; }
+        .card-back span { font-size: 2rem; margin-bottom: 5px; }
+
+        /* GENERAL STYLES */
+        .evidence-box { background: white; border: 2px solid #ddd; padding: 20px; margin: 20px 0; text-align: center; }
+        .emoji-clue { font-size: 5rem; display: block; margin-bottom: 10px; }
+        .word-hint { font-size: 1.8rem; font-weight: bold; text-transform: uppercase; color: var(--detective-blue); }
+        .sentence-text { font-size: 1.2rem; line-height: 1.6; font-weight: bold; color: var(--detective-blue); margin-bottom: 10px; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .detective-btn { background: var(--detective-blue); color: white; border: none; padding: 15px; font-size: 1.1rem; cursor: pointer; border-radius: 4px; font-family: inherit; transition: 0.2s; }
+        .detective-btn:hover { background: #34495e; }
+        
+        .code-display { font-size: 2.5rem; letter-spacing: 10px; border-bottom: 3px solid #333; margin-bottom: 20px; display: inline-block; }
+        .letter-btn { background: var(--clue-yellow); border: 2px solid #333; width: 50px; height: 50px; font-size: 1.5rem; margin: 4px; cursor: pointer; font-weight: bold; }
+
+        .hidden { display: none; }
+        .progress-container { height: 8px; background: #ddd; margin-top: 20px; border-radius: 4px; overflow: hidden; }
+        #fill { height: 100%; background: var(--solve-green); width: 0%; transition: 0.3s; }
+        
+        .correct { background: var(--solve-green) !important; animation: pop 0.4s; }
+        .wrong { background: var(--danger-red) !important; }
+        @keyframes pop { 50% { transform: scale(1.1); } }
+
+        .success-msg { color: var(--solve-green); font-weight: bold; margin-top: 20px; font-size: 1.1rem; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="case-file">
+    <div class="header">
+        <div id="lvl-tag" class="lvl-stamp">LEVEL 0: MEMORY</div>
+        <div style="font-weight: bold;">SOLVED: <span id="score">0</span></div>
+    </div>
+
+    <!-- LEVEL 0: MEMORY GAME (4 Pairs) -->
+    <div id="lvl0" class="screen">
+        <p style="text-align:center;"><strong>MISSION:</strong> Match the base adjective to its comparative form!</p>
+        <div id="memory-grid" class="memory-grid"></div>
+    </div>
+
+    <!-- LEVEL 1: IDENTIFY (Sentence Fill) -->
+    <div id="lvl1" class="screen hidden">
+        <p><strong>MISSION:</strong> Complete the sentence about Harry!</p>
+        <div class="evidence-box">
+            <span id="l1-emoji" class="emoji-clue">👦</span>
+            <div id="l1-sentence" class="sentence-text">Sentence...</div>
+        </div>
+        <div id="l1-btns" class="options-grid"></div>
+    </div>
+
+    <!-- LEVEL 2: PHOTO RECOGNITION -->
+    <div id="lvl2" class="hidden">
+        <p><strong>MISSION:</strong> Look at the evidence and complete the sentence about George!</p>
+        <div class="evidence-box">
+            <span id="l2-emoji" class="emoji-clue">🤣</span>
+            <div id="l2-sentence" class="sentence-text">Sentence...</div>
+        </div>
+        <div id="l2-btns" class="options-grid"></div>
+    </div>
+
+    <!-- LEVEL 3: SECRET CODES (Typing comparative) -->
+    <div id="lvl3" class="hidden">
+        <p><strong>MISSION:</strong> Type the correct comparative code!</p>
+        <div class="evidence-box">
+            <span id="l3-emoji" class="emoji-clue">🏃‍♂️</span>
+            <div id="l3-sentence" class="sentence-text">Sentence...</div>
+            <div id="l3-display" class="code-display">____</div>
+            <div id="l3-letters" style="display: flex; flex-wrap: wrap; justify-content: center;"></div>
+        </div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div id="win" class="hidden" style="text-align: center;">
+        <h1 style="font-size: 4rem;">🕵️‍♂️</h1>
+        <h2>MISSION ACCOMPLISHED!</h2>
+        <p>Case closed. You are a Master Detective.</p>
+        <p style="font-size: 1.2rem; font-weight: bold; margin-top: 15px;">Score: <span id="final-score"></span></p>
+        
+        <div class="success-msg" id="successMsg">Results sent successfully! ✅</div>
+        
+        <button class="detective-btn" onclick="location.reload()" style="width: 100%; margin-top: 20px;">RESTART CASE</button>
+    </div>
+
+    <div class="progress-container"><div id="fill"></div></div>
+</div>
+
+<script>
+    // --- GOOGLE SHEETS INTEGRATION VARIABLES ---
+    const TEST_NAME = "Harry and George Comparatives Detective";
+    let userMistakes = [];
+    let score = 0;
+
+    // --- DATA ---
+    // For Memory (Level 0) - 4 PAIRS
+    const memoryData = [
+        { sing: "young", plur: "younger", emoS: "👶", id: 1 },
+        { sing: "sporty", plur: "sportier", emoS: "⚽", id: 2 },
+        { sing: "good", plur: "better", emoS: "👍", id: 3 },
+        { sing: "funny", plur: "funnier", emoS: "😂", id: 4 }
+    ];
+
+    // Codes Data (Level 3)
+    const codesData = [
+        { sing: "young", plur: "younger", emoS: "👶" },
+        { sing: "sporty", plur: "sportier", emoS: "⚽" },
+        { sing: "good", plur: "better", emoS: "👍" },
+        { sing: "funny", plur: "funnier", emoS: "😂" },
+        { sing: "stylish", plur: "more stylish", emoS: "🕶️" },
+        { sing: "organised", plur: "more organised", emoS: "📁" }
+    ];
+
+    // Questions for Level 1 & 2
+    const questions = [
+        // Level 1
+        { lvl: 1, emoji: "👦", sentence: "Harry is [ _ ] than George.", opts: ["younger", "youngest", "more young"], correct: "younger" },
+        { lvl: 1, emoji: "🎾", sentence: "He's [ _ ] at tennis.", opts: ["gooder", "better", "best"], correct: "better" },
+        { lvl: 1, emoji: "🏃‍♂️", sentence: "He's a [ _ ] runner than George.", opts: ["more fast", "faster", "fastest"], correct: "faster" },
+        { lvl: 1, emoji: "👕", sentence: "His clothes are [ _ ] than his brother's.", opts: ["more stylish", "stylish", "stylishly"], correct: "more stylish" },
+        // Level 2
+        { lvl: 2, emoji: "🤣", sentence: "George is [ _ ] than Harry.", opts: ["funnyer", "more funny", "funnier"], correct: "funnier" },
+        { lvl: 2, emoji: "📁", sentence: "He's also [ _ ].", opts: ["more organised", "most organised", "organised"], correct: "more organised" },
+        { lvl: 2, emoji: "💃", sentence: "He's a [ _ ] dancer than Harry.", opts: ["gooder", "best", "better"], correct: "better" }
+    ];
+
+    let currentLvl = 0;
+    let currentIdx = 0;
+    let l3Input = "";
+    let flippedCards = [];
+    let matchedPairs = 0;
+
+    function initLevel() {
+        updateProgress();
+        if(currentLvl === 0) loadL0();
+        else if(currentLvl === 1) loadL1();
+        else if(currentLvl === 2) loadL2();
+        else if(currentLvl === 3) loadL3();
+    }
+
+    // LEVEL 0: MEMORY (4 Pairs = 8 Cards)
+    function loadL0() {
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        let cardsData = [];
+        memoryData.forEach(item => {
+            cardsData.push({ text: item.sing, emo: item.emoS, id: item.id });
+            cardsData.push({ text: item.plur, emo: item.emoS, id: item.id }); 
+        });
+        cardsData.sort(() => Math.random() - 0.5);
+
+        cardsData.forEach(cardInfo => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-face card-front">TOP SECRET</div>
+                <div class="card-face card-back"><span>${cardInfo.emo}</span>${cardInfo.text}</div>
+            `;
+            card.onclick = () => flipCard(card, cardInfo.id);
+            grid.appendChild(card);
+        });
+    }
+
+    function flipCard(card, id) {
+        if(flippedCards.length < 2 && !card.classList.contains('flipped')) {
+            card.classList.add('flipped');
+            flippedCards.push({ card, id });
+
+            if(flippedCards.length === 2) {
+                if(flippedCards[0].id === flippedCards[1].id) {
+                    matchedPairs++;
+                    score += 5;
+                    flippedCards = [];
+                    if(matchedPairs === 4) setTimeout(nextLevel, 1000);
+                } else {
+                    setTimeout(() => {
+                        flippedCards.forEach(c => c.card.classList.remove('flipped'));
+                        flippedCards = [];
+                    }, 1000);
+                }
+            }
+        }
+        updateProgress();
+    }
+
+    // LEVEL 1 & 2: CHOICE
+    function loadL1() {
+        const item = questions[currentIdx];
+        document.getElementById('l1-emoji').innerText = item.emoji;
+        document.getElementById('l1-sentence').innerText = item.sentence;
+        const box = document.getElementById('l1-btns');
+        box.innerHTML = '';
+        let opts = [...item.opts].sort(() => Math.random() - 0.5);
+        opts.forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = 'detective-btn';
+            btn.innerText = o;
+            btn.onclick = () => checkAnswer(o, item.correct, btn);
+            box.appendChild(btn);
+        });
+    }
+
+    function loadL2() {
+        const item = questions[currentIdx];
+        document.getElementById('l2-emoji').innerText = item.emoji;
+        document.getElementById('l2-sentence').innerText = item.sentence;
+        const box = document.getElementById('l2-btns');
+        box.innerHTML = '';
+        let opts = [...item.opts].sort(() => Math.random() - 0.5);
+        opts.forEach(o => {
+            const btn = document.createElement('button');
+            btn.className = 'detective-btn';
+            btn.innerText = o;
+            btn.onclick = () => checkAnswer(o, item.correct, btn);
+            box.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(choice, correct, btn) {
+        document.querySelectorAll('.detective-btn').forEach(b => b.disabled = true);
+        
+        if(choice === correct) { 
+            btn.classList.add('correct'); 
+            score += 10; 
+            setTimeout(nextIdx, 800); 
+        } else { 
+            btn.classList.add('wrong'); 
+            document.querySelectorAll('.detective-btn').forEach(b => {
+                if(b.innerText === correct) b.classList.add('correct');
+            });
+            userMistakes.push(choice);
+            setTimeout(nextIdx, 1500); 
+        }
+        updateProgress();
+    }
+
+    // LEVEL 3: CODES
+    function loadL3() {
+        const item = codesData[currentIdx];
+        l3Input = "";
+        document.getElementById('l3-emoji').innerText = item.emoS;
+        document.getElementById('l3-sentence').innerText = `Type the comparative form of: ${item.sing.toUpperCase()}`;
+        document.getElementById('l3-display').innerText = "_".repeat(item.plur.length);
+        const box = document.getElementById('l3-letters');
+        box.innerHTML = '';
+        
+        // ONLY the letters needed for the word (No extra noise letters)
+        let letters = item.plur.split('');
+        
+        // If it has a space (like "more stylish"), add a space button
+        if(item.plur.includes(' ')) {
+            // Filter out the actual space from letters array
+            letters = letters.filter(l => l !== ' ');
+            letters.push(' '); // Add one space button
+        }
+        
+        letters.sort(() => Math.random() - 0.5);
+
+        letters.forEach(l => {
+            const b = document.createElement('button');
+            b.className = 'letter-btn';
+            b.innerText = l === ' ' ? '␣' : l;
+            b.onclick = () => {
+                if(l3Input.length < item.plur.length) {
+                    l3Input += l;
+                    document.getElementById('l3-display').innerText = l3Input + "_".repeat(item.plur.length - l3Input.length);
+                    b.style.visibility = 'hidden';
+                    if(l3Input.length === item.plur.length) {
+                        if(l3Input === item.plur) { 
+                            score += 20; 
+                            setTimeout(nextIdx, 800); 
+                        }
+                        else { 
+                            userMistakes.push(l3Input);
+                            setTimeout(loadL3, 1000); 
+                        }
+                    }
+                }
+            };
+            box.appendChild(b);
+        });
+    }
+
+    function nextIdx() {
+        currentIdx++;
+        if(currentLvl === 1 && currentIdx >= 4) { currentIdx = 0; nextLevel(); }
+        else if(currentLvl === 2 && currentIdx >= 3) { currentIdx = 0; nextLevel(); }
+        else if(currentLvl === 3 && currentIdx >= 6) { currentIdx = 0; nextLevel(); }
+        else { initLevel(); }
+    }
+
+    function nextLevel() {
+        currentLvl++;
+        document.querySelectorAll('.screen, #lvl1, #lvl2, #lvl3, #win').forEach(s => s.classList.add('hidden'));
+        const tags = ["MEMORY", "IDENTITY", "PHOTOS", "CODES", "CLOSED"];
+        document.getElementById('lvl-tag').innerText = "LEVEL " + currentLvl + ": " + (tags[currentLvl] || "END");
+        
+        if(currentLvl === 1) document.getElementById('lvl1').classList.remove('hidden');
+        else if(currentLvl === 2) document.getElementById('lvl2').classList.remove('hidden');
+        else if(currentLvl === 3) document.getElementById('lvl3').classList.remove('hidden');
+        else {
+            document.getElementById('win').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            sendResultsToGoogle();
+        }
+        
+        initLevel();
+    }
+
+    function updateProgress() {
+        let percent = 0;
+        if(currentLvl === 0) percent = (matchedPairs / 4) * 25;
+        else if(currentLvl === 1) percent = 25 + ((currentIdx / 4) * 25);
+        else if(currentLvl === 2) percent = 50 + ((currentIdx / 3) * 25);
+        else if(currentLvl === 3) percent = 75 + ((currentIdx / 6) * 25);
+        else percent = 100;
+        
+        document.getElementById('fill').style.width = percent + "%";
+        document.getElementById('score').innerText = score;
+    }
+
+    // --- GOOGLE SHEETS INTEGRATION ---
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams();
+        params.append('name', TEST_NAME);
+        params.append('score', score);
+        params.append('total', 40); 
+        params.append('mistakes', userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: params.toString()
+        })
+        .then(() => {
+            document.getElementById('successMsg').style.display = 'block';
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    initLevel();
+</script>
+</body>
+</html>
