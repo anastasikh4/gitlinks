@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dialogue Match — Interactive Quiz</title>
+    <style>
+        :root {
+            --quiz-purple: #461a42;
+            --quiz-light-purple: #8854d0;
+            --quiz-pink: #ff6b9d;
+            --quiz-green: #26de81;
+            --quiz-red: #eb3b5a;
+            --white: #ffffff;
+            --pink-soft: #ffe4ec;
+            --yellow-soft: #fff9c4;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--quiz-purple);
+            color: var(--white);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background: var(--white);
+            color: #333;
+            width: 100%;
+            max-width: 700px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============ HEADER ============ */
+        h1 {
+            color: var(--quiz-light-purple);
+            font-size: 1.6rem;
+            margin: 0 0 6px 0;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        /* ============ RULE BOX ============ */
+        .rule-box {
+            background: var(--pink-soft);
+            border-left: 6px solid var(--quiz-pink);
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 22px;
+        }
+        .rule-box h3 {
+            margin: 0 0 12px 0;
+            color: var(--quiz-pink);
+            font-size: 1.15rem;
+        }
+        .rule-box p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 8px 0;
+            color: #2c3e50;
+        }
+        .rule-box .highlight {
+            font-weight: 900;
+            color: var(--quiz-light-purple);
+        }
+
+        /* ============ QUIZ SECTION ============ */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 12px;
+        }
+        .progress-container {
+            flex: 1;
+            background: #eee;
+            height: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--quiz-light-purple);
+            transition: width 0.4s ease;
+        }
+        .category-tag {
+            background: var(--quiz-light-purple);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        /* Sentence display */
+        .sentence-display {
+            background: #fafafa;
+            padding: 24px 22px;
+            border-radius: 12px;
+            border: 2px dashed #dfe4ea;
+            margin-bottom: 18px;
+            font-size: 1.2rem;
+            line-height: 1.7;
+            color: #2c3e50;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .speaker-a {
+            font-weight: 900;
+            color: var(--quiz-light-purple);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Answer Options */
+        .options-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .option-btn {
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 3px solid #bdc3c7;
+            background: #fafafa;
+            color: #333;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #e6f7ff;
+            border-color: #3498db;
+            transform: scale(1.01);
+        }
+
+        .option-btn.correct {
+            background: #e8f8f0;
+            border-color: var(--quiz-green);
+            color: var(--quiz-green);
+        }
+
+        .option-btn.wrong {
+            background: #fff0f0;
+            border-color: var(--quiz-red);
+            color: var(--quiz-red);
+            animation: shake 0.4s;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            transform: none;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+            font-family: inherit;
+        }
+
+        .btn-next {
+            background: var(--quiz-green);
+            display: none;
+            width: 100%;
+        }
+        .btn-next:hover { background: #20bf6b; }
+
+        #feedback {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        /* ============ FINAL SCREEN ============ */
+        .final-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        .final-screen h1 { font-size: 3rem; margin: 0; }
+        .final-screen h2 { color: var(--quiz-light-purple); margin: 10px 0; }
+        .final-screen p { font-size: 1.2rem; color: #2c3e50; }
+        
+        .success-msg {
+            color: var(--quiz-green);
+            font-weight: 900;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .hidden { display: none; }
+
+        /* Shake animation */
+        @keyframes shake {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-5px); }
+            50%  { transform: translateX(5px); }
+            75%  { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Mobile */
+        @media (max-width: 500px) {
+            .quiz-container { padding: 18px; }
+            .sentence-display { font-size: 1.05rem; padding: 18px; }
+            .option-btn { font-size: 1rem; padding: 14px; }
+            h1 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-box">
+
+    <!-- ============ RULE BOX ============ -->
+    <div class="rule-box">
+        <h3>💬 Dialogue Matching</h3>
+        <p>Remember to look at the <span class="highlight">Demonstratives (this / these / that / those)</span> and the context of the question to find the correct response!</p>
+    </div>
+
+    <!-- ============ QUIZ SECTION ============ -->
+    <h1>Match the Phrases</h1>
+    <div class="subtitle">Choose the best response for Speaker A.</div>
+
+    <div class="header-row">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="category-tag" id="category">1 / 5</div>
+    </div>
+
+    <div class="sentence-display" id="sentence-display">
+        <div class="speaker-a" id="speaker-a">Speaker A: ...</div>
+        <div id="speaker-b">Speaker B: ???</div>
+    </div>
+
+    <div class="options-area" id="options-area">
+        <!-- Options injected by JS -->
+    </div>
+
+    <div id="feedback"></div>
+
+    <div class="action-buttons">
+        <button class="btn btn-next" id="next-btn" onclick="handleNext()">Next Dialogue ➡️</button>
+    </div>
+
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Dialogue Match (Demonstratives & Responses)";
+    let userMistakes = [];
+    let score = 0;
+
+    /* =====================================================
+       QUIZ DATA
+       Similar rules to the photo (Demonstratives, questions, 
+       exclamations), but different vocabulary & context.
+       ===================================================== */
+    const questions = [
+        {
+            before: "Look at these jackets!",
+            after: "???",
+            options: [
+                "They are very cool!",
+                "Open and see!",
+                "It's a clothes shop!",
+                "Thank you!"
+            ],
+            correct: "They are very cool!",
+            explanation: "Speaker A points out plural objects ('these jackets'), so Speaker B comments on them using 'They'."
+        },
+        {
+            before: "What's that?",
+            after: "???",
+            options: [
+                "They're trainers.",
+                "It's a beautiful garden.",
+                "Let's buy a present!",
+                "Happy birthday!"
+            ],
+            correct: "It's a beautiful garden.",
+            explanation: "'What's that?' uses the singular 'that'. The response must use the singular 'It'."
+        },
+        {
+            before: "What are these?",
+            after: "???",
+            options: [
+                "It's a dress.",
+                "Open and see!",
+                "They're roller-skates.",
+                "Thank you!"
+            ],
+            correct: "They're roller-skates.",
+            explanation: "'What are these?' uses the plural 'these'. The response must use the plural 'They'."
+        },
+        {
+            before: "A shoe shop!",
+            after: "???",
+            options: [
+                "What's that?",
+                "Look at these hats!",
+                "Let's buy some boots!",
+                "Happy birthday!"
+            ],
+            correct: "Let's buy some boots!",
+            explanation: "Speaker A identifies the place (shoe shop). The logical response is to suggest an action related to it (buying shoes/boots)."
+        },
+        {
+            before: "Happy birthday!",
+            after: "???",
+            options: [
+                "They are cool!",
+                "Thank you!",
+                "What are these?",
+                "Open and see!"
+            ],
+            correct: "Thank you!",
+            explanation: "When someone wishes you a happy birthday, the standard polite response is 'Thank you!'."
+        }
+    ];
+
+    let currentQ = 0;
+    let isAnswered = false;
+
+    /* =====================================================
+       LOAD QUESTION
+       ===================================================== */
+    function loadQuestion() {
+        const q = questions[currentQ];
+
+        // Progress bar
+        document.getElementById('progress-bar').style.width = (currentQ / questions.length) * 100 + "%";
+        document.getElementById('category').innerText = (currentQ + 1) + " / " + questions.length;
+
+        // Build dialogue
+        document.getElementById('speaker-a').innerText = "A: " + q.before;
+        document.getElementById('speaker-b').innerText = "B: ???";
+
+        // Feedback reset
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('next-btn').style.display = 'none';
+        isAnswered = false;
+
+        // Populate options
+        const optArea = document.getElementById('options-area');
+        optArea.innerHTML = '';
+
+        // Shuffle options
+        const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.dataset.value = opt;
+            btn.onclick = () => checkAnswer(btn);
+            optArea.appendChild(btn);
+        });
+    }
+
+    /* =====================================================
+       CHECK ANSWER
+       ===================================================== */
+    function checkAnswer(btn) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const q = questions[currentQ];
+        const userChoice = btn.dataset.value;
+        const feedback = document.getElementById('feedback');
+        const speakerB = document.getElementById('speaker-b');
+        const allBtns = document.querySelectorAll('.option-btn');
+
+        // Lock all buttons
+        allBtns.forEach(b => b.disabled = true);
+
+        if (userChoice === q.correct) {
+            // Correct
+            score++;
+            btn.classList.add('correct');
+            speakerB.innerText = "B: " + q.correct;
+            speakerB.style.color = "var(--quiz-green)";
+            
+            feedback.innerHTML = `<span style="color:var(--quiz-green)">✅ Correct! ${q.explanation}</span>`;
+        } else {
+            // Wrong
+            btn.classList.add('wrong');
+            
+            // Highlight correct answer
+            allBtns.forEach(b => {
+                if (b.dataset.value === q.correct) {
+                    b.classList.add('correct');
+                }
+            });
+
+            speakerB.innerText = "B: " + q.correct;
+            speakerB.style.color = "var(--quiz-red)";
+            
+            feedback.innerHTML = `<span style="color:var(--quiz-red)">❌ Oops! ${q.explanation}</span>`;
+
+            // Track mistake
+            userMistakes.push(userChoice);
+        }
+
+        document.getElementById('next-btn').style.display = 'block';
+    }
+
+    /* =====================================================
+       NEXT QUESTION
+       ===================================================== */
+    function handleNext() {
+        currentQ++;
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    /* =====================================================
+       RESULTS & GOOGLE SHEETS SENDING
+       ===================================================== */
+    function showResults() {
+        document.getElementById('progress-bar').style.width = "100%";
+
+        let emoji = '🏆';
+        let title = 'Dialogue Complete!';
+        let message = 'Well done!';
+        const pct = Math.round((score / questions.length) * 100);
+
+        if (pct === 100)     { emoji = '🥇'; title = 'Perfect!';   message = 'You understand English dialogue perfectly!'; }
+        else if (pct >= 80)  { emoji = '🌟'; title = 'Excellent!'; message = 'Almost perfect!'; }
+        else if (pct >= 60)  { emoji = '💪'; title = 'Good work!'; message = 'Keep practising!'; }
+        else                 { emoji = '📚'; title = 'Nice try!';  message = 'Review the rules again.'; }
+
+        document.getElementById('quiz-box').innerHTML = `
+            <div class="final-screen">
+                <h1>${emoji}</h1>
+                <h2>${title}</h2>
+                <p>${message}</p>
+                <p style="font-size:1.3rem; margin-top:18px;">
+                    You scored <strong>${score} / ${questions.length}</strong>
+                </p>
+                
+                <div id="successMsg" class="success-msg">Results sent successfully! ✅</div>
+                
+                <button class="btn" style="background: #bdc3c7; margin-top:20px; padding:14px 32px; font-size:1.05rem;"
+                        onclick="location.reload()">TRY AGAIN 🔄</button>
+            </div>
+        `;
+
+        // --- SEND TO GOOGLE SHEETS ---
+        sendResultsToGoogle();
+    }
+
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    /* =====================================================
+       INIT
+       ===================================================== */
+    loadQuestion();
+</script>
+
+</body>
+</html>

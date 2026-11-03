@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Odd Word Out — Toy Shop (Starlight 3)</title>
+<style>
+    :root {
+        --primary: #6c5ce7;
+        --primary-dark: #4a3fa3;
+        --success: #00b894;
+        --success-light: #d4f7e8;
+        --error: #e17055;
+        --error-light: #ffe0d4;
+        --bg-start: #a29bfe;
+        --bg-end: #74b9ff;
+        --text: #2d3436;
+        --text-soft: #636e72;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 18px;
+        color: var(--text);
+    }
+
+    .quiz-card {
+        background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+        width: 100%;
+        max-width: 640px;
+        padding: 34px 30px 30px;
+        border-radius: 26px;
+        box-shadow: 0 22px 45px rgba(0,0,0,0.22);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    h1 {
+        color: var(--primary);
+        margin-bottom: 20px;
+        font-size: 1.55rem;
+        letter-spacing: 0.3px;
+    }
+
+    .progress-container {
+        height: 10px;
+        background: #eef1f5;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        overflow: hidden;
+    }
+    #progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #6c5ce7, #00b894);
+        border-radius: 6px;
+        transition: width 0.4s ease;
+    }
+
+    .counter {
+        font-size: 0.78rem;
+        font-weight: 800;
+        color: var(--text-soft);
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        margin-bottom: 22px;
+    }
+
+    .instruction-box {
+        background: #f8f9fa;
+        border-left: 5px solid var(--primary);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        text-align: left;
+    }
+
+    .word-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .word-btn {
+        padding: 20px 15px;
+        background: white;
+        border: 3px solid var(--primary);
+        border-bottom-width: 6px;
+        color: var(--primary);
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 1.2rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        text-align: center;
+    }
+
+    .word-btn:hover:not(.disabled) {
+        background: #ede9fe;
+        transform: translateY(-2px);
+        border-bottom-width: 8px;
+    }
+
+    .word-btn:active:not(.disabled) {
+        transform: translateY(3px);
+        border-bottom-width: 3px;
+    }
+
+    .word-btn.disabled {
+        pointer-events: none;
+        opacity: 0.45;
+    }
+
+    .word-btn.correct {
+        background: var(--success-light) !important;
+        border-color: var(--success);
+        border-bottom-color: #00916e;
+        color: var(--success);
+        opacity: 1 !important;
+        animation: pulse 0.5s;
+    }
+
+    .word-btn.wrong {
+        background: var(--error-light) !important;
+        border-color: var(--error);
+        border-bottom-color: #a84028;
+        color: var(--error);
+        animation: shake 0.4s;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-7px); }
+        40% { transform: translateX(7px); }
+        60% { transform: translateX(-5px); }
+        80% { transform: translateX(5px); }
+    }
+
+    #feedback-area {
+        margin: 14px 0 10px;
+        font-weight: 800;
+        font-size: 1.05rem;
+        min-height: 26px;
+        display: none;
+    }
+    #feedback-area.correct { color: var(--success); display: block; }
+    #feedback-area.wrong { color: var(--error); display: block; }
+
+    #next-btn {
+        padding: 14px 30px;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 1rem;
+        cursor: pointer;
+        margin: 6px 5px;
+        letter-spacing: 0.5px;
+        transition: 0.15s;
+        background: var(--primary);
+        box-shadow: 0 5px 0 var(--primary-dark);
+        width: 100%;
+    }
+    #next-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--primary-dark); }
+    #next-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--primary-dark); }
+    #next-btn.hidden { display: none; }
+
+    .results {
+        display: none;
+        padding: 16px 0 8px;
+        animation: pop 0.5s ease;
+    }
+    .results .trophy {
+        font-size: 4.2rem;
+        margin-bottom: 10px;
+        animation: bounce 1.6s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+    }
+    .results h2 {
+        color: var(--primary);
+        font-size: 1.9rem;
+        margin-bottom: 12px;
+    }
+    .results .message {
+        font-size: 1rem;
+        color: var(--text-soft);
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    .results .score {
+        background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+        border-radius: 18px;
+        padding: 22px;
+        margin: 18px 0 22px;
+        font-size: 1.9rem;
+        font-weight: 900;
+        color: #b83b1a;
+        box-shadow: 0 6px 0 #e1a947;
+    }
+    .results button {
+        padding: 16px 36px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-bottom: 6px solid var(--primary-dark);
+        border-radius: 14px;
+        font-family: inherit;
+        font-weight: 900;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: 0.15s;
+        letter-spacing: 0.5px;
+    }
+    .results button:hover { transform: translateY(-2px); }
+    .results button:active { transform: translateY(3px); border-bottom-width: 3px; }
+
+    .success-msg {
+        color: var(--success);
+        font-weight: 900;
+        font-size: 1.1rem;
+        margin-top: 15px;
+        display: none;
+    }
+
+    @media (max-width: 480px) {
+        body { padding: 10px; }
+        .quiz-card { padding: 24px 16px 20px; border-radius: 20px; }
+        h1 { font-size: 1.2rem; margin-bottom: 14px; }
+        .instruction-box { font-size: 1rem; padding: 12px; }
+        .word-grid { gap: 10px; }
+        .word-btn { padding: 15px 10px; font-size: 1.05rem; }
+        .results h2 { font-size: 1.5rem; }
+        .results .score { font-size: 1.5rem; padding: 16px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div id="quiz-ui">
+        <h1>Toy Shop: Find the Odd Word</h1>
+        <div class="progress-container"><div id="progress-fill"></div></div>
+        <div class="counter">Question <span id="qNow">1</span> / <span id="qTotal">10</span></div>
+
+        <div class="instruction-box" id="instruction">
+            Подчеркните лишнее слово.
+        </div>
+
+        <div class="word-grid" id="word-grid"></div>
+
+        <div id="feedback-area"></div>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next ➡️</button>
+    </div>
+
+    <div id="result-ui" class="results">
+        <div class="trophy">🧸🏆</div>
+        <h2>Quiz Complete!</h2>
+        <p class="message" id="score-text"></p>
+        <div class="score" id="score-big">0 / 10</div>
+        <p id="successMsg" class="success-msg">Results sent successfully! ✅</p>
+        <button onclick="location.reload()">Try Again 🔄</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Starlight 3 Toy Shop - Odd Word Out";
+    let userMistakes = [];
+    let score = 0;
+
+    /* ============================================================
+       QUIZ DATA (Toy Shop / Starlight 3 Unit 2)
+       ============================================================ */
+    const questions = [
+        {
+            instruction: "Подчеркните лишнее слово (Toys vs. Transport).",
+            words: ["ball", "doll", "car", "lorry"], 
+            correct: "doll",
+            explanation: "'Ball', 'car', and 'lorry' can be toys, but 'car' and 'lorry' are vehicles. Wait, let's make it clearer."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Demonstratives).",
+            words: ["this", "that", "these", "they"],
+            correct: "they",
+            explanation: "'This', 'that', and 'these' are demonstratives used to point. 'They' is a personal pronoun."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Plurals ending in -es).",
+            words: ["box", "bus", "doll", "watch"],
+            correct: "doll",
+            explanation: "We add '-es' to box, bus, and watch. 'Doll' just adds an '-s' (dolls)."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Irregular Plurals).",
+            words: ["man", "child", "toy", "woman"],
+            correct: "toy",
+            explanation: "'Man' (men), 'child' (children), and 'woman' (women) are irregular. 'Toy' becomes 'toys'."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (What you can buy).",
+            words: ["train", "plane", "kite", "shop"],
+            correct: "shop",
+            explanation: "You can buy trains, planes, and kites. A 'shop' is the place you buy them, not the item itself."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Prepositions of place).",
+            words: ["in", "on", "under", "box"],
+            correct: "box",
+            explanation: "'In', 'on', and 'under' are prepositions of place. 'Box' is a noun."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Singular vs. Plural).",
+            words: ["toys", "bikes", "balls", "doll"],
+            correct: "doll",
+            explanation: "'Toys', 'bikes', and 'balls' are plural. 'Doll' is singular."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Grammar: Pointing).",
+            words: ["What's this?", "What are these?", "What's that?", "They are cool!"],
+            correct: "They are cool!",
+            explanation: "The first three are questions asking to identify something. The last one is a statement."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Toys).",
+            words: ["teddy bear", "robot", "doll", "table"],
+            correct: "table",
+            explanation: "'Teddy bear', 'robot', and 'doll' are toys. 'Table' is furniture."
+        },
+        {
+            instruction: "Подчеркните лишнее слово (Phrases in a shop).",
+            words: ["Let's buy a present!", "Open and see!", "Happy birthday!", "Thank you!"],
+            correct: "Open and see!",
+            explanation: "The others are common phrases said in a shop or at a birthday party. 'Open and see!' is usually for a wrapped gift, but it's still a bit different. Let's change this."
+        }
+    ];
+
+    // Refining a few questions to be perfectly clear for Starlight 3
+    questions[0] = {
+        instruction: "Подчеркните лишнее слово (Toys vs. Vehicles).",
+        words: ["ball", "doll", "car", "lorry"], 
+        correct: "doll",
+        explanation: "'Ball', 'car', and 'lorry' can all be played with, but 'car' and 'lorry' are also vehicles. Actually, 'doll' is the only one you can't ride or roll. Let's make a better one."
+    };
+    
+    questions[0] = {
+        instruction: "Подчеркните лишнее слово (Toys).",
+        words: ["ball", "doll", "bike", "robot"],
+        correct: "robot", // Wait, a robot is a toy. Let's fix this.
+        explanation: "..."
+    };
+
+    questions[0] = {
+        instruction: "Подчеркните лишнее слово (Toys).",
+        words: ["ball", "doll", "kite", "dress"],
+        correct: "dress",
+        explanation: "'Ball', 'doll', and 'kite' are toys. A 'dress' is clothing."
+    };
+
+    questions[9] = {
+        instruction: "Подчеркните лишнее слово (Dialogue responses).",
+        words: ["What are these?", "They are cars.", "What's that?", "Look at these bikes!"],
+        correct: "They are cars.",
+        explanation: "The others are questions or exclamations pointing something out. 'They are cars' is a direct answer."
+    };
+
+    let currentQ = 0;
+    let isAnswered = false;
+    const totalQuestions = questions.length;
+
+    document.getElementById('qTotal').innerText = totalQuestions;
+
+    /* ============================================================
+       LOAD QUESTION
+       ============================================================ */
+    function loadQuestion() {
+        if (currentQ >= totalQuestions) {
+            showResults();
+            return;
+        }
+
+        isAnswered = false;
+        const data = questions[currentQ];
+
+        // Update progress and counters
+        document.getElementById('progress-fill').style.width = (currentQ / totalQuestions) * 100 + '%';
+        document.getElementById('qNow').innerText = currentQ + 1;
+        document.getElementById('instruction').innerText = data.instruction;
+
+        // Reset UI
+        const fb = document.getElementById('feedback-area');
+        fb.className = '';
+        fb.style.display = 'none';
+        document.getElementById('next-btn').classList.add('hidden');
+
+        // Populate words
+        const grid = document.getElementById('word-grid');
+        grid.innerHTML = '';
+        
+        data.words.forEach(word => {
+            const btn = document.createElement('button');
+            btn.className = 'word-btn';
+            btn.innerText = word;
+            btn.onclick = () => selectWord(btn, word, data.correct);
+            grid.appendChild(btn);
+        });
+    }
+
+    /* ============================================================
+       HANDLE ANSWER
+       ============================================================ */
+    function selectWord(btn, word, correct) {
+        if (isAnswered) return;
+
+        const allBtns = document.querySelectorAll('.word-btn');
+        const fb = document.getElementById('feedback-area');
+
+        if (word === correct) {
+            isAnswered = true;
+            score++;
+
+            btn.classList.add('correct');
+            allBtns.forEach(b => {
+                if (b !== btn) b.classList.add('disabled');
+            });
+
+            fb.textContent = '✅ Correct! ' + questions[currentQ].explanation;
+            fb.className = 'correct';
+            
+            document.getElementById('next-btn').classList.remove('hidden');
+
+            if (navigator.vibrate) navigator.vibrate(100);
+        } else {
+            btn.classList.add('wrong');
+            btn.classList.add('disabled');
+
+            fb.textContent = '❌ Not quite — try again.';
+            fb.className = 'wrong';
+
+            userMistakes.push(word);
+
+            if (navigator.vibrate) navigator.vibrate(200);
+
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+            }, 600);
+        }
+    }
+
+    /* ============================================================
+       NEXT QUESTION
+       ============================================================ */
+    function nextQuestion() {
+        currentQ++;
+        loadQuestion();
+    }
+
+    /* ============================================================
+       RESULT SCREEN
+       ============================================================ */
+    function showResults() {
+        document.getElementById('quiz-ui').style.display = 'none';
+        document.getElementById('result-ui').style.display = 'block';
+        document.getElementById('progress-fill').style.width = '100%';
+
+        document.getElementById('score-big').innerText = `${score} / ${totalQuestions}`;
+
+        const pct = Math.round((score / totalQuestions) * 100);
+        let msg;
+        if (pct === 100)      msg = 'Perfect! You are a Master of the Toy Shop!';
+        else if (pct >= 80)   msg = 'Excellent! Almost perfect!';
+        else if (pct >= 60)   msg = 'Good job! Keep practising.';
+        else                  msg = 'Practise makes perfect — try again!';
+
+        document.getElementById('score-text').innerText = msg;
+
+        // Send to Google Sheets
+        sendResultsToGoogle();
+    }
+
+    /* ============================================================
+       GOOGLE SHEETS INTEGRATION (MANDATORY)
+       ============================================================ */
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    /* ============================================================
+       START
+       ============================================================ */
+    loadQuestion();
+</script>
+
+</body>
+</html>
