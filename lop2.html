@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparatives & Superlatives Worksheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --space-bg: #fff5f5;
+            --text-dark: #2b2d42;
+            --text-red: #d90429;
+            --card-bg: #ffffff;
+            --btn-default: #ffe3e3;
+            --btn-correct: #52b788;
+            --btn-wrong: #ff6b6b;
+            --border-color: #2b2d42;
+        }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: var(--space-bg);
+            background-image: radial-gradient(#ffccd5 20%, transparent 20%);
+            background-size: 20px 20px;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 30px; 
+            border-radius: 30px; 
+            border: 4px solid var(--border-color); 
+            box-shadow: 0 10px 0 rgba(43, 45, 66, 0.2); 
+        }
+
+        h1 { 
+            color: var(--text-red); 
+            text-align: center; 
+            margin-bottom: 5px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-dark);
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .reading-box {
+            background: #fff5f5;
+            border: 3px dashed var(--text-red);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .reading-box h3 {
+            margin-top: 0;
+            color: var(--text-red);
+            margin-bottom: 15px;
+        }
+
+        .speaker {
+            font-weight: 800;
+            color: var(--text-red);
+        }
+
+        .highlight {
+            font-weight: 800;
+            color: #1b4332;
+            background: #d8f3dc;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .exercise {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 0 rgba(43, 45, 66, 0.1);
+        }
+
+        .exercise h2 {
+            color: var(--text-red);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .exercise h3 {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .question-text { 
+            font-size: 1.1rem; 
+            font-weight: 800; 
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .hint-text {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        input[type="radio"].quiz-radio { display: none; }
+        
+        .quiz-label {
+            padding: 10px 20px;
+            background-color: var(--btn-default);
+            border: 3px solid var(--border-color);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            transition: 0.2s;
+            margin: 3px;
+            display: inline-block;
+        }
+
+        .quiz-label:hover { 
+            filter: brightness(0.95); 
+            transform: translateY(-2px);
+        }
+
+        .correct:checked + .quiz-label { 
+            background-color: var(--btn-correct); 
+            color: white; 
+            border-color: #1b4332;
+            box-shadow: 0 4px 0 rgba(27, 67, 50, 0.3);
+        }
+        .correct:checked + .quiz-label::after { content: " ✓"; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .wrong:checked + .quiz-label { 
+            background-color: var(--btn-wrong); 
+            color: white; 
+            animation: shake 0.3s;
+            border-color: #a01a58;
+        }
+        .wrong:checked + .quiz-label::after { content: " ✗"; }
+
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: #ffb703;
+            border: 3px solid var(--border-color);
+            border-radius: 20px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 var(--border-color);
+        }
+
+        .success-msg {
+            display: none;
+            text-align: center;
+            color: #52b788;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; border: 2px solid #000; }
+            .quiz-label:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Grammar Worksheet</h1>
+    <p class="subtitle">Comparatives & Superlatives</p>
+    
+    <!-- ========================================== -->
+    <!-- EXERCISE 1: DIALOGUE -->
+    <!-- ========================================== -->
+    <div class="exercise">
+        <h2>Exercise 1: Complete the dialogue</h2>
+        
+        <div class="reading-box">
+            <p><span class="speaker">Leo:</span> Hi, Mia. Can you help me with my History project? You are <span class="highlight">better</span> (good) at this than me. I can't understand this text. It's <span class="highlight">more difficult</span> (difficult) than the other chapters. It's <span class="highlight">longer</span> (long) than the other chapters too. It has fifty pages! It's the <span class="highlight">most boring</span> (boring) subject in this school!</p>
+            <p><span class="speaker">Mia:</span> Don't worry. Let's see. That's funny...</p>
+            <p><span class="speaker">Leo:</span> What?</p>
+            <p><span class="speaker">Mia:</span> Well, I don't know these words! You are looking at page 10. Our project is on page 40.</p>
+            <p><span class="speaker">Leo:</span> Good! I'm not the <span class="highlight">worst</span> (bad) student in our History class!</p>
+        </div>
+        
+        <h3>Choose the correct answer based on the dialogue:</h3>
+        
+        <div class="question">
+            <span class="question-text">1. Who does Leo think is better at History?</span>
+            <input type="radio" name="q1" id="q1a" class="wrong quiz-radio" onclick="trackMistake('Himself')"><label for="q1a" class="quiz-label">Himself</label>
+            <input type="radio" name="q1" id="q1b" class="correct quiz-radio" onclick="checkComplete()"><label for="q1b" class="quiz-label">Mia</label>
+            <input type="radio" name="q1" id="q1c" class="wrong quiz-radio" onclick="trackMistake('His teacher')"><label for="q1c" class="quiz-label">His teacher</label>
+        </div>
+
+        <div class="question">
+            <span class="question-text">2. How does Leo describe the chapter?</span>
+            <input type="radio" name="q2" id="q2a" class="wrong quiz-radio" onclick="trackMistake('Shorter and easier')"><label for="q2a" class="quiz-label">Shorter and easier</label>
+            <input type="radio" name="q2" id="q2b" class="correct quiz-radio" onclick="checkComplete()"><label for="q2b" class="quiz-label">More difficult and longer</label>
+            <input type="radio" name="q2" id="q2c" class="wrong quiz-radio" onclick="trackMistake('The most boring chapter')"><label for="q2c" class="quiz-label">The most boring chapter</label>
+        </div>
+
+        <div class="question">
+            <span class="question-text">3. Why is Leo happy at the end?</span>
+            <input type="radio" name="q3" id="q3a" class="wrong quiz-radio" onclick="trackMistake('He finished the project')"><label for="q3a" class="quiz-label">He finished the project</label>
+            <input type="radio" name="q3" id="q3b" class="wrong quiz-radio" onclick="trackMistake('He found page 40')"><label for="q3b" class="quiz-label">He found page 40</label>
+            <input type="radio" name="q3" id="q3c" class="correct quiz-radio" onclick="checkComplete()"><label for="q3c" class="quiz-label">He is not the worst student</label>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- EXERCISE 2: HARRY AND GEORGE -->
+    <!-- ========================================== -->
+    <div class="exercise">
+        <h2>Exercise 2: Complete the sentences about Harry and George</h2>
+        <p class="hint-text">Use the comparative form of the adjectives.</p>
+        
+        <div class="reading-box">
+            <p><strong>Harry</strong><br>
+            1. young → Harry is <span class="highlight">younger</span> than George.<br>
+            2. sporty → He's <span class="highlight">sportier</span> than his brother.<br>
+            3. good at tennis → He's <span class="highlight">better</span> at tennis and he's also a <span class="highlight">faster</span> runner than George.</p>
+            <p><strong>George</strong><br>
+            5. funny → George is <span class="highlight">funnier</span> than Harry.<br>
+            6. stylish → His clothes are <span class="highlight">more stylish</span> than his brother's.<br>
+            7. organised → He's also <span class="highlight">more organised</span> and he's a <span class="highlight">better</span> dancer than Harry.</p>
+        </div>
+        
+        <h3>Choose the correct comparative form:</h3>
+        
+        <div class="question">
+            <span class="question-text">4. Harry is _____ than George. (young)</span>
+            <input type="radio" name="q4" id="q4a" class="wrong quiz-radio" onclick="trackMistake('youngest')"><label for="q4a" class="quiz-label">youngest</label>
+            <input type="radio" name="q4" id="q4b" class="correct quiz-radio" onclick="checkComplete()"><label for="q4b" class="quiz-label">younger</label>
+            <input type="radio" name="q4" id="q4c" class="wrong quiz-radio" onclick="trackMistake('more young')"><label for="q4c" class="quiz-label">more young</label>
+        </div>
+
+        <div class="question">
+            <span class="question-text">5. Harry is _____ than his brother. (sporty)</span>
+            <input type="radio" name="q5" id="q5a" class="wrong quiz-radio" onclick="trackMistake('more sporty')"><label for="q5a" class="quiz-label">more sporty</label>
+            <input type="radio" name="q5" id="q5b" class="wrong quiz-radio" onclick="trackMistake('sportiest')"><label for="q5b" class="quiz-label">sportiest</label>
+            <input type="radio" name="q5" id="q5c" class="correct quiz-radio" onclick="checkComplete()"><label for="q5c" class="quiz-label">sportier</label>
+        </div>
+
+        <div class="question">
+            <span class="question-text">6. He's _____ at tennis. (good)</span>
+            <input type="radio" name="q6" id="q6a" class="correct quiz-radio" onclick="checkComplete()"><label for="q6a" class="quiz-label">better</label>
+            <input type="radio" name="q6" id="q6b" class="wrong quiz-radio" onclick="trackMistake('gooder')"><label for="q6b" class="quiz-label">gooder</label>
+            <input type="radio" name="q6" id="q6c" class="wrong quiz-radio" onclick="trackMistake('more good')"><label for="q6c" class="quiz-label">more good</label>
+        </div>
+        
+        <div class="question">
+            <span class="question-text">7. George's clothes are _____ than his brother's. (stylish)</span>
+            <input type="radio" name="q7" id="q7a" class="wrong quiz-radio" onclick="trackMistake('stylishier')"><label for="q7a" class="quiz-label">stylishier</label>
+            <input type="radio" name="q7" id="q7b" class="correct quiz-radio" onclick="checkComplete()"><label for="q7b" class="quiz-label">more stylish</label>
+            <input type="radio" name="q7" id="q7c" class="wrong quiz-radio" onclick="trackMistake('most stylish')"><label for="q7c" class="quiz-label">most stylish</label>
+        </div>
+    </div>
+
+    <!-- ============ SUBMIT ============ -->
+    <button class="reset-btn" onclick="submitResults()">Finish Worksheet & Send Results</button>
+    <p id="successMsg" class="success-msg">Results sent successfully! ✅</p>
+
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Grammar Worksheet (Comparatives & Superlatives)";
+    let userMistakes = [];
+    const totalQuestions = 7;
+
+    function trackMistake(word) {
+        if (!userMistakes.includes(word)) {
+            userMistakes.push(word);
+        }
+    }
+
+    function checkComplete() {
+        // Optional logic
+    }
+
+    function submitResults() {
+        // Calculate score based on checked 'correct' radio buttons
+        let score = 0;
+        for (let i = 1; i <= totalQuestions; i++) {
+            const correctInput = document.querySelector(`input[name="q${i}"].correct`);
+            if (correctInput && correctInput.checked) {
+                score++;
+            }
+        }
+
+        // Send to Google Sheets
+        sendResultsToGoogle(score);
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle(score) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalQuestions,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) {
+                msgEl.style.display = 'block';
+                document.querySelector('.reset-btn').style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+</script>
+
+</body>
+</html>

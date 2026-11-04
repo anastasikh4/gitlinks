@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Work & Routines Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #58cc02;
+            --primary-dark: #46a302;
+            --primary-light: #d7ffb1;
+            --blue: #1cb0f6;
+            --blue-dark: #1899d6;
+            --red: #ff4b4b;
+            --red-dark: #ea2b2b;
+            --red-light: #ffdfe0;
+            --gray: #e5e5e5;
+            --text-dark: #4b4b4b;
+            --text-light: #afafaf;
+            --bg: #f7f7f7;
+            --white: #ffffff;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- HEADER & PROGRESS --- */
+        .header {
+            width: 100%; max-width: 600px; padding: 20px;
+            display: flex; align-items: center; gap: 15px;
+            position: sticky; top: 0; background: rgba(247, 247, 247, 0.95); z-index: 100;
+        }
+
+        .progress-container {
+            flex-grow: 1; height: 16px; background-color: var(--gray);
+            border-radius: 8px; overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%; background-color: var(--primary); width: 0%;
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1); border-radius: 8px;
+        }
+
+        .close-btn { font-size: 24px; color: var(--gray); cursor: pointer; font-weight: 900; }
+
+        /* --- MAIN CONTAINER --- */
+        .quiz-container {
+            width: 100%; max-width: 600px; padding: 0 20px;
+            flex-grow: 1; display: flex; flex-direction: column; position: relative;
+        }
+
+        /* --- QUESTION CARD --- */
+        .question-card {
+            background: var(--white); border-radius: 20px; padding: 30px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            min-height: 160px; display: flex; flex-direction: column; justify-content: center;
+        }
+
+        .hint-text {
+            font-size: 14px; color: var(--text-light); margin-bottom: 10px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .sentence-text {
+            font-size: 22px; font-weight: 800; line-height: 1.5; color: var(--text-dark);
+        }
+
+        .blank {
+            color: var(--blue); text-decoration: underline;
+            text-decoration-color: var(--gray); text-decoration-thickness: 3px;
+            text-underline-offset: 4px;
+        }
+
+        /* --- OPTIONS GRID --- */
+        .options-grid {
+            display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 100px;
+        }
+
+        .option-btn {
+            background: var(--white); border: 2px solid var(--gray); border-bottom: 4px solid var(--gray);
+            border-radius: 12px; padding: 16px; font-size: 18px; font-weight: 700;
+            color: var(--text-dark); cursor: pointer; transition: all 0.1s;
+            font-family: inherit; text-align: left;
+        }
+
+        .option-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+        .option-btn.selected {
+            background: #e3f4ff; border-color: var(--blue);
+            border-bottom-color: var(--blue-dark); color: #0d47a1;
+        }
+
+        .option-btn.correct {
+            background: var(--primary-light) !important; border-color: var(--primary) !important;
+            border-bottom-color: var(--primary-dark) !important; color: var(--primary-dark) !important;
+        }
+
+        .option-btn.wrong {
+            background: var(--red-light) !important; border-color: var(--red) !important;
+            border-bottom-color: var(--red-dark) !important; color: var(--red-dark) !important;
+        }
+
+        .option-btn:disabled { cursor: default; }
+
+        /* --- FOOTER & FEEDBACK --- */
+        .footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--bg); border-top: 2px solid var(--gray);
+            padding: 20px; display: flex; justify-content: center; z-index: 10;
+        }
+
+        .footer-content { width: 100%; max-width: 600px; }
+
+        .check-btn {
+            background: var(--primary); color: white; border: none;
+            border-bottom: 4px solid var(--primary-dark); border-radius: 12px;
+            padding: 16px 40px; font-size: 18px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+            width: 100%; transition: all 0.1s; font-family: inherit;
+        }
+
+        .check-btn:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; }
+        .check-btn:disabled { background: var(--gray); border-color: #d1d1d1; color: var(--text-light); cursor: default; }
+
+        /* Feedback Panel */
+        .feedback-panel {
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            padding: 20px; z-index: 20; transition: bottom 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .feedback-panel.show { bottom: 0; }
+
+        .feedback-content {
+            max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .feedback-header { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; }
+        .feedback-text { background: var(--white); padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+
+        .feedback-panel.correct-ui { background: var(--primary-light); }
+        .feedback-panel.correct-ui .feedback-header { color: var(--primary-dark); }
+        .feedback-panel.correct-ui .feedback-text { border: 2px solid var(--primary); color: var(--primary-dark); }
+
+        .feedback-panel.wrong-ui { background: var(--red-light); }
+        .feedback-panel.wrong-ui .feedback-header { color: var(--red-dark); }
+        .feedback-panel.wrong-ui .feedback-text { border: 2px solid var(--red); color: var(--red-dark); }
+
+        .continue-btn {
+            background: var(--primary); color: white; border: none;
+            border-bottom: 4px solid var(--primary-dark); border-radius: 12px;
+            padding: 16px; font-size: 18px; font-weight: 900;
+            text-transform: uppercase; cursor: pointer; font-family: inherit; width: 100%;
+        }
+
+        .feedback-panel.wrong-ui .continue-btn { background: var(--red); border-color: var(--red-dark); }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.4s; }
+
+        /* --- FINAL SCREEN --- */
+        .final-screen {
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; text-align: center; height: 100vh; padding: 20px;
+        }
+
+        .final-screen h1 { font-size: 32px; color: var(--primary); margin-bottom: 10px; }
+        .final-screen .score { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 30px; }
+
+        .restart-btn {
+            background: var(--blue); color: white; border: none;
+            border-bottom: 4px solid var(--blue-dark); border-radius: 12px;
+            padding: 16px 40px; font-size: 18px; font-weight: 900;
+            text-transform: uppercase; cursor: pointer; font-family: inherit;
+        }
+
+        .success-msg {
+            color: var(--primary-dark); font-weight: 900; font-size: 18px;
+            margin-top: 15px; display: none;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Progress -->
+    <div class="header" id="header">
+        <div class="progress-container"><div class="progress-fill" id="progressBar"></div></div>
+        <div class="close-btn" onclick="location.reload()">✕</div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-card" id="questionCard">
+            <div class="hint-text" id="hintText">Question 1 of 8</div>
+            <div class="sentence-text" id="sentenceText">Loading...</div>
+        </div>
+
+        <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+    <!-- Footer Check Button -->
+    <div class="footer" id="footer">
+        <div class="footer-content">
+            <button class="check-btn" id="checkBtn" disabled onclick="checkAnswer()">Check</button>
+        </div>
+    </div>
+
+    <!-- Feedback Panel -->
+    <div class="feedback-panel" id="feedbackPanel">
+        <div class="feedback-content">
+            <div class="feedback-header" id="feedbackHeader">Correct!</div>
+            <div class="feedback-text" id="feedbackText">
+                <span>Great job!</span>
+                <span id="feedbackWord"></span>
+            </div>
+            <button class="continue-btn" id="continueBtn" onclick="nextQuestion()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Final Screen -->
+    <div class="final-screen" id="finalScreen">
+        <h1 id="finalTitle">Lesson Complete!</h1>
+        <div class="score" id="finalScoreText">You scored 0/8</div>
+        <p id="successMsg" class="success-msg">Results sent successfully! ✅</p>
+        <button class="restart-btn" onclick="location.reload()">Try Again</button>
+    </div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Work & Routines - Duolingo Quiz";
+    let userMistakes = [];
+    let score = 0;
+
+    // --- DATA ---
+    const questions = [
+        {
+            q: "Workers on an offshore rig usually work two weeks ___, two weeks off.",
+            options: ["on", "in", "at", "to"],
+            correct: "on",
+            type: "text"
+        },
+        {
+            q: "I am ___ duty for two weeks. I can't leave the platform.",
+            options: ["on", "in", "at", "by"],
+            correct: "on",
+            type: "text"
+        },
+        {
+            q: "He is ___ leave tomorrow, so he is going home to his family.",
+            options: ["on", "in", "at", "to"],
+            correct: "on",
+            type: "text"
+        },
+        {
+            q: "Tore usually ___ cranes, but today he is supervising the crew.",
+            options: ["operates", "operate", "is operating", "operated"],
+            correct: "operates",
+            type: "text"
+        },
+        {
+            q: "Bill ___ pipes under the sea. (Current routine)",
+            options: ["repairs", "repair", "is repairing", "repaired"],
+            correct: "repairs",
+            type: "text"
+        },
+        {
+            q: "Who does she ___ to? She reports to the Maintenance Supervisor.",
+            options: ["report", "reports", "reporting", "reported"],
+            correct: "report",
+            type: "text"
+        },
+        {
+            q: "Read the explanation and choose the term: 'To check or examine something carefully, like equipment or pipes, to make sure it is safe and working.'",
+            options: ["supervise", "operate", "inspect", "maintain"],
+            correct: "inspect",
+            type: "definition"
+        },
+        {
+            q: "Read the explanation and choose the term: 'To keep equipment in good condition by checking and repairing it regularly.'",
+            options: ["supervise", "operate", "repair", "maintain"],
+            correct: "maintain",
+            type: "definition"
+        }
+    ];
+
+    let currentIndex = 0;
+    let selectedOption = null;
+
+    // --- INITIALIZATION ---
+    function initQuiz() {
+        loadQuestion();
+    }
+
+    // --- LOAD QUESTION ---
+    function loadQuestion() {
+        if (currentIndex >= questions.length) {
+            showFinalScreen();
+            return;
+        }
+
+        const q = questions[currentIndex];
+        selectedOption = null;
+
+        // Reset UI
+        document.getElementById('checkBtn').disabled = true;
+        document.getElementById('checkBtn').style.display = 'block';
+        document.getElementById('feedbackPanel').classList.remove('show');
+        
+        // Update Progress & Hint
+        document.getElementById('progressBar').style.width = `${(currentIndex / questions.length) * 100}%`;
+        document.getElementById('hintText').innerText = `Question ${currentIndex + 1} of ${questions.length}`;
+
+        // Update Content
+        if (q.type === 'definition') {
+            document.getElementById('sentenceText').innerHTML = `<span style="font-size: 18px; font-style: italic; color: #555;">"${q.q}"</span>`;
+        } else {
+            document.getElementById('sentenceText').innerHTML = q.q.replace('___', '<span class="blank">___</span>');
+        }
+
+        // Generate Options
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => selectOption(btn, opt);
+            grid.appendChild(btn);
+        });
+
+        // Animation In
+        const card = document.getElementById('questionCard');
+        card.style.transform = 'translateY(20px)';
+        card.style.opacity = '0';
+        setTimeout(() => {
+            card.style.transform = 'translateY(0)';
+            card.style.opacity = '1';
+        }, 50);
+    }
+
+    // --- SELECT OPTION ---
+    function selectOption(btn, opt) {
+        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedOption = opt;
+        document.getElementById('checkBtn').disabled = false;
+    }
+
+    // --- CHECK ANSWER ---
+    function checkAnswer() {
+        if (!selectedOption) return;
+
+        const q = questions[currentIndex];
+        const isCorrect = selectedOption === q.correct;
+        
+        document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+        document.getElementById('checkBtn').style.display = 'none';
+
+        const feedbackPanel = document.getElementById('feedbackPanel');
+        const feedbackHeader = document.getElementById('feedbackHeader');
+        const feedbackWord = document.getElementById('feedbackWord');
+        const feedbackText = document.getElementById('feedbackText');
+
+        if (isCorrect) {
+            score++;
+            
+            document.querySelectorAll('.option-btn').forEach(b => {
+                if (b.innerText === q.correct) b.classList.add('correct');
+            });
+
+            feedbackPanel.className = 'feedback-panel correct-ui show';
+            feedbackHeader.innerHTML = '✔️ Excellent!';
+            feedbackText.style.display = 'none'; 
+            
+        } else {
+            document.querySelectorAll('.option-btn').forEach(b => {
+                if (b.innerText === selectedOption) b.classList.add('wrong');
+                if (b.innerText === q.correct) b.classList.add('correct');
+            });
+
+            const card = document.getElementById('questionCard');
+            card.classList.add('shake');
+            setTimeout(() => card.classList.remove('shake'), 400);
+
+            if (navigator.vibrate) navigator.vibrate(200);
+            
+            // Track mistake
+            userMistakes.push(selectedOption);
+
+            feedbackPanel.className = 'feedback-panel wrong-ui show';
+            feedbackHeader.innerHTML = '❌ Not quite';
+            feedbackText.style.display = 'flex';
+            feedbackText.firstElementChild.innerText = "Correct answer:";
+            feedbackWord.innerText = q.correct;
+        }
+    }
+
+    // --- NEXT QUESTION ---
+    function nextQuestion() {
+        const card = document.getElementById('questionCard');
+        card.style.transform = 'translateY(-20px)';
+        card.style.opacity = '0';
+        
+        document.getElementById('feedbackPanel').classList.remove('show');
+
+        setTimeout(() => {
+            currentIndex++;
+            loadQuestion();
+        }, 300);
+    }
+
+    // --- FINAL SCREEN ---
+    function showFinalScreen() {
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('header').style.display = 'none';
+        document.getElementById('quizContainer').style.display = 'none';
+        document.getElementById('footer').style.display = 'none';
+        document.getElementById('feedbackPanel').classList.remove('show');
+        
+        const finalScreen = document.getElementById('finalScreen');
+        finalScreen.style.display = 'flex';
+        
+        let title = "Lesson Complete!";
+        if (score === questions.length) title = "Perfect! You are a Rig Master!";
+        else if (score > 5) title = "Great job! You know your routine!";
+        
+        document.getElementById('finalTitle').innerText = title;
+        document.getElementById('finalScoreText').innerText = `You scored ${score} out of ${questions.length}`;
+
+        // --- SEND TO GOOGLE SHEETS ---
+        sendResultsToGoogle();
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Start
+    initQuiz();
+
+</script>
+</body>
+</html>

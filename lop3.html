@@ -1,0 +1,516 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparatives & Superlatives Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --green: #58cc02; 
+            --dark-green: #46a302; 
+            --blue: #1cb0f6; 
+            --gray: #e5e5e5; 
+            --text: #4b4b4b; 
+            --red: #ff4b4b;
+        }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: #f0f7ff; 
+            color: var(--text); 
+            min-height: 100vh;
+            padding-bottom: 120px;
+        }
+        header { 
+            width: 100%; 
+            max-width: 650px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 14px;
+            box-sizing: border-box; 
+        }
+        .progress-bar { 
+            flex-grow: 1; 
+            height: 16px; 
+            background: var(--gray); 
+            border-radius: 10px; 
+            overflow: hidden;
+        }
+        #fill { 
+            width: 0%; 
+            height: 100%; 
+            background: var(--green); 
+            border-radius: 10px; 
+            transition: width 0.4s; 
+        }
+        .heart { font-size: 22px; white-space: nowrap; }
+        main { 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 25px; 
+            text-align: center; 
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05); 
+            margin-top: 20px; 
+            box-sizing: border-box;
+        }
+        h1 { 
+            font-size: 24px; 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            color: #1e293b; 
+        }
+        .subtitle {
+            font-size: 15px;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-top: 20px; 
+        }
+        .card { 
+            background: white; 
+            border: 2px solid var(--gray); 
+            border-bottom: 5px solid var(--gray); 
+            border-radius: 16px; 
+            padding: 16px; 
+            font-size: 18px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: all 0.1s; 
+            font-family: inherit; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 8px;
+            min-height: 70px; 
+            text-align: center;
+            color: #334155;
+        }
+        .card:hover:not(.correct):not(.wrong):not(.gone) {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        .card:active { 
+            transform: translateY(2px); 
+            border-bottom-width: 2px;
+        }
+        .card.selected { 
+            background: #e0f2fe; 
+            border-color: #7dd3fc; 
+            color: #0369a1; 
+        }
+        .card.correct { 
+            background: #d7ffb8; 
+            border-color: #58cc02; 
+            color: #14532d; 
+            border-bottom-width: 2px;
+            cursor: default; 
+            pointer-events: none; 
+        }
+        .card.gone {
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .card.wrong {
+            background: #fef2f2;
+            border-color: var(--red);
+            color: #b91c1c;
+            animation: shake 0.4s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .big-pic {
+            font-size: 50px; /* Adjusted for text instead of emojis */
+            font-weight: 900;
+            color: var(--blue);
+            margin: 10px 0 4px;
+            animation: pop 0.4s;
+        }
+        @keyframes pop { 0% { transform: scale(0.4); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .near-far {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--blue);
+            background: #e0f2fe;
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 12px;
+            margin-bottom: 6px;
+        }
+        #feedback { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            padding: 20px; 
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: #d7ffb8; 
+            border-top: 2px solid #58cc02; 
+            z-index: 10; 
+        }
+        #feedback .msg { font-weight: 800; font-size: 18px; color: #14532d; }
+        .next-btn { 
+            background: var(--green); 
+            color: white; 
+            border: none; 
+            border-bottom: 4px solid var(--dark-green); 
+            padding: 12px 50px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-family: inherit;
+        }
+        .next-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .end-screen { font-size: 22px; font-weight: 800; line-height: 1.5; color: #14532d; }
+        .end-screen .trophy { font-size: 60px; display: block; margin-bottom: 15px; animation: pop 0.5s; }
+        .restart-btn {
+            margin-top: 20px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-bottom: 4px solid #1899d6;
+            padding: 12px 40px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        .success-msg {
+            color: var(--green);
+            font-weight: 900;
+            font-size: 18px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+    <span class="heart">❤️ <span id="lives">3</span></span>
+</header>
+
+<main>
+    <h1 id="title">Comparatives & Superlatives</h1>
+    <p class="subtitle" id="subtitle">Level 1</p>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <span class="msg">✅ Great job!</span>
+    <button class="next-btn" onclick="nextStep()">CONTINUE</button>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Comparatives & Superlatives Challenge";
+    let userMistakes = [];
+
+    // --- LEVEL 1: MEMORY MATCH (Adjective to Comparative/Superlative) ---
+    const level1Data = [
+        { id: 1, text: 'big', type: 'word' }, { id: 1, text: 'the biggest', type: 'match' },
+        { id: 2, text: 'fast', type: 'word' }, { id: 2, text: 'faster than', type: 'match' },
+        { id: 3, text: 'dangerous', type: 'word' }, { id: 3, text: 'more dangerous', type: 'match' },
+        { id: 4, text: 'expensive', type: 'word' }, { id: 4, text: 'the most expensive', type: 'match' },
+        { id: 5, text: 'exciting', type: 'word' }, { id: 5, text: 'more exciting', type: 'match' }
+    ];
+
+    // --- LEVEL 2: COMPARATIVE OR SUPERLATIVE? ---
+    const questions2 = [
+        { word: 'big', context: 'The train station near my house has [ ? ] platform in the city!', correct: "the biggest", options: ["the biggest", "bigger than"] },
+        { word: 'fast', context: 'I\'ve got a motorbike. It is not [ ? ] way to travel, but it is good.', correct: "the fastest", options: ["the fastest", "faster than"] },
+        { word: 'dangerous', context: 'People say that motorbikes are [ ? ] cars because they go very fast.', correct: "more dangerous than", options: ["more dangerous than", "the most dangerous"] },
+        { word: 'expensive', context: 'Plane tickets are [ ? ] train tickets, but I love flying.', correct: "more expensive than", options: ["more expensive than", "the most expensive"] },
+        { word: 'exciting', context: 'For me, the train is [ ? ] the plane. I love looking out the window.', correct: "more exciting than", options: ["more exciting than", "the most exciting"] }
+    ];
+
+    // --- LEVEL 3: LISTEN AND CHOOSE ---
+    const targetSentences3 = [
+        { audio: "The train is more exciting than the plane.", correct: "more exciting than", choices: ["more exciting than", "the most exciting", "excitinger than"] },
+        { audio: "The train station has the biggest platform.", correct: "the biggest", choices: ["the biggest", "bigger than", "more big"] },
+        { audio: "Motorbikes are more dangerous than cars.", correct: "more dangerous than", choices: ["more dangerous than", "the most dangerous", "dangerouser than"] },
+        { audio: "Plane tickets are more expensive than train tickets.", correct: "more expensive than", choices: ["more expensive than", "the most expensive", "expensiver than"] }
+    ];
+
+    // --- LEVEL 4: TEXT COMPLETION (From the photo) ---
+    const textCompletion = [
+        { before: "Plane tickets are ", after: " train tickets, but I love flying to new countries!", correct: "more expensive than", options: ["more expensive than", "the most expensive", "expensiver than"] },
+        { before: "For me, the train is ", after: " the plane. I love looking out the window.", correct: "more exciting than", options: ["more exciting than", "the most exciting", "excitinger than"] },
+        { before: "The train station near my house has ", after: " platform in the city!", correct: "the biggest", options: ["the biggest", "bigger than", "more big"] },
+        { before: "I've got a motorbike. It is not ", after: " way to travel, but it is good.", correct: "the fastest", options: ["the fastest", "faster than", "most fast"] },
+        { before: "People say that motorbikes are ", before2: "", after: " cars because they go very fast.", correct: "more dangerous than", options: ["more dangerous than", "the most dangerous", "dangerouser than"] }
+    ];
+
+    const PAIRS = level1Data.length / 2;
+    const totalSteps = PAIRS + questions2.length + targetSentences3.length + textCompletion.length; 
+
+    let currentLevel = 1;
+    let subStep = 0;
+    let lives = 3;
+    let selectedCards = [];
+    let matchedPairs = 0;
+    let score = 0;
+
+    function shuffle(arr) {
+        return [...arr].sort(() => Math.random() - 0.5);
+    }
+
+    function updateProgress() {
+        let done;
+        if (currentLevel === 1) done = matchedPairs;
+        else if (currentLevel === 2) done = PAIRS + subStep;
+        else if (currentLevel === 3) done = PAIRS + questions2.length + subStep;
+        else done = PAIRS + questions2.length + targetSentences3.length + subStep;
+        document.getElementById('fill').style.width = (done / totalSteps * 100) + '%';
+    }
+
+    function loseLife() {
+        lives--;
+        if (lives < 0) lives = 0;
+        document.getElementById('lives').innerText = lives;
+        if (lives === 0) gameOver();
+    }
+
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+        selectedCards = [];
+
+        if (currentLevel === 1) {
+            matchedPairs = 0;
+            document.getElementById('title').innerText = "Match the Adjective";
+            document.getElementById('subtitle').innerText = "Level 1: Tap the base word, then tap its comparative/superlative form.";
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            shuffle(level1Data).forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+            updateProgress();
+        } 
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "Complete the Sentence";
+            document.getElementById('subtitle').innerText = "Level 2: Choose the correct form.";
+            const q = questions2[subStep];
+
+            const contextText = document.createElement('div');
+            contextText.style.cssText = "font-size: 20px; font-weight: 700; margin-bottom: 20px; color: #334155; line-height: 1.5;";
+            contextText.innerHTML = q.context.replace('[ ? ]', '<span style="color: var(--blue); border-bottom: 3px solid var(--blue); padding: 0 10px;">___</span>');
+            area.appendChild(contextText);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            grid.style.gridTemplateColumns = "1fr";
+            shuffle(q.options).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkChoice(opt, q.correct, btn);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+            updateProgress();
+        }
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "Listen and Choose";
+            document.getElementById('subtitle').innerText = "Level 3: Listen to the sentence and pick the correct phrase.";
+            const stage = targetSentences3[subStep];
+            area.innerHTML = '<button class="card" onclick="speak(\'' + stage.audio + '\')" style="width:100%; margin-bottom:20px; background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; font-size:20px; justify-content:center;">🔊 LISTEN</button>';
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            grid.style.gridTemplateColumns = "1fr";
+            shuffle(stage.choices).forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = choice;
+                btn.onclick = () => checkChoice(choice, stage.correct, btn);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+            speak(stage.audio);
+            updateProgress();
+        }
+        else if (currentLevel === 4) {
+            document.getElementById('title').innerText = "Read and Complete";
+            document.getElementById('subtitle').innerText = "Level 4: Based on the text about cities and transport.";
+            const q = textCompletion[subStep];
+
+            const textBlock = document.createElement('div');
+            textBlock.style.cssText = "font-size: 18px; font-weight: 600; color: #334155; line-height: 1.8; text-align: left; background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid var(--blue);";
+            textBlock.innerHTML = q.before + '<span style="color: var(--blue); border-bottom: 3px solid var(--blue); padding: 0 10px;">___</span>' + q.after;
+            area.appendChild(textBlock);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            grid.style.gridTemplateColumns = "1fr";
+            shuffle(q.options).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkChoice(opt, q.correct, btn);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+            updateProgress();
+        }
+    }
+
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || card.classList.contains('gone') || selectedCards.some(c => c.card === card)) return;
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const [a, b] = selectedCards;
+            if (a.item.id === b.item.id && a.item.type !== b.item.type) {
+                selectedCards.forEach(c => { c.card.classList.remove('selected'); c.card.classList.add('correct'); });
+                selectedCards = [];
+                matchedPairs++;
+                score++;
+                updateProgress();
+                if (matchedPairs === PAIRS) showNext();
+            } else {
+                loseLife();
+                selectedCards.forEach(c => { c.card.classList.remove('selected'); c.card.classList.add('wrong'); });
+                const toClear = selectedCards.slice();
+                selectedCards = [];
+                setTimeout(() => {
+                    toClear.forEach(c => c.card.classList.remove('wrong'));
+                }, 500);
+            }
+        }
+    }
+
+    function checkChoice(choice, correct, btn) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (choice === correct) {
+            btn.classList.add('correct');
+            score++;
+            document.querySelectorAll('#game-area .card').forEach(b => b.style.pointerEvents = 'none');
+            showNext();
+        } else {
+            btn.classList.add('wrong');
+            btn.style.pointerEvents = 'none';
+            userMistakes.push(choice);
+            loseLife();
+        }
+    }
+
+    function showNext() {
+        if (lives > 0) {
+            document.getElementById('feedback').style.display = 'flex';
+        }
+    }
+
+    function nextStep() {
+        if (currentLevel === 1) { currentLevel = 2; subStep = 0; }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= questions2.length) { currentLevel = 3; subStep = 0; }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= targetSentences3.length) { currentLevel = 4; subStep = 0; }
+        }
+        else if (currentLevel === 4) {
+            subStep++;
+            if (subStep >= textCompletion.length) { finishGame(); return; }
+        }
+        initLevel();
+    }
+
+    function finishGame() {
+        document.getElementById('title').innerText = "You did it!";
+        document.getElementById('subtitle').innerText = "All levels complete!";
+        document.getElementById('fill').style.width = '100%';
+        document.getElementById('game-area').innerHTML =
+            '<div class="end-screen"><span class="trophy">🏆</span>' +
+            'Great job! You know your comparatives!<br>' +
+            'Lives left: ' + (lives > 0 ? '❤️'.repeat(lives) : 'none') +
+            '<p id="successMsg" class="success-msg">Results sent successfully! ✅</p>' +
+            '<br><button class="restart-btn" onclick="location.reload()">PLAY AGAIN</button></div>';
+        document.getElementById('feedback').style.display = 'none';
+        sendResultsToGoogle();
+    }
+
+    function gameOver() {
+        document.getElementById('title').innerText = "Try again!";
+        document.getElementById('subtitle').innerText = "";
+        document.getElementById('game-area').innerHTML =
+            '<div class="end-screen"><span class="trophy">💪</span>' +
+            'Good try! Let\'s play again.' +
+            '<br><button class="restart-btn" onclick="location.reload()">TRY AGAIN</button></div>';
+        document.getElementById('feedback').style.display = 'none';
+    }
+
+    function speak(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8; 
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: totalSteps,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    initLevel();
+</script>
+
+</body>
+</html>

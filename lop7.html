@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💼 Corporate Communication Quest 💼</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .app { max-width: 800px; width: 100%; }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 3px solid #2b3a67;
+        }
+        .header { text-align: center; margin-bottom: 25px; }
+        .title { color: #1e3a8a; font-size: 2em; margin-bottom: 10px; font-weight: 700; }
+        
+        .story-box {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            color: #334155;
+            border-left: 6px solid #2b3a67;
+        }
+
+        .story-box .highlight {
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        .question-text { font-size: 1.3em; color: #1e3a8a; margin-bottom: 20px; font-weight: bold; }
+        .options { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .btn {
+            padding: 16px 20px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: left;
+            color: #334155;
+        }
+        .btn:hover { border-color: #2b3a67; background: #e2e8f0; }
+        .btn.correct { background: #dcfce7 !important; border-color: #16a34a; color: #166534; }
+        .btn.wrong { background: #fee2e2 !important; border-color: #dc2626; color: #991b1b; }
+
+        .progress-bar {
+            width: 100%; height: 8px; background: #e2e8f0;
+            border-radius: 5px; margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background: #2b3a67; width: 0%; transition: 0.4s; }
+        
+        .win-screen { display: none; text-align: center; padding: 20px; }
+        .emoji { font-size: 4em; margin-bottom: 15px; }
+        
+        .success-msg {
+            color: #16a34a; font-weight: 800; font-size: 1.2em;
+            margin-top: 15px; display: none;
+        }
+
+        @media (max-width: 600px) {
+            .title { font-size: 1.5em; }
+            .card { padding: 20px; }
+            .story-box { font-size: 1em; padding: 15px; }
+            .question-text { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <div id="gameUI">
+        <div class="header">
+            <div class="title">💼 Corporate Communication</div>
+            <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+        </div>
+
+        <div class="card">
+            <div id="storySection" class="story-box">
+                <p><strong>Read the article. Choose the correct answer.</strong></p>
+                <br>
+                <p>Some professionals are better communicators than others, and this trait helps them choose their career paths. People who work alone, for example, software developers or data analysts, do not need excellent verbal communication skills. Accountants communicate with clients primarily through numbers and reports.</p>
+                <p>However, workers who interact with the public all day, for instance, corporate sales managers, need to enjoy meeting and persuading people. One profession that requires good communication skills (but does not always have them) is engineering. A brilliant engineer may not be very effective at explaining complex technical concepts to non-technical clients. Some progressive tech companies now train their engineers to develop a good "client-side manner." This means the engineers learn to be patient and clear when they are explaining issues to frustrated or confused clients.</p>
+                <p>Another profession that demands good communication skills is human resources (HR). HR specialists learn to read carefully the tone of emails and the body language in video calls so they can "read" if an employee is disengaged or being untruthful.</p>
+            </div>
+            <div class="question-text" id="qText">Question...</div>
+            <div class="options" id="optBox"></div>
+        </div>
+    </div>
+
+    <div id="winScreen" class="win-screen card">
+        <div class="emoji">🏆💼📊</div>
+        <h1 style="color: #1e3a8a;">TRAINING COMPLETE!</h1>
+        <p style="font-size: 1.3em; margin: 15px 0; color: #334155;">You have mastered the reading comprehension!</p>
+        <p id="successMsg" class="success-msg">Results sent successfully! ✅</p>
+        <button class="btn" onclick="submitResults()" style="padding: 12px 30px; background: #2b3a67; color: white; border: none; width: 100%; max-width: 300px; margin: 20px auto; text-align: center;">Finish & Send Results</button>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURATION & RESULTS TRACKING ---
+    const TEST_NAME = "Corporate Communication Reading Quiz";
+    let userMistakes = [];
+    let score = 0;
+
+    const questions = [
+        // 1. Quantifier (All / Some)
+        { q: "1. ___ professionals are good communicators.", a: ["All", "Some"], c: "Some" },
+        // 2. Comprehension (Working in a hotel / meeting people)
+        { q: "2. A good sales manager likes ___.", a: ["meeting people", "working alone"], c: "meeting people" },
+        // 3. Quantifier (Most / Some)
+        { q: "3. ___ engineers are bad communicators.", a: ["Most", "Some"], c: "Some" },
+        // 4. Modal verb (can't / can)
+        { q: "4. Engineers ___ learn to communicate with clients.", a: ["can't", "can"], c: "can" },
+        // 5. Vocabulary (about science / kindly to clients)
+        { q: "5. A 'client-side manner' means you can talk ___ to clients.", a: ["kindly", "about science"], c: "kindly" },
+        // 6. Vocabulary (student doctors / non-technical clients)
+        { q: "6. Non-technical clients are ___ who need clear explanations.", a: ["sick people", "ordinary people"], c: "ordinary people" },
+        // 7. Comprehension (dangerous / frustrated or confused)
+        { q: "7. Frustrated clients are ___.", a: ["dangerous", "unhappy people"], c: "unhappy people" },
+        // 8. Modal verb (can't / can)
+        { q: "8. You ___ learn to read body language.", a: ["can't", "can"], c: "can" }
+    ];
+
+    let current = 0;
+
+    function load() {
+        if (current >= questions.length) {
+            document.getElementById('gameUI').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'block';
+            return;
+        }
+
+        const data = questions[current];
+        document.getElementById('qText').innerText = data.q;
+        
+        document.getElementById('storySection').style.display = "block";
+        
+        const box = document.getElementById('optBox');
+        box.innerHTML = '';
+        
+        data.a.forEach(opt => {
+            const b = document.createElement('button');
+            b.className = 'btn';
+            b.innerText = opt;
+            b.onclick = () => check(opt, b);
+            box.appendChild(b);
+        });
+
+        document.getElementById('pFill').style.width = (current / questions.length) * 100 + '%';
+    }
+
+    function check(choice, btn) {
+        // Disable all buttons to prevent multiple clicks
+        document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+
+        if (choice === questions[current].c) {
+            score++;
+            btn.classList.add('correct');
+            setTimeout(() => { current++; load(); }, 800);
+        } else {
+            btn.classList.add('wrong');
+            
+            // Highlight correct answer
+            document.querySelectorAll('.btn').forEach(b => {
+                if (b.innerText === questions[current].c) {
+                    b.classList.add('correct');
+                }
+            });
+
+            // Track mistake
+            userMistakes.push(choice);
+
+            setTimeout(() => { current++; load(); }, 2000);
+        }
+    }
+
+    // ================================================================
+    //  GOOGLE SHEETS INTEGRATION (MANDATORY)
+    // ================================================================
+    async function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const params = new URLSearchParams({
+            name: TEST_NAME,
+            score: score,
+            total: questions.length,
+            mistakes: userMistakes.join(', ')
+        });
+
+        try {
+            await fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            
+            // Show success message
+            const msgEl = document.getElementById('successMsg');
+            if (msgEl) msgEl.style.display = 'block';
+            
+            // Hide the button after sending
+            document.querySelector('#winScreen button').style.display = 'none';
+            
+        } catch (error) {
+            console.error("Error sending results:", error);
+        }
+    }
+
+    // Since the original code didn't have a submit button on the win screen, 
+    // I added one to trigger the Google Sheets function manually.
+    function submitResults() {
+        // Calculate final score text before sending
+        document.querySelector('#winScreen p').innerHTML = `You scored <b>${score} out of ${questions.length}</b>!`;
+        sendResultsToGoogle();
+    }
+
+    // Start the quiz
+    load();
+</script>
+
+</body>
+</html>
