@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Formula 1 · Paddock Grammar Quest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #f0f4f8; /* Light background */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #1a202c;
+        }
+        .game-container {
+            max-width: 720px;
+            width: 100%;
+        }
+        
+        /* HEADER */
+        .quest-header {
+            background: #e10600; /* F1 Red */
+            padding: 14px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 0 #990400;
+        }
+        .quest-badge {
+            background: #ffffff;
+            padding: 5px 14px;
+            font-weight: 800;
+            color: #e10600;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quest-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .can-badge {
+            margin-left: auto;
+            background: #00e5ff;
+            color: #004488;
+            padding: 5px 16px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* QUIZ SECTIONS */
+        .quiz-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px 22px 32px;
+            border: 2px solid #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #e10600;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #f1f5f9;
+        }
+
+        /* HIDDEN SECTION */
+        .hidden-section {
+            display: none;
+        }
+
+        /* CONTENT AREA */
+        .img-preview {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 2px dashed #cbd5e1;
+            margin-bottom: 20px;
+        }
+        .img-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+            max-height: 160px;
+            object-fit: cover;
+        }
+
+        .mine-block {
+            background: #f8fafc;
+            border-left: 6px solid #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .mine-block p {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        /* OPTIONS */
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 16px 12px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+        }
+        .option-btn:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+        }
+        .option-btn:active {
+            transform: translateY(2px);
+        }
+        .option-btn.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .option-btn.wrong {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* FEEDBACK */
+        .feedback-area {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            border-left: 6px solid #e10600;
+            color: #334155;
+            font-weight: 600;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* PROGRESS */
+        .progress-indicator {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        .progress-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+        .progress-dot.done {
+            background: #22c55e;
+        }
+        .progress-dot.active {
+            background: #00e5ff;
+            transform: scale(1.2);
+        }
+
+        /* FINAL SCREEN */
+        .final-screen {
+            text-align: center;
+            padding: 30px 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-top: 20px;
+        }
+        .final-screen h2 {
+            color: #e10600;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .final-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            color: #334155;
+            font-weight: 600;
+        }
+        .status-msg {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        @media (max-width: 550px) {
+            .option-grid { grid-template-columns: 1fr; gap: 10px; }
+            .quest-title { font-size: 1.2rem; }
+            .quiz-section { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div class="quest-header">
+        <span class="quest-badge">🏁 Pit Lane</span>
+        <span class="quest-title">F1 Syntax & Abilities</span>
+        <span class="can-badge">TELEMETRY ACTIVE</span>
+    </div>
+
+    <!-- ========== PART 1 ========== -->
+    <div class="quiz-section">
+        <div class="section-title">🧩 Part 1: Word Order</div>
+        <div class="img-preview">
+            <img src="https://avatars.mds.yandex.net/i?id=d1035867099714e164b64a0f72ee0a4b_l-5282198-images-thumbs&n=13" alt="F1 Track">
+        </div>
+
+        <div class="mine-block">
+            <p id="t1-text">Loading syntax parameters...</p>
+        </div>
+
+        <div class="option-grid" id="t1-options"></div>
+
+        <div class="progress-indicator" id="t1-progress"></div>
+        <div class="feedback-area" id="t1-feedback">🔧 Put the words in the correct order.</div>
+    </div>
+
+    <!-- ========== PART 2 (HIDDEN INITIALLY) ========== -->
+    <div class="quiz-section hidden-section" id="part2-section">
+        <div class="section-title">⏱️ Part 2: Can / Can't</div>
+        <div class="img-preview">
+            <img src="https://s-cdn.sportbox.ru/images/styles/upload/fp_fotos/3e/61/2c46ec8199c859f4437722cc1661e03b595a273641e62616221044.jpg" alt="F1 Pit Crew">
+        </div>
+
+        <div class="mine-block">
+            <p id="t2-text">Loading ability configurations...</p>
+        </div>
+
+        <div class="option-grid" id="t2-options"></div>
+
+        <div class="progress-indicator" id="t2-progress"></div>
+        <div class="feedback-area" id="t2-feedback">🚦 Fill in the sentences with can or can't.</div>
+    </div>
+    
+    <!-- ========== FINAL SCREEN CONTAINER ========== -->
+    <div id="final-container"></div>
+</div>
+
+<script>
+    // ===== EXACT LEXIS FROM THE PICTURE =====
+    
+    // Part 1: Word Order (Photo Part 3)
+    const tab1Tasks = [
+        {
+            text: "Put the words in the correct order: seat belt / your / wear / always",
+            correct: "always wear your seat belt",
+            options: ["always wear your seat belt", "wear your always seat belt", "your seat belt wear always", "seat belt your wear always"]
+        },
+        {
+            text: "Put the words in the correct order: talk to / driver / the / don't",
+            correct: "don't talk to the driver",
+            options: ["don't talk to the driver", "talk to the don't driver", "the driver don't talk to", "don't the driver talk to"]
+        },
+        {
+            text: "Put the words in the correct order: before / look / both ways / crossing",
+            correct: "look both ways before crossing",
+            options: ["look both ways before crossing", "before look both ways crossing", "both ways look before crossing", "crossing look before both ways"]
+        },
+        {
+            text: "Put the words in the correct order: into / don't run / the road",
+            correct: "don't run into the road",
+            options: ["don't run into the road", "run don't into the road", "into the road don't run", "don't into the road run"]
+        },
+        {
+            text: "Put the words in the correct order: the / pavement / walk / on",
+            correct: "walk on the pavement",
+            options: ["walk on the pavement", "on the pavement walk", "pavement the on walk", "walk the pavement on"]
+        }
+    ];
+
+    // Part 2: Can / Can't (Photo Part 4)
+    const tab2Tasks = [
+        {
+            text: "Sarah is only one year old. She ________ write yet.",
+            correct: "can't",
+            options: ["can't", "can", "don't", "doesn't"]
+        },
+        {
+            text: "Mr. Smith is seventy years old. He ________ see very well so he wears glasses.",
+            correct: "can't",
+            options: ["can't", "can", "not", "isn't"]
+        },
+        {
+            text: "Tony ________ swim very well. He always comes first in the races.",
+            correct: "can",
+            options: ["can", "can't", "does", "is"]
+        },
+        {
+            text: "Anne is two years old. She ________ cook.",
+            correct: "can't",
+            options: ["can't", "can", "don't", "doesn't"]
+        },
+        {
+            text: "Bill and Sue love music. They ________ both play the guitar.",
+            correct: "can",
+            options: ["can", "can't", "are", "do"]
+        },
+        {
+            text: "Ann is from Japan. She ________ speak Japanese.",
+            correct: "can",
+            options: ["can", "can't", "is", "does"]
+        },
+        {
+            text: "Mary is only six. She ________ fly a plane.",
+            correct: "can't",
+            options: ["can't", "can", "don't", "doesn't"]
+        },
+        {
+            text: "Katie is only three years old but she ________ write her name perfectly.",
+            correct: "can",
+            options: ["can", "can't", "is", "does"]
+        }
+    ];
+
+    let t1Idx = 0;
+    let t2Idx = 0;
+    
+    // --- TRACKING DATA ---
+    const TEST_NAME = "F1 Grammar: Word Order & Can/Can't";
+    let correctAnswers = 0;
+    let userMistakes = [];
+
+    function initTrack() {
+        renderDots('t1-progress', tab1Tasks.length);
+        renderDots('t2-progress', tab2Tasks.length);
+        loadTab1Task();
+        // We don't load Tab 2 tasks yet until Part 1 is done
+    }
+
+    function renderDots(containerId, count) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'progress-dot';
+            container.appendChild(dot);
+        }
+    }
+
+    function updateDots(containerId, activeIdx, count) {
+        const dots = document.getElementById(containerId).children;
+        for (let i = 0; i < count; i++) {
+            dots[i].className = 'progress-dot';
+            if (i < activeIdx) dots[i].classList.add('done');
+            if (i === activeIdx) dots[i].classList.add('active');
+        }
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ===== PART 1 =====
+    function loadTab1Task() {
+        if (t1Idx >= tab1Tasks.length) {
+            updateDots('t1-progress', tab1Tasks.length, tab1Tasks.length);
+            document.getElementById('t1-text').innerText = "🏁 Word Order section complete!";
+            document.getElementById('t1-options').innerHTML = '';
+            document.getElementById('t1-feedback').innerText = "Part 1 data clear. Unlocking Part 2...";
+            
+            // Reveal Part 2
+            revealPart2();
+            return;
+        }
+
+        updateDots('t1-progress', t1Idx, tab1Tasks.length);
+        const task = tab1Tasks[t1Idx];
+        document.getElementById('t1-text').innerHTML = task.text;
+
+        const optGrid = document.getElementById('t1-options');
+        optGrid.innerHTML = '';
+
+        shuffle(task.options).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkTab1(opt, btn);
+            optGrid.appendChild(btn);
+        });
+    }
+
+    function checkTab1(selected, btn) {
+        const task = tab1Tasks[t1Idx];
+        const buttons = document.getElementById('t1-options').querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (selected === task.correct) {
+            correctAnswers++;
+            btn.classList.add('correct');
+            document.getElementById('t1-feedback').innerText = "🟢 Green flag! Correct order.";
+            setTimeout(() => {
+                t1Idx++;
+                loadTab1Task();
+            }, 1000);
+        } else {
+            userMistakes.push(selected);
+            btn.classList.add('wrong');
+            document.getElementById('t1-feedback').innerText = `🔴 Red flag! The correct order is: "${task.correct}"`;
+            setTimeout(() => {
+                t1Idx++;
+                loadTab1Task();
+            }, 1500);
+        }
+    }
+
+    // ===== REVEAL PART 2 =====
+    function revealPart2() {
+        const part2 = document.getElementById('part2-section');
+        part2.classList.remove('hidden-section');
+        
+        // Load the first question of Part 2
+        loadTab2Task();
+        
+        // Scroll smoothly down to Part 2
+        setTimeout(() => {
+            part2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 600);
+    }
+
+    // ===== PART 2 =====
+    function loadTab2Task() {
+        if (t2Idx >= tab2Tasks.length) {
+            updateDots('t2-progress', tab2Tasks.length, tab2Tasks.length);
+            document.getElementById('t2-text').innerText = "🏁 Can / Can't section complete!";
+            document.getElementById('t2-options').innerHTML = '';
+            document.getElementById('t2-feedback').innerText = "Part 2 data clear. Check your final score below.";
+            showFinalScreen();
+            return;
+        }
+
+        updateDots('t2-progress', t2Idx, tab2Tasks.length);
+        const task = tab2Tasks[t2Idx];
+        document.getElementById('t2-text').innerHTML = task.text;
+
+        const optGrid = document.getElementById('t2-options');
+        optGrid.innerHTML = '';
+
+        shuffle(task.options).forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkTab2(opt, btn);
+            optGrid.appendChild(btn);
+        });
+    }
+
+    function checkTab2(selected, btn) {
+        const task = tab2Tasks[t2Idx];
+        const buttons = document.getElementById('t2-options').querySelectorAll('.option-btn');
+        buttons.forEach(b => b.classList.add('disabled'));
+
+        if (selected === task.correct) {
+            correctAnswers++;
+            btn.classList.add('correct');
+            document.getElementById('t2-feedback').innerText = "🟢 Green flag! Correct answer.";
+            setTimeout(() => {
+                t2Idx++;
+                loadTab2Task();
+            }, 1000);
+        } else {
+            userMistakes.push(selected);
+            btn.classList.add('wrong');
+            document.getElementById('t2-feedback').innerText = `🔴 Red flag! The correct answer is: "${task.correct}"`;
+            setTimeout(() => {
+                t2Idx++;
+                loadTab2Task();
+            }, 1500);
+        }
+    }
+
+    // ===== FINAL SCORE & GOOGLE SHEETS SENDING =====
+    function showFinalScreen() {
+        const finalContainer = document.getElementById('final-container');
+        const totalQ = tab1Tasks.length + tab2Tasks.length;
+        
+        finalContainer.innerHTML = `
+            <div class="final-screen">
+                <h2>🏆 RACE COMPLETE!</h2>
+                <p>You scored <strong>${correctAnswers}</strong> out of <strong>${totalQ}</strong></p>
+                <p>Mistakes: ${userMistakes.length > 0 ? userMistakes.join(', ') : 'None! Perfect run!'}</p>
+                <div id="send-status" class="status-msg">Sending telemetry data...</div>
+            </div>
+        `;
+        
+        // Automatically trigger the send function
+        sendResultsToGoogle(correctAnswers, totalQ);
+        
+        // Scroll smoothly to the bottom so the user sees the score
+        setTimeout(() => {
+            finalContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
+    }
+
+    function sendResultsToGoogle(score, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", total);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            const statusEl = document.getElementById('send-status');
+            if(statusEl) {
+                statusEl.style.color = '#166534'; // Dark Green
+                statusEl.style.background = '#dcfce7';
+                statusEl.innerText = "Results sent successfully! ✅";
+            }
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            const statusEl = document.getElementById('send-status');
+            if(statusEl) {
+                statusEl.style.color = '#991b1b'; // Dark Red
+                statusEl.style.background = '#fee2e2';
+                statusEl.innerText = "Failed to send results ❌. Check console.";
+            }
+        });
+    }
+
+    initTrack();
+</script>
+
+</body>
+</html>

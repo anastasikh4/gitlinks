@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>F1 PADDOCK RACE · Safety Instructions Grand Prix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0b0c10;
+      background-image: radial-gradient(circle at 20% 10%, #1f2833 5%, #0b0c10 80%);
+      font-family: 'Raleway', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #c5a059;
+    }
+    .game-ui {
+      max-width: 750px;
+      width: 100%;
+      background: rgba(26, 38, 57, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 3px solid #e10600;
+      box-shadow: 0 0 50px rgba(225, 6, 0, 0.3), inset 0 0 30px rgba(0,0,0,0.6);
+      border-radius: 40px;
+      padding: 24px 28px 30px;
+    }
+    .dmc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #e10600;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: #e10600;
+      text-shadow: 0 0 15px rgba(225, 6, 0, 0.6);
+      letter-spacing: 2px;
+      font-weight: 900;
+    }
+    .style-meter {
+      background: #0f172a;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      color: #00f2fe;
+      font-size: 1.3rem;
+      border: 2px solid #e10600;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .quest-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid #e10600;
+      border-radius: 30px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      color: #00f2fe;
+      margin-bottom: 12px;
+      border-left: 10px solid #e10600;
+      padding-left: 18px;
+      display: inline-block;
+      font-weight: 900;
+    }
+    .question-area {
+      background: #0f172a;
+      border-radius: 25px;
+      padding: 25px 20px;
+      margin: 20px 0;
+      border: 2px solid #334155;
+      transition: all 0.3s;
+    }
+    .options-grid {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .word-btn {
+      background: #1e293b;
+      border: 2px solid #475569;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 120px;
+    }
+    .word-btn:hover {
+      background: #334155;
+      border-color: #00f2fe;
+    }
+    .word-btn.correct-glow {
+      background: #2ecc71 !important;
+      color: #ffffff !important;
+      border-color: #fff !important;
+      box-shadow: 0 0 25px #2ecc71;
+      pointer-events: none;
+    }
+    .word-btn.wrong-shake {
+      animation: shake 0.25s ease-in-out;
+      background: #7f1d1d !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+      pointer-events: none;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+      100% { transform: translateX(0); }
+    }
+    .feedback-msg {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 18px 0 10px;
+      min-height: 2.5rem;
+    }
+    .progress-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    .red-orb {
+      width: 14px;
+      height: 14px;
+      background: #e10600;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #e10600;
+      transition: all 0.3s;
+    }
+    .next-btn {
+      background: #e10600;
+      border: none;
+      color: white;
+      font-weight: bold;
+      padding: 14px 35px;
+      border-radius: 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #990400;
+      margin-top: 12px;
+      transition: 0.1s;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .next-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #5f0300;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .restart-link {
+      font-size: 0.95rem;
+      color: #00f2fe;
+      cursor: pointer;
+      margin-left: 15px;
+      text-decoration: underline;
+    }
+    .mission-label {
+      font-size: 0.9rem;
+      color: #ff4d4d;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .status-msg {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-top: 15px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+<div class="game-ui">
+  <div class="dmc-header">
+    <span class="logo">🏁 F1 ACADEMY</span>
+    <div class="style-meter">⚡ TELEMETRY: OK</div>
+  </div>
+
+  <div class="quest-card" id="mainQuest">
+    <div id="missionTag" class="mission-label"></div>
+    <h2 id="questTitle">LAP LOG</h2>
+    <div id="questionArea" class="question-area"></div>
+    <div id="feedbackMsg" class="feedback-msg"></div>
+    <div class="progress-indicator" id="progressOrbs"></div>
+    <button id="nextBtn" class="next-btn hidden">NEXT LAP ▶</button>
+    <span class="restart-link" id="restartAll">↻ restart grand prix</span>
+    
+    <!-- Status Message for Google Sheets Sync -->
+    <div id="send-status" class="status-msg"></div>
+  </div>
+</div>
+
+<script>
+  // ========== TRACKING DATA ==========
+  const TEST_NAME = "F1 Pit Lane Safety (Verb Completion)";
+  let userMistakes = [];
+  let score = 0;
+
+  (function() {
+    // ========== ADAPTED DATA (F1 CONTEXT, SAME RULES) ==========
+    const allQuestions = [
+      { 
+        type: 'verb', 
+        title: "🏎️ PIT LANE SAFETY", 
+        mission: "INSTRUCTIONS",
+        text: "When in the pit lane, don't ______ in front of the cars.", 
+        options: ["run", "fly", "sleep"], 
+        correct: "run" 
+      },
+      { 
+        type: 'verb', 
+        title: "🏎️ TRACK SAFETY", 
+        mission: "INSTRUCTIONS",
+        text: "When on the track, ______ both ways before crossing.", 
+        options: ["look", "cook", "read"], 
+        correct: "look" 
+      },
+      { 
+        type: 'verb', 
+        title: "🏎️ DRIVER SAFETY", 
+        mission: "INSTRUCTIONS",
+        text: "When you enter the car, don't ______ to the driver.", 
+        options: ["talk", "swim", "sing"], 
+        correct: "talk" 
+      },
+      { 
+        type: 'verb', 
+        title: "🏎️ GARAGE SAFETY", 
+        mission: "INSTRUCTIONS",
+        text: "When you enter the garage, don't ______ the tools.", 
+        options: ["touch", "eat", "paint"], 
+        correct: "touch" 
+      },
+      { 
+        type: 'verb', 
+        title: "🏎️ RACE DAY", 
+        mission: "INSTRUCTIONS",
+        text: "When going to the track, ______ on the pavement.", 
+        options: ["walk", "fly", "jump"], 
+        correct: "walk" 
+      },
+      { 
+        type: 'verb', 
+        title: "🏎️ BIKE SAFETY", 
+        mission: "INSTRUCTIONS",
+        text: "When you ride your bike, ______ a safety helmet.", 
+        options: ["wear", "throw", "wash"], 
+        correct: "wear" 
+      }
+    ];
+
+    let currentIdx = 0;
+
+    function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
+
+    function initGame() {
+        currentIdx = 0;
+        score = 0;
+        userMistakes = [];
+        
+        // Reset status
+        const statusEl = document.getElementById('send-status');
+        if(statusEl) {
+            statusEl.innerText = "";
+            statusEl.style.color = "inherit";
+        }
+
+        document.getElementById('restartAll').onclick = initGame;
+        document.getElementById('nextBtn').onclick = () => { currentIdx++; renderStage(); };
+        renderStage();
+    }
+
+    function renderStage() {
+        const fb = document.getElementById('feedbackMsg');
+        const next = document.getElementById('nextBtn');
+        fb.innerText = "";
+        fb.style.color = "inherit";
+        next.classList.add('hidden');
+
+        if(currentIdx >= allQuestions.length) {
+            document.getElementById('missionTag').innerText = "FINISH";
+            document.getElementById('questTitle').innerText = "🏆 P1 CHAMPION!";
+            
+            // Show final screen
+            document.getElementById('questionArea').innerHTML = `
+                <p style='font-size:1.5rem; text-align:center; color: #2ecc71; font-weight: bold; margin-bottom: 10px;'>CHEQUERED FLAG!</p>
+                <p style='font-size:1.2rem; text-align:center; color: #f8fafc;'>Final Score: ${score}/${allQuestions.length}</p>
+            `;
+            
+            // Send data to Google Sheets
+            sendResultsToGoogle();
+            
+            return;
+        }
+
+        const q = allQuestions[currentIdx];
+        document.getElementById('missionTag').innerText = q.mission;
+        document.getElementById('questTitle').innerText = q.title;
+
+        const area = document.getElementById('questionArea');
+        area.innerHTML = "";
+
+        const orbs = document.getElementById('progressOrbs');
+        orbs.innerHTML = "";
+        for(let i=0; i<allQuestions.length; i++) {
+            const orb = document.createElement('span');
+            orb.className = "red-orb";
+            orb.style.opacity = i <= currentIdx ? "1" : "0.25";
+            orbs.appendChild(orb);
+        }
+
+        if(q.type === 'verb') {
+            area.innerHTML = `<p style='font-size:1.3rem; margin-bottom:15px; line-height: 1.4;'>${q.text.replace('______', '<u style="color:#00f2fe;">???</u>')}</p>`;
+            const grid = document.createElement('div');
+            grid.className = 'options-grid';
+            
+            // Shuffle options for display
+            shuffle([...q.options]).forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'word-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if(opt === q.correct) {
+                        btn.classList.add('correct-glow');
+                        fb.innerText = "🟢 LAP VALIDATED!";
+                        fb.style.color = "#2ecc71";
+                        score++;
+                        next.classList.remove('hidden');
+                    } else {
+                        userMistakes.push(opt); // Track wrong answer
+                        btn.classList.add('wrong-shake');
+                        setTimeout(() => btn.classList.remove('wrong-shake'), 300);
+                    }
+                };
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", score);
+        formData.append("total", allQuestions.length);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#c5a059"; // Default color while loading
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            // With 'no-cors', we assume success if the promise resolves
+            statusEl.style.color = '#2ecc71'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#ef4444'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    window.onload = initGame;
+  })();
+</script>
+</body>
+</html>
