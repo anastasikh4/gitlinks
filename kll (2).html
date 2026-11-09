@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suffix Agent: Career & Science Academy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Baloo+2:wght@700;800&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Baloo 2', 'Comic Sans MS', sans-serif;
+            background: linear-gradient(180deg, #4fc3f7 0%, #81d4fa 40%, #b3e5fc 100%);
+            background-attachment: fixed;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative clouds */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before {
+            width: 180px; height: 60px;
+            top: 40px; left: -30px;
+            box-shadow: 80px 20px 0 -10px rgba(255,255,255,0.7),
+                        160px -10px 0 -15px rgba(255,255,255,0.6);
+        }
+        body::after {
+            width: 220px; height: 70px;
+            bottom: 60px; right: -50px;
+            box-shadow: -100px 30px 0 -15px rgba(255,255,255,0.7),
+                        -200px 5px 0 -20px rgba(255,255,255,0.5);
+        }
+
+        /* ===== MAIN CARD ===== */
+        .detective-card {
+            background: #fff;
+            width: 100%;
+            max-width: 560px;
+            padding: 30px 25px 25px;
+            border-radius: 30px;
+            border: 5px solid #0d47a1;
+            box-shadow: 0 12px 0 #0d47a1, 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Star badge at top of card */
+        .detective-card::before {
+            content: '⭐';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 46px;
+            filter: drop-shadow(0 3px 0 #b8860b);
+            animation: starSpin 3s ease-in-out infinite;
+        }
+
+        @keyframes starSpin {
+            0%, 100% { transform: translateX(-50%) rotate(-10deg) scale(1); }
+            50% { transform: translateX(-50%) rotate(10deg) scale(1.1); }
+        }
+
+        /* ===== HEADERS ===== */
+        .level-tag {
+            display: inline-block;
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+            color: #5d4037;
+            font-family: 'Fredoka One', cursive;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 3px solid #5d4037;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 #5d4037;
+        }
+
+        h1 {
+            color: #0d47a1;
+            font-family: 'Fredoka One', cursive;
+            font-size: 22px;
+            margin: 0 0 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 4px dashed #bbdefb;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== WORD DISPLAY ===== */
+        .word-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 36px;
+            font-weight: 800;
+            color: #d32f2f;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            text-transform: lowercase;
+            text-shadow: 3px 3px 0 #ffe082, 6px 6px 0 rgba(0,0,0,0.08);
+            animation: wordBounce 0.6s ease-out;
+            min-height: 60px;
+            word-wrap: break-word;
+        }
+
+        @keyframes wordBounce {
+            0% { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.15) rotate(3deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .translation-hint {
+            display: inline-block;
+            font-size: 16px;
+            color: #fff;
+            background: #7e57c2;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 5px 0 20px;
+            border: 3px solid #4527a0;
+            box-shadow: 0 4px 0 #4527a0;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #42a5f5, #1976d2);
+            color: white;
+            border: 3px solid #0d47a1;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-family: 'Baloo 2', sans-serif;
+            font-weight: 800;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0d47a1;
+            transition: 0.12s;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(180deg, #64b5f6, #2196f3);
+            transform: translateY(-2px);
+        }
+
+        .action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0d47a1;
+        }
+
+        /* ===== FEEDBACK ===== */
+        #feedback {
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 22px;
+            min-height: 30px;
+            font-family: 'Fredoka One', cursive;
+            letter-spacing: 0.5px;
+        }
+
+        .feedback-correct {
+            color: #2e7d32;
+            animation: popFeedback 0.4s ease-out;
+        }
+
+        .feedback-wrong {
+            color: #c62828;
+            animation: shakeFeedback 0.4s ease-out;
+        }
+
+        @keyframes popFeedback {
+            0% { transform: scale(0.5); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeFeedback {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* ===== VICTORY ===== */
+        .victory-title {
+            color: #2e7d32;
+            font-family: 'Fredoka One', cursive;
+            font-size: 30px;
+            margin: 15px 0;
+            animation: victoryPulse 1s ease-in-out infinite;
+            text-shadow: 3px 3px 0 #c8e6c9;
+        }
+
+        @keyframes victoryPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+        }
+
+        .victory-text {
+            color: #555;
+            font-size: 17px;
+            margin: 10px 0 20px;
+            font-weight: 700;
+        }
+
+        .victory-emoji {
+            font-size: 70px;
+            display: block;
+            margin: 10px 0;
+            animation: trophyBounce 0.8s ease-in-out infinite alternate;
+        }
+
+        @keyframes trophyBounce {
+            0% { transform: translateY(0) rotate(-5deg); }
+            100% { transform: translateY(-12px) rotate(5deg); }
+        }
+
+        .replay-btn {
+            background: linear-gradient(180deg, #66bb6a, #43a047);
+            color: white;
+            border: 3px solid #1b5e20;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 18px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1b5e20;
+            font-weight: bold;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            transition: 0.12s;
+        }
+
+        .replay-btn:hover { transform: translateY(-2px); }
+        .replay-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b5e20; }
+
+        .victory-card::before,
+        .victory-card::after {
+            content: '🎉';
+            position: absolute;
+            font-size: 40px;
+            animation: floatStar 2s ease-in-out infinite;
+        }
+        .victory-card::before { top: 20px; left: 20px; }
+        .victory-card::after { top: 20px; right: 20px; animation-delay: 0.5s; }
+
+        @keyframes floatStar {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-10px) rotate(10deg); }
+        }
+        
+        .status-msg {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .detective-card { padding: 25px 15px 20px; border-radius: 25px; }
+            .word-display { font-size: 26px; }
+            h1 { font-size: 18px; }
+            .action-btn { font-size: 16px; padding: 12px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="detective-card" id="detective-card">
+    <div class="level-tag" id="level-label">LEVEL 1</div>
+    <h1 id="task-desc">Suffix Matcher!</h1>
+    <div class="word-display" id="main-word">Loading...</div>
+    <div class="translation-hint" id="translation-hint">Значение: Загрузка...</div>
+    <div id="interaction-area" class="btn-grid"></div>
+    <div id="feedback"></div>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Career & Science Vocabulary (All 50 Words)";
+    let userMistakes = [];
+    let totalScore = 0;
+
+    // ========== VOCABULARY DATA (ALL WORDS FROM IMAGES) ==========
+    const vocabulary = [
+        // --- 1. JOBS (17 words) ---
+        { base: "auth", ending: "or", completed: "author", translation: "Автор", opts1: ["or", "er", "ar"], opts2: ["author", "auther", "authar"] },
+        { base: "traffic ward", ending: "en", completed: "traffic warden", translation: "Инспектор дорожного движения", opts1: ["en", "on", "an"], opts2: ["traffic warden", "traffic wardon", "traffic wardan"] },
+        { base: "v", ending: "et", completed: "vet", translation: "Ветеринар", opts1: ["et", "at", "it"], opts2: ["vet", "vat", "vit"] },
+        { base: "lion tam", ending: "er", completed: "lion tamer", translation: "Укротитель львов", opts1: ["er", "or", "ar"], opts2: ["lion tamer", "lion tamor", "lion tamar"] },
+        { base: "art", ending: "ist", completed: "artist", translation: "Художник", opts1: ["ist", "est", "yst"], opts2: ["artist", "artest", "artyst"] },
+        { base: "operat", ending: "or", completed: "operator", translation: "Оператор", opts1: ["or", "er", "ar"], opts2: ["operator", "operater", "operatar"] },
+        { base: "air traffic controll", ending: "er", completed: "air traffic controller", translation: "Авиадиспетчер", opts1: ["er", "or", "ar"], opts2: ["air traffic controller", "air traffic controllor", "air traffic controllar"] },
+        { base: "wait", ending: "er", completed: "waiter", translation: "Официант", opts1: ["er", "or", "ar"], opts2: ["waiter", "waitor", "waitar"] },
+        { base: "archit", ending: "ect", completed: "architect", translation: "Архитектор", opts1: ["ect", "act", "ict"], opts2: ["architect", "architact", "architict"] },
+        { base: "graphic design", ending: "er", completed: "graphic designer", translation: "Графический дизайнер", opts1: ["er", "or", "ar"], opts2: ["graphic designer", "graphic designor", "graphic designar"] },
+        { base: "cash", ending: "ier", completed: "cashier", translation: "Кассир", opts1: ["ier", "eer", "ior"], opts2: ["cashier", "casheer", "cashior"] },
+        { base: "computer programm", ending: "er", completed: "computer programmer", translation: "Программист", opts1: ["er", "or", "ar"], opts2: ["computer programmer", "computer programmor", "computer programmar"] },
+        { base: "account", ending: "ant", completed: "accountant", translation: "Бухгалтер", opts1: ["ant", "ent", "int"], opts2: ["accountant", "accountent", "accountint"] },
+        { base: "bank tell", ending: "er", completed: "bank teller", translation: "Банковский кассир", opts1: ["er", "or", "ar"], opts2: ["bank teller", "bank tellor", "bank tellar"] },
+        { base: "car salesm", ending: "an", completed: "car salesman", translation: "Продавец автомобилей", opts1: ["an", "en", "in"], opts2: ["car salesman", "car salesmen", "car salesmin"] },
+        { base: "pizza delivery b", ending: "oy", completed: "pizza delivery boy", translation: "Доставщик пиццы", opts1: ["oy", "ay", "ey"], opts2: ["pizza delivery boy", "pizza delivery bay", "pizza delivery bey"] },
+        { base: "sales assist", ending: "ant", completed: "sales assistant", translation: "Продавец-консультант", opts1: ["ant", "ent", "ist"], opts2: ["sales assistant", "sales assistent", "sales assistist"] },
+
+        // --- 2. WORK CONDITIONS (10 words) ---
+        { base: "freelanc", ending: "er", completed: "freelancer", translation: "Фрилансер", opts1: ["er", "or", "ar"], opts2: ["freelancer", "freelancor", "freelancar"] },
+        { base: "de", ending: "sk", completed: "desk", translation: "Рабочий стол", opts1: ["sk", "ck", "k"], opts2: ["desk", "deck", "dek"] },
+        { base: "unif", ending: "orm", completed: "uniform", translation: "Униформа", opts1: ["orm", "arm", "erm"], opts2: ["uniform", "unifarm", "uniferm"] },
+        { base: "full-t", ending: "ime", completed: "full-time", translation: "Полная занятость", opts1: ["ime", "ame", "eme"], opts2: ["full-time", "full-tame", "full-teme"] },
+        { base: "overt", ending: "ime", completed: "overtime", translation: "Сверхурочные", opts1: ["ime", "ame", "eme"], opts2: ["overtime", "overtame", "overteme"] },
+        { base: "sh", ending: "ift", completed: "shift", translation: "Смена", opts1: ["ift", "eft", "aft"], opts2: ["shift", "sheft", "shaft"] },
+        { base: "sal", ending: "ary", completed: "salary", translation: "Заработная плата", opts1: ["ary", "ery", "ory"], opts2: ["salary", "salery", "salory"] },
+        { base: "deadl", ending: "ines", completed: "deadlines", translation: "Сроки", opts1: ["ines", "ions", "ens"], opts2: ["deadlines", "deadlions", "deadlens"] },
+        { base: "pay r", ending: "ise", completed: "pay rise", translation: "Повышение зарплаты", opts1: ["ise", "ize", "ice"], opts2: ["pay rise", "pay rize", "pay rice"] },
+        { base: "part-t", ending: "ime", completed: "part-time", translation: "Частичная занятость", opts1: ["ime", "ame", "eme"], opts2: ["part-time", "part-tame", "part-teme"] },
+
+        // --- 3. SCIENCE (17 words) ---
+        { base: "Biol", ending: "ogy", completed: "Biology", translation: "Биология", opts1: ["ogy", "agy", "egy"], opts2: ["Biology", "Biologi", "Byology"] },
+        { base: "Chem", ending: "istry", completed: "Chemistry", translation: "Химия", opts1: ["istry", "estry", "astry"], opts2: ["Chemistry", "Chemestry", "Chemastry"] },
+        { base: "Phys", ending: "ics", completed: "Physics", translation: "Физика", opts1: ["ics", "eks", "ax"], opts2: ["Physics", "Physicks", "Physix"] },
+        { base: "Earth Sci", ending: "ence", completed: "Earth Science", translation: "Науки о Земле", opts1: ["ence", "ance", "ince"], opts2: ["Earth Science", "Earth Sciance", "Earth Scinence"] },
+        { base: "Geogr", ending: "aphy", completed: "Geography", translation: "География", opts1: ["aphy", "ephy", "ophy"], opts2: ["Geography", "Geogrephy", "Geographi"] },
+        { base: "Ecol", ending: "ogy", completed: "Ecology", translation: "Экология", opts1: ["ogy", "agy", "egy"], opts2: ["Ecology", "Ecologi", "Ecologi"] },
+        { base: "Astron", ending: "omy", completed: "Astronomy", translation: "Астрономия", opts1: ["omy", "amy", "emy"], opts2: ["Astronomy", "Astronami", "Astronemy"] },
+        { base: "Psychol", ending: "ogy", completed: "Psychology", translation: "Психология", opts1: ["ogy", "agy", "egy"], opts2: ["Psychology", "Psychologi", "Psycholegy"] },
+        { base: "Educat", ending: "ion", completed: "Education", translation: "Образование", opts1: ["ion", "eon", "ian"], opts2: ["Education", "Educateon", "Educatian"] },
+        { base: "Hist", ending: "ory", completed: "History", translation: "История", opts1: ["ory", "ary", "ery"], opts2: ["History", "Histary", "Histery"] },
+        { base: "Polit", ending: "ics", completed: "Politics", translation: "Политика", opts1: ["ics", "eks", "ax"], opts2: ["Politics", "Politicks", "Politix"] },
+        { base: "Sociol", ending: "ogy", completed: "Sociology", translation: "Социология", opts1: ["ogy", "agy", "egy"], opts2: ["Sociology", "Sociologi", "Sociolegy"] },
+        { base: "Econom", ending: "ics", completed: "Economics", translation: "Экономика", opts1: ["ics", "eks", "ax"], opts2: ["Economics", "Economicks", "Economix"] },
+        { base: "Engineer", ending: "ing", completed: "Engineering", translation: "Инженерия", opts1: ["ing", "eng", "ang"], opts2: ["Engineering", "Engineereng", "Engineerang"] },
+        { base: "Manag", ending: "ement", completed: "Management", translation: "Менеджмент", opts1: ["ement", "emant", "amant"], opts2: ["Management", "Managemant", "Managemant"] },
+        { base: "Computer Sci", ending: "ence", completed: "Computer Science", translation: "Информатика", opts1: ["ence", "ance", "ince"], opts2: ["Computer Science", "Computer Sciance", "Computer Scinence"] },
+        { base: "Health Sci", ending: "ence", completed: "Health Science", translation: "Медицинские науки", opts1: ["ence", "ance", "ince"], opts2: ["Health Science", "Health Sciance", "Health Scinence"] },
+
+        // --- 4. SCIENCE PHRASES (6 phrases) ---
+        { base: "came to the conclus", ending: "ion", completed: "came to the conclusion", translation: "пришли к выводу", opts1: ["ion", "eon", "ian"], opts2: ["came to the conclusion", "came to the conclusian", "came to the concluseon"] },
+        { base: "l", ending: "ift", completed: "lift", translation: "поднимать", opts1: ["ift", "eft", "aft"], opts2: ["lift", "left", "laft"] },
+        { base: "capt", ending: "ure", completed: "capture", translation: "захватывать", opts1: ["ure", "ore", "are"], opts2: ["capture", "captore", "captare"] },
+        { base: "experim", ending: "ents", completed: "experiments", translation: "эксперименты", opts1: ["ents", "ants", "ents"], opts2: ["experiments", "experimants", "experimints"] },
+        { base: "presen", ending: "ted", completed: "presented", translation: "представил", opts1: ["ted", "ded", "ted"], opts2: ["presented", "presended", "presentid"] },
+        { base: "safe and so", ending: "und", completed: "safe and sound", translation: "целые и невредимые", opts1: ["und", "ound", "and"], opts2: ["safe and sound", "safe and sownd", "safe and sand"] }
+    ];
+
+    let currentLevel = 1;
+    let currentIdx = 0;
+
+    function initTask() {
+        // --- STAGE JUMP LOGIC ---
+        if (currentIdx >= vocabulary.length) {
+            if (currentLevel < 3) {
+                currentLevel++;
+                currentIdx = 0;
+                const fb = document.getElementById('feedback');
+                fb.innerText = `🚀 ADVANCING TO LEVEL ${currentLevel}...`;
+                fb.style.color = "#1976D2";
+                fb.className = '';
+                setTimeout(initTask, 1500);
+                return;
+            } else {
+                showVictory();
+                return;
+            }
+        }
+
+        const data = vocabulary[currentIdx];
+        const area = document.getElementById('interaction-area');
+        const label = document.getElementById('level-label');
+        const desc = document.getElementById('task-desc');
+        const mainWord = document.getElementById('main-word');
+        const transHint = document.getElementById('translation-hint');
+
+        area.innerHTML = "";
+        const fb = document.getElementById('feedback');
+        fb.innerText = "";
+        fb.className = '';
+
+        mainWord.style.animation = 'none';
+        setTimeout(() => mainWord.style.animation = '', 10);
+
+        transHint.innerText = `Значение: ${data.translation}`;
+
+        /* ===== LEVEL 1 ===== */
+        if (currentLevel === 1) {
+            label.innerText = "🎯 LEVEL 1: SUFFIX PAIRING";
+            desc.innerText = "Choose the correct ending:";
+            
+            // Show base with dashes for missing letters
+            mainWord.innerText = data.base + " " + "_".repeat(data.ending.length);
+
+            let choices = [...data.opts1].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = "-" + opt;
+                btn.onclick = () => {
+                    if (opt === data.ending) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Try another option! 🔍");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 2 ===== */
+        else if (currentLevel === 2) {
+            label.innerText = "🔨 LEVEL 2: CORRECT SPELLING";
+            desc.innerText = "Choose the correctly spelled word:";
+            mainWord.innerText = data.base + "...";
+
+            let choices = [...data.opts2].sort(() => Math.random() - 0.5);
+            choices.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.completed) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Wrong spelling! 🔧");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+
+        /* ===== LEVEL 3 ===== */
+        else if (currentLevel === 3) {
+            label.innerText = "🌍 LEVEL 3: TRANSLATION MATCH";
+            desc.innerText = "Pick the correct translation:";
+            mainWord.innerText = data.completed;
+
+            let options = [data.translation];
+            while (options.length < 3) {
+                let randTrans = vocabulary[Math.floor(Math.random() * vocabulary.length)].translation;
+                if (!options.includes(randTrans)) options.push(randTrans);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'action-btn';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (opt === data.translation) success();
+                    else {
+                        userMistakes.push(opt);
+                        error("Wrong translation! 🤔");
+                    }
+                };
+                area.appendChild(btn);
+            });
+        }
+    }
+
+    function success() {
+        const fb = document.getElementById('feedback');
+        fb.innerText = "✅ GREAT JOB!";
+        fb.className = 'feedback-correct';
+        
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(vocabulary[currentIdx].completed);
+            msg.lang = 'en-GB';
+            msg.rate = 0.85;
+            window.speechSynthesis.speak(msg);
+        }
+
+        totalScore++;
+        currentIdx++;
+        setTimeout(initTask, 1200);
+    }
+
+    function error(msg = "Incorrect! Try again!") {
+        const fb = document.getElementById('feedback');
+        fb.innerText = `❌ ${msg}`;
+        fb.className = 'feedback-wrong';
+    }
+
+    function showVictory() {
+        const card = document.getElementById('detective-card');
+        card.classList.add('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" style="background: linear-gradient(180deg, #66bb6a, #2e7d32); color: white; border-color: #1b5e20;">MISSION COMPLETE</div>
+            <span class="victory-emoji">🏆</span>
+            <h1 class="victory-title">YOU WIN, AGENT!</h1>
+            <p class="victory-text">You mastered all 50 words from the academy! 🦸‍♂️</p>
+            <p style="font-size: 1.2rem; font-weight: bold; color: #1976d2; margin-bottom: 10px;">Final Score: ${totalScore} / ${vocabulary.length * 3}</p>
+            
+            <div id="send-status" class="status-msg"></div>
+            
+            <button class="replay-btn" onclick="replayQuest()">▶️ PLAY AGAIN</button>
+        `;
+        
+        sendResultsToGoogle();
+    }
+
+    function replayQuest() {
+        currentLevel = 1;
+        currentIdx = 0;
+        totalScore = 0;
+        userMistakes = [];
+        const card = document.getElementById('detective-card');
+        card.classList.remove('victory-card');
+        card.innerHTML = `
+            <div class="level-tag" id="level-label">LEVEL 1</div>
+            <h1 id="task-desc">Suffix Matcher!</h1>
+            <div class="word-display" id="main-word">Loading...</div>
+            <div class="translation-hint" id="translation-hint">Значение: Загрузка...</div>
+            <div id="interaction-area" class="btn-grid"></div>
+            <div id="feedback"></div>
+        `;
+        initTask();
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle() {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", totalScore);
+        formData.append("total", vocabulary.length * 3);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#555";
+        statusEl.innerText = "Sending data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2e7d32'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#c62828'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    initTask();
+</script>
+
+</body>
+</html>
