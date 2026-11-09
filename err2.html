@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Too / Enough · Adjective Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --green: #58cc02; --dark-green: #46a302; --blue: #1cb0f6; --gray: #e5e5e5; --text: #4b4b4b; }
+        body { font-family: 'Nunito', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; background: #fff; color: var(--text); min-height: 100vh; }
+        header { width: 100%; max-width: 600px; padding: 20px; display: flex; align-items: center; box-sizing: border-box; }
+        .progress-bar { flex-grow: 1; height: 16px; background: var(--gray); border-radius: 10px; }
+        #fill { width: 0%; height: 100%; background: var(--green); border-radius: 10px; transition: width 0.4s; }
+        main { width: 100%; max-width: 500px; padding: 20px; text-align: center; }
+        h1 { font-size: 24px; font-weight: 800; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .card {
+            background: white; border: 2px solid var(--gray); border-bottom: 4px solid var(--gray);
+            border-radius: 15px; padding: 15px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.1s; text-align: center;
+        }
+        .card:active { transform: translateY(2px); }
+        .card.selected { background: #ddf4ff; border-color: #84d8ff; color: var(--blue); }
+        .card.correct { background: #d7ffb8; border-color: #58cc02; color: #58a700; }
+        .card.wrong { background: #ffdfe0; border-color: #ff4b4b; color: #a00000; }
+        .hidden { display: none; }
+        #feedback { position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; display: none; justify-content: center; background: #d7ffb8; border-top: 2px solid #58cc02; z-index: 100; }
+        .next-btn { background: var(--green); color: white; border: none; border-bottom: 4px solid var(--dark-green); padding: 12px 40px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 18px; }
+        .next-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .emoji-big { font-size: 70px; margin-bottom: 15px; }
+        .listen-btn { background: #ffd966; border: 2px solid #f0b400; border-bottom: 4px solid #c99200; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 18px; width: 100%; margin-bottom: 15px; }
+        .completion { padding: 30px 0; }
+        .completion h2 { font-size: 32px; color: var(--green); }
+        .completion .icon { font-size: 72px; }
+        .status-msg { font-size: 14px; font-weight: 700; margin-top: 15px; min-height: 20px; }
+        
+        /* Additional styling for sentences */
+        .sentence-text { font-size: 22px; font-weight: 700; line-height: 1.5; margin-bottom: 25px; color: #333; }
+        .gap { color: var(--blue); font-weight: 900; border-bottom: 2px dashed var(--blue); padding: 0 10px; }
+
+        @media (max-width: 480px) {
+            .card { font-size: 14px; padding: 12px; }
+            .grid { gap: 8px; }
+            h1 { font-size: 20px; }
+            .sentence-text { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="progress-bar"><div id="fill"></div></div>
+</header>
+
+<main>
+    <h1 id="title">Too / Enough · Adjectives</h1>
+    <div id="game-area"></div>
+</main>
+
+<div id="feedback">
+    <button class="next-btn" onclick="nextStep()">✨ CONTINUE ✨</button>
+</div>
+
+<script>
+    // ========== TRACKING DATA ==========
+    const TEST_NAME = "Too / Enough + Adjectives";
+    let userMistakes = [];
+
+    // ========== QUIZ DATA (10 Sentences) ==========
+    const quizData = [
+        { text: "The coffee is ___ to drink.", correct: "too hot", options: ["too hot", "hot enough", "enough hot"], full: "The coffee is too hot to drink." },
+        { text: "He isn't ___ to reach the shelf.", correct: "tall enough", options: ["too tall", "tall enough", "enough tall"], full: "He isn't tall enough to reach the shelf." },
+        { text: "This box is ___ to lift.", correct: "too heavy", options: ["heavy enough", "too heavy", "enough heavy"], full: "This box is too heavy to lift." },
+        { text: "The room isn't ___ to read.", correct: "bright enough", options: ["too bright", "bright enough", "enough bright"], full: "The room isn't bright enough to read." },
+        { text: "I am ___ to go out.", correct: "too tired", options: ["too tired", "tired enough", "enough tired"], full: "I am too tired to go out." },
+        { text: "She is ___ to drive.", correct: "old enough", options: ["too old", "old enough", "enough old"], full: "She is old enough to drive." },
+        { text: "The car is ___ to buy.", correct: "too expensive", options: ["expensive enough", "too expensive", "enough expensive"], full: "The car is too expensive to buy." },
+        { text: "The water is ___ to swim.", correct: "warm enough", options: ["too warm", "warm enough", "enough warm"], full: "The water is warm enough to swim." },
+        { text: "My shoes are ___ for the house.", correct: "too dirty", options: ["dirty enough", "too dirty", "enough dirty"], full: "My shoes are too dirty for the house." },
+        { text: "The soup isn't ___.", correct: "salty enough", options: ["too salty", "salty enough", "enough salty"], full: "The soup isn't salty enough." }
+    ];
+
+    // ========== GAME LOGIC ==========
+    let currentLevel = 1;
+    let subStep = 0;
+    let selectedCards = [];
+    let totalSteps = 0;
+    let score = 0;
+
+    // Helper to shuffle arrays
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function initLevel() {
+        const area = document.getElementById('game-area');
+        area.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        if (currentLevel === 1) {
+            document.getElementById('title').innerText = "🔍 Match the sentence halves";
+            
+            // Select 5 random sentences for the matching game
+            const l1Items = shuffleArray([...quizData]).slice(0, 5);
+            let level1Data = [];
+            
+            l1Items.forEach((item, index) => {
+                // Split the sentence into two parts at the blank
+                const parts = item.text.split('___');
+                const part1 = parts[0].trim();
+                // Reconstruct part 2 with the correct answer
+                const part2 = (item.correct + parts[1]).trim();
+                
+                level1Data.push({ id: index, text: part1, type: 'word' });
+                level1Data.push({ id: index, text: part2, type: 'ending' });
+            });
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            const shuffled = shuffleArray(level1Data);
+            
+            shuffled.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerText = item.text;
+                card.dataset.id = item.id;
+                card.dataset.type = item.type;
+                card.onclick = () => selectLevel1(item, card);
+                grid.appendChild(card);
+            });
+            area.appendChild(grid);
+            
+            // Total steps: 1 (matching) + 10 (L2) + 10 (L3)
+            totalSteps = 1 + quizData.length + quizData.length;
+        }
+        else if (currentLevel === 2) {
+            document.getElementById('title').innerText = "🎯 Complete the sentence";
+            const q = quizData[subStep];
+            
+            // Render sentence with blank
+            area.innerHTML = `<div class="sentence-text">${q.text.replace('___', '<span class="gap">___</span>')}</div>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            
+            // Shuffle options
+            const shuffledOptions = shuffleArray(q.options);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel2(opt, btn, q.correct);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+        }
+        else if (currentLevel === 3) {
+            document.getElementById('title').innerText = "🎧 Listen and choose the phrase";
+            const q = quizData[subStep];
+            
+            area.innerHTML = `<button class="listen-btn" onclick="speakPhrase('${q.full}')">🔊 LISTEN AGAIN</button>`;
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+            // Grid has 3 columns for L3 to fit the text better
+            grid.style.gridTemplateColumns = "1fr"; 
+            
+            const shuffledOptions = shuffleArray(q.options);
+            shuffledOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'card';
+                btn.innerText = opt;
+                btn.onclick = () => checkLevel3(opt, btn, q.correct);
+                grid.appendChild(btn);
+            });
+            area.appendChild(grid);
+            
+            // auto-speak after a short delay
+            setTimeout(() => speakPhrase(q.full), 500);
+        }
+    }
+
+    // ---- LEVEL 1: Matching ----
+    function selectLevel1(item, card) {
+        if (card.classList.contains('correct') || selectedCards.some(p => p.card === card)) return;
+        card.classList.add('selected');
+        selectedCards.push({ item, card });
+
+        if (selectedCards.length === 2) {
+            const a = selectedCards[0];
+            const b = selectedCards[1];
+            if (a.item.id === b.item.id && a.item.type !== b.item.type) {
+                a.card.classList.remove('selected');
+                b.card.classList.remove('selected');
+                a.card.classList.add('correct');
+                b.card.classList.add('correct');
+                selectedCards = [];
+                const allCorrect = document.querySelectorAll('.card.correct').length === 10;
+                if (allCorrect) showNext();
+            } else {
+                // wrong match
+                a.card.classList.add('wrong');
+                b.card.classList.add('wrong');
+                setTimeout(() => {
+                    a.card.classList.remove('selected', 'wrong');
+                    b.card.classList.remove('selected', 'wrong');
+                    selectedCards = [];
+                }, 600);
+            }
+        }
+    }
+
+    // ---- LEVEL 2: Multiple Choice ----
+    function checkLevel2(choice, btn, correct) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (choice === correct) {
+            btn.classList.add('correct');
+            score++;
+            showNext();
+        } else {
+            userMistakes.push(choice);
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- LEVEL 3: Listening ----
+    function checkLevel3(selected, btn, correct) {
+        if (btn.classList.contains('correct') || btn.classList.contains('wrong')) return;
+        if (selected === correct) {
+            btn.classList.add('correct');
+            score++;
+            showNext();
+        } else {
+            userMistakes.push(selected);
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+        }
+    }
+
+    // ---- show "Continue" button ----
+    function showNext() {
+        document.getElementById('feedback').style.display = 'flex';
+        let completed = 0;
+        if (currentLevel === 1) completed = 1;
+        else if (currentLevel === 2) completed = 1 + subStep + 1;
+        else if (currentLevel === 3) completed = 1 + quizData.length + subStep + 1;
+        const progress = (completed / totalSteps) * 100;
+        document.getElementById('fill').style.width = progress + '%';
+    }
+
+    // ---- next step ----
+    function nextStep() {
+        if (currentLevel === 1) {
+            currentLevel = 2;
+            subStep = 0;
+        }
+        else if (currentLevel === 2) {
+            subStep++;
+            if (subStep >= quizData.length) {
+                currentLevel = 3;
+                subStep = 0;
+            }
+        }
+        else if (currentLevel === 3) {
+            subStep++;
+            if (subStep >= quizData.length) {
+                // game complete!
+                document.getElementById('game-area').innerHTML = `
+                    <div class="completion">
+                        <div class="icon">🎉</div>
+                        <h2>Amazing! You're a Grammar Master! 🌟</h2>
+                        <p style="font-size:18px; color:#777;">You scored ${score} out of ${totalSteps - 1}!</p>
+                        <div id="send-status" class="status-msg"></div>
+                        <button onclick="location.reload()" style="background:var(--green); color:white; border:none; border-bottom:4px solid var(--dark-green); padding:12px 40px; border-radius:12px; font-weight:800; cursor:pointer; font-size:18px; margin-top:20px;">🔄 Play Again</button>
+                    </div>
+                `;
+                document.getElementById('feedback').style.display = 'none';
+                document.getElementById('fill').style.width = '100%';
+                
+                // Send results to Google Sheets
+                sendResultsToGoogle(score, totalSteps - 1);
+                return;
+            }
+        }
+        initLevel();
+    }
+
+    // ---- Speech Synthesis ----
+    function speakPhrase(text) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'en-US';
+        msg.rate = 0.85;
+        msg.pitch = 1;
+        window.speechSynthesis.speak(msg);
+    }
+
+    // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+    function sendResultsToGoogle(finalScore, total) {
+        const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+        
+        const formData = new URLSearchParams();
+        formData.append("name", TEST_NAME);
+        formData.append("score", finalScore);
+        formData.append("total", total);
+        formData.append("mistakes", userMistakes.join(', '));
+
+        const statusEl = document.getElementById('send-status');
+        statusEl.style.color = "#666";
+        statusEl.innerText = "Sending telemetry data...";
+
+        fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(() => {
+            statusEl.style.color = '#2e7d32'; // Green
+            statusEl.innerText = "Results sent successfully! ✅";
+        })
+        .catch((error) => {
+            console.error("Error sending results:", error);
+            statusEl.style.color = '#e74c3c'; // Red
+            statusEl.innerText = "Failed to send results ❌.";
+        });
+    }
+
+    // ---- start ----
+    initLevel();
+</script>
+
+</body>
+</html>

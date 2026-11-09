@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shops & Places Vocabulary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-blue: #1cb0f6;
+            --duo-gray: #e5e5e5;
+            --duo-text: #4b4b4b;
+            --duo-red: #ff4b4b;
+            --duo-light-green: #d7ffb1;
+            --duo-light-red: #ffdfe0;
+            --duo-purple: #ce82ff;
+            --duo-light-purple: #f3e5ff;
+            --duo-orange: #ff9f43;
+            --duo-light-orange: #ffeaa7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff;
+            color: var(--duo-text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 15px;
+            font-size: 13px;
+            padding-bottom: 100px; /* Space for footer */
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            height: 12px;
+            background-color: var(--duo-gray);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--duo-green);
+            transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            padding: 15px;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--duo-text);
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 800;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--duo-text);
+        }
+
+        /* Vocabulary Boxes */
+        .vocab-box {
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            box-shadow: 0 3px 0;
+        }
+
+        .purple-box {
+            background-color: var(--duo-light-purple);
+            border: 2px solid var(--duo-purple);
+            box-shadow: 0 3px 0 var(--duo-purple);
+        }
+        .purple-box strong { color: #9b59b6; font-weight: 800; }
+
+        .vocab-box ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 8px 0 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+        }
+
+        .vocab-box li {
+            background: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-weight: 700;
+        }
+
+        /* Letter / Question Boxes */
+        .letter-box {
+            border: 2px solid var(--duo-gray);
+            border-radius: 12px;
+            padding: 20px;
+            line-height: 2.2;
+            font-size: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 0 var(--duo-gray);
+            background: #fafafa;
+        }
+
+        .letter-box p {
+            margin: 6px 0;
+        }
+
+        select {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 4px 10px;
+            border: 2px solid var(--duo-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            outline: none;
+            color: var(--duo-blue);
+            font-size: 13px;
+            transition: all 0.2s;
+            background: white;
+            min-width: 140px;
+        }
+
+        select:focus {
+            border-color: var(--duo-blue);
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            border-top: 2px solid var(--duo-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            z-index: 100;
+        }
+
+        #check-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 3px solid var(--duo-green-dark);
+            padding: 10px 45px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        #check-btn:active {
+            border-bottom-width: 1px;
+            transform: translateY(2px);
+        }
+
+        /* Final Screen */
+        #final-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        #final-screen h2 {
+            font-size: 24px;
+            color: var(--duo-green);
+            margin-bottom: 10px;
+        }
+
+        .final-stats {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .status-msg {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+
+        .continue-btn {
+            background-color: var(--duo-green);
+            color: white;
+            border: none;
+            border-bottom: 3px solid var(--duo-green-dark);
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container" id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div class="card" id="quiz-card">
+        <h1>Shops & Places</h1>
+
+        <div class="vocab-box purple-box">
+            <strong>Read the description and choose the correct shop.</strong>
+            <ul>
+                <li>baker's</li>
+                <li>chemist's</li>
+                <li>bookshop</li>
+                <li>clothes shop</li>
+                <li>greengrocer's</li>
+                <li>newsagent's</li>
+                <li>shoe shop</li>
+                <li>sports shop</li>
+                <li>department store</li>
+            </ul>
+        </div>
+
+        <div class="letter-box">
+            <p><strong>1.</strong> You buy fresh bread and cakes at the <select id="A" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="chemist's">chemist's</option>
+                <option value="baker's">baker's</option>
+                <option value="department store">department store</option>
+            </select>.</p>
+
+            <p><strong>2.</strong> You buy medicine and soap at the <select id="B" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="chemist's">chemist's</option>
+                <option value="sports shop">sports shop</option>
+                <option value="baker's">baker's</option>
+            </select>.</p>
+
+            <p><strong>3.</strong> You buy novels and textbooks at the <select id="C" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="bookshop">bookshop</option>
+            </select>.</p>
+
+            <p><strong>4.</strong> You buy a t-shirt and jeans at the <select id="D" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="department store">department store</option>
+            </select>.</p>
+
+            <p><strong>5.</strong> You buy apples and carrots at the <select id="E" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="baker's">baker's</option>
+                <option value="greengrocer's">greengrocer's</option>
+                <option value="chemist's">chemist's</option>
+            </select>.</p>
+
+            <p><strong>6.</strong> You buy a newspaper and a magazine at the <select id="F" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="sports shop">sports shop</option>
+                <option value="newsagent's">newsagent's</option>
+                <option value="bookshop">bookshop</option>
+            </select>.</p>
+
+            <p><strong>7.</strong> You buy boots and trainers at the <select id="G" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="clothes shop">clothes shop</option>
+                <option value="department store">department store</option>
+                <option value="shoe shop">shoe shop</option>
+            </select>.</p>
+
+            <p><strong>8.</strong> You buy a football and a tennis racket at the <select id="H" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="sports shop">sports shop</option>
+                <option value="shoe shop">shoe shop</option>
+                <option value="greengrocer's">greengrocer's</option>
+            </select>.</p>
+
+            <p><strong>9.</strong> You buy many different things like clothes, toys, and furniture under one roof at a <select id="I" onchange="updateProgress()">
+                <option value="">---</option>
+                <option value="bookshop">bookshop</option>
+                <option value="department store">department store</option>
+                <option value="clothes shop">clothes shop</option>
+            </select>.</p>
+        </div>
+    </div>
+
+    <!-- Final Screen (Hidden by default) -->
+    <div class="card" id="final-screen">
+        <h2>Quiz Completed!</h2>
+        <div class="final-stats" id="final-stats">Score: 0 / 9</div>
+        <div class="status-msg" id="send-status"></div>
+        <button class="continue-btn" onclick="location.reload()">TRY AGAIN</button>
+    </div>
+
+    <div class="footer" id="footer">
+        <button id="check-btn" onclick="checkAnswers()">Check</button>
+    </div>
+
+    <script>
+        // ========== TRACKING DATA ==========
+        const TEST_NAME = "Shops & Places Vocabulary Quiz";
+        let userMistakes = [];
+
+        const answers = { 
+            A: "baker's", 
+            B: "chemist's", 
+            C: "bookshop", 
+            D: "clothes shop", 
+            E: "greengrocer's",
+            F: "newsagent's", 
+            G: "shoe shop", 
+            H: "sports shop", 
+            I: "department store"
+        };
+        const totalQuestions = Object.keys(answers).length;
+
+        function updateProgress() {
+            const selects = document.querySelectorAll('select');
+            let filled = 0;
+            selects.forEach(s => { if(s.value !== "") filled++; });
+            document.getElementById('progress-bar').style.width = (filled / totalQuestions) * 100 + '%';
+        }
+
+        function checkAnswers() {
+            let correctCount = 0;
+            const selects = document.querySelectorAll('select');
+            let allFilled = Array.from(selects).every(s => s.value !== "");
+
+            if(!allFilled) return alert("Please fill in all blanks first!");
+
+            for (let id in answers) {
+                const select = document.getElementById(id);
+                if (select.value === answers[id]) {
+                    correctCount++;
+                    select.style.borderColor = "var(--duo-green)";
+                    select.style.backgroundColor = "#f0ffe8";
+                } else {
+                    // Track mistake
+                    userMistakes.push(select.value); 
+                    select.style.borderColor = "var(--duo-red)";
+                    select.style.backgroundColor = "#fff0f0";
+                }
+            }
+
+            // Hide quiz, show final screen
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('final-screen').style.display = 'block';
+            document.getElementById('footer').style.display = 'none';
+            document.getElementById('progress-container').style.display = 'none';
+            
+            // Update Score
+            document.getElementById('final-stats').innerText = `Score: ${correctCount} / ${totalQuestions}`;
+            
+            // Send Data to Google Sheets
+            sendResultsToGoogle(correctCount, totalQuestions);
+        }
+
+        // ========== GOOGLE SHEETS SENDING FUNCTION ==========
+        function sendResultsToGoogle(score, total) {
+            const url = "https://script.google.com/macros/s/AKfycbxZDFh5oa4GAU6RMvWX_OIh0GeLTbolr7P-6cCtbCNT5qiTShRaCYlETAxewsLsnooK/exec";
+            
+            const formData = new URLSearchParams();
+            formData.append("name", TEST_NAME);
+            formData.append("score", score);
+            formData.append("total", total);
+            formData.append("mistakes", userMistakes.join(', '));
+
+            const statusEl = document.getElementById('send-status');
+            statusEl.style.color = "#666";
+            statusEl.innerText = "Sending data...";
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            })
+            .then(() => {
+                statusEl.style.color = '#2e7d32'; // Green
+                statusEl.innerText = "Results sent successfully! ✅";
+            })
+            .catch((error) => {
+                console.error("Error sending results:", error);
+                statusEl.style.color = '#e74c3c'; // Red
+                statusEl.innerText = "Failed to send results ❌.";
+            });
+        }
+    </script>
+</body>
+</html>
