@@ -354,6 +354,7 @@
             selectedRightCard = null;
 
             if (matchesFoundStage0 === stage0Data.length) {
+                currentStage = 1; // FIX: Set stage to 1 before starting Stage 1
                 setTimeout(startStage1, 1000);
             }
         } else {
