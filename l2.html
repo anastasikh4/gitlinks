@@ -6,7 +6,10 @@
   <meta name="description" content="English teaching hub, finance tracker, word games, and tutor schedule.">
   <title>English Learning Resources Hub</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- Заменили html2canvas на html-to-image -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  
   <style>
     :root{--radius:1.75rem}*{-webkit-font-smoothing:antialiased}body{font-family:Inter,ui-sans-serif,system-ui,sans-serif}
     .glass{background:linear-gradient(135deg,rgba(255,255,255,.07),rgba(255,255,255,.025));backdrop-filter:blur(20px) saturate(160%);border:1px solid rgba(255,255,255,.12);box-shadow:0 28px 70px -35px #000,inset 0 1px rgba(255,255,255,.09)}
@@ -29,106 +32,31 @@
     .day-card.flash{box-shadow:0 0 0 2px rgba(52,211,153,.55)}
     .fin-page{display:none}.fin-page.active{display:block;animation:page-in .3s ease}
     #calendarPanel{display:none}#calendarPanel.open{display:block}
-    .ws-grid{display:grid;gap:3px;width:min(100%,720px);margin:0 auto}
-    .ws-cell{aspect-ratio:1;display:grid;place-items:center;border-radius:.55rem;background:#f3f4f6;border:1px solid #d1d5db;font-weight:700;font-size:clamp(.7rem,2.4vw,1.05rem);cursor:pointer;user-select:none;color:#1f2937;transition:all .15s}
-    .ws-cell:hover{background:#e5e7eb;transform:scale(1.02)}
-    .ws-cell.found{background:#bbf7d0;border-color:#22c55e;color:#166534}
-    #gridWrap{background:#ffffff;border-color:#e5e7eb}
-    #wsSkipped{color:#b45309}
-    .magic-out{display:none}.magic-out.show{display:block;animation:page-in .3s ease}
-    canvas.magic-canvas{max-width:100%;height:auto;background:#fff;border-radius:1rem}
+    
+    /* Стили для заданий (Canvas версии) */
+    .ws-grid{display:grid;gap:5px;padding:10px;background:#fff;border-radius:1rem;margin:0 auto;width:fit-content}
+    .ws-cell{width:35px;height:35px;display:flex;align-items:center;justify-content:center;background:#f3f4f6;border-radius:4px;font-weight:700;cursor:pointer;user-select:none;font-size:1.1rem;color:#1e293b;transition:.15s}
+    .ws-cell:hover{background:#e5e7eb}
+    .ws-cell.found{background:#55efc4;color:#000}
+    .magic-canvas{display:block;margin:0 auto;max-width:100%;background:#fff;border-radius:1rem}
+    
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
-    /* Стили для кроссворда */
-    .cw-cell {
-      width: 40px;
-      height: 40px;
-      position: relative;
-      background: white;
-      border: 1px solid #94a3b8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-    .cw-num {
-      position: absolute;
-      top: 2px;
-      left: 3px;
-      font-size: 10px;
-      font-weight: bold;
-      color: #4b5563;
-      line-height: 1;
-    }
-    .cw-empty {
-      background: #e2e8f0;
-      opacity: 0.3;
-      border-color: #cbd5e1;
-    }
-    .cw-teacher .cw-cell {
-      background: #fffbeb;
-      border-color: #fcd34d;
-      color: #92400e;
-    }
-    .cw-teacher .cw-empty {
-      background: #fef3c7;
-      opacity: 0.3;
-    }
-    .cw-clues ul {
-      list-style: none;
-      padding: 0;
-      font-size: 0.9rem;
-    }
-    .cw-clues li {
-      margin-bottom: 0.2rem;
-    }
-    .cw-clues b {
-      color: #1e293b;
-    }
-    .print-box {
-      background: white;
-    }
+    /* Стили для расписания */
+    .schedule-input{width:100%;border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;background:rgba(15,23,42,0.6);color:#f4f4f5;padding:0.6rem 0.8rem;font-size:0.875rem;outline:none;transition:all 0.2s}
+    .schedule-input:focus{border-color:rgba(99,102,241,0.5);box-shadow:0 0 0 3px rgba(99,102,241,0.15)}
+    .lesson-card{position:relative;border-radius:0.85rem;padding:0.75rem;border:1px solid;transition:all 0.2s}
+    .lesson-tools{position:absolute;right:0.5rem;top:0.5rem;display:none;gap:0.25rem}
+    .lesson-card:hover .lesson-tools{display:flex}
+    #scheduleCapture{background:#ffffff;border-radius:1.5rem;padding:1.5rem;color:#0f172a}
 
-    /* Стили для расписания (страница 4) */
-    .schedule-input {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 0.75rem;
-      background: rgba(15,23,42,0.6);
-      color: #f4f4f5;
-      padding: 0.6rem 0.8rem;
-      font-size: 0.875rem;
-      outline: none;
-      transition: all 0.2s;
-    }
-    .schedule-input:focus {
-      border-color: rgba(99,102,241,0.5);
-      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-    }
-    .lesson-card {
-      position: relative;
-      border-radius: 0.85rem;
-      padding: 0.75rem;
-      border: 1px solid;
-      transition: all 0.2s;
-    }
-    .lesson-tools {
-      position: absolute;
-      right: 0.5rem;
-      top: 0.5rem;
-      display: none;
-      gap: 0.25rem;
-    }
-    .lesson-card:hover .lesson-tools {
-      display: flex;
-    }
-    #scheduleCapture {
-      background: #ffffff;
-      border-radius: 1.5rem;
-      padding: 1.5rem;
-      color: #0f172a;
-    }
+    /* Стили для Колеса */
+    .category-row-wheel{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);padding:8px 12px;border-radius:12px;transition:0.2s}
+    .category-row-wheel:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.15)}
+    #wheelChart-wrapper{background:#0f172a;border-radius:16px;border:1px solid rgba(255,255,255,.05)}
+    
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
   </style>
 </head>
 <body class="min-h-screen overflow-x-hidden bg-[#04060a] text-zinc-200 selection:bg-emerald-500/30">
@@ -159,136 +87,55 @@
                 <div class="relative mb-6 flex items-center gap-4"><div class="grid h-12 w-12 place-items-center rounded-xl bg-indigo-500/10 text-indigo-300 ring-1 ring-white/10"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m16 13 5 3V8l-5 3"/><rect x="3" y="6" width="13" height="12" rx="2"/></svg></div><div><h2 class="text-xl font-semibold text-white">Conference Channels</h2><p class="mt-1 text-[10px] font-semibold uppercase tracking-[.2em] text-indigo-300">Live communications</p></div></div>
                <div class="relative scroll flex-grow space-y-3 overflow-y-auto rounded-xl bg-[#0a0d15]/60 pr-1" id="conferenceLinks">
   
-  <!-- Zoom BASE -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09">
-    <div>
-      <h3 class="text-sm font-medium text-white">Zoom BASE</h3>
-      <p class="mt-1 text-xs text-zinc-500">ID: 869 451 0279 · Passcode: 900876</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom BASE | ID: https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09 | Number: 869 451 0279 Passcode: 900876">Copy</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09">
+    <div><h3 class="text-sm font-medium text-white">Zoom BASE</h3><p class="mt-1 text-xs text-zinc-500">ID: 869 451 0279 · Passcode: 900876</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom BASE | ID: https://us05web.zoom.us/j/8694510279?pwd=VmhJV2FubEJOeFlIa09keDdEWjUwdz09 | Number: 869 451 0279 Passcode: 900876">Copy</button></div>
   </div>
 
-  <!-- Zoom NEW -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1">
-    <div>
-      <h3 class="text-sm font-medium text-white">Zoom NEW</h3>
-      <p class="mt-1 text-xs text-zinc-500">ID: 791 8227 1796 · Passcode: 123456</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom NEW | ID: https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1 | Number: 791 8227 1796 Passcode: 123456">Copy</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1">
+    <div><h3 class="text-sm font-medium text-white">Zoom NEW</h3><p class="mt-1 text-xs text-zinc-500">ID: 791 8227 1796 · Passcode: 123456</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom NEW | ID: https://us06web.zoom.us/j/79182271796?pwd=RXR4LeqSQ3T4ACDnF2CmwgHfPIZP4a.1 | Number: 791 8227 1796 Passcode: 123456">Copy</button></div>
   </div>
 
-  <!-- Zoom EXTRA 1 -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1">
-    <div>
-      <h3 class="text-sm font-medium text-white">Zoom EXTRA 1</h3>
-      <p class="mt-1 text-xs text-zinc-500">ID: 826 5841 5026 · NO Passcode: 5C3E71</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom EXTRA 1 | ID: https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1 | Number: 826 5841 5026 Passcode: 5C3E71">Copy</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1">
+    <div><h3 class="text-sm font-medium text-white">Zoom EXTRA 1</h3><p class="mt-1 text-xs text-zinc-500">ID: 826 5841 5026 · NO Passcode: 5C3E71</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom EXTRA 1 | ID: https://us06web.zoom.us/j/82658415026?pwd=tIuF2bqCFbcnkk7hMXlugS4q7SafD3.1 | Number: 826 5841 5026 Passcode: 5C3E71">Copy</button></div>
   </div>
 
-  <!-- Zoom EXTRA 2 -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1">
-    <div>
-      <h3 class="text-sm font-medium text-white">Zoom EXTRA 2</h3>
-      <p class="mt-1 text-xs text-zinc-500">ID: 886 4925 4429 · NO Passcode: 009009</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom EXTRA 2 | ID: https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1 | Number: 886 4925 4429 Passcode: 009009">Copy</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1">
+    <div><h3 class="text-sm font-medium text-white">Zoom EXTRA 2</h3><p class="mt-1 text-xs text-zinc-500">ID: 886 4925 4429 · NO Passcode: 009009</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="Zoom EXTRA 2 | ID: https://us05web.zoom.us/j/88649254429?pwd=NfvzAr0Cz9mEQhqAAt9X2L4dqLP9Fd.1 | Number: 886 4925 4429 Passcode: 009009">Copy</button></div>
   </div>
 
-  <!-- Yandex M+G -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://telemost.yandex.ru/j/90112271761592">
-    <div>
-      <h3 class="text-sm font-medium text-white">Yandex</h3>
-      <p class="mt-1 text-xs text-zinc-500">Gs</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/90112271761592">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/90112271761592">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://telemost.yandex.ru/j/90112271761592">
+    <div><h3 class="text-sm font-medium text-white">Yandex</h3><p class="mt-1 text-xs text-zinc-500">Gs</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/90112271761592">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/90112271761592">Copy link</button></div>
   </div>
 
-  <!-- Yandex Adult -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://telemost.yandex.ru/j/96276160430845">
-    <div>
-      <h3 class="text-sm font-medium text-white">Yandex</h3>
-      <p class="mt-1 text-xs text-zinc-500">Adult</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/96276160430845">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/96276160430845">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://telemost.yandex.ru/j/96276160430845">
+    <div><h3 class="text-sm font-medium text-white">Yandex</h3><p class="mt-1 text-xs text-zinc-500">Adult</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/96276160430845">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/96276160430845">Copy link</button></div>
   </div>
 
-  <!-- Yandex Kids -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://telemost.yandex.ru/j/32323878732068">
-    <div>
-      <h3 class="text-sm font-medium text-white">Yandex</h3>
-      <p class="mt-1 text-xs text-zinc-500">Kids</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/32323878732068">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/32323878732068">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://telemost.yandex.ru/j/32323878732068">
+    <div><h3 class="text-sm font-medium text-white">Yandex</h3><p class="mt-1 text-xs text-zinc-500">Kids</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/32323878732068">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/32323878732068">Copy link</button></div>
   </div>
 
-  <!-- Yandex Sophi -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://telemost.yandex.ru/j/23438701378819">
-    <div>
-      <h3 class="text-sm font-medium text-white">Yandex</h3>
-      <p class="mt-1 text-xs text-zinc-500">Sophi + Ad</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/23438701378819">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/23438701378819">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://telemost.yandex.ru/j/23438701378819">
+    <div><h3 class="text-sm font-medium text-white">Yandex</h3><p class="mt-1 text-xs text-zinc-500">Sophi + Ad</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://telemost.yandex.ru/j/23438701378819">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://telemost.yandex.ru/j/23438701378819">Copy link</button></div>
   </div>
 
-  <!-- MTC Link -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://my.mts-link.ru/j/77262783/23966424007">
-    <div>
-      <h3 class="text-sm font-medium text-white">MTC Link</h3>
-      <p class="mt-1 text-xs text-zinc-500">G + V</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://my.mts-link.ru/j/77262783/23966424007">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://my.mts-link.ru/j/77262783/23966424007">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://my.mts-link.ru/j/77262783/23966424007">
+    <div><h3 class="text-sm font-medium text-white">MTC Link</h3><p class="mt-1 text-xs text-zinc-500">G + V</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://my.mts-link.ru/j/77262783/23966424007">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://my.mts-link.ru/j/77262783/23966424007">Copy link</button></div>
   </div>
 
-  <!-- MTC Girls -->
-  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4"
-       data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">
-    <div>
-      <h3 class="text-sm font-medium text-white">Girls</h3>
-      <p class="mt-1 text-xs text-zinc-500">MTS Link</p>
-    </div>
-    <div class="flex gap-2">
-      <button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Open</button>
-      <button class="copy text-xs font-semibold text-indigo-300" data-copy="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Copy link</button>
-    </div>
+  <div class="row flex items-center justify-between gap-4 rounded-xl border border-white/[.07] bg-white/[.025] p-4" data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">
+    <div><h3 class="text-sm font-medium text-white">Girls</h3><p class="mt-1 text-xs text-zinc-500">MTS Link</p></div>
+    <div class="flex gap-2"><button class="open-btn text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition" data-url="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Open</button><button class="copy text-xs font-semibold text-indigo-300" data-copy="https://my.mts-link.ru/j/77262783/26483538767/stream-new/25992850635">Copy link</button></div>
   </div>
-
 </div>
 
 <script>
@@ -298,7 +145,6 @@
         e.stopPropagation();
         const url = this.getAttribute('data-url');
         if (url) window.open(url, '_blank', 'noopener,noreferrer');
-        else console.warn('Open button: data-url missing');
       });
     });
     document.querySelectorAll('.copy').forEach(btn => {
@@ -307,16 +153,6 @@
         const text = this.getAttribute('data-copy') || '';
         if (!text) return;
         navigator.clipboard.writeText(text).then(() => {
-          const orig = this.textContent;
-          this.textContent = '✓ Copied!';
-          setTimeout(() => this.textContent = orig, 1500);
-        }).catch(() => {
-          const area = document.createElement('textarea');
-          area.value = text;
-          document.body.appendChild(area);
-          area.select();
-          document.execCommand('copy');
-          area.remove();
           const orig = this.textContent;
           this.textContent = '✓ Copied!';
           setTimeout(() => this.textContent = orig, 1500);
@@ -400,20 +236,12 @@
         </div>
       </div>
 
-      <!-- Финансовый трекер -->
       <div id="finTracker" class="fin-page active">
-
-        <!-- Сводка финансов -->
         <div id="financeSummary" class="mb-5 overflow-hidden rounded-2xl border border-emerald-400/20 bg-[#07140f] p-4">
           <div class="mb-3 flex items-end justify-between gap-3">
-            <div>
-              <p class="text-[10px] font-semibold uppercase tracking-[.22em] text-emerald-300">Финансовый трекер 2026</p>
-              <p id="weekLabel" class="mt-1 text-xs text-zinc-500"></p>
-            </div>
+            <div><p class="text-[10px] font-semibold uppercase tracking-[.22em] text-emerald-300">Финансовый трекер 2026</p><p id="weekLabel" class="mt-1 text-xs text-zinc-500"></p></div>
             <p class="text-[11px] text-zinc-500">налог 4%</p>
           </div>
-
-          <!-- Сетка показателей -->
           <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             <div class="rounded-xl bg-emerald-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-emerald-300">К выплате (−4%)</p><p id="sumNet" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
             <div class="rounded-xl bg-white/5 p-3"><p class="text-[10px] uppercase tracking-wider text-zinc-500">Грязными</p><p id="sumGross" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
@@ -421,8 +249,6 @@
             <div class="rounded-xl bg-sky-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-sky-300">После расходов</p><p id="sumAfter" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
             <div class="rounded-xl bg-amber-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-amber-300">Расходы</p><p id="sumExp" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
             <div class="rounded-xl bg-indigo-400/10 p-3"><p class="text-[10px] uppercase tracking-wider text-indigo-300">Оплата по дням</p><p id="sumPay" class="mt-1 text-lg font-bold text-white">0 ₽</p></div>
-
-            <!-- Объединённый блок: Итого к получению -->
             <div class="col-span-2 sm:col-span-3 lg:col-span-6 rounded-xl bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 p-3 border border-emerald-500/30 mt-1">
               <p class="text-[10px] uppercase tracking-wider text-zinc-300 font-semibold">Итого к получению (После расходов + Дни −4%):</p>
               <p id="sumTotalCombined" class="mt-1 text-xl font-black text-emerald-400">0 ₽</p>
@@ -430,44 +256,31 @@
           </div>
         </div>
 
-        <!-- Двухколоночная сетка: слева — контент, справа — калькулятор -->
         <div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px] items-start">
-
-          <!-- ЛЕВАЯ КОЛОНКА -->
           <div class="space-y-5">
-
-            <!-- 1. Сетка дней недели -->
             <div id="daysGrid" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-2"></div>
 
-            <!-- 2. Секция Дополнительно -->
             <section class="rounded-2xl border border-amber-400/35 bg-amber-400/[.06] p-4">
               <div class="mb-3 flex items-center justify-between">
                 <h2 class="text-sm font-semibold text-amber-200">Дополнительно</h2>
                 <span class="text-[10px] uppercase tracking-wider text-amber-300/80">пакеты и разовые</span>
               </div>
               <div id="extraList"></div>
-
               <div class="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
                 <p class="mb-2 text-[11px] text-zinc-400">Оплата за доп. блок</p>
                 <div class="flex flex-wrap items-center gap-2">
-                  <label class="flex items-center gap-2 text-xs text-zinc-300">
-                    <input id="extraPayCb" class="pay-cb" type="checkbox" data-default="6000"> стандарт 6 000 ₽
-                  </label>
+                  <label class="flex items-center gap-2 text-xs text-zinc-300"><input id="extraPayCb" class="pay-cb" type="checkbox" data-default="6000"> стандарт 6 000 ₽</label>
                   <input id="extraPayCustom" class="fin-input max-w-[160px] pay-custom-input" type="number" min="0" placeholder="Своя сумма">
                 </div>
               </div>
-
               <div class="mt-3 grid gap-2 sm:grid-cols-[1fr_120px_auto]">
                 <input id="customName" class="fin-input" placeholder="Имя ученика / занятия">
                 <input id="customPrice" class="fin-input" type="number" min="0" placeholder="Сумма">
                 <button id="addCustom" type="button" class="rounded-xl bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-100 hover:bg-amber-400/30">Добавить в список</button>
               </div>
             </section>
-
           </div>
-          <!-- /ЛЕВАЯ КОЛОНКА -->
 
-          <!-- ПРАВАЯ КОЛОНКА (Калькулятор) -->
           <aside class="h-fit rounded-2xl border border-white/10 bg-[#0a0d16]/90 p-4 xl:sticky xl:top-[13.5rem] w-full">
             <h2 class="mb-3 text-sm font-semibold text-white">Калькулятор</h2>
             <div id="calcDisplay" class="mb-3 min-h-[52px] rounded-xl border border-white/10 bg-black/40 px-3 py-3 text-right font-mono text-lg text-emerald-200">0</div>
@@ -502,82 +315,59 @@
               <button type="button" class="calc-btn" data-op=".">.</button>
             </div>
           </aside>
-
         </div>
-        <!-- /Двухколоночная сетка -->
 
         <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
           <h2 class="mb-3 text-sm font-semibold text-white">Расходы</h2>
           <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Телефон">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Телефон</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Животные">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Животные</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Еда">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Еда</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Маркетплейс">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Маркетплейс</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Кредит">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Кредит</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Благотворительность">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Благотворительность</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Транспорт">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Транспорт</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Квартира">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Квартира</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Подарки">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Подарки</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Такси">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Такси</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Аптека">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Аптека</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Отдых">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Отдых</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Сплит">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Сплит</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Одежда">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Одежда</p>
-              <div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div>
-            </div>
-            <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2 lg:col-span-2 xl:col-span-2" data-cat="Дополнительное">
-              <p class="mb-2 text-xs font-semibold text-zinc-300">Дополнительное поле</p>
-              <div class="grid gap-2 sm:grid-cols-[1fr_140px_auto]">
-                <input id="extraExpName" class="fin-input" placeholder="Название расхода">
-                <input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма">
-                <button type="button" class="exp-add rounded-xl bg-white/10 px-4 text-sm">+</button>
-              </div>
-            </div>
-
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Телефон"><p class="mb-2 text-xs font-semibold text-zinc-300">Телефон</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Животные"><p class="mb-2 text-xs font-semibold text-zinc-300">Животные</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Еда"><p class="mb-2 text-xs font-semibold text-zinc-300">Еда</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Маркетплейс"><p class="mb-2 text-xs font-semibold text-zinc-300">Маркетплейс</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Кредит"><p class="mb-2 text-xs font-semibold text-zinc-300">Кредит</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Благотворительность"><p class="mb-2 text-xs font-semibold text-zinc-300">Благотворительность</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Транспорт"><p class="mb-2 text-xs font-semibold text-zinc-300">Транспорт</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Квартира"><p class="mb-2 text-xs font-semibold text-zinc-300">Квартира</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Подарки"><p class="mb-2 text-xs font-semibold text-zinc-300">Подарки</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Такси"><p class="mb-2 text-xs font-semibold text-zinc-300">Такси</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Аптека"><p class="mb-2 text-xs font-semibold text-zinc-300">Аптека</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Отдых"><p class="mb-2 text-xs font-semibold text-zinc-300">Отдых</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Сплит"><p class="mb-2 text-xs font-semibold text-zinc-300">Сплит</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3" data-cat="Одежда"><p class="mb-2 text-xs font-semibold text-zinc-300">Одежда</p><div class="flex gap-2"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-3 text-sm">+</button></div></div>
+            <div class="exp-cat rounded-xl border border-white/10 p-3 md:col-span-2 lg:col-span-2 xl:col-span-2" data-cat="Дополнительное"><p class="mb-2 text-xs font-semibold text-zinc-300">Дополнительное поле</p><div class="grid gap-2 sm:grid-cols-[1fr_140px_auto]"><input id="extraExpName" class="fin-input" placeholder="Название расхода"><input class="fin-input exp-sum" type="number" min="0" placeholder="Сумма"><button type="button" class="exp-add rounded-xl bg-white/10 px-4 text-sm">+</button></div></div>
           </div>
           <ul id="expenseList" class="mt-3 space-y-1.5 text-sm"></ul>
         </section>
+
+        <!-- БЮДЖЕТНОЕ КОЛЕСО -->
+        <details class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
+            <summary class="cursor-pointer text-sm font-semibold text-white flex items-center justify-between">
+                Бюджетное колесо
+                <svg class="h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="mt-4 flex flex-col lg:flex-row gap-6">
+                <div class="w-full lg:w-[350px] shrink-0 flex flex-col gap-4">
+                    <div class="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[.025] p-4">
+                        <span class="text-sm font-medium text-zinc-300">Общий доход:</span>
+                        <input type="number" id="wheelTotalIncome" value="90000" min="0" step="1000" class="fin-input text-right w-32 border-emerald-500/30 text-emerald-300 font-bold">
+                    </div>
+                    <div class="scroll flex flex-col gap-2 max-h-[400px] overflow-y-auto pr-1" id="wheelCategoryList"></div>
+                    <button type="button" onclick="addWheelCategory()" class="mt-2 flex items-center justify-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300 transition hover:bg-emerald-500/20 border border-emerald-500/20">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        Добавить категорию
+                    </button>
+                </div>
+                <div class="flex flex-grow flex-col items-center">
+                    <div id="wheelChart-wrapper" class="w-full h-[450px] p-4 relative">
+                        <div id="wheelChart" class="w-full h-full"></div>
+                    </div>
+                    <button type="button" class="mt-4 flex items-center gap-2 rounded-xl border border-white/10 bg-indigo-500/10 px-6 py-3 text-sm font-bold text-indigo-300 transition hover:bg-indigo-500/20" onclick="downloadWheelImage()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Скачать картинку
+                    </button>
+                </div>
+            </div>
+        </details>
 
         <section class="mt-5 rounded-2xl border border-white/10 bg-white/[.03] p-4">
           <div class="mb-3 flex flex-wrap items-center gap-2">
@@ -607,9 +397,7 @@
           <button id="copyCashback" type="button" class="mt-2 hidden rounded-xl border border-white/10 px-4 py-2 text-xs font-semibold text-zinc-300">Копировать кэшбек</button>
         </section>
       </div>
-      <!-- /finTracker -->
 
-      <!-- Заметки -->
       <div id="finNotes" class="fin-page">
         <div class="overflow-hidden rounded-[1.8rem] border border-white/10 bg-[#080b12]/90">
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/[.07] px-5 py-4">
@@ -628,53 +416,51 @@
       </div>
     </section>
 
-    <!-- Страница 3: филворд, змейка, кроссворд -->
+    <!-- Страница 3: филворд, змейка, кроссворд (Canvas versions) -->
     <section id="sitePage3" class="site-page hidden" aria-label="Magic Teacher Tools 3-in-1">
       <div class="mx-auto max-w-5xl space-y-5">
-        <div class="rounded-[1.8rem] border border-white/10 bg-[#080b12]/90 p-5 sm:p-6">
+        <div class="glass rounded-[1.8rem] border border-white/10 bg-[#080b12]/90 p-5 sm:p-6">
           <p class="text-[10px] font-semibold uppercase tracking-[.22em] text-fuchsia-300">Magic Teacher Tools 3-in-1</p>
           <h2 class="mt-2 text-2xl font-bold tracking-tight text-white">Филворд · Змейка · Кроссворд</h2>
-          <p class="mt-2 max-w-2xl text-sm text-zinc-400">Введите слова через запятую и сгенерируйте задание. Алфавит случайных букв переключается RU/EN.</p>
-          <div class="mt-5 grid gap-3 sm:grid-cols-[auto_160px_1fr] sm:items-start">
-            <button id="langBtn" type="button" class="rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-2.5 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-500/20">Язык: RU</button>
-            <select id="gridSize" class="fin-input">
-              <option value="5">5×5</option><option value="8">8×8</option><option value="10" selected>10×10</option><option value="15">15×15</option><option value="20">20×20</option>
+          <p class="mt-2 max-w-2xl text-sm text-zinc-400">Введите слова через запятую и сгенерируйте задание.</p>
+          
+          <div class="mt-5 flex flex-wrap gap-2 items-center">
+            <button id="langBtn" class="rounded-xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-2.5 text-xs font-bold text-fuchsia-200 hover:bg-fuchsia-500/20" onclick="toggleLang()">RU</button>
+            
+            <select id="gridSize" class="fin-input max-w-[120px]">
+                <option value="5,5">5 x 5</option>
+                <option value="8,8">8 x 8</option>
+                <option value="10,10" selected>10 x 10</option>
+                <option value="15,15">15 x 15</option>
+                <option value="20,20">20 x 20</option>
             </select>
-            <textarea id="magicWords" class="fin-input min-h-[88px] sm:col-span-3" placeholder="apple, banana, orange, grape"></textarea>
+
+            <input type="text" id="wordInput" class="fin-input flex-grow min-w-[200px]" placeholder="apple, banana, orange..." value="SHOULDER, BETTER, TRY, TOGETHER">
+            
+            <button onclick="generateGrid()" class="rounded-xl bg-emerald-500/20 px-4 py-2.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/30">Create Wordsearch</button>
+            <button class="snake-btn rounded-xl bg-amber-500/20 px-4 py-2.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/30" onclick="generateSnake()">Create Snake</button>
+            <button class="cross-btn rounded-xl bg-sky-500/20 px-4 py-2.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/30" onclick="generateCrossword()">Create Crossword</button>
           </div>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <button id="btnWordsearch" type="button" class="rounded-xl bg-emerald-500/20 px-4 py-2.5 text-xs font-semibold text-emerald-200 hover:bg-emerald-500/30">Create Wordsearch</button>
-            <button id="btnSnake" type="button" class="rounded-xl bg-amber-500/20 px-4 py-2.5 text-xs font-semibold text-amber-200 hover:bg-amber-500/30">Create Snake</button>
-            <button id="btnCrossword" type="button" class="rounded-xl bg-sky-500/20 px-4 py-2.5 text-xs font-semibold text-sky-200 hover:bg-sky-500/30">Create Crossword</button>
-          </div>
         </div>
 
-        <div id="gridWrap" class="magic-out rounded-[1.8rem] border border-e5e7eb bg-white p-5">
-          <div class="mb-3 flex items-center justify-between gap-2"><h3 class="text-sm font-semibold text-zinc-800">Wordsearch</h3><p class="text-[11px] text-zinc-500">Кликайте по буквам, чтобы отмечать найденные слова</p></div>
-          <p id="wsSkipped" class="mb-3 hidden text-xs text-amber-700"></p>
-          <div id="grid" class="ws-grid"></div>
+        <div id="grid" class="mx-auto rounded-[1.8rem] bg-white p-5 shadow-2xl overflow-x-auto" style="display:none;"></div>
+
+        <div id="snakeContainer" class="mx-auto rounded-[1.8rem] bg-white p-5 shadow-2xl overflow-x-auto text-center" style="display:none;">
+            <canvas id="snakeCanvas" class="mx-auto max-w-full"></canvas>
         </div>
 
-        <div id="snakeContainer" class="magic-out rounded-[1.8rem] border border-white/10 bg-white p-4">
-          <div class="mb-3 flex items-center justify-between gap-2"><h3 class="text-sm font-semibold text-zinc-800">Word Snake</h3><p class="text-[11px] text-zinc-500">Правый клик по картинке — сохранить</p></div>
-          <canvas id="snakeCanvas" class="magic-canvas w-full"></canvas>
-        </div>
-
-        <div id="crossContainer" class="magic-out space-y-4">
-          <div class="rounded-[1.8rem] border border-white/10 bg-white p-4 print-box">
-            <h3 class="mb-2 text-sm font-semibold text-zinc-800">📝 Кроссворд для ученика</h3>
-            <div id="studentGrid" class="flex justify-center overflow-auto p-2"></div>
-            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm cw-clues">
-              <div><h4 class="font-bold text-emerald-700">➡️ Across</h4><ul id="acrossClues"></ul></div>
-              <div><h4 class="font-bold text-indigo-700">⬇️ Down</h4><ul id="downClues"></ul></div>
+        <div id="crossContainer" class="mx-auto rounded-[1.8rem] bg-white p-5 shadow-2xl overflow-x-auto" style="display:none;">
+            <div class="flex flex-wrap gap-6 justify-center">
+                <div class="border border-gray-200 rounded-xl p-4 bg-white">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">Student's Version (Empty)</h3>
+                    <canvas id="crossCanvasEmpty" class="max-w-full"></canvas>
+                </div>
+                <div class="border border-gray-200 rounded-xl p-4 bg-red-50">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3">Teacher's Key (Filled)</h3>
+                    <canvas id="crossCanvasFilled" class="max-w-full"></canvas>
+                </div>
             </div>
-            <button onclick="downloadCrossword('student')" class="mt-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 text-sm transition shadow-md">📸 Скачать кроссворд</button>
-          </div>
-          <div class="rounded-[1.8rem] border border-white/10 bg-white p-4 print-box">
-            <h3 class="mb-2 text-sm font-semibold text-zinc-800">🔐 Ключ для учителя</h3>
-            <div id="teacherGrid" class="flex justify-center overflow-auto p-2"></div>
-            <button onclick="downloadCrossword('teacher')" class="mt-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 text-sm transition shadow-md">📸 Скачать ключ</button>
-          </div>
+            <p class="mt-4 text-xs text-gray-500 italic text-center">Right click -> Copy Image to save. | Правой кнопкой -> Копировать, чтобы сохранить.</p>
         </div>
       </div>
     </section>
@@ -685,10 +471,13 @@
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
           <div>
             <h2 class="text-2xl font-black text-white">📅 Моё расписание занятий</h2>
-            <p class="text-sm text-zinc-400">Планируйте уроки, редактируйте и скачивайте в нужном формате.</p>
+            <p class="text-sm text-zinc-400">Вставьте расписание текстом, сохраните и скачайте в нужном формате.</p>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button id="schedulePng" type="button" class="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition">📷 Скачать как фото</button>
+            <button id="schedulePng" type="button" class="flex items-center gap-2 rounded-xl border border-white/10 bg-indigo-500/10 px-4 py-2 text-xs font-bold text-indigo-300 transition hover:bg-indigo-500/20">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Скачать картинку
+            </button>
             <button id="scheduleTxt" type="button" class="rounded-xl bg-white/10 px-4 py-2 text-xs font-bold text-zinc-200 hover:bg-white/15 transition">📝 Скачать заметку</button>
             <button id="scheduleIcs" type="button" class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300 hover:bg-white/10 transition">📅 Календарь (.ics)</button>
             <button id="schedulePrint" type="button" class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-zinc-300 hover:bg-white/10 transition">🖨 Печать / PDF</button>
@@ -696,66 +485,64 @@
         </div>
 
         <div class="grid gap-8 lg:grid-cols-[330px_minmax(0,1fr)]">
-          <!-- Левая колонка: форма -->
+          <!-- Левая колонка: ввод текста -->
           <section class="no-print h-fit space-y-6 rounded-2xl border border-white/10 bg-[#090d16]/80 p-5 shadow-2xl backdrop-blur-xl lg:sticky lg:top-6">
             <div>
-              <h3 class="text-lg font-bold text-white">Добавить занятие</h3>
-              <p class="mt-1 text-xs text-zinc-400">Заполните поля для создания карточки урока.</p>
+              <h3 class="text-lg font-bold text-white">Импорт расписания</h3>
+              <p class="mt-1 text-xs text-zinc-400">Вставьте текст расписания (формат: День недели -> Время Ученик Платформа).</p>
             </div>
 
-            <form id="scheduleForm" class="space-y-4">
+            <div class="space-y-4">
               <div>
-                <label class="mb-1 block text-xs font-semibold text-zinc-400">Предмет *</label>
-                <input name="subject" required placeholder="Математика, Английский..." class="schedule-input">
-              </div>
-              <div>
-                <label class="mb-1 block text-xs font-semibold text-zinc-400">Ученик / репетитор</label>
-                <input name="person" placeholder="Имя ученика" class="schedule-input">
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">День недели</label>
-                  <select name="day" class="schedule-input cursor-pointer">
-                    <option value="0">Понедельник</option><option value="1">Вторник</option><option value="2">Среда</option><option value="3">Четверг</option><option value="4">Пятница</option><option value="5">Суббота</option><option value="6">Воскресенье</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">Цвет карточки</label>
-                  <select name="color" class="schedule-input cursor-pointer">
-                    <option value="indigo">Синий</option><option value="emerald">Зелёный</option><option value="amber">Жёлтый</option><option value="rose">Красный</option><option value="violet">Фиолетовый</option><option value="cyan">Голубой</option>
-                  </select>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">Начало</label>
-                  <input type="time" name="start" value="16:00" class="schedule-input">
-                </div>
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">Конец</label>
-                  <input type="time" name="end" value="17:00" class="schedule-input">
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">Место / ссылка</label>
-                  <input name="place" placeholder="Zoom / Skype / Дома" class="schedule-input">
-                </div>
-                <div>
-                  <label class="mb-1 block text-xs font-semibold text-zinc-400">Цена, ₽</label>
-                  <input type="number" min="0" step="50" name="price" placeholder="1500" class="schedule-input">
-                </div>
-              </div>
-              <div>
-                <label class="mb-1 block text-xs font-semibold text-zinc-400">Заметка к уроку</label>
-                <textarea name="note" rows="2" placeholder="Домашнее задание, темы..." class="schedule-input resize-none"></textarea>
+                <label class="mb-1 block text-xs font-semibold text-zinc-400">Текст расписания</label>
+                <textarea id="scheduleInput" class="schedule-input w-full min-h-[300px] font-mono text-xs" placeholder="ПН: 4100, ВТ: 3900, СР: 4800, ЧТ: 1900, ПТ: 4900, СБ: 1100, ВС: 1000
+Итого: 21 700 ₽
+
+Schedule
+
+Monday
+17:00 Vanya Ya
+18:00 Sonya zN
+19:00 Leo zO
+20:00 Katya Ya
+21:00 Andrey Ya
+
+Tuesday
+16:00 Katya zN
+17:00 Sophia Ya
+18:00 Gosha MTS
+19:00 OLEG zN
+20:00 Liza zN
+
+Wednesday
+17:00 Vanya MTS
+18:00 Sonya zN
+19:00 Egor Max
+20:00 Devochki MTS
+21:00 Andrew Ya
+
+Thursday
+17:00 Sophia Ya
+21:00 Andrew Ya
+
+Friday
+15:00 Ksy zN
+17:00 Sonya zN
+18:00 Gosha MTS
+19:00 Leo zO
+20:00 Liza zN
+
+Saturday
+11:00 Egor Max
+
+Sunday
+19:00 Devochki MTS"></textarea>
               </div>
 
               <div class="flex gap-2 pt-2">
-                <button type="submit" id="scheduleSubmit" class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 active:scale-95 transition">Добавить занятие</button>
-                <button type="button" id="scheduleCancel" class="hidden rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-bold text-zinc-300 hover:bg-white/10 transition">Отмена</button>
+                <button type="button" id="parseScheduleBtn" class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white hover:bg-indigo-500 active:scale-95 transition">📥 Загрузить расписание</button>
               </div>
-            </form>
+            </div>
 
             <div class="space-y-3 border-t border-white/5 pt-4">
               <div>
@@ -799,6 +586,30 @@
 
   <div id="toast" class="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 translate-y-3 rounded-full border border-white/10 bg-zinc-900 px-5 py-2.5 text-xs font-semibold text-white opacity-0 shadow-2xl transition-all" role="status" aria-live="polite"></div>
 
+  <!-- Модальное окно для картинок -->
+  <div id="imageModal" class="fixed inset-0 z-[100] hidden bg-black/80 p-4 flex flex-col items-center justify-center backdrop-blur-md transition-opacity">
+      <div class="relative w-full max-w-5xl flex justify-between items-center mb-4">
+          <h3 class="text-white font-bold text-lg">Скриншот / Сохранение</h3>
+          <button id="closeImageModal" class="rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+      </div>
+      
+      <div class="relative w-full max-w-5xl flex-grow overflow-auto flex items-center justify-center rounded-2xl bg-white p-4 shadow-2xl">
+          <div id="imageModalLoader" class="absolute inset-0 flex items-center justify-center bg-white text-slate-800 font-bold z-10 text-lg">
+              Создаем картинку...
+          </div>
+          <img id="imageModalImg" class="max-w-full max-h-[75vh] object-contain hidden shadow-sm" />
+      </div>
+      
+      <div class="mt-6 flex gap-4">
+          <a id="imageModalDownload" class="rounded-xl bg-indigo-600 px-8 py-3 text-sm font-bold text-white hover:bg-indigo-500 transition shadow-lg flex items-center gap-2 hidden">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              Скачать файл
+          </a>
+      </div>
+  </div>
+
   <script>
     (() => {
       // ================================================================
@@ -814,6 +625,30 @@
       const num = v => Number(v)||0;
       const escHtml = s => String(s??'').replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m]));
       const mins = t => { if (!t) return 0; const [h,m]=t.split(':').map(Number); return h*60+m; };
+
+      // ================================================================
+      // УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ДЛЯ КАРТИНОК
+      // ================================================================
+      function showImageModal(loadingText = 'Создаем картинку...') {
+          $('imageModal').classList.remove('hidden');
+          $('imageModalLoader').classList.remove('hidden');
+          $('imageModalLoader').innerText = loadingText;
+          $('imageModalImg').classList.add('hidden');
+          $('imageModalDownload').classList.add('hidden');
+      }
+
+      function setModalImage(dataUrl) {
+          $('imageModalLoader').classList.add('hidden');
+          const img = $('imageModalImg');
+          img.src = dataUrl;
+          img.classList.remove('hidden');
+          
+          const dl = $('imageModalDownload');
+          dl.href = dataUrl;
+          dl.classList.remove('hidden');
+      }
+
+      $('closeImageModal').onclick = () => $('imageModal').classList.add('hidden');
 
       // ================================================================
       // 1. НАВИГАЦИЯ СТРАНИЦ И КАРУСЕЛЬ
@@ -854,6 +689,7 @@
           on?btn.setAttribute('aria-current','page'):btn.removeAttribute('aria-current');
         });
         if(page===1) play(); else stop();
+        if(page===2) setTimeout(()=>window.dispatchEvent(new Event('resize')), 100); 
       }
       sitePageButtons.forEach(b=>b.addEventListener('click',()=>openSitePage(Number(b.dataset.sitePage))));
       $('prev').onclick = ()=>go(current-1,true); $('next').onclick = ()=>go(current+1,true);
@@ -892,6 +728,230 @@
       let finTab = 'tracker';
       let banksData = [];
 
+      // ====== БЮДЖЕТНОЕ КОЛЕСО ======
+      const COLOR_PALETTE = ["#6366f1", "#10b981", "#f59e0b", "#8b5cf6", "#14b8a6", "#ec4899", "#f43f5e", "#0ea5e9"];
+      let colorIndex = 0;
+      let wheelData = JSON.parse(localStorage.getItem('wheelBudgetData_v1') || 'null');
+      if (!wheelData) {
+          wheelData = [
+              { label: "Квартира", amount: 18000, color: "#6366f1" },
+              { label: "Еда", amount: 13000, color: "#10b981" },
+              { label: "Кредит", amount: 10000, color: "#f59e0b" },
+              { label: "Маркетплейс", amount: 1000, color: "#8b5cf6" },
+              { label: "Животные", amount: 10000, color: "#14b8a6" },
+              { label: "Отдых", amount: 5000, color: "#ec4899" },
+              { label: "Благотворительность", amount: 3000, color: "#f43f5e" },
+              { label: "Телефон", amount: 1000, color: "#0ea5e9" },
+              { label: "Такси", amount: 500, color: "#eab308" },
+              { label: "Транспорт", amount: 1000, color: "#64748b" },
+              { label: "Аптека", amount: 1000, color: "#84cc16" },
+              { label: "Одежда", amount: 1000, color: "#d946ef" },
+              { label: "Подарки", amount: 3000, color: "#ef4444" },
+              { label: "Сплит", amount: 1000, color: "#22d3ee" }
+          ];
+          localStorage.setItem('wheelBudgetData_v1', JSON.stringify(wheelData));
+      }
+      let unallocatedExpenses = num(localStorage.getItem('wheelUnallocatedExpenses_v1')) || 0;
+      let wheelChart = null;
+
+      function saveWheelData() {
+          localStorage.setItem('wheelBudgetData_v1', JSON.stringify(wheelData));
+          localStorage.setItem('wheelUnallocatedExpenses_v1', unallocatedExpenses);
+      }
+
+      function renderWheelCategories() {
+          const list = $('wheelCategoryList');
+          if(!list) return;
+          list.innerHTML = '';
+          wheelData.forEach((item, index) => {
+              const row = document.createElement('div');
+              row.className = 'category-row-wheel';
+              row.innerHTML = `
+                  <div class="h-4 w-4 rounded-md shrink-0" style="background-color: ${item.color}"></div>
+                  <input type="text" value="${item.label}" oninput="updateWheelData(${index}, 'label', this.value)" class="w-full bg-transparent text-sm font-medium text-zinc-200 outline-none border-b border-transparent focus:border-indigo-400/50 pb-1 transition-colors">
+                  <input type="number" value="${item.amount}" min="0" step="500" oninput="updateWheelData(${index}, 'amount', this.value)" class="fin-input w-[85px] text-right border-white/10">
+                  <button class="grid h-7 w-7 place-items-center rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition shrink-0" onclick="deleteWheelCategory(${index})">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
+              `;
+              list.appendChild(row);
+          });
+      }
+
+      window.updateWheelData = function(index, field, value) {
+          if (field === 'amount') value = parseFloat(value) || 0;
+          wheelData[index][field] = value;
+          saveWheelData();
+          updateWheelChart();
+      }
+
+      window.deleteWheelCategory = function(index) {
+          wheelData.splice(index, 1);
+          saveWheelData();
+          renderWheelCategories();
+          updateWheelChart();
+      }
+
+      window.addWheelCategory = function() {
+          const color = COLOR_PALETTE[colorIndex % COLOR_PALETTE.length];
+          colorIndex++;
+          wheelData.push({ label: "Новая категория", amount: 0, color: color });
+          saveWheelData();
+          renderWheelCategories();
+          updateWheelChart();
+      }
+
+      function updateWheelChart() {
+          if (!wheelChart) return;
+          const income = parseFloat($('wheelTotalIncome').value) || 0;
+          const totalAllocated = wheelData.reduce((sum, item) => sum + item.amount, 0);
+          const freeFunds = income - totalAllocated - unallocatedExpenses;
+
+          let chartData = wheelData.map(item => ({
+              name: item.label,
+              value: item.amount,
+              itemStyle: { color: item.color }
+          }));
+
+          if (freeFunds > 0) {
+              chartData.push({
+                  name: "Свободные средства",
+                  value: freeFunds,
+                  itemStyle: { color: "#334155" }
+              });
+          }
+
+          const option = {
+              tooltip: {
+                  trigger: 'item',
+                  formatter: '{b}: {c} ₽ ({d}%)',
+                  backgroundColor: '#1e293b',
+                  borderColor: '#334155',
+                  textStyle: { color: '#f8fafc' }
+              },
+              series: [
+                  {
+                      type: 'pie',
+                      radius: '65%', 
+                      center: ['50%', '50%'], 
+                      data: chartData,
+                      label: {
+                          show: true,
+                          formatter: '{b}\n{c} ₽',
+                          fontSize: 12,
+                          fontWeight: '500',
+                          fontFamily: 'Inter, sans-serif',
+                          color: '#e4e4e7',
+                          lineHeight: 18
+                      },
+                      labelLine: {
+                          show: true,
+                          length: 15,   
+                          length2: 25,
+                          lineStyle: {
+                              color: '#52525b',
+                              width: 1.5
+                          }
+                      },
+                      labelLayout: {
+                          hideOverlap: true 
+                      }
+                  }
+              ]
+          };
+          wheelChart.setOption(option);
+      }
+
+      // ================================================================
+      // СКАЧИВАНИЕ КАРТИНКИ КОЛЕСА (ЧЕРЕЗ МОДАЛЬНОЕ ОКНО)
+      // ================================================================
+      window.downloadWheelImage = function() {
+          if (!wheelChart) return;
+          showImageModal('Готовим колесо...');
+          
+          setTimeout(() => {
+              try {
+                  const imgData = wheelChart.getDataURL({
+                      type: 'png',
+                      pixelRatio: 2,
+                      backgroundColor: '#0f172a'
+                  });
+                  setModalImage(imgData);
+              } catch (e) {
+                  $('imageModalLoader').innerText = 'Ошибка при создании картинки';
+              }
+          }, 100);
+      }
+
+      function initWheel() {
+          const chartDom = $('wheelChart');
+          if(!chartDom) return;
+          wheelChart = echarts.init(chartDom);
+          
+          $('wheelTotalIncome').value = localStorage.getItem('wheelTotalIncome_v1') || 90000;
+          $('wheelTotalIncome').addEventListener('input', function() {
+              localStorage.setItem('wheelTotalIncome_v1', this.value);
+              updateWheelChart();
+          });
+
+          renderWheelCategories();
+          updateWheelChart();
+
+          const detailsEl = document.querySelector('details');
+          if (detailsEl) {
+              detailsEl.addEventListener('toggle', (e) => {
+                  if (detailsEl.open) {
+                      setTimeout(() => wheelChart.resize(), 50);
+                  }
+              });
+          }
+      }
+
+      function syncExpenseToWheel(name, amount) {
+          let matched = false;
+          const lowerName = name.toLowerCase();
+          
+          for (let i = 0; i < wheelData.length; i++) {
+              if (wheelData[i].label.toLowerCase() === lowerName) {
+                  wheelData[i].amount -= amount;
+                  if (wheelData[i].amount < 0) wheelData[i].amount = 0;
+                  matched = true;
+                  break;
+              }
+          }
+          
+          if (!matched) {
+              unallocatedExpenses += amount;
+          }
+          
+          saveWheelData();
+          renderWheelCategories();
+          updateWheelChart();
+      }
+
+      function desyncExpenseFromWheel(name, amount) {
+          let matched = false;
+          const lowerName = name.toLowerCase();
+          
+          for (let i = 0; i < wheelData.length; i++) {
+              if (wheelData[i].label.toLowerCase() === lowerName) {
+                  wheelData[i].amount += amount;
+                  matched = true;
+                  break;
+              }
+          }
+          
+          if (!matched) {
+              unallocatedExpenses -= amount;
+              if (unallocatedExpenses < 0) unallocatedExpenses = 0;
+          }
+          
+          saveWheelData();
+          renderWheelCategories();
+          updateWheelChart();
+      }
+
+
       const BANKS = [
         {name:'Т-Банк', cats:['Рестораны','Аптеки','Транспорт','Маркетплейсы']},
         {name:'Сбербанк', cats:['Продукты','АЗС','ЖКХ','Онлайн']},
@@ -899,7 +959,6 @@
         {name:'Озон Банк', cats:['Ozon','Аптеки','Развлечения','Путешествия']}
       ];
 
-      // ====== ДОПОЛНИТЕЛЬНЫЕ ЗАНЯТИЯ (пакеты, разовые) ======
       const EXTRA = [
         { name: 'Лиза', price: 8000 },
         { name: 'Ксюша', price: 6000 },
@@ -908,50 +967,42 @@
       ];
 
       const SCHEDULE = [
-        // ПОНЕДЕЛЬНИК
         [
           { name: 'Vanya', price: 1000 },
-          { name: 'Sonya', price: 0 },    // пакет
+          { name: 'Sonya', price: 0 },
           { name: 'Лео', price: 700 }
         ],
-        // ВТОРНИК
         [
           { name: 'Sophia', price: 1100 },
-          { name: 'Лиза', price: 0 },      // пакет
+          { name: 'Лиза', price: 0 },
           { name: 'Гоша', price: 700 }
         ],
-        // СРЕДА
         [
-          { name: 'Sonya', price: 0 },    // пакет
-          { name: 'Egor', price: 0 },     // пакет
+          { name: 'Sonya', price: 0 },
+          { name: 'Egor', price: 0 },
           { name: 'Andrey', price: 800 }
         ],
-        // ЧЕТВЕРГ
         [
           { name: 'Sophia', price: 1100 },
           { name: 'Vanya', price: 1000 },
           { name: 'Девочки', price: 1000 },
           { name: 'Andrey', price: 800 }
         ],
-        // ПЯТНИЦА
         [
-          { name: 'Ksy', price: 0 },      // пакет
-          { name: 'Sonya', price: 0 },    // пакет
+          { name: 'Ksy', price: 0 },
+          { name: 'Sonya', price: 0 },
           { name: 'Гоша', price: 700 },
           { name: 'Лео', price: 700 },
-          { name: 'Лиза', price: 0 }      // пакет
+          { name: 'Лиза', price: 0 }
         ],
-        // СУББОТА
         [
-          { name: 'Egor', price: 0 }      // пакет
+          { name: 'Egor', price: 0 }
         ],
-        // ВОСКРЕСЕНЬЕ
         [
           { name: 'Девочки', price: 1000 }
         ]
       ];
 
-      // ---------- Дни ----------
       function taskRow(item, id){
         const tax=Math.round(item.price*TAX);
         return `<label class="task-item"><span class="flex items-center gap-2 min-w-0"><input type="checkbox" data-price="${item.price}" data-name="${item.name}" data-id="${id}"><span class="truncate text-sm">${item.name}</span></span><span class="shrink-0 text-right"><span class="text-sm font-semibold text-white">${money(item.price)}</span><span class="ml-2 text-[10px] text-rose-300">налог ${money(tax)}</span></span></label>`;
@@ -965,10 +1016,9 @@
           </div>
         </div>`;
       }
-            function renderDays(){
-        // Суммы по умолчанию для каждого дня (0-Пн, 1-Вт, 2-Ср, 3-Чт, 4-Пт, 5-Сб, 6-Вс)
+      
+      function renderDays(){
         const DAILY_NORMA = [4100, 2800, 3800, 2900, 4900, 1100, 1000];
-
         $('daysGrid').innerHTML = DAYS_RU.map((day,i)=>`
           <article class="day-card rounded-2xl border border-white/10 bg-white/[.035] p-4" data-day="${i}" id="day-${i}">
             <div class="mb-3 flex items-baseline justify-between"><h3 class="text-sm font-semibold text-white">${day}</h3><span class="cal-date text-[11px] text-zinc-500" data-idx="${i}"></span></div>
@@ -979,7 +1029,6 @@
         $('extraList').innerHTML = EXTRA.map((t,i)=>taskRow(t,'x'+i)).join('');
       }
 
-      // ---------- Банки ----------
       function bankCard(bank, idx){
         return `<article class="bank-card rounded-xl border border-white/10 bg-black/10 p-3" data-bank-id="${escHtml(bank.id)}">
           <div class="mb-3 flex items-center gap-2">
@@ -1025,7 +1074,6 @@
       }
       function renderBanks(){ $('banks').innerHTML = banksData.map(bankCard).join(''); }
 
-      // ---------- Оплата по дням ----------
       function getDayPaymentsTotal(){
         let total=0;
         document.querySelectorAll('.day-payment').forEach(box=>{
@@ -1041,7 +1089,6 @@
         return total;
       }
 
-      // ---------- Основной расчёт ----------
       function calc(){
         let gross=0;
         document.querySelectorAll('.task-item input:checked').forEach(ch=>gross+=num(ch.dataset.price));
@@ -1055,7 +1102,6 @@
         $('sumAfter').textContent=money(after);
         $('sumPay').textContent=money(pay);
 
-        // Обновление "Итого за день"
         document.querySelectorAll('.day-card').forEach(card => {
             let daySum = 0;
             card.querySelectorAll('.task-item input:checked').forEach(ch => daySum += num(ch.dataset.price));
@@ -1063,18 +1109,15 @@
             if (totalEl) totalEl.textContent = `Итого за день: ${money(daySum)}`;
         });
 
-        // Итоговая сумма: (Чистыми - Расходы) + (Оплата по дням - 4%)
         const totalCombined = after + (pay * (1 - TAX));
         const totalEl = $('sumTotalCombined');
         if (totalEl) totalEl.textContent = money(totalCombined);
       }
 
-      // ---------- Расходы ----------
       function renderExpenses(){
         $('expenseList').innerHTML = expenses.map((e,i)=>`<li class="flex items-center justify-between rounded-lg border border-white/10 bg-white/[.03] px-3 py-2"><span class="text-zinc-300">${e.name}</span><span class="flex items-center gap-3"><b>${money(e.sum)}</b><button type="button" data-del="${i}" class="text-[11px] text-rose-300">✕</button></span></li>`).join('');
       }
 
-      // ---------- События для трекера ----------
       document.addEventListener('change', e=>{
         if(!sitePage2.contains(e.target)) return;
         if(e.target.matches('.task-item input, .pay-cb, .pay-custom-input')){
@@ -1117,15 +1160,27 @@
             if(cat.dataset.cat==='Дополнительное') name=$('extraExpName').value.trim();
             if(!name) name=cat.dataset.cat;
             if(!sum){ notify('Введите сумму расхода'); return; }
+            
             expenses.push({name: name, sum});
-            expenseTotal+=sum; cat.querySelector('.exp-sum').value='';
+            expenseTotal+=sum; 
+            
+            syncExpenseToWheel(name, sum);
+
+            cat.querySelector('.exp-sum').value='';
             renderExpenses(); calc();
           }
         });
       });
       $('expenseList').addEventListener('click', e=>{
         const btn=e.target.closest('[data-del]'); if(!btn) return;
-        const i=Number(btn.dataset.del); expenseTotal-=expenses[i].sum; expenses.splice(i,1); renderExpenses(); calc();
+        const i=Number(btn.dataset.del); 
+        const removed = expenses[i];
+        expenseTotal-=removed.sum; 
+        
+        desyncExpenseFromWheel(removed.name, removed.sum);
+
+        expenses.splice(i,1); 
+        renderExpenses(); calc();
       });
 
       function generateReport(){
@@ -1230,7 +1285,6 @@
         }
       });
 
-      // ---------- Калькулятор ----------
       const disp=$('calcDisplay');
       function updateCalcDisplay(){ disp.textContent=calcExpression||'0'; }
       function calcInput(ch){ calcExpression+=ch; updateCalcDisplay(); }
@@ -1267,7 +1321,6 @@
         if(activeSitePage===2 && finTab==='tracker' && !e.target.matches('input,textarea')) handleCalcKeys(e);
       });
 
-      // ---------- Календарь ----------
       function initCalendar(){
         const now=new Date(); const monday=new Date(now); monday.setDate(now.getDate()-((now.getDay()+6)%7));
         $('weekLabel').textContent = monday.toLocaleDateString('ru-RU',{day:'numeric',month:'long'})+' — '+new Date(monday.getTime()+6*86400000).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
@@ -1287,7 +1340,6 @@
         card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'),1200);
       });
 
-      // ---------- Внутренние вкладки финансов ----------
       function openFin(tab){
         finTab=tab;
         $('finTracker').classList.toggle('active', tab==='tracker');
@@ -1300,7 +1352,6 @@
       }
       document.querySelectorAll('.fin-nav').forEach(b=>b.onclick=()=>openFin(b.dataset.fin));
 
-      // ---------- Заметки ----------
       const notes=$('userNotes'), status=$('notesStatus');
       let ns;
       function setStatus(t){ status.textContent=t; clearTimeout(ns); ns=setTimeout(()=>status.textContent='📌 Сохраняется автоматически', 1600); }
@@ -1310,11 +1361,214 @@
       $('copyNotes').onclick=()=>{ copy(notes.value); setStatus('📋 Скопировано!'); };
       $('clearNotes').onclick=()=>{ if(!confirm('Очистить заметки?')) return; notes.value=''; setStatus('🗑️ Очищено'); };
 
-      // ---------- Инициализация финансов ----------
       renderDays(); loadBanks(); renderBanks(); saveBanks(); initCalendar(); calc(); openFin(finTab==='notes'?'notes':'tracker');
+      initWheel();
 
       // ================================================================
-      // 3. РАСПИСАНИЕ ЗАНЯТИЙ (страница 4)
+      // 3. МАГИЧЕСКИЕ ИНСТРУМЕНТЫ (Canvas версии)
+      // ================================================================
+      let currentLang = 'RU';
+      const alphabets = { 'RU': 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'EN': 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' };
+
+      window.toggleLang = function() {
+          currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+          document.getElementById('langBtn').textContent = currentLang;
+      }
+
+      function hideAllMagic() {
+          document.getElementById('grid').style.display = 'none';
+          document.getElementById('snakeContainer').style.display = 'none';
+          document.getElementById('crossContainer').style.display = 'none';
+      }
+
+      window.generateGrid = function() {
+          hideAllMagic();
+          const input = document.getElementById('wordInput').value;
+          const [cols, rows] = document.getElementById('gridSize').value.split(',').map(Number);
+          const words = input.split(',').map(w => w.trim().toUpperCase()).filter(w => w.length > 0);
+          
+          const gridElement = document.getElementById('grid');
+          gridElement.style.display = 'grid';
+          gridElement.style.gridTemplateColumns = `repeat(${cols}, 35px)`;
+          gridElement.innerHTML = '';
+
+          let grid = Array(rows).fill().map(() => Array(cols).fill(''));
+
+          words.forEach((word) => {
+              let placed = false;
+              let attempts = 0;
+              while (!placed && attempts < 150) {
+                  const isHor = Math.random() > 0.5;
+                  const rLimit = isHor ? rows : rows - word.length + 1;
+                  const cLimit = isHor ? cols - word.length + 1 : cols;
+                  let r = Math.floor(Math.random() * rLimit);
+                  let c = Math.floor(Math.random() * cLimit);
+                  
+                  let canPlace = true;
+                  for (let i = 0; i < word.length; i++) {
+                      let currR = isHor ? r : r + i;
+                      let currC = isHor ? c + i : c;
+                      if (grid[currR][currC] !== '' && grid[currR][currC] !== word[i]) {
+                          canPlace = false; break;
+                      }
+                  }
+                  if (canPlace) {
+                      for (let i = 0; i < word.length; i++) {
+                          let currR = isHor ? r : r + i;
+                          let currC = isHor ? c + i : c;
+                          grid[currR][currC] = word[i];
+                      }
+                      placed = true;
+                  }
+                  attempts++;
+              }
+          });
+
+          const chars = alphabets[currentLang];
+          for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                  let char = grid[r][c] || chars[Math.floor(Math.random() * chars.length)];
+                  const cell = document.createElement('div');
+                  cell.className = 'ws-cell';
+                  cell.textContent = char;
+                  cell.onclick = () => cell.classList.toggle('found');
+                  gridElement.appendChild(cell);
+              }
+          }
+      }
+
+      window.generateSnake = function() {
+          hideAllMagic();
+          const input = document.getElementById('wordInput').value;
+          if (!input) return;
+          const words = input.split(',').map(w => w.trim());
+          const canvas = document.getElementById('snakeCanvas');
+          const ctx = canvas.getContext('2d');
+          document.getElementById('snakeContainer').style.display = 'block';
+
+          const chars = alphabets[currentLang].toLowerCase();
+          let fullString = "";
+          words.forEach(word => {
+              fullString += word.toLowerCase();
+              for(let i=0; i < (Math.floor(Math.random()*2)+2); i++) 
+                  fullString += chars[Math.floor(Math.random() * chars.length)];
+          });
+
+          const fontSize = 44;
+          const charSpacing = 30;
+          canvas.width = (fullString.length * charSpacing) + 100;
+          canvas.height = 150;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.font = `italic 600 ${fontSize}px "Times New Roman", serif`;
+          ctx.textBaseline = 'middle';
+
+          for (let i = 0; i < fullString.length; i++) {
+              const x = 50 + (i * charSpacing);
+              const y = 75 + Math.sin(i * 0.25) * 25;
+              ctx.fillStyle = '#3498db';
+              ctx.save();
+              ctx.translate(x, y);
+              ctx.rotate(Math.cos(i * 0.25) * 0.15);
+              ctx.fillText(fullString[i], 0, 0);
+              ctx.restore();
+          }
+      }
+
+      window.generateCrossword = function() {
+          hideAllMagic();
+          const input = document.getElementById('wordInput').value.toUpperCase();
+          if (!input) return;
+          
+          const words = input.split(',').map(w => w.trim()).filter(w => w.length > 1);
+          document.getElementById('crossContainer').style.display = 'block';
+
+          const cellSize = 45;
+          let placedWords = [];
+
+          words.forEach((word, index) => {
+              const wordNum = index + 1;
+              if (index === 0) {
+                  placedWords.push({word, x: 0, y: 0, hor: true, num: wordNum});
+              } else {
+                  let placed = false;
+                  for (let p of placedWords) {
+                      for (let i = 0; i < p.word.length; i++) {
+                          for (let j = 0; j < word.length; j++) {
+                              if (p.word[i] === word[j] && !placed) {
+                                  let newX = p.hor ? p.x + i : p.x - j;
+                                  let newY = p.hor ? p.y - j : p.y + i;
+                                  placedWords.push({word, x: newX, y: newY, hor: !p.hor, num: wordNum});
+                                  placed = true;
+                              }
+                          }
+                      }
+                  }
+                  if (!placed) {
+                      let lastY = Math.max(...placedWords.map(w => w.y + (w.hor ? 0 : w.word.length))) + 2;
+                      placedWords.push({word, x: 0, y: lastY, hor: true, num: wordNum});
+                  }
+              }
+          });
+
+          const minX = Math.min(...placedWords.flatMap(w => w.hor ? [w.x, w.x + w.word.length] : [w.x]));
+          const maxX = Math.max(...placedWords.flatMap(w => w.hor ? [w.x, w.x + w.word.length] : [w.x + 1]));
+          const minY = Math.min(...placedWords.flatMap(w => w.hor ? [w.y] : [w.y, w.y + w.word.length]));
+          const maxY = Math.max(...placedWords.flatMap(w => w.hor ? [w.y + 1] : [w.y, w.y + w.word.length]));
+
+          const padding = 1.5;
+          const finalW = (maxX - minX + padding * 2) * cellSize;
+          const finalH = (maxY - minY + padding * 2) * cellSize;
+
+          renderCross('crossCanvasEmpty', placedWords, minX, minY, padding, cellSize, finalW, finalH, false);
+          renderCross('crossCanvasFilled', placedWords, minX, minY, padding, cellSize, finalW, finalH, true);
+      }
+
+      function renderCross(id, placedWords, minX, minY, padding, cellSize, w, h, isFilled) {
+          const canvas = document.getElementById(id);
+          const ctx = canvas.getContext('2d');
+          canvas.width = w;
+          canvas.height = h;
+
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, w, h);
+
+          placedWords.forEach(pw => {
+              const offsetX = (pw.x - minX + padding);
+              const offsetY = (pw.y - minY + padding);
+              
+              for (let i = 0; i < pw.word.length; i++) {
+                  let curX = (pw.hor ? (offsetX + i) : offsetX) * cellSize;
+                  let curY = (pw.hor ? offsetY : (offsetY + i)) * cellSize;
+                  
+                  ctx.strokeStyle = "#2d3436";
+                  ctx.lineWidth = 2;
+                  ctx.strokeRect(curX, curY, cellSize, cellSize);
+
+                  if (i === 0) {
+                      ctx.fillStyle = "#636e72";
+                      ctx.font = "11px Arial";
+                      ctx.textAlign = "left";
+                      ctx.textBaseline = "top";
+                      ctx.fillText(pw.num, curX + 4, curY + 4);
+                  }
+
+                  if (isFilled) {
+                      ctx.fillStyle = "#2d3436";
+                      ctx.font = "bold 20px Arial";
+                      ctx.textAlign = "center";
+                      ctx.textBaseline = "middle";
+                      ctx.fillText(pw.word[i], curX + cellSize/2, curY + cellSize/2 + 2);
+                  }
+              }
+          });
+      }
+
+      // Инициализация кроссворда при загрузке
+      setTimeout(() => { if(document.getElementById('wordInput')) generateCrossword(); }, 500);
+
+
+      // ================================================================
+      // 4. РАСПИСАНИЕ ЗАНЯТИЙ (страница 4)
       // ================================================================
       const LCOLORS = {
         indigo: { bg: '#f5f7ff', bd: '#c7d2fe', tx: '#312e81', dot: '#4f46e5' },
@@ -1324,13 +1578,24 @@
         violet: { bg: '#faf5ff', bd: '#ddd6fe', tx: '#3b0764', dot: '#8b5cf6' },
         cyan: { bg: '#f0fdfa', bd: '#a5f3fc', tx: '#115e59', dot: '#06b6d4' }
       };
-      let lessons = [
-        { id: 'a1', subject: 'Математика', person: 'Анна П.', day: '0', color: 'indigo', start: '16:00', end: '17:30', place: 'Zoom', price: '1500', note: 'Тригонометрия' },
-        { id: 'a2', subject: 'Английский', person: 'Марк', day: '2', color: 'emerald', start: '18:00', end: '19:00', place: 'дома', price: '1200', note: 'Разговорный урок' },
-        { id: 'a3', subject: 'Физика', person: 'Лена', day: '4', color: 'amber', start: '15:00', end: '16:30', place: 'Skype', price: '1800', note: 'Подготовка к ЕГЭ' }
-      ];
-      let editId = null;
-      const schedForm = $('scheduleForm');
+      
+      let lessons = JSON.parse(localStorage.getItem('tutorSchedule_v2') || 'null');
+      let scheduleDayTotals = JSON.parse(localStorage.getItem('tutorScheduleTotals_v2') || '[0,0,0,0,0,0,0]');
+      let scheduleGrandTotal = parseInt(localStorage.getItem('tutorScheduleGrandTotal_v2') || '0', 10);
+
+      if (!lessons) {
+          lessons = [
+            { id: 'a1', subject: 'Математика', person: 'Анна П.', day: '0', color: 'indigo', start: '16:00', end: '17:30', place: 'Zoom', price: '1500', note: 'Тригонометрия' },
+            { id: 'a2', subject: 'Английский', person: 'Марк', day: '2', color: 'emerald', start: '18:00', end: '19:00', place: 'дома', price: '1200', note: 'Разговорный урок' },
+            { id: 'a3', subject: 'Физика', person: 'Лена', day: '4', color: 'amber', start: '15:00', end: '16:30', place: 'Skype', price: '1800', note: 'Подготовка к ЕГЭ' }
+          ];
+      }
+
+      function saveSchedule() {
+          localStorage.setItem('tutorSchedule_v2', JSON.stringify(lessons));
+          localStorage.setItem('tutorScheduleTotals_v2', JSON.stringify(scheduleDayTotals));
+          localStorage.setItem('tutorScheduleGrandTotal_v2', scheduleGrandTotal.toString());
+      }
 
       function renderSchedule() {
         const title = $('scheduleTitle').value || 'Расписание занятий';
@@ -1362,7 +1627,7 @@
               <div class="lesson-card group relative mb-2.5 last:mb-0 shadow-sm" style="background:${c.bg}; border-color:${c.bd}; color:${c.tx}">
                 <div class="flex items-center gap-1.5 text-[10px] font-bold" style="color:${c.dot}">
                   <span class="h-1.5 w-1.5 rounded-full" style="background:${c.dot}"></span>
-                  ${l.start || ''}${l.end ? '–' + l.end : ''}${l.price ? ' · ' + l.price + ' ₽' : ''}
+                  ${l.start || ''}${l.end ? '–' + l.end : ''}${l.price && l.price !== '0' ? ' · ' + l.price + ' ₽' : ''}
                 </div>
                 <div class="mt-1 text-sm font-black leading-tight text-slate-800">${escHtml(l.subject)}</div>
                 ${l.person ? `<div class="mt-0.5 text-xs font-semibold text-slate-600">${escHtml(l.person)}</div>` : ''}
@@ -1374,41 +1639,116 @@
                 </div>
               </div>`);
           });
+          
+          const dayTotal = scheduleDayTotals[di];
+          if (dayTotal > 0) {
+              col.insertAdjacentHTML('beforeend', `<div class="mt-auto pt-3 flex justify-between border-t border-slate-200 text-xs font-bold text-slate-700"><span>Итого за день:</span><span>${dayTotal.toLocaleString('ru-RU')} ₽</span></div>`);
+          }
+
           grid.appendChild(col);
         });
 
         $('schedCount').textContent = lessons.length;
         $('schedHours').textContent = (Math.round(hours * 10) / 10) + ' ч';
-        $('schedMoney').textContent = moneySum.toLocaleString('ru-RU') + ' ₽';
+        $('schedMoney').textContent = (scheduleGrandTotal > 0 ? scheduleGrandTotal : moneySum).toLocaleString('ru-RU') + ' ₽';
+        saveSchedule();
       }
 
-      schedForm.addEventListener('submit', e => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(schedForm));
-        if (editId) {
-          lessons = lessons.map(l => l.id === editId ? { ...data, id: editId } : l);
-          editId = null;
-          $('scheduleSubmit').textContent = 'Добавить занятие';
-          $('scheduleCancel').classList.add('hidden');
-          notify('Занятие сохранено');
-        } else {
-          lessons.push({ ...data, id: Date.now().toString(36) });
-          notify('Занятие добавлено');
-        }
-        const keep = { day: schedForm.day.value, start: schedForm.start.value, end: schedForm.end.value, color: schedForm.color.value };
-        schedForm.reset();
-        schedForm.day.value = keep.day;
-        schedForm.start.value = keep.start;
-        schedForm.end.value = keep.end;
-        schedForm.color.value = keep.color;
-        renderSchedule();
-      });
+      $('parseScheduleBtn').onclick = () => {
+          const text = $('scheduleInput').value;
+          if (!text.trim()) { notify('Вставьте текст расписания'); return; }
 
-      $('scheduleCancel').onclick = () => {
-        editId = null;
-        schedForm.reset();
-        $('scheduleSubmit').textContent = 'Добавить занятие';
-        $('scheduleCancel').classList.add('hidden');
+          // Reset totals
+          scheduleDayTotals = [0, 0, 0, 0, 0, 0, 0];
+          scheduleGrandTotal = 0;
+
+          const totalRegex = /(ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)\s*:\s*(\d+)/gi;
+          let match;
+          while ((match = totalRegex.exec(text)) !== null) {
+              const dayStr = match[1].toUpperCase();
+              const amount = parseInt(match[2], 10);
+              const dayIdx = ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'].indexOf(dayStr);
+              if (dayIdx !== -1) scheduleDayTotals[dayIdx] = amount;
+          }
+          const grandMatch = text.match(/Итого\s*:\s*([\d\s]+)/i);
+          if (grandMatch) {
+              scheduleGrandTotal = parseInt(grandMatch[1].replace(/\s/g, ''), 10);
+          }
+
+          const dayMap = {
+              'monday': 0, 'понедельник': 0, 'пн': 0,
+              'tuesday': 1, 'вторник': 1, 'вт': 1,
+              'wednesday': 2, 'среда': 2, 'ср': 2,
+              'thursday': 3, 'четверг': 3, 'чт': 3,
+              'friday': 4, 'пятница': 4, 'пт': 4,
+              'saturday': 5, 'суббота': 5, 'сб': 5,
+              'sunday': 6, 'воскресенье': 6, 'вс': 6
+          };
+
+          const colors = ['indigo', 'emerald', 'amber', 'rose', 'violet', 'cyan'];
+          let currentDay = -1;
+          let newLessons = [];
+          let idCounter = 0;
+
+          const lines = text.split('\n');
+          lines.forEach(line => {
+              const trimmed = line.trim();
+              if (!trimmed) return;
+
+              const lowerLine = trimmed.toLowerCase();
+              let foundDay = -1;
+              for (const [key, val] of Object.entries(dayMap)) {
+                  if (lowerLine === key || lowerLine.startsWith(key + ' ') || lowerLine === key + ':') {
+                      foundDay = val;
+                      break;
+                  }
+              }
+              if (foundDay !== -1) {
+                  currentDay = foundDay;
+                  return;
+              }
+
+              if (currentDay !== -1) {
+                  const match = trimmed.match(/^(\d{1,2}:\d{2})\s+([A-Za-zА-Яа-яЁё\s]+?)\s+([A-Za-zА-Яа-яЁё]+)$/);
+                  if (match) {
+                      const start = match[1].padStart(5, '0');
+                      const person = match[2].trim();
+                      const platform = match[3].trim();
+
+                      let place = platform;
+                      if (platform === 'Ya') place = 'Яндекс';
+                      else if (platform === 'zN' || platform === 'zO') place = 'Zoom';
+                      else if (platform === 'MTS') place = 'MTS Link';
+                      else if (platform === 'Max') place = 'Max';
+
+                      let [h, m] = start.split(':').map(Number);
+                      m += 45;
+                      if (m >= 60) { h += 1; m -= 60; }
+                      const end = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+                      newLessons.push({
+                          id: 'p' + (idCounter++),
+                          subject: person,
+                          person: '',
+                          day: currentDay,
+                          color: colors[currentDay % colors.length],
+                          start: start,
+                          end: end,
+                          place: place,
+                          price: '0',
+                          note: ''
+                      });
+                  }
+              }
+          });
+
+          if (newLessons.length > 0) {
+              lessons = newLessons;
+              renderSchedule();
+              notify('Расписание успешно загружено!');
+          } else {
+              notify('Не удалось распознать занятия. Проверьте формат.');
+          }
       };
 
       $('scheduleGrid').addEventListener('click', e => {
@@ -1420,40 +1760,51 @@
             notify('Занятие удалено');
           }
         }
-        if (ed) {
-          const l = lessons.find(x => x.id === ed.dataset.edit);
-          if (!l) return;
-          editId = l.id;
-          ['subject', 'person', 'day', 'color', 'start', 'end', 'place', 'price', 'note'].forEach(k => {
-            if (schedForm[k]) schedForm[k].value = l[k] || '';
-          });
-          $('scheduleSubmit').textContent = 'Сохранить изменения';
-          $('scheduleCancel').classList.remove('hidden');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
       });
 
       ['scheduleTitle', 'scheduleSubtitle'].forEach(id => $(id).addEventListener('input', renderSchedule));
 
       $('clearSchedule').onclick = () => {
-        if (confirm('Удалить ВСЕ занятия?')) { lessons = []; renderSchedule(); notify('Все занятия удалены'); }
+        if (confirm('Удалить ВСЕ занятия?')) { 
+            lessons = []; 
+            scheduleDayTotals = [0,0,0,0,0,0,0];
+            scheduleGrandTotal = 0;
+            renderSchedule(); 
+            notify('Все занятия удалены'); 
+        }
       };
 
-      $('schedulePng').onclick = async () => {
+      // ================================================================
+      // СКАЧИВАНИЕ КАРТИНКИ РАСПИСАНИЯ (ЧЕРЕЗ МОДАЛЬНОЕ ОКНО)
+      // ================================================================
+      $('schedulePng').onclick = () => {
         const node = $('scheduleCapture');
-        try {
-          const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-          const a = document.createElement('a');
-          a.href = canvas.toDataURL('image/png');
-          a.download = 'raspisanie.png';
-          a.click();
-          notify('Расписание скачано как PNG');
-        } catch { notify('Ошибка создания скриншота'); }
+        showImageModal('Создаем расписание...');
+        
+        setTimeout(() => {
+            htmlToImage.toPng(node, { 
+                pixelRatio: 2, 
+                backgroundColor: '#ffffff'
+            })
+            .then(function (dataUrl) {
+                setModalImage(dataUrl);
+            })
+            .catch(function (error) {
+                console.error('oops, something went wrong!', error);
+                $('imageModalLoader').innerText = 'Ошибка при создании картинки. Попробуйте еще раз.';
+            });
+        }, 100);
       };
 
       $('scheduleTxt').onclick = () => {
         let out = ($('scheduleTitle').value || 'Расписание занятий') + '\n' + ($('scheduleSubtitle').value || '') + '\n' + '='.repeat(34) + '\n\n';
         let hours = 0, moneySum = 0;
+        
+        const dayTotalsLine = scheduleDayTotals.map((t, i) => `${SHORT[i]}: ${t}`).join(', ');
+        if (scheduleGrandTotal > 0) {
+            out += dayTotalsLine + '\nИтого: ' + scheduleGrandTotal.toLocaleString('ru-RU') + ' ₽\n\n';
+        }
+
         DAYS_RU.forEach((name, di) => {
           const list = lessons.filter(l => +l.day === di).sort((a, b) => mins(a.start) - mins(b.start));
           out += name.toUpperCase() + '\n';
@@ -1463,11 +1814,14 @@
             moneySum += Number(l.price || 0);
             out += `  ${l.start || ''}${l.end ? '–' + l.end : ''}  ${l.subject}`;
             if (l.person) out += ` (${l.person})`;
-            if (l.price) out += ` — ${l.price} ₽`;
+            if (l.price && l.price !== '0') out += ` — ${l.price} ₽`;
             out += '\n';
             if (l.place) out += `      место: ${l.place}\n`;
             if (l.note) out += `      заметка: ${l.note}\n`;
           });
+          if (scheduleDayTotals[di] > 0) {
+              out += `  Итого за день: ${scheduleDayTotals[di].toLocaleString('ru-RU')} ₽\n`;
+          }
           out += '\n';
         });
         out += `Итого: ${lessons.length} занятий, ${Math.round(hours * 10) / 10} ч, ${moneySum.toLocaleString('ru-RU')} ₽\n`;
@@ -1502,260 +1856,11 @@
       $('scheduleSubtitle').value = '';
       renderSchedule();
 
-      // ================================================================
-      // 4. КРОССВОРД
-      // ================================================================
-      const alphabets = { RU:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', EN:'ABCDEFGHIJKLMNOPQRSTUVWXYZ' };
-      let currentLang = 'RU';
-      function parseWords(){ return $('magicWords').value.split(/[,;\n]+/).map(w=>w.trim()).filter(w=>w.length>1); }
-      function hideAllMagic(){ ['gridWrap','snakeContainer','crossContainer'].forEach(id=>$(id).classList.remove('show')); }
-      $('langBtn').onclick=()=>{ currentLang=currentLang==='RU'?'EN':'RU'; $('langBtn').textContent='Язык: '+currentLang; };
-      function randLetter(){ const a=alphabets[currentLang]; return a[Math.floor(Math.random()*a.length)]; }
-
-      function generateGrid(){
-        const words=parseWords();
-        if(!words.length){ notify('Введите слова через запятую'); return; }
-        const n=Number($('gridSize').value)||10;
-        const grid=Array.from({length:n},()=>Array(n).fill(''));
-        const skipped=[];
-        const dirs=[{r:0,c:1},{r:1,c:0}];
-        words.forEach(raw=>{
-          const word=raw.replace(/\s+/g,'').toUpperCase();
-          let placed=false;
-          for(let attempt=0; attempt<150 && !placed; attempt++){
-            const dir=dirs[Math.floor(Math.random()*2)];
-            const maxR=n-(dir.r?word.length:1);
-            const maxC=n-(dir.c?word.length:1);
-            if(maxR<0||maxC<0) break;
-            const r0=Math.floor(Math.random()*(maxR+1));
-            const c0=Math.floor(Math.random()*(maxC+1));
-            let ok=true;
-            for(let i=0;i<word.length;i++){
-              const cell=grid[r0+dir.r*i][c0+dir.c*i];
-              if(cell && cell!==word[i]){ ok=false; break; }
-            }
-            if(!ok) continue;
-            for(let i=0;i<word.length;i++) grid[r0+dir.r*i][c0+dir.c*i]=word[i];
-            placed=true;
-          }
-          if(!placed) skipped.push(raw);
-        });
-        for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(!grid[r][c]) grid[r][c]=randLetter();
-        hideAllMagic();
-        const box=$('grid');
-        box.style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
-        box.innerHTML=grid.flat().map(ch=>`<button type="button" class="ws-cell">${ch}</button>`).join('');
-        $('gridWrap').classList.add('show');
-        const skip=$('wsSkipped');
-        if(skipped.length){ skip.textContent='Не поместились: '+skipped.join(', '); skip.classList.remove('hidden'); }
-        else skip.classList.add('hidden');
-      }
-      $('grid').addEventListener('click',e=>{
-        const cell=e.target.closest('.ws-cell'); if(cell) cell.classList.toggle('found');
-      });
-
-      function generateSnake(){
-        const words=parseWords();
-        if(!words.length){ notify('Введите слова через запятую'); return; }
-        let chain='';
-        words.forEach((w,i)=>{
-          chain+=w.toLowerCase();
-          if(i<words.length-1){
-            const n=2+Math.floor(Math.random()*3);
-            for(let k=0;k<n;k++) chain+=randLetter().toLowerCase();
-          }
-        });
-        const canvas=$('snakeCanvas');
-        const step=28, pad=40;
-        const w=Math.max(640, pad*2+chain.length*step*0.72);
-        const h=220;
-        canvas.width=w; canvas.height=h;
-        const ctx=canvas.getContext('2d');
-        ctx.fillStyle='#fff8f1'; ctx.fillRect(0,0,w,h);
-        ctx.font='italic 26px "Times New Roman", serif';
-        ctx.textAlign='center'; ctx.textBaseline='middle';
-        for(let i=0;i<chain.length;i++){
-          const x=pad+i*step*0.72;
-          const y=h/2+Math.sin(i*0.55)*42;
-          const rot=(Math.sin(i*0.4)*18)*Math.PI/180;
-          ctx.save();
-          ctx.translate(x,y); ctx.rotate(rot);
-          ctx.fillStyle=i%2?'#3f3f46':'#18181b';
-          ctx.fillText(chain[i],0,0);
-          ctx.restore();
-        }
-        hideAllMagic(); $('snakeContainer').classList.add('show');
-      }
-
-      function generateCrossword(){
-        const inputText = $('magicWords').value.trim();
-        if (!inputText) { notify('Введите слова и подсказки в формате СЛОВО: подсказка'); return; }
-        const items = [];
-        inputText.split('\n').forEach(line => {
-          const parts = line.split(':');
-          if (parts.length >= 2) {
-            items.push({ word: parts[0].trim().toUpperCase(), clue: parts[1].trim() });
-          }
-        });
-        if (items.length === 0) { notify('Неверный формат. Используйте СЛОВО: подсказка'); return; }
-        items.sort((a,b) => b.word.length - a.word.length);
-        const size = 18;
-        let grid = Array(size).fill(null).map(() => Array(size).fill(null));
-        let placedWords = [];
-        function canPlace(word, row, col, dir) {
-          if (dir === 'A' && col + word.length > size) return false;
-          if (dir === 'D' && row + word.length > size) return false;
-          let intersections = 0;
-          for (let i = 0; i < word.length; i++) {
-            let r = row + (dir === 'D' ? i : 0);
-            let c = col + (dir === 'A' ? i : 0);
-            let currentCell = grid[r][c];
-            if (currentCell !== null) {
-              if (currentCell.char !== word[i]) return false;
-              intersections++;
-            } else {
-              if (dir === 'A') {
-                if (r > 0 && grid[r-1][c] !== null) return false;
-                if (r < size-1 && grid[r+1][c] !== null) return false;
-              } else {
-                if (c > 0 && grid[r][c-1] !== null) return false;
-                if (c < size-1 && grid[r][c+1] !== null) return false;
-              }
-            }
-          }
-          return placedWords.length === 0 || intersections > 0;
-        }
-        let first = items[0];
-        let startCol = Math.floor((size - first.word.length) / 2);
-        let startRow = Math.floor(size / 2);
-        for(let i=0; i<first.word.length; i++) {
-          grid[startRow][startCol + i] = { char: first.word[i], num: null, dir: 'A' };
-        }
-        placedWords.push({ word: first.word, clue: first.clue, row: startRow, col: startCol, dir: 'A' });
-        for (let k = 1; k < items.length; k++) {
-          let placed = false;
-          let currentItem = items[k];
-          for (let r = 0; r < size && !placed; r++) {
-            for (let c = 0; c < size && !placed; c++) {
-              if (grid[r][c] !== null) {
-                let letterIndex = currentItem.word.indexOf(grid[r][c].char);
-                if (letterIndex !== -1) {
-                  let nextDir = grid[r][c].dir === 'A' ? 'D' : 'A';
-                  let nextRow = r - (nextDir === 'D' ? letterIndex : 0);
-                  let nextCol = c - (nextDir === 'A' ? letterIndex : 0);
-                  if (nextRow >= 0 && nextCol >= 0 && canPlace(currentItem.word, nextRow, nextCol, nextDir)) {
-                    for (let i = 0; i < currentItem.word.length; i++) {
-                      let targetR = nextRow + (nextDir === 'D' ? i : 0);
-                      let targetC = nextCol + (nextDir === 'A' ? i : 0);
-                      if (grid[targetR][targetC] === null) {
-                        grid[targetR][targetC] = { char: currentItem.word[i], num: null, dir: nextDir };
-                      }
-                    }
-                    placedWords.push({ word: currentItem.word, clue: currentItem.clue, row: nextRow, col: nextCol, dir: nextDir });
-                    placed = true;
-                  }
-                }
-              }
-            }
-          }
-        }
-        let clueNum = 1;
-        placedWords.forEach(pw => {
-          if (grid[pw.row][pw.col]) {
-            if (!grid[pw.row][pw.col].num) {
-              grid[pw.row][pw.col].num = clueNum;
-              pw.num = clueNum;
-              clueNum++;
-            } else {
-              pw.num = grid[pw.row][pw.col].num;
-            }
-          }
-        });
-        renderCrosswordGrids(grid, placedWords, size);
-        hideAllMagic(); $('crossContainer').classList.add('show');
-      }
-
-      function renderCrosswordGrids(grid, placedWords, size) {
-        const studentGrid = $('studentGrid'), teacherGrid = $('teacherGrid');
-        const acrossClues = $('acrossClues'), downClues = $('downClues');
-        studentGrid.innerHTML = ''; teacherGrid.innerHTML = '';
-        acrossClues.innerHTML = ''; downClues.innerHTML = '';
-        const sTable = document.createElement('div');
-        sTable.className = 'grid gap-0.5 bg-slate-300 p-1 rounded-lg';
-        sTable.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
-        const tTable = document.createElement('div');
-        tTable.className = 'grid gap-0.5 bg-slate-300 p-1 rounded-lg cw-teacher';
-        tTable.style.gridTemplateColumns = `repeat(${size}, minmax(0, 1fr))`;
-        for (let r = 0; r < size; r++) {
-          for (let c = 0; c < size; c++) {
-            const cellData = grid[r][c];
-            const sCell = document.createElement('div');
-            sCell.className = 'cw-cell';
-            const tCell = document.createElement('div');
-            tCell.className = 'cw-cell';
-            if (cellData === null) {
-              sCell.classList.add('cw-empty');
-              tCell.classList.add('cw-empty');
-            } else {
-              if (cellData.num) {
-                const numSpan = document.createElement('span');
-                numSpan.className = 'cw-num';
-                numSpan.textContent = cellData.num;
-                sCell.appendChild(numSpan);
-                const numSpan2 = document.createElement('span');
-                numSpan2.className = 'cw-num';
-                numSpan2.textContent = cellData.num;
-                tCell.appendChild(numSpan2);
-              }
-              const letterSpan = document.createElement('span');
-              letterSpan.textContent = cellData.char;
-              tCell.appendChild(letterSpan);
-            }
-            sTable.appendChild(sCell);
-            tTable.appendChild(tCell);
-          }
-        }
-        studentGrid.appendChild(sTable);
-        teacherGrid.appendChild(tTable);
-        placedWords.sort((a,b) => a.num - b.num);
-        placedWords.forEach(pw => {
-          const li = document.createElement('li');
-          li.innerHTML = `<b>${pw.num}.</b> ${pw.clue}`;
-          if (pw.dir === 'A') acrossClues.appendChild(li);
-          else downClues.appendChild(li);
-        });
-      }
-
-      function downloadCrossword(mode) {
-        const id = mode === 'student' ? 'studentGrid' : 'teacherGrid';
-        const target = document.getElementById(id).closest('.print-box') || document.getElementById(id);
-        html2canvas(target, { backgroundColor: "#ffffff", scale: 2 })
-          .then(canvas => {
-            const link = document.createElement('a');
-            link.download = mode === 'student' ? 'Crossword_Student.png' : 'Crossword_Teacher_Key.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-          })
-          .catch(err => notify('Ошибка при создании изображения'));
-      }
-
-      $('btnWordsearch').onclick = generateGrid;
-      $('btnSnake').onclick = generateSnake;
-      $('btnCrossword').onclick = generateCrossword;
-      window.downloadCrossword = downloadCrossword;
-
-      if (!$('magicWords').value.trim()) {
-        $('magicWords').value = 'SHOULDER: Body part between your neck and arm\nBETTER: Opposite of worse\nTRY: To make an effort to do something\nTOGETHER: With each other, not alone';
-        generateCrossword();
-      }
-
-      // ================================================================
-      // 5. ОБЩАЯ ИНИЦИАЛИЗАЦИЯ
-      // ================================================================
       const savedPage = '1'; 
       openSitePage(Number(savedPage));
-      document.querySelectorAll('.site-page-button').forEach(btn => {
-        btn.addEventListener('click', () => {  });
+      
+      window.addEventListener('resize', () => {
+          if (wheelChart) wheelChart.resize();
       });
     })();
   </script>
